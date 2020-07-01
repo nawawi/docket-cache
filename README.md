@@ -9,7 +9,7 @@ A persistent WordPress Object Cache stored on local disk. Rather than using seri
 
 ## Installation
 
-1. Install and activate plugin.
+1. Install and activate plugin. ([Download zip file](https://github.com/nawawi/docket-cache/releases/)).
 2. Enable the object cache under _Settings -> Docket Cache_, or in Multisite setups under _Network Admin -> Settings -> Docket Cache_.
 
 ## Configuration Options
@@ -88,6 +88,6 @@ Docket cache is open-sourced software licensed under the [MIT license](https://o
 
 ## Changelog
 
-= 1.0 =
+### 1.0
 
   * Initial release
