@@ -1,0 +1,9 @@
+* text=auto
+
+/.gitattributes export-ignore
+/.github export-ignore
+/.gitignore export-ignore
+/.phpcs.xml export-ignore
+/phpunit.xml export-ignore
+/README.md export-ignore
+/tests export-ignore

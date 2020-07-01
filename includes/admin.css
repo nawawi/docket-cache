@@ -1,0 +1,26 @@
+#docket-cache .form-table th,
+#docket-cache .form-table td {
+    padding-top:7px;
+    padding-bottom: 7px;;
+}
+
+#docket-cache .form-table td code {
+    display: inline-block;
+    min-width: 150px;
+    margin:0;
+}
+
+#docket-cache br.clearfix {
+    display: none;
+}
+
+@media screen and (min-width: 1110px) {
+    #docket-cache .section-overview {
+        float: left;
+    }
+
+    #docket-cache br.clearfix {
+        display: block;
+        clear: both;
+    }
+}

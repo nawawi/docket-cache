@@ -1,0 +1,9 @@
+dist/
+composer.lock
+*.cache
+*.sh
+!/tests/
+/tests/*
+!/tests/*.php
+*-phar*.php
+.php_cs
