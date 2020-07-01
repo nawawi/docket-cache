@@ -89,6 +89,6 @@ Docket cache is open-sourced software licensed under the [MIT license](https://o
 
 ## Changelog
 
-### 1.0
+### 1.0.0
 
   * Initial release
