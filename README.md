@@ -9,6 +9,8 @@ A persistent WordPress Object Cache stored on local disk. Rather than using seri
 
 ## Installation
 
+To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for better performance.
+
 1. Download [docket-cache.zip](https://github.com/nawawi/docket-cache/releases/).
 2. Upload and install through WordPress plugin panel.
 3. Enable the object cache under _Settings -> Docket Cache_, or in Multisite setups under _Network Admin -> Settings -> Docket Cache_.
