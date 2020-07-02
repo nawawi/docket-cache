@@ -1,3 +1,24 @@
+#docket-cache .form-table,
+#docket-cache .form-table td,
+#docket-cache .form-table th,
+#docket-cache .form-table tr {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+
+#docket-cache table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+#docket-cache .form-table th {
+    font-weight: bold;
+}
+
 #docket-cache .form-table th,
 #docket-cache .form-table td {
     padding-top:7px;
@@ -5,22 +26,16 @@
 }
 
 #docket-cache .form-table td code {
-    display: inline-block;
+    display: block;
     min-width: 150px;
+    padding-left: 7px;
+    padding-top: 3px;
+    padding-bottom: 3px;
     margin:0;
 }
 
-#docket-cache br.clearfix {
-    display: none;
-}
-
 @media screen and (min-width: 1110px) {
-    #docket-cache .section-overview {
+    #docket-cache .section {
         float: left;
-    }
-
-    #docket-cache br.clearfix {
-        display: block;
-        clear: both;
     }
 }

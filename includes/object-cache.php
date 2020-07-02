@@ -527,9 +527,8 @@ class WP_Object_Cache
     public function flush()
     {
         $this->cache = [];
-        $ok = $this->docket_flush();
 
-        return $ok;
+        return $this->docket_flush();
     }
 
     /**
@@ -688,15 +687,17 @@ class WP_Object_Cache
      */
     public function stats()
     {
-        echo '<p>';
-        echo "<strong>Cache Hits:</strong> {$this->cache_hits}<br />";
-        echo "<strong>Cache Misses:</strong> {$this->cache_misses}<br />";
-        echo '</p>';
-        echo '<ul>';
+        $ret = '';
+        $ret .= '<p>';
+        $ret .= "<strong>Cache Hits:</strong> {$this->cache_hits}<br />";
+        $ret .= "<strong>Cache Misses:</strong> {$this->cache_misses}<br />";
+        $ret .= '</p>';
+        $ret .= '<ul>';
         foreach ($this->cache as $group => $cache) {
-            echo '<li><strong>Group:</strong> '.esc_html($group).' - ( '.number_format(strlen(serialize($cache)) / KB_IN_BYTES, 2).'k )</li>';
+            $ret .= '<li><strong>Group:</strong> '.esc_html($group).' - ( '.number_format(strlen(serialize($cache)) / KB_IN_BYTES, 2).'K )</li>';
         }
-        echo '</ul>';
+        $ret .= '</ul>';
+        echo $ret;
     }
 
     /**
@@ -730,6 +731,7 @@ class WP_Object_Cache
             if (false !== $data) {
                 $this->cache[$group][$key] = $data;
                 $is_exists = true;
+                $this->debug('hit', $group.':'.$key);
             }
         }
 
@@ -801,7 +803,7 @@ class WP_Object_Cache
                 $data = var_export($data, 1);
                 $data = str_replace('stdClass::__set_state', 'docket_cache_fix_object', $data);
             } else {
-                $this->debug(__FUNCTION__, $e->getMessage());
+                $this->debug('error', __FUNCTION__.': '.$e->getMessage());
             }
         }
 
@@ -811,46 +813,50 @@ class WP_Object_Cache
     private function docket_flush()
     {
         $dir = $this->store_path;
-        $this->remove_dir($dir);
 
-        return !@file_exists($dir.'/index.php');
-    }
+        if (is_writable($dir)) {
+            try {
+                $this->flush_dir($dir);
+            } catch (\Exception $e) {
+                $this->debug('error', $e->getMessage());
+            }
 
-    private function remove_dir($dir)
-    {
-        if (false === strpos($dir, constant('WP_CONTENT_DIR')) || '/' === $dir) {
-            return;
-        }
+            if (!@file_exists($dir.'/index.php')) {
+                $this->debug('flush', 'OK');
 
-        $dir = untrailingslashit($dir);
-        if (!is_dir($dir)) {
-            return;
-        }
-
-        $data_dir = @scandir($dir);
-        if ('array' === gettype($data_dir)) {
-            $objects = array_diff(
-                $data_dir,
-                ['..', '.']
-            );
-        }
-
-        if (empty($objects)) {
-            return;
-        }
-
-        foreach ($objects as $object) {
-            $object = $dir.DIRECTORY_SEPARATOR.$object;
-
-            if (is_dir($object)) {
-                $this->remove_dir($object);
-            } else {
-                @unlink($object);
+                return true;
             }
         }
 
-        @rmdir($dir);
-        clearstatcache();
+        $this->debug('error', 'Object cache could not be flushed');
+
+        return false;
+    }
+
+    private function flush_dir($files)
+    {
+        if ($files instanceof \Traversable) {
+            $files = iterator_to_array($files, false);
+        } elseif (!is_array($files)) {
+            $files = [$files];
+        }
+
+        $files = array_reverse($files);
+        foreach ($files as $file) {
+            if (is_link($file)) {
+                if (!(@unlink($file) || '\\' !== \DIRECTORY_SEPARATOR || @rmdir($file)) && file_exists($file)) {
+                    throw new Exception(sprintf('Failed to remove symlink "%s"', $file));
+                }
+            } elseif (is_dir($file)) {
+                $this->flush_dir(new \FilesystemIterator($file, \FilesystemIterator::CURRENT_AS_PATHNAME | \FilesystemIterator::SKIP_DOTS));
+
+                if (!@rmdir($file) && file_exists($file)) {
+                    throw new \Exception(sprintf('Failed to remove directory "%s"', $file));
+                }
+            } elseif (!@unlink($file) && file_exists($file)) {
+                throw new \Exception(sprintf('Failed to remove file "%s"', $file));
+            }
+        }
     }
 
     private function file_hash($str, $length = 12)
@@ -868,9 +874,14 @@ class WP_Object_Cache
     private function docket_remove($key, $group)
     {
         $file = $this->get_file_path($key, $group);
-        if (file_exists($file)) {
-            return @unlink($this->get_file_path($key, $group));
+        if (file_exists($file) && is_writable($file)) {
+            $file = $this->get_file_path($key, $group);
+            $this->debug('remove', $group.':'.$key.' '.basename($file, '.php'));
+
+            return @unlink($file);
         }
+
+        $this->debug('error', __FUNCTION__.': '.sprintf('Failed to remove file "%s"', $file));
 
         return false;
     }
@@ -887,7 +898,7 @@ class WP_Object_Cache
         }
 
         if ($data['timeout'] > 0 && time() >= $data['timeout']) {
-            $this->debug(__FUNCTION__, 'timeout '.$group.':'.$key);
+            $this->debug('get', 'Expired '.$group.':'.$key.' '.basename($file, '.php'));
             $this->docket_remove($key, $group);
 
             return false;
@@ -899,12 +910,12 @@ class WP_Object_Cache
     private function docket_save($key, $data, $group = 'default', $expire = 0)
     {
         if (!wp_mkdir_p($this->store_path)) {
-            $this->debug(__FUNCTION__, 'Unable to create directory:'.$this->store_path);
+            $this->debug('error', 'Unable to create directory: '.$this->store_path);
 
             return false;
         }
 
-        @touch($this->store_path.'/index.php');
+        @$this->file_put($this->store_path.'/index.php', ' ');
 
         $file = $this->get_file_path($key, $group);
 
@@ -944,10 +955,28 @@ class WP_Object_Cache
         return $this->file_put($file, $code);
     }
 
+    private function chmod($file)
+    {
+        static $cache = [];
+
+        if (isset($cache[$file])) {
+            return $cache[$file];
+        }
+
+        $stat = @stat(dirname($file));
+        $perms = $stat['mode'] & 0007777;
+        $perms = $perms & 0000666;
+        if (@chmod($file, $perms)) {
+            $cache[$file] = $perms;
+        }
+
+        clearstatcache();
+    }
+
     private function file_put($file, $data)
     {
         if (!$handle = @fopen($file, 'w')) {
-            $this->debug(__FUNCTION__, 'Unable to write to file: '.$file);
+            $this->debug('error', 'Unable to write to file: '.$file);
 
             return false;
         }
@@ -957,11 +986,7 @@ class WP_Object_Cache
         clearstatcache();
 
         if (false !== $ok) {
-            $stat = @stat(dirname($file));
-            $perms = $stat['mode'] & 0007777;
-            $perms = $perms & 0000666;
-            @chmod($file, $perms);
-            clearstatcache();
+            $this->chmod($file);
             $ok = true;
         }
 
@@ -982,9 +1007,9 @@ class WP_Object_Cache
             $this->non_persistent_keys = DOCKET_CACHE_IGNORED_KEYS;
         }
 
-        if (defined('DOCKET_CACHE_MAXTTL') && is_array(DOCKET_CACHE_IGNORED_KEYS)) {
+        if (defined('DOCKET_CACHE_MAXTTL') && is_int(DOCKET_CACHE_MAXTTL)) {
             $this->maxttl = (int) DOCKET_CACHE_MAXTTL;
-            if ($this->maxttl > PHP_INT_MAX) {
+            if ($this->maxttl > PHP_INT_MAX - 100) {
                 $this->maxttl = PHP_INT_MAX;
             }
         }
@@ -995,7 +1020,7 @@ class WP_Object_Cache
                     );
 
         if (!file_exists($autoload)) {
-            throw new Exception('Docket library not found. Re-install Docket Cache plugin or delete object-cache.php.');
+            throw new \Exception('Docket library not found. Re-install Docket Cache plugin or delete object-cache.php.');
         }
 
         include_once $autoload;
@@ -1049,20 +1074,31 @@ class WP_Object_Cache
         }
     }
 
-    private function debug($caller, $data, $is_append = true)
+    private function debug($tag, $data, $is_append = true)
     {
         if (!defined('DOCKET_CACHE_DEBUG') || !DOCKET_CACHE_DEBUG) {
             return false;
         }
+        static $duplicate = [];
 
         $flag = LOCK_EX;
-        if ($is_append) {
+        if ($is_append && 'flush' !== $tag) {
             $flag = FILE_APPEND | LOCK_EX;
         }
 
-        $log = '['.date('Y-m-d H:i:s e').'] '.$caller.': '.trim($data)."\n";
+        $log = '['.date('Y-m-d H:i:s e').'] '.$tag.': '.trim($data)."\n";
+        if (isset($duplicate[$log])) {
+            return true;
+        }
 
-        return @file_put_contents(WP_CONTENT_DIR.'/object-cache.log', $log, $flag);
+        if (@file_put_contents(WP_CONTENT_DIR.'/object-cache.log', $log, $flag)) {
+            $duplicate[$log] = 1;
+            $this->chmod($log);
+
+            return true;
+        }
+
+        return false;
     }
 }
 

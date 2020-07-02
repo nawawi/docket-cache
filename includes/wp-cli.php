@@ -33,20 +33,19 @@ class Docket_Object_Cache_CLI_Commands extends WP_CLI_Command
     {
         $docket = $this->docket();
         $status = $docket->get_status();
-        $halt = 0;
+        $text = $docket->status_code[$status];
+        $halt = 1;
 
         switch ($status) {
-            case __('Disabled', $docket->slug):
-                $status = WP_CLI::colorize("%y{$status}%n");
-                break;
-            case __('Enabled', $docket->slug):
-                $status = WP_CLI::colorize("%g{$status}%n");
+            case 1:
+                $text = WP_CLI::colorize("%g{$text}%n");
                 break;
             default:
-                $halt = 1;
+                $text = WP_CLI::colorize("%r{$text}%n");
+                break;
         }
 
-        WP_CLI::line('Status: '.$status);
+        WP_CLI::line('Status: '.$text);
         WP_CLI::halt($halt);
     }
 
@@ -62,9 +61,6 @@ class Docket_Object_Cache_CLI_Commands extends WP_CLI_Command
      */
     public function enable()
     {
-        global $wp_filesystem;
-
-        WP_Filesystem();
         $docket = $this->docket();
 
         if ($docket->has_dropin()) {
@@ -76,10 +72,7 @@ class Docket_Object_Cache_CLI_Commands extends WP_CLI_Command
             $this->halt_error(__('An unknown object cache drop-in was found. To use Docket object cache, run: wp docket-cache update-dropin.', $docket->slug));
         }
 
-        $src = $docket->path.'/includes/object-cache.php';
-        $dst = WP_CONTENT_DIR.'/object-cache.php';
-
-        if ($wp_filesystem->copy($src, $dst, true)) {
+        if ($docket->dropin_install()) {
             $this->halt_success(__('Object cache enabled.', $docket->slug));
         }
 
@@ -98,9 +91,6 @@ class Docket_Object_Cache_CLI_Commands extends WP_CLI_Command
      */
     public function disable()
     {
-        global $wp_filesystem;
-        WP_Filesystem();
-
         $docket = $this->docket();
 
         if (!$docket->has_dropin()) {
@@ -111,7 +101,7 @@ class Docket_Object_Cache_CLI_Commands extends WP_CLI_Command
             $this->halt_error(__('An unknown object cache drop-in was found. To use Docket run: wp docket-cache update-dropin.', $docket->slug));
         }
 
-        if ($wp_filesystem->delete(WP_CONTENT_DIR.'/object-cache.php')) {
+        if ($docket->dropin_uninstall()) {
             $this->halt_success(__('Object cache disabled.', $docket->slug));
         }
 
@@ -131,18 +121,32 @@ class Docket_Object_Cache_CLI_Commands extends WP_CLI_Command
      */
     public function update_dropin()
     {
-        global $wp_filesystem;
-        WP_Filesystem();
-
         $docket = $this->docket();
 
-        $src = $docket->path.'/includes/object-cache.php';
-        $dst = WP_CONTENT_DIR.'/object-cache.php';
-
-        if ($wp_filesystem->copy($src, $dst, true)) {
+        if ($docket->dropin_install()) {
             $this->halt_success(__('Updated object cache drop-in and enabled Docket object cache.', $docket->slug));
         }
         $this->halt_error(__('Object cache drop-in could not be updated.', $docket->slug));
+    }
+
+    /**
+     * Flushes the object cache.
+     *
+     * Directly execute 'wp cache flush' if drop-in file exists.
+     *
+     * ## EXAMPLES
+     *
+     *     wp docket-cache flush
+     */
+    public function flush()
+    {
+        $docket = $this->docket();
+
+        if (!$docket->has_dropin()) {
+            $this->halt_error(__('No object cache drop-in found.', $docket->slug));
+        }
+
+        WP_CLI::runcommand('cache flush');
     }
 }
 

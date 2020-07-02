@@ -1,5 +1,6 @@
 dist/
 composer.lock
+composer.json
 *.cache
 *.sh
 !/tests/

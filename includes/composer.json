@@ -1,8 +1,0 @@
-{
-    "require": {
-        "symfony/var-exporter": "^5.1"
-    },
-    "config": {
-        "optimize-autoloader": true
-    }
-}

@@ -3,9 +3,9 @@
 
 A persistent WordPress Object Cache stored on local disk.
 
-## Description
+## Introduction
 
-A persistent WordPress Object Cache stored on local disk. Rather than using serialize and unserialize PHP object to store in flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance if combined with PHP Opcache.
+The Docket cache is a persistent WordPress Object Cache that stored on local disk. Rather than using `serialize` and `unserialize` a PHP object to store into flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance if combined with PHP OPcache.
 
 ## Installation
 
@@ -19,7 +19,7 @@ To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for b
 
 To adjust the configuration, define any of the following constants in your `wp-config.php` file.
 
-  * `DOCKET_CACHE_MAXTTL` (default: _not set_)
+  * `DOCKET_CACHE_MAXTTL` (default: 86400)
 
     Set maximum time-to-live (in seconds) for cache keys with an expiration time of `0`.
 
