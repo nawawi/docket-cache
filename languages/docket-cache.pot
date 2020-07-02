@@ -4,7 +4,7 @@
 msgid   ""
 msgstr  "Project-Id-Version: Docket Cache 1.0.0\n"
         "Report-Msgid-Bugs-To: https://ghostbird.me\n"
-        "POT-Creation-Date: 2020-07-02 22:53+0800\n"
+        "POT-Creation-Date: 2020-07-03 02:18+0800\n"
         "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
         "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
         "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr  ""
 msgid   "Unknown"
 msgstr  ""
 
-#: docket-cache.php:313 includes/admin.php:13
+#: docket-cache.php:313 includes/admin.php:14
 msgid   "Docket Object Cache"
 msgstr  ""
 
@@ -89,35 +89,39 @@ msgstr  ""
 msgid   "Settings"
 msgstr  ""
 
-#: includes/admin.php:16
+#: includes/admin.php:17
 msgid   "Overview"
 msgstr  ""
 
-#: includes/admin.php:20
+#: includes/admin.php:21
 msgid   "Status"
 msgstr  ""
 
-#: includes/admin.php:25
+#: includes/admin.php:26
 msgid   "OPCache"
 msgstr  ""
 
-#: includes/admin.php:30
+#: includes/admin.php:31
 msgid   "Memory"
 msgstr  ""
 
-#: includes/admin.php:36
+#: includes/admin.php:37
 msgid   "Cache Size"
 msgstr  ""
 
-#: includes/admin.php:45
+#: includes/admin.php:43
+msgid   "Debug"
+msgstr  ""
+
+#: includes/admin.php:52
 msgid   "Enable Object Cache"
 msgstr  ""
 
-#: includes/admin.php:47
+#: includes/admin.php:54
 msgid   "Flush Cache"
 msgstr  ""
 
-#: includes/admin.php:48
+#: includes/admin.php:55
 msgid   "Disable Object Cache"
 msgstr  ""
 

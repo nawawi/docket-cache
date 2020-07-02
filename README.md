@@ -19,7 +19,7 @@ To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for b
 
 To adjust the configuration, define any of the following constants in your `wp-config.php` file.
 
-  * `DOCKET_CACHE_MAXTTL` (default: 86400)
+  * `DOCKET_CACHE_MAXTTL` (default: `86400`)
 
     Set maximum time-to-live (in seconds) for cache keys with an expiration time of `0`.
 

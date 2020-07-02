@@ -876,7 +876,7 @@ class WP_Object_Cache
         $file = $this->get_file_path($key, $group);
         if (file_exists($file) && is_writable($file)) {
             $file = $this->get_file_path($key, $group);
-            $this->debug('remove', $group.':'.$key.' '.basename($file, '.php'));
+            $this->debug('del', $group.':'.$key.' '.basename($file, '.php'));
 
             return @unlink($file);
         }
@@ -935,7 +935,13 @@ class WP_Object_Cache
         $code = '<?php ';
         $code .= 'return '.$data.';'.PHP_EOL;
 
-        return $this->file_put($file, $code);
+        if ($this->file_put($file, $code)) {
+            $this->debug('set', $group.':'.$key);
+
+            return true;
+        }
+
+        return false;
     }
 
     private function docket_update($key, $data, $group)
@@ -1082,16 +1088,20 @@ class WP_Object_Cache
         static $duplicate = [];
 
         $flag = LOCK_EX;
-        if ($is_append && 'flush' !== $tag) {
+        if ($is_append && ('flush' !== $tag)) {
             $flag = FILE_APPEND | LOCK_EX;
         }
 
-        $log = '['.date('Y-m-d H:i:s e').'] '.$tag.': '.trim($data)."\n";
+        $log = '['.date('Y-m-d H:i:s e').'] '.$tag.': "'.trim($data).'"';
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            $log .= ' "'.$_SERVER['REQUEST_URI'].'"';
+        }
+
         if (isset($duplicate[$log])) {
             return true;
         }
 
-        if (@file_put_contents(WP_CONTENT_DIR.'/object-cache.log', $log, $flag)) {
+        if (@file_put_contents(WP_CONTENT_DIR.'/object-cache.log', $log."\n", $flag)) {
             $duplicate[$log] = 1;
             $this->chmod($log);
 

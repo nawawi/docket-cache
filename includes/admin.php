@@ -3,6 +3,7 @@
 defined('ABSPATH') || exit;
 $status = $this->get_status();
 $status_text = $this->status_code[$status];
+$is_debug = (defined('DOCKET_CACHE_DEBUG') && DOCKET_CACHE_DEBUG);
 
 if (1 === $status && isset($this->token) && 'docket-cache-flushed' === $this->token) {
     wp_cache_flush();
@@ -23,7 +24,7 @@ if (1 === $status && isset($this->token) && 'docket-cache-flushed' === $this->to
 
             <tr>
                 <th><?php _e('OPCache', $this->slug); ?></th>
-                <td><code><?php echo $this->get_opcache_status(); ?></code></td>
+                <td><code><?php echo $this->status_code[$this->get_opcache_status()]; ?></code></td>
             </tr>
 
             <tr>
@@ -37,6 +38,12 @@ if (1 === $status && isset($this->token) && 'docket-cache-flushed' === $this->to
                 <td><code><?php echo $this->get_dirsize(); ?></code></td>
             </tr>
             <?php endif; ?>
+            <?php if ($is_debug):?>
+            <tr>
+                <th><?php _e('Debug', $this->slug); ?></th>
+                <td><a href="<?php echo get_home_url(null, '/wp-content/object-cache.log'); ?>" target="_blank" rel="noopener">object-cache.log</a></td>
+            </tr>
+            <?php endif; ?>
         </table>
 
         <p class="submit">
@@ -44,7 +51,7 @@ if (1 === $status && isset($this->token) && 'docket-cache-flushed' === $this->to
             <?php if (!$this->has_dropin()) : ?>
                 <a href="<?php echo $this->action_query('enable-cache'); ?>" class="button button-primary button-large"><?php _e('Enable Object Cache', $this->slug); ?></a>
             <?php elseif ($this->validate_dropin()) : ?>
-                <a href="<?php echo $this->action_query('flush-cache'); ?>" class="button button-primary button-large"><?php _e('Flush Cache', $this->slug); ?></a> &nbsp;
+                <a href="<?php echo $this->action_query('flush-cache'); ?>" class="button button-primary button-large"><?php _e('Flush Cache', $this->slug); ?></a>&nbsp;&nbsp;
                 <a href="<?php echo $this->action_query('disable-cache'); ?>" class="button button-secondary button-large"><?php _e('Disable Object Cache', $this->slug); ?></a>
            <?php endif; ?>
 
