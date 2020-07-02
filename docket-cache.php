@@ -182,7 +182,7 @@ class Docket_Object_Cache
         return $GLOBALS['wp_filesystem'];
     }
 
-    public function initialize_filesystem($url, $silent = false)
+    public function init_filesystem($url, $silent = false)
     {
         $this->maybe_filesystem();
 
@@ -226,7 +226,13 @@ class Docket_Object_Cache
         $src = $this->dropin_file()->src;
         $dst = $this->dropin_file()->dst;
 
-        return @$wp_filesystem->copy($src, $dst, true);
+        if (@$wp_filesystem->copy($src, $dst, true)) {
+            wp_schedule_single_event(time() + 1, 'docket_preload');
+
+            return true;
+        }
+
+        return false;
     }
 
     public function dropin_uninstall()
@@ -240,7 +246,7 @@ class Docket_Object_Cache
     private function dropin_remove()
     {
         wp_cache_flush();
-        if ($this->validate_dropin() && $this->initialize_filesystem('', true)) {
+        if ($this->validate_dropin() && $this->init_filesystem('', true)) {
             $this->dropin_uninstall();
         }
     }
@@ -321,7 +327,7 @@ class Docket_Object_Cache
                         foreach ($this->actions as $name) {
                             if ($action === $name && wp_verify_nonce($_GET['_wpnonce'], $action)) {
                                 $url = wp_nonce_url(network_admin_url(add_query_arg('action', $action, $this->page)), $action);
-                                if (false === $this->initialize_filesystem($url)) {
+                                if (false === $this->init_filesystem($url)) {
                                     return;
                                 }
                             }
@@ -377,7 +383,7 @@ class Docket_Object_Cache
                         $message = wp_cache_flush() ? 'docket-cache-flushed' : 'docket-cache-flushed-failed';
                     }
 
-                    if ($this->initialize_filesystem($url, true)) {
+                    if ($this->init_filesystem($url, true)) {
                         switch ($action) {
                             case 'docket-enable-cache':
                                 $result = $this->dropin_install();
@@ -459,6 +465,58 @@ class Docket_Object_Cache
             );
 
             return $links;
+        });
+
+        add_action('docket_preload', function () {
+            // preload
+            add_action('shutdown', function () {
+                $args = [
+                    'blocking' => false,
+                    'timeout' => 45,
+                    'httpversion' => '1.1',
+                    'user-agent' => 'docket-cache',
+                    'body' => null,
+                    'compress' => false,
+                    'decompress' => true,
+                    'sslverify' => false,
+                    'stream' => false,
+                ];
+
+                @wp_remote_get(get_home_url(), $args);
+                if (is_user_logged_in()) {
+                    foreach ($_COOKIE as $name => $value) {
+                        $cookies[] = new WP_Http_Cookie(['name' => $name, 'value' => $value]);
+                    }
+
+                    $args['cookies'] = $cookies;
+
+                    @wp_remote_get(admin_url('/'), $args);
+
+                    if (is_admin()) {
+                        $list = [
+                            'options-general.php',
+                            'options-writing.php',
+                            'options-reading.php',
+                            'options-discussion.php',
+                            'options-media.php',
+                            'options-permalink.php',
+                            'edit-comments.php',
+                            'profile.php',
+                            'users.php',
+                            'upload.php',
+                            'plugins.php',
+                            'edit.php',
+                            'themes.php',
+                            'tools.php',
+                            'widgets.php',
+                            'update-core.php',
+                        ];
+                        foreach ($list as $path) {
+                            @wp_remote_get(admin_url('/'.$path), $args);
+                        }
+                    }
+                }
+            }, PHP_INT_MAX);
         });
     }
 }
