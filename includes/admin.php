@@ -8,11 +8,14 @@ $is_debug = (defined('DOCKET_CACHE_DEBUG') && DOCKET_CACHE_DEBUG);
 if (1 === $status && isset($this->token) && 'docket-cache-flushed' === $this->token) {
     wp_cache_flush();
 }
+
+if (is_multisite()) {
+    settings_errors('general');
+}
 ?>
 
 <div class="wrap" id="docket-cache">
     <h1><?php _e('Docket Object Cache', $this->slug); ?></h1>
-
     <div class="section">
         <h2 class="title"><?php _e('Overview', $this->slug); ?></h2>
 

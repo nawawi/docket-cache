@@ -415,7 +415,7 @@ class Docket_Object_Cache
 
         add_action('load-'.$this->screen, function () {
             if (version_compare(PHP_VERSION, '7.2', '<')) {
-                add_settings_error('', $this->slug, __('This plugin requires PHP 7.2 or greater.', $this->slug));
+                add_settings_error(is_multisite() ? 'general' : '', $this->slug, __('This plugin requires PHP 7.2 or greater.', $this->slug));
             }
 
             if (isset($_GET['message'])) {
@@ -449,7 +449,7 @@ class Docket_Object_Cache
                         break;
                 }
 
-                add_settings_error('', $this->slug, isset($message) ? $message : $error, isset($message) ? 'updated' : 'error');
+                add_settings_error(is_multisite() ? 'general' : '', $this->slug, isset($message) ? $message : $error, isset($message) ? 'updated' : 'error');
             }
         });
 
