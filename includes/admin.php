@@ -7,7 +7,7 @@ $is_debug = (defined('DOCKET_CACHE_DEBUG') && DOCKET_CACHE_DEBUG);
 
 if (1 === $status && isset($this->token) && 'docket-cache-flushed' === $this->token) {
     wp_cache_flush();
-    wp_schedule_single_event(time() + 1, 'docket_preload');
+    do_action('docket_preload');
 }
 ?>
 
