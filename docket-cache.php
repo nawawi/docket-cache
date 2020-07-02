@@ -227,7 +227,7 @@ class Docket_Object_Cache
         $dst = $this->dropin_file()->dst;
 
         if (@$wp_filesystem->copy($src, $dst, true)) {
-            do_action('docket_preload');
+            //do_action('docket_preload');
 
             return true;
         }
