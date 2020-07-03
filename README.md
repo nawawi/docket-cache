@@ -3,7 +3,7 @@
 
 A persistent WordPress Object Cache stored on local disk.
 
-## Introduction
+## Description
 
 The Docket cache is a persistent WordPress Object Cache that stored on local disk. Rather than using `serialize` and `unserialize` a PHP object to store into flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance if combined with PHP OPcache.
 
@@ -11,9 +11,40 @@ The Docket cache is a persistent WordPress Object Cache that stored on local dis
 
 To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for better performance.
 
-1. Download [docket-cache.zip](https://github.com/nawawi/docket-cache/releases/).
-2. Upload and install through WordPress plugin panel.
-3. Enable the object cache under _Settings -> Docket Cache_, or in Multisite setups under _Network Admin -> Settings -> Docket Cache_.
+### Manual
+ 1. Download the plugin as a [ZIP file](https://github.com/nawawi/docket-cache/archive/master.zip) from GitHub.
+ 2. In your WordPress admin click *Plugins -> Add New -> Upload Plugin*.
+ 3. Upload the ZIP file.
+ 4. Activate the plugin.
+ 5. Enable the object cache under _Settings -> Docket Cache_, or in Multisite setups under _Network Admin -> Settings -> Docket Cache_.
+
+### Via WP-CLI
+
+[`WP-CLI`](http://wp-cli.org/) is the official command-line interface for WordPress. You can install `docket-cache` using `wp` command like this:
+
+```
+wp plugin install --activate https://github.com/nawawi/docket-cache/archive/master.zip
+```
+
+### Via Composer
+The plugin is available as [Composer package](https://packagist.org/packages/nawawi/docket-cache) and can be installed via Composer from the root of your WordPress installation.
+```
+composer require nawawi/docket-cache
+```
+
+If you have changed the default directory structure or just want the plugin to a specific location, you can create a project from the Composer package.
+```
+composer create-project nawawi/docket-cache <optional-name>
+```
+
+### Via Git
+Go to your WordPress plugins folder `cd wp-content/plugins`
+```
+git clone https://github.com/nawawi/docket-cache
+```
+
+### Automatic Udates
+The plugin supports the [GitHub Updater plugin](https://github.com/afragen/github-updater) for WordPress. The plugin enable automatic updates from this GitHub Repository. You will find all information about the how and why at the [plugin wiki page](https://github.com/afragen/github-updater/wiki).
 
 ## Configuration Options
 
@@ -45,7 +76,28 @@ To adjust the configuration, define any of the following constants in your `wp-c
 
   * `DOCKET_CACHE_DEBUG` (default: _not set_)
 
-    Set to `true` to enable debug log in WP_CONTENT_DIR/object-cache.log
+    Set to `true` to enable debug log.
+
+  * `DOCKET_CACHE_DEBUG_FLUSH` (default: `true`)
+
+    Set to `true` to empty the log file when object cache flushed.
+
+  * `DOCKET_CACHE_DEBUG_SIZE` (default: `10000000`)
+
+    Set the maximum size of log file in byte. Default set to 10MB.
+
+  * `DOCKET_CACHE_PRELOAD` (default: `false`)
+
+    Set to `true` to enable cache preloading after cache has been flushed and installing drop-in.
+
+  * `DOCKET_CACHE_PRELOAD_ADMIN` (default: `['options-general.php', 'options-writing.php', 'options-reading.php', 'options-discussion.php', 'options-media.php', 'options-permalink.php', 'edit-comments.php', 'profile.php', 'users.php', 'upload.php', 'plugins.php', 'edit.php', 'themes.php', 'tools.php', 'widgets.php', 'update-core.php']`)
+
+    Set the admin path _(/wp-admin/<path>)_ to preload.
+
+  * `DOCKET_CACHE_PRELOAD_NETWORK` (default: `['update-core.php', 'sites.php', 'users.php', 'themes.php', 'plugins.php', 'settings.php']`)
+
+    Set the network admin path _(/wp-admin/network/<path>)_ to preload _(Multisite only)_.
+
 
 ## WP-CLI Commands
 
