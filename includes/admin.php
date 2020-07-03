@@ -1,52 +1,57 @@
 
 <?php
-defined('ABSPATH') || exit;
+\defined('ABSPATH') || exit;
+
 $status = $this->get_status();
 $status_text = $this->status_code[$status];
-$is_debug = (defined('DOCKET_CACHE_DEBUG') && DOCKET_CACHE_DEBUG);
+$is_debug = (\defined('DOCKET_CACHE_DEBUG') && DOCKET_CACHE_DEBUG && \defined('DOCKET_CACHE_DEBUG_FILE'));
 
-if (1 === $status && isset($this->token) && 'docket-cache-flushed' === $this->token) {
-    wp_cache_flush();
+$do_preload = false;
+if (1 === $status && isset($this->token)) {
+    switch ($this->token) {
+        case 'docket-cache-flushed':
+            wp_cache_flush();
+            $do_preload = true;
+        break;
+        case 'docket-cache-enabled':
+            $do_preload = true;
+        break;
+    }
 }
 
-if (is_multisite()) {
+if (is_multisite() && is_network_admin()) {
     settings_errors('general');
 }
 ?>
-
 <div class="wrap" id="docket-cache">
     <h1><?php _e('Docket Object Cache', $this->slug); ?></h1>
-    <div class="section">
+    <div class="section overview">
         <h2 class="title"><?php _e('Overview', $this->slug); ?></h2>
 
         <table class="form-table">
-            <tr>
-                <th><?php _e('Status', $this->slug); ?></th>
-                <td><code><?php echo $status_text; ?></code></td>
-            </tr>
+            <tbody>
+                <tr>
+                    <th><?php _e('Status', $this->slug); ?></th>
+                    <td><code><?php echo $status_text; ?></code></td>
+                </tr>
 
-            <tr>
-                <th><?php _e('OPCache', $this->slug); ?></th>
-                <td><code><?php echo $this->status_code[$this->get_opcache_status()]; ?></code></td>
-            </tr>
+                <tr>
+                    <th><?php _e('OPCache', $this->slug); ?></th>
+                    <td><code><?php echo $this->status_code[$this->get_opcache_status()]; ?></code></td>
+                </tr>
 
-            <tr>
-                <th><?php _e('Memory', $this->slug); ?></th>
-                <td><code><?php echo $this->get_mem_size(); ?></code></td>
-            </tr>
+                <tr>
+                    <th><?php _e('Memory', $this->slug); ?></th>
+                    <td><code><?php echo $this->get_mem_size(); ?></code></td>
+                </tr>
 
-            <?php if (1 === $status): ?>
-            <tr>
-                <th><?php _e('Cache Size', $this->slug); ?></th>
-                <td><code><?php echo $this->get_dirsize(); ?></code></td>
-            </tr>
-            <?php endif; ?>
-            <?php if ($is_debug):?>
-            <tr>
-                <th><?php _e('Debug', $this->slug); ?></th>
-                <td><a href="<?php echo get_home_url(null, '/wp-content/object-cache.log'); ?>" target="_blank" rel="noopener">object-cache.log</a></td>
-            </tr>
-            <?php endif; ?>
+                <?php if (1 === $status): ?>
+                <tr>
+                    <th><?php _e('Cache Size', $this->slug); ?></th>
+                    <td><code><?php echo $this->get_dirsize(); ?></code></td>
+                </tr>
+                <?php endif; ?>
+            </tbody>
         </table>
 
         <p class="submit">
@@ -60,4 +65,33 @@ if (is_multisite()) {
 
         </p>
     </div>
+
+<?php if ($is_debug):?>
+    <div class="section log">
+        <h2 class="title"><?php _e('Debug Log', $this->slug); ?></h2>
+        <?php
+            $output = $this->debug_log(100);
+            if (empty($output)) {
+                echo '<p><code>empty</code></p>';
+            } else {
+                echo '<textarea id="log" class="code" readonly="readonly" rows="10">'.implode("\n", array_reverse($output, true)).'</textarea>';
+            }
+        ?>
+       
+        <a href="#" onclick="window.location.assign(window.location.href); return false;" class="button button-primary button-large"><?php _e('Refresh', $this->slug); ?></a>&nbsp;
+        <?php if (!empty($output)): ?>
+            <a href="<?php echo get_home_url(null, '/wp-content/object-cache.log').'?'.time(); ?>" target="_blank" rel="noopener" class="button button-primary button-large">Download</a>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
 </div>
+
+<?php if ($do_preload): ?>
+<script>
+jQuery(document).ready(function() {
+    wp.ajax.post( "docket_preload", {} ).done(function(response) {
+    console.log(response);
+  });
+});
+</script>
+<?php endif; ?>

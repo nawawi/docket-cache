@@ -34,6 +34,23 @@
     margin:0;
 }
 
+#docket-cache .button {
+    min-width: 150px;
+    text-align: center;
+}
+
+#docket-cache .log {
+    width: 100%;
+}
+
+#docket-cache .log textarea {
+    width: 100%;
+	font-size: 100%;
+	font: courier;
+	vertical-align: baseline;
+    margin-bottom: 10px;
+}
+
 @media screen and (min-width: 1110px) {
     #docket-cache .section {
         float: left;

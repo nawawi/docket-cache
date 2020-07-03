@@ -1,0 +1,28 @@
+{
+    "name": "nawawi/docket-cache",
+    "description": "A persistent WordPress Object Cache stored on local disk.",
+    "keywords": [
+        "object cache"
+    ],
+    "type": "wordpress-plugin",
+    "license": "MIT",
+    "homepage": "https://github.com/nawawi/docket-cache",
+    "authors": [
+        {
+            "name": "Nawawi Jamili",
+            "email": "nawawi@rutweb.com",
+            "homepage": "https://rutweb.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "symfony/var-exporter": "^5.0"
+    },
+    "suggest": {
+        "ext-zend-opcache": "Recommended for better performance"
+    },
+    "minimum-stability": "dev",
+    "config": {
+        "optimize-autoloader": true
+    }
+}

@@ -16,11 +16,12 @@ namespace Symfony\Component\VarExporter\Internal;
  *
  * @internal
  */
-class Values {
-
+class Values
+{
     public $values;
 
-    public function __construct( array $values ) {
+    public function __construct(array $values)
+    {
         $this->values = $values;
     }
 }

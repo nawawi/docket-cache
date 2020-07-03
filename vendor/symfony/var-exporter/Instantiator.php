@@ -21,8 +21,8 @@ use Symfony\Component\VarExporter\Internal\Registry;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class Instantiator {
-
+final class Instantiator
+{
     /**
      * Creates an object and sets its properties without calling its constructor nor any other methods.
      *
@@ -57,35 +57,36 @@ final class Instantiator {
      *
      * @throws ExceptionInterface When the instance cannot be created
      */
-    public static function instantiate( string $class, array $properties = [], array $privateProperties = [] ): object {
-        $reflector = Registry::$reflectors[ $class ] ?? Registry::getClassReflector( $class );
+    public static function instantiate(string $class, array $properties = [], array $privateProperties = []): object
+    {
+        $reflector = Registry::$reflectors[$class] ?? Registry::getClassReflector($class);
 
-        if ( Registry::$cloneable[ $class ] ) {
-            $wrappedInstance = [ clone Registry::$prototypes[ $class ] ];
-        } elseif ( Registry::$instantiableWithoutConstructor[ $class ] ) {
-            $wrappedInstance = [ $reflector->newInstanceWithoutConstructor() ];
-        } elseif ( null === Registry::$prototypes[ $class ] ) {
-            throw new NotInstantiableTypeException( $class );
-        } elseif ( $reflector->implementsInterface( 'Serializable' ) && ( \PHP_VERSION_ID < 70400 || ! method_exists( $class, '__unserialize' ) ) ) {
-            $wrappedInstance = [ unserialize( 'C:'.\strlen( $class ).':"'.$class.'":0:{}' ) ];
+        if (Registry::$cloneable[$class]) {
+            $wrappedInstance = [clone Registry::$prototypes[$class]];
+        } elseif (Registry::$instantiableWithoutConstructor[$class]) {
+            $wrappedInstance = [$reflector->newInstanceWithoutConstructor()];
+        } elseif (null === Registry::$prototypes[$class]) {
+            throw new NotInstantiableTypeException($class);
+        } elseif ($reflector->implementsInterface('Serializable') && (\PHP_VERSION_ID < 70400 || !method_exists($class, '__unserialize'))) {
+            $wrappedInstance = [unserialize('C:'.\strlen($class).':"'.$class.'":0:{}')];
         } else {
-            $wrappedInstance = [ unserialize( 'O:'.\strlen( $class ).':"'.$class.'":0:{}' ) ];
+            $wrappedInstance = [unserialize('O:'.\strlen($class).':"'.$class.'":0:{}')];
         }
 
-        if ( $properties ) {
-            $privateProperties[ $class ] = isset( $privateProperties[ $class ] ) ? $properties + $privateProperties[ $class ] : $properties;
+        if ($properties) {
+            $privateProperties[$class] = isset($privateProperties[$class]) ? $properties + $privateProperties[$class] : $properties;
         }
 
-        foreach ( $privateProperties as $class => $properties ) {
-            if ( ! $properties ) {
+        foreach ($privateProperties as $class => $properties) {
+            if (!$properties) {
                 continue;
             }
-            foreach ( $properties as $name => $value ) {
+            foreach ($properties as $name => $value) {
                 // because they're also used for "unserialization", hydrators
                 // deal with array of instances, so we need to wrap values
-                $properties[ $name ] = [ $value ];
+                $properties[$name] = [$value];
             }
-            ( Hydrator::$hydrators[ $class ] ?? Hydrator::getHydrator( $class ) )( $properties, $wrappedInstance );
+            (Hydrator::$hydrators[$class] ?? Hydrator::getHydrator($class))($properties, $wrappedInstance);
         }
 
         return $wrappedInstance[0];

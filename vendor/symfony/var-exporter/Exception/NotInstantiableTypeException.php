@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\VarExporter\Exception;
 
-class NotInstantiableTypeException extends \Exception implements ExceptionInterface {
-
-    public function __construct( string $type ) {
-        parent::__construct( sprintf( 'Type "%s" is not instantiable.', $type ) );
+class NotInstantiableTypeException extends \Exception implements ExceptionInterface
+{
+    public function __construct(string $type)
+    {
+        parent::__construct(sprintf('Type "%s" is not instantiable.', $type));
     }
 }

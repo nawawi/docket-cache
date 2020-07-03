@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\VarExporter\Exception;
 
-interface ExceptionInterface extends \Throwable {
-
+interface ExceptionInterface extends \Throwable
+{
 }

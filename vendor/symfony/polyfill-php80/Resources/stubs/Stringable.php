@@ -1,7 +1,7 @@
 <?php
 
-interface Stringable {
-
+interface Stringable
+{
     /**
      * @return string
      */

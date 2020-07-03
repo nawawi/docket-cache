@@ -1,6 +1,6 @@
 dist/
 composer.lock
-composer.json
+/vendor/composer.json
 *.cache
 *.sh
 !/tests/
