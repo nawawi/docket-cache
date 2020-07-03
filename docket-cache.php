@@ -5,7 +5,7 @@
  * Version:             1.0.0
  * Description:         A persistent WP Object Cache stored on local disk.
  * GitHub URI:          nawawi/docket-cache
- * GitHub Plugin URI:   nawawi/docket-cache
+ * GitHub Plugin URI:   https://github.com/nawawi/docket-cache
  * Author:              Nawawi Jamili
  * Author URI:          https://rutweb.com
  * Requires at least:   5.4
