@@ -11,7 +11,7 @@
  * Requires at least:   5.4
  * Requires PHP:        7.2
  * License:             MIT
- * License URI:         ./LICENSE.txt
+ * License URI:         https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
  * Text Domain:         docket-cache
  * Domain Path:         /languages
  */

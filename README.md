@@ -139,10 +139,4 @@ Anyone can contribute to Docket Cache. Please do so by posting issues when you'v
 
 ## License
 
-Docket cache is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-## Changelog
-
-### 1.0.0
-
-  * Initial release
+Docket cache is open-sourced software licensed under the [MIT license](https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt).
