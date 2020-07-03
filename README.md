@@ -20,7 +20,7 @@ To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for b
 
 ### Via WP-CLI
 
-[`WP-CLI`](http://wp-cli.org/) is the official command-line interface for WordPress. You can install `docket-cache` using `wp` command like this:
+[`WP-CLI`](http://wp-cli.org/) is the official command-line interface for WordPress. You can install `docket-cache` using the `wp` command like this:
 
 ```
 wp plugin install --activate https://github.com/nawawi/docket-cache/archive/master.zip
@@ -44,7 +44,7 @@ git clone https://github.com/nawawi/docket-cache
 ```
 
 ### Automatic Udates
-The plugin supports the [GitHub Updater plugin](https://github.com/afragen/github-updater) for WordPress. The plugin enable automatic updates from this GitHub Repository. You will find all information about the how and why at the [plugin wiki page](https://github.com/afragen/github-updater/wiki).
+The plugin supports the [GitHub Updater plugin](https://github.com/afragen/github-updater) for WordPress. The plugin enables automatic updates from this GitHub Repository. You will find all information about the how and why at the [plugin wiki page](https://github.com/afragen/github-updater/wiki).
 
 ## Configuration Options
 
@@ -53,10 +53,6 @@ To adjust the configuration, define any of the following constants in your `wp-c
   * `DOCKET_CACHE_MAXTTL` (default: `86400`)
 
     Set maximum time-to-live (in seconds) for cache keys with an expiration time of `0`.
-
-  * `DOCKET_CACHE_GLOBAL_GROUPS` (default: `['blog-details', 'blog-id-cache', 'blog-lookup', 'global-posts', 'networks', 'rss', 'sites', 'site-details', 'site-lookup', 'site-options', 'site-transient', 'users', 'useremail', 'userlogins', 'usermeta', 'user_meta', 'userslugs']`)
-
-    Set the list of network-wide cache groups that should not be prefixed with the blog-id _(Multisite only)_.
 
   * `DOCKET_CACHE_IGNORED_GROUPS` (default: `['counts', 'plugins', 'themes', 'comment', 'wc_session_id', 'bp_notifications', 'bp_messages','bp_pages']`)
 
@@ -88,15 +84,21 @@ To adjust the configuration, define any of the following constants in your `wp-c
 
   * `DOCKET_CACHE_PRELOAD` (default: `false`)
 
-    Set to `true` to enable cache preloading after cache has been flushed and installing drop-in.
+    Set to `true` to enable cache preloading after the cache has been flushed and after installation of drop-in file.
 
   * `DOCKET_CACHE_PRELOAD_ADMIN` (default: `['options-general.php', 'options-writing.php', 'options-reading.php', 'options-discussion.php', 'options-media.php', 'options-permalink.php', 'edit-comments.php', 'profile.php', 'users.php', 'upload.php', 'plugins.php', 'edit.php', 'themes.php', 'tools.php', 'widgets.php', 'update-core.php']`)
 
-    Set the admin path _(/wp-admin/<path>)_ to preload.
+    Set the list of admin path _(/wp-admin/<path>)_ to preload.
+
+### Multisite Options
+
+  * `DOCKET_CACHE_GLOBAL_GROUPS` (default: `['blog-details', 'blog-id-cache', 'blog-lookup', 'global-posts', 'networks', 'rss', 'sites', 'site-details', 'site-lookup', 'site-options', 'site-transient', 'users', 'useremail', 'userlogins', 'usermeta', 'user_meta', 'userslugs']`)
+
+    Set the list of network-wide cache groups that should not be prefixed with the blog-id _(Multisite only)_.
 
   * `DOCKET_CACHE_PRELOAD_NETWORK` (default: `['update-core.php', 'sites.php', 'users.php', 'themes.php', 'plugins.php', 'settings.php']`)
 
-    Set the network admin path _(/wp-admin/network/<path>)_ to preload _(Multisite only)_.
+    Set the list of network admin path _(/wp-admin/network/<path>)_ to preload _(Multisite only)_.
 
 
 ## WP-CLI Commands
