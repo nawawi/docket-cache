@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit2e5490ddf49152da9c02c2dbeba14170
+class ComposerStaticInite83f272e926b05c6a29fbd03b6aa4f65
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -15,6 +15,10 @@ class ComposerStaticInit2e5490ddf49152da9c02c2dbeba14170
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Component\\VarExporter\\' => 30,
+        ),
+        'N' => 
+        array (
+            'Nawawi\\Docket_Cache\\' => 20,
         ),
     );
 
@@ -27,9 +31,15 @@ class ComposerStaticInit2e5490ddf49152da9c02c2dbeba14170
         array (
             0 => __DIR__ . '/..' . '/symfony/var-exporter',
         ),
+        'Nawawi\\Docket_Cache\\' => 
+        array (
+            0 => __DIR__ . '/../../..' . '/includes/src',
+        ),
     );
 
     public static $classMap = array (
+        'Nawawi\\Docket_Cache\\CLI\\Command' => __DIR__ . '/../../..' . '/includes/src/CLI/Command.php',
+        'Nawawi\\Docket_Cache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'Symfony\\Component\\VarExporter\\Exception\\ClassNotFoundException' => __DIR__ . '/..' . '/symfony/var-exporter/Exception/ClassNotFoundException.php',
         'Symfony\\Component\\VarExporter\\Exception\\ExceptionInterface' => __DIR__ . '/..' . '/symfony/var-exporter/Exception/ExceptionInterface.php',
@@ -48,9 +58,9 @@ class ComposerStaticInit2e5490ddf49152da9c02c2dbeba14170
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit2e5490ddf49152da9c02c2dbeba14170::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit2e5490ddf49152da9c02c2dbeba14170::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit2e5490ddf49152da9c02c2dbeba14170::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInite83f272e926b05c6a29fbd03b6aa4f65::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInite83f272e926b05c6a29fbd03b6aa4f65::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInite83f272e926b05c6a29fbd03b6aa4f65::$classMap;
 
         }, null, ClassLoader::class);
     }

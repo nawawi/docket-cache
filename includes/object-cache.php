@@ -821,7 +821,7 @@ class WP_Object_Cache
         if (false !== $dir && is_dir($dir) && is_writable($dir)) {
             $dir = realpath($dir);
             try {
-                foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)) as $object) {
+                foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)) as $object) {
                     $f = $object->getPathName();
                     if (is_file($f) && is_writable($f)) {
                         unlink($f);
@@ -1032,7 +1032,7 @@ class WP_Object_Cache
         }
 
         $autoload = sprintf(
-                        '%s/docket-cache/vendor/autoload.php',
+                        '%s/docket-cache/includes/load.php',
                         \defined('WP_PLUGIN_DIR') ? WP_PLUGIN_DIR : WP_CONTENT_DIR.'/plugins'
                     );
 

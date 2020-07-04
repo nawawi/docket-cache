@@ -14,6 +14,16 @@
             "homepage": "https://rutweb.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/nawawi/docket-cache"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/nawawi/docket-cache/issues",
+        "source": "https://github.com/nawawi/docket-cache"
+    },
     "require": {
         "php": ">=7.2",
         "symfony/var-exporter": "^5.0"
@@ -22,7 +32,27 @@
         "ext-zend-opcache": "Recommended for better performance"
     },
     "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    },
+    "scripts": {
+        "post-update-cmd": [
+            "wp i18n make-pot . languages/docket-cache.pot"
+        ]
+    },
+    "autoload": {
+        "psr-4": {
+            "Nawawi\\Docket_Cache\\": "includes/src"
+        },
+       "classmap": [
+            "includes/src"
+        ]
+     },
     "config": {
+        "vendor-dir": "includes/vendor",
         "optimize-autoloader": true
     }
 }

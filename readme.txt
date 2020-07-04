@@ -1,48 +1,26 @@
-
-# Docket Cache
+=== Docket Cache ===
+Contributors: Nawawi Jamili
+Tags: caching, cache, object cache
+Requires at least: 5.4
+Tested up to: 5.4
+Requires PHP: 7.2
+License: MIT
+License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 
 A persistent WordPress Object Cache stored on local disk.
   
-## Description
+== Description ==
 
 The Docket cache is a persistent WordPress Object Cache that stored on local disk. Rather than using `serialize` and `unserialize` a PHP object to store into flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance if combined with PHP OPcache.
 
-## Installation
+== Installation ==
 
 To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for better performance.
 
-### Manual
- 1. Download the plugin as a [ZIP file](https://github.com/nawawi/docket-cache/archive/master.zip) from GitHub.
- 2. In your WordPress admin click *Plugins -> Add New -> Upload Plugin*.
- 3. Upload the ZIP file.
- 4. Activate the plugin.
- 5. Enable the object cache under _Settings -> Docket Cache_, or in Multisite setups under _Network Admin -> Settings -> Docket Cache_.
+1. Install and activate plugin.
+2. Enable the object cache under _Settings -> Docket Cache_, or in Multisite setups under _Network Admin -> Settings -> Docket Cache_.
 
-### Via WP-CLI
-
-[`WP-CLI`](http://wp-cli.org/) is the official command-line interface for WordPress. You can install `docket-cache` using the `wp` command like this:
-
-```
-wp plugin install --activate https://github.com/nawawi/docket-cache/archive/master.zip
-```
-
-### Via Composer
-The plugin is available as [Composer package](https://packagist.org/packages/nawawi/docket-cache) and can be installed via Composer from the root of your WordPress installation.
-```
-composer create-project -s dev --prefer-dist nawawi/docket-cache wp-content/plugins/docket-cache
-```
-
-### Via Git
-Go to your WordPress plugins folder `cd wp-content/plugins`
-```
-git clone https://github.com/nawawi/docket-cache
-```
-
-### Automatic Udates
-The plugin supports the [GitHub Updater plugin](https://github.com/afragen/github-updater) for WordPress. The plugin enables automatic updates from this GitHub Repository. You will find all information about the how and why at the [plugin wiki page](https://github.com/afragen/github-updater/wiki).
-
-
-## Configuration Options
+== Configuration Options ==
 
 To adjust the configuration, define any of the following constants in your `wp-config.php` file.
 
@@ -97,7 +75,7 @@ To adjust the configuration, define any of the following constants in your `wp-c
     Set the list of network admin path _(/wp-admin/network/<path>)_ to preload.
 
 
-## WP-CLI Commands
+== WP-CLI Commands ==
 
 To use the WP-CLI commands, make sure the plugin is activated:
 
@@ -122,20 +100,8 @@ The following commands are supported:
     Updates the Docket object cache drop-in. Default behavior is to overwrite any existing object cache drop-in.
 
 
-## How Versions Work
+== Changelog ==
 
-Versions are as follows: Major.Minor.Patch
+= 1.0.0 =
 
-* Major: Rewrites with completely new code-base.
-* Minor: New Features/Changes that breaks compatibility.
-* Patch: New Features/Fixes that does not break compatibility.
-
-
-## Contributions
-
-Anyone can contribute to Docket Cache. Please do so by posting issues when you've found something that is unexpected or sending a pull request for improvements.
-
-
-## License
-
-Docket cache is open-sourced software licensed under the [MIT license](https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt).
+- Public release.

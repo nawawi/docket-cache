@@ -1,152 +1,162 @@
-# Copyright (C) 2020 Ghostbird Media
-# This file is distributed under the same license as the Docket Cache package.
-#, fuzzy
-msgid   ""
-msgstr  "Project-Id-Version: Docket Cache 1.0.0\n"
-        "Report-Msgid-Bugs-To: https://ghostbird.me\n"
-        "POT-Creation-Date: 2020-07-03 19:22+0800\n"
-        "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-        "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-        "Language-Team: LANGUAGE <LL@li.org>\n"
-        "Language: \n"
-        "MIME-Version: 1.0\n"
-        "Content-Type: text/plain; charset=CHARSET\n"
-        "Content-Transfer-Encoding: 8bit\n"
+# Copyright (C) 2020 Nawawi Jamili
+# This file is distributed under the same license as the Docket Cache plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Docket Cache 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2020-07-04T18:45:05+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.4.0\n"
+"X-Domain: docket-cache\n"
 
-#: docket-cache.php:53
-msgid   "Disabled"
-msgstr  ""
+#. Plugin Name of the plugin
+msgid "Docket Cache"
+msgstr ""
 
-#: docket-cache.php:54
-msgid   "Enable"
-msgstr  ""
+#. Description of the plugin
+msgid "A persistent WP Object Cache stored on local disk."
+msgstr ""
 
-#: docket-cache.php:55
-msgid   "Not Available"
-msgstr  ""
+#. Author of the plugin
+msgid "Nawawi Jamili"
+msgstr ""
 
-#: docket-cache.php:56
-msgid   "Unknown"
-msgstr  ""
+#. Author URI of the plugin
+msgid "https://rutweb.com"
+msgstr ""
 
-#: docket-cache.php:314 includes/admin.php:27
-msgid   "Docket Object Cache"
-msgstr  ""
+#: includes/admin/page.php:26
+msgid "Docket Object Cache"
+msgstr ""
 
-#: docket-cache.php:315
-msgid   "Docket Cache"
-msgstr  ""
+#: includes/admin/page.php:28
+msgid "Overview"
+msgstr ""
 
-#: docket-cache.php:346
-#, php-format
-msgid   "The Docket Object Cache drop-in is outdated. Please <a href=\"%s"
-        "\">update it now</a>."
-msgstr  ""
+#: includes/admin/page.php:33
+msgid "Status"
+msgstr ""
 
-#: docket-cache.php:349
-#, php-format
-msgid   "An unknown object cache drop-in was found. To use Docket, <a href="
-        "\"%s\">please replace it now</a>."
-msgstr  ""
+#: includes/admin/page.php:38
+msgid "OPCache"
+msgstr ""
 
-#: docket-cache.php:419
-msgid   "This plugin requires PHP 7.2 or greater."
-msgstr  ""
+#: includes/admin/page.php:43
+msgid "Memory"
+msgstr ""
 
-#: docket-cache.php:427 includes/wp-cli.php:76
-msgid   "Object cache enabled."
-msgstr  ""
+#: includes/admin/page.php:49
+msgid "Cache Size"
+msgstr ""
 
-#: docket-cache.php:430 includes/wp-cli.php:79
-msgid   "Object cache could not be enabled."
-msgstr  ""
+#: includes/admin/page.php:59
+msgid "Enable Object Cache"
+msgstr ""
 
-#: docket-cache.php:433 includes/wp-cli.php:105
-msgid   "Object cache disabled."
-msgstr  ""
+#: includes/admin/page.php:61
+msgid "Flush Cache"
+msgstr ""
 
-#: docket-cache.php:436 includes/wp-cli.php:108
-msgid   "Object cache could not be disabled."
-msgstr  ""
+#: includes/admin/page.php:62
+msgid "Disable Object Cache"
+msgstr ""
 
-#: docket-cache.php:439
-msgid   "Object cache was flushed."
-msgstr  ""
+#: includes/admin/page.php:70
+msgid "Debug Log"
+msgstr ""
 
-#: docket-cache.php:442
-msgid   "Object cache could not be flushed."
-msgstr  ""
+#: includes/admin/page.php:79
+msgid "Refresh"
+msgstr ""
 
-#: docket-cache.php:445 includes/wp-cli.php:127
-msgid   "Updated object cache drop-in and enabled Docket object cache."
-msgstr  ""
+#: includes/src/CLI/Command.php:84
+msgid "Docket object cache already enabled."
+msgstr ""
 
-#: docket-cache.php:448
-msgid   "Docket object cache drop-in could not be updated."
-msgstr  ""
+#: includes/src/CLI/Command.php:88
+msgid "An unknown object cache drop-in was found. To use Docket object cache, run: wp docket-cache update-dropin."
+msgstr ""
 
-#: docket-cache.php:463
-msgid   "Settings"
-msgstr  ""
+#: includes/src/CLI/Command.php:92
+#: includes/src/Plugin.php:411
+msgid "Object cache enabled."
+msgstr ""
 
-#: includes/admin.php:29
-msgid   "Overview"
-msgstr  ""
+#: includes/src/CLI/Command.php:95
+#: includes/src/Plugin.php:414
+msgid "Object cache could not be enabled."
+msgstr ""
 
-#: includes/admin.php:34
-msgid   "Status"
-msgstr  ""
+#: includes/src/CLI/Command.php:113
+#: includes/src/CLI/Command.php:162
+msgid "No object cache drop-in found."
+msgstr ""
 
-#: includes/admin.php:39
-msgid   "OPCache"
-msgstr  ""
+#: includes/src/CLI/Command.php:117
+msgid "An unknown object cache drop-in was found. To use Docket run: wp docket-cache update-dropin."
+msgstr ""
 
-#: includes/admin.php:44
-msgid   "Memory"
-msgstr  ""
+#: includes/src/CLI/Command.php:121
+#: includes/src/Plugin.php:417
+msgid "Object cache disabled."
+msgstr ""
 
-#: includes/admin.php:50
-msgid   "Cache Size"
-msgstr  ""
+#: includes/src/CLI/Command.php:124
+#: includes/src/Plugin.php:420
+msgid "Object cache could not be disabled."
+msgstr ""
 
-#: includes/admin.php:60
-msgid   "Enable Object Cache"
-msgstr  ""
+#: includes/src/CLI/Command.php:143
+#: includes/src/Plugin.php:429
+msgid "Updated object cache drop-in and enabled Docket object cache."
+msgstr ""
 
-#: includes/admin.php:62
-msgid   "Flush Cache"
-msgstr  ""
+#: includes/src/CLI/Command.php:145
+msgid "Object cache drop-in could not be updated."
+msgstr ""
 
-#: includes/admin.php:63
-msgid   "Disable Object Cache"
-msgstr  ""
+#: includes/src/Plugin.php:39
+msgid "Disabled"
+msgstr ""
 
-#: includes/admin.php:71
-msgid   "Debug Log"
-msgstr  ""
+#: includes/src/Plugin.php:40
+msgid "Enable"
+msgstr ""
 
-#: includes/admin.php:81
-msgid   "Refresh"
-msgstr  ""
+#: includes/src/Plugin.php:41
+msgid "Not Available"
+msgstr ""
 
-#: includes/wp-cli.php:68
-msgid   "Docket object cache already enabled."
-msgstr  ""
+#: includes/src/Plugin.php:42
+msgid "Unknown"
+msgstr ""
 
-#: includes/wp-cli.php:72
-msgid   "An unknown object cache drop-in was found. To use Docket object "
-        "cache, run: wp docket-cache update-dropin."
-msgstr  ""
+#: includes/src/Plugin.php:166
+msgid "WP_Filesystem not available"
+msgstr ""
 
-#: includes/wp-cli.php:97 includes/wp-cli.php:146
-msgid   "No object cache drop-in found."
-msgstr  ""
+#. translators: %s: path name
+#: includes/src/Plugin.php:258
+msgid "Invalid setting for DOCKET_CACHE_PATH: %s"
+msgstr ""
 
-#: includes/wp-cli.php:101
-msgid   "An unknown object cache drop-in was found. To use Docket run: wp "
-        "docket-cache update-dropin."
-msgstr  ""
+#: includes/src/Plugin.php:403
+msgid "This plugin requires PHP 7.2 or greater."
+msgstr ""
 
-#: includes/wp-cli.php:129
-msgid   "Object cache drop-in could not be updated."
-msgstr  ""
+#: includes/src/Plugin.php:423
+msgid "Object cache was flushed."
+msgstr ""
+
+#: includes/src/Plugin.php:426
+msgid "Object cache could not be flushed."
+msgstr ""
+
+#: includes/src/Plugin.php:432
+msgid "Docket object cache drop-in could not be updated."
+msgstr ""
