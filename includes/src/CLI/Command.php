@@ -18,16 +18,15 @@ use WP_CLI_Command;
  */
 class Command extends WP_CLI_Command
 {
-    private $docket;
+    private $plugin;
 
-    public function __construct($parent)
+    public function __construct($plugin)
     {
-        $this->docket = $parent;
+        $this->plugin = $plugin;
     }
 
     private function halt_error($error)
     {
-        $docket = $this->docket;
         WP_CLI::error($error, false);
         WP_CLI::halt(1);
     }
@@ -36,6 +35,12 @@ class Command extends WP_CLI_Command
     {
         WP_CLI::success($success, false);
         WP_CLI::halt(0);
+    }
+
+    private function halt_status($text, $status = 0)
+    {
+        WP_CLI::line($text);
+        WP_CLI::halt($status);
     }
 
     /**
@@ -47,9 +52,8 @@ class Command extends WP_CLI_Command
      */
     public function status()
     {
-        $docket = $this->docket;
-        $status = $docket->get_status();
-        $text = $docket->status_code[$status];
+        $status = $this->plugin->get_status();
+        $text = $this->plugin->status_code[$status];
         $halt = 1;
 
         switch ($status) {
@@ -61,8 +65,7 @@ class Command extends WP_CLI_Command
                 break;
         }
 
-        WP_CLI::line('Status: '.$text);
-        WP_CLI::halt($halt);
+        $this->halt_status('Status: '.$text);
     }
 
     /**
@@ -77,10 +80,8 @@ class Command extends WP_CLI_Command
      */
     public function enable()
     {
-        $docket = $this->docket;
-
-        if ($docket->has_dropin()) {
-            if ($docket->validate_dropin()) {
+        if ($this->plugin->has_dropin()) {
+            if ($this->plugin->validate_dropin()) {
                 WP_CLI::line(__('Docket object cache already enabled.', 'docket-cache'));
                 WP_CLI::halt(0);
             }
@@ -88,7 +89,7 @@ class Command extends WP_CLI_Command
             $this->halt_error(__('An unknown object cache drop-in was found. To use Docket object cache, run: wp docket-cache update-dropin.', 'docket-cache'));
         }
 
-        if ($docket->dropin_install()) {
+        if ($this->plugin->dropin_install()) {
             $this->halt_success(__('Object cache enabled.', 'docket-cache'));
         }
 
@@ -107,17 +108,15 @@ class Command extends WP_CLI_Command
      */
     public function disable()
     {
-        $docket = $this->docket;
-
-        if (!$docket->has_dropin()) {
+        if (!$this->plugin->has_dropin()) {
             $this->halt_error(__('No object cache drop-in found.', 'docket-cache'));
         }
 
-        if (!$docket->validate_dropin()) {
+        if (!$this->plugin->validate_dropin()) {
             $this->halt_error(__('An unknown object cache drop-in was found. To use Docket run: wp docket-cache update-dropin.', 'docket-cache'));
         }
 
-        if ($docket->dropin_uninstall()) {
+        if ($this->plugin->dropin_uninstall()) {
             $this->halt_success(__('Object cache disabled.', 'docket-cache'));
         }
 
@@ -137,9 +136,7 @@ class Command extends WP_CLI_Command
      */
     public function update_dropin()
     {
-        $docket = $this->docket;
-
-        if ($docket->dropin_install()) {
+        if ($this->plugin->dropin_install()) {
             $this->halt_success(__('Updated object cache drop-in and enabled Docket object cache.', 'docket-cache'));
         }
         $this->halt_error(__('Object cache drop-in could not be updated.', 'docket-cache'));
@@ -156,9 +153,7 @@ class Command extends WP_CLI_Command
      */
     public function flush()
     {
-        $docket = $this->docket;
-
-        if (!$docket->has_dropin()) {
+        if (!$this->plugin->has_dropin()) {
             $this->halt_error(__('No object cache drop-in found.', 'docket-cache'));
         }
 
@@ -179,6 +174,6 @@ class Command extends WP_CLI_Command
      */
     public function type()
     {
-        WP_CLI::line($this->docket->slug);
+        $this->halt_status($this->plugin->slug);
     }
 }

@@ -27,8 +27,8 @@
 
 namespace Nawawi\Docket_Cache;
 
-\defined('ABSPATH') || exit;
+\defined('ABSPATH') && !\defined('DOCKET_CACHE_FILE') || exit;
 
-// Load the Composer autoloader.
+\define('DOCKET_CACHE_FILE', __FILE__);
 require __DIR__.'/includes/load.php';
 (new Plugin(__FILE__))->attach();

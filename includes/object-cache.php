@@ -838,6 +838,10 @@ class WP_Object_Cache
         if (!@file_exists($dir.'/index.php')) {
             $this->debug('flush', 'OK', $cnt);
 
+            if (\defined('WP_CLI') && WP_CLI) {
+                do_action('docket_preload');
+            }
+
             return true;
         }
 

@@ -24,16 +24,14 @@ class Plugin
     private $page;
     private $token;
 
-    public function __construct($file)
+    public function __construct()
     {
         $this->slug = 'docket-cache';
-        $this->file = $file;
+        $this->file = DOCKET_CACHE_FILE;
         $this->version = get_file_data($this->file, ['Version' => 'Version'])['Version'];
         $this->hook = plugin_basename($this->file);
         $this->path = realpath(plugin_dir_path($this->file));
         $this->page = (is_multisite() ? 'settings.php?page=' : 'options-general.php?page=').$this->slug;
-
-        $this->register_plugin_hooks();
 
         $this->status_code = [
             0 => __('Disabled', 'docket-cache'),
@@ -41,7 +39,6 @@ class Plugin
             2 => __('Not Available', 'docket-cache'),
             -1 => __('Unknown', 'docket-cache'),
         ];
-        $this->register_admin_hooks();
     }
 
     public function has_dropin()
@@ -221,7 +218,7 @@ class Plugin
         $wp_filesystem = $this->maybe_filesystem();
         $dst = $this->dropin_file()->dst;
 
-        return $wp_filesystem->delete($dst);
+        return @$wp_filesystem->delete($dst);
     }
 
     private function dropin_remove()
@@ -277,6 +274,10 @@ class Plugin
         register_activation_hook($this->hook, [$this, 'activate']);
         register_deactivation_hook($this->hook, [$this, 'deactivate']);
         register_uninstall_hook($this->hook, [__CLASS__, 'uninstall']);
+    }
+
+    private function has_cap()
+    {
     }
 
     private function action_query($key)
@@ -557,11 +558,12 @@ class Plugin
 
     public function attach()
     {
+        $this->register_plugin_hooks();
+        $this->register_admin_hooks();
+
         if (\defined('WP_CLI') && WP_CLI && !\defined('Docket_Cache_CLI')) {
             \define('Docket_Cache_CLI', true);
             $cli = new Command($this);
-            //\WP_CLI::add_command('docket-cache', $cli);
-
             \WP_CLI::add_command('cache update', [$cli, 'update_dropin']);
             \WP_CLI::add_command('cache enable', [$cli, 'enable']);
             \WP_CLI::add_command('cache disable', [$cli, 'disable']);
