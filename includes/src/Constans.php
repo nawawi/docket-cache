@@ -1,4 +1,12 @@
 <?php
+/**
+ * Docket Cache.
+ *
+ * @author  Nawawi Jamili
+ * @license MIT
+ *
+ * @see    https://github.com/nawawi/docket-cache
+ */
 
 namespace Nawawi\Docket_Cache;
 

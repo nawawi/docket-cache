@@ -1,4 +1,12 @@
 <?php
+/**
+ * Docket Cache.
+ *
+ * @author  Nawawi Jamili
+ * @license MIT
+ *
+ * @see    https://github.com/nawawi/docket-cache
+ */
 
 namespace Nawawi\Docket_Cache;
 
@@ -341,7 +349,6 @@ class Plugin
         add_action('admin_enqueue_scripts', function ($hook) {
             if ($hook === $this->screen) {
                 wp_enqueue_style($this->slug, plugin_dir_url($this->file).'includes/admin/style.css', null, $this->version);
-                wp_enqueue_script('wp-util');
             }
         });
 

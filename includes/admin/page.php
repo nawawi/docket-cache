@@ -131,9 +131,9 @@ $output = $this->tail_log(100);
 <?php if ($do_preload): ?>
 <script>
 jQuery(document).ready(function() {
-    wp.ajax.post( "docket_preload", {} ).done(function(response) {
-    console.log(response);
-  });
+    jQuery.post(ajaxurl, {"action":"docket_preload"}, function(response) {
+        console.log(response.data+' '+response.success);
+	});
 });
 </script>
 <?php endif; ?>
