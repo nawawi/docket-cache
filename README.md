@@ -50,7 +50,7 @@ To adjust the configuration, define any of the following constants in your `wp-c
 
 Maximum cache time-to-live in seconds, if expiry key `0`.   
 Default:
-```
+```php
 define('DOCKET_CACHE_MAXTTL', 8600); 
 ```
 
