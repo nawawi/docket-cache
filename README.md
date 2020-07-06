@@ -1,5 +1,5 @@
 
-# ![Docket Cache](https://static.monodb.io/logo-150x150.svg) Docket Cache
+# ![Docket Cache](./.wordpress.org/icon-128x128.png) Docket Cache
 
 A file-based persistent WordPress Object Cache stored as a plain PHP code.
   
