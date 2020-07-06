@@ -322,9 +322,11 @@ class Plugin
 
                 if ($this->validate_dropin()) {
                     if (version_compare($this->plugin_data('dropin')['Version'], $this->plugin_data('plugin')['Version'], '<')) {
+                        /* translators: %s: url */
                         $message = sprintf(__('The Docket Object Cache drop-in is outdated. Please <a href="%s">update it now</a>', 'docket-cache'), $url);
                     }
                 } else {
+                    /* translators: %s: url */
                     $message = sprintf(__('An unknown object cache drop-in was found. To use Docket, <a href="%s" class="button button-secondary button-large">please replace it now</a>.', 'docket-cache'), $url);
                 }
 

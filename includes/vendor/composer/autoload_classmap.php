@@ -7,7 +7,7 @@ $baseDir = dirname(dirname($vendorDir));
 
 return array(
     'Nawawi\\Docket_Cache\\CLI\\Command' => $baseDir . '/includes/src/CLI/Command.php',
-    'Nawawi\\Docket_Cache\\Constans\\Constans' => $baseDir . '/includes/src/Constans.php',
+    'Nawawi\\Docket_Cache\\Constans' => $baseDir . '/includes/src/Constans.php',
     'Nawawi\\Docket_Cache\\Plugin' => $baseDir . '/includes/src/Plugin.php',
     'Stringable' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
     'Symfony\\Component\\VarExporter\\Exception\\ClassNotFoundException' => $vendorDir . '/symfony/var-exporter/Exception/ClassNotFoundException.php',
