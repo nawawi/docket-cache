@@ -365,6 +365,7 @@ class Plugin
 
                     if ('docket-flush-cache' === $action) {
                         $message = wp_cache_flush() ? 'docket-cache-flushed' : 'docket-cache-flushed-failed';
+                        $this->empty_log();
                     }
 
                     if ($this->access_filesystem($url, true)) {
@@ -532,11 +533,23 @@ class Plugin
         });
     }
 
+    private function has_log()
+    {
+        return  \defined('DOCKET_CACHE_DEBUG_FILE') && is_file(DOCKET_CACHE_DEBUG_FILE) && is_readable(DOCKET_CACHE_DEBUG_FILE);
+    }
+
+    private function empty_log()
+    {
+        if ($this->has_log()) {
+            @unlink(DOCKET_CACHE_DEBUG_FILE);
+        }
+    }
+
     private function tail_log($limit = 100)
     {
         $limit = (int) $limit;
         $output = [];
-        if (\defined('DOCKET_CACHE_DEBUG_FILE') && is_file(DOCKET_CACHE_DEBUG_FILE) && is_readable(DOCKET_CACHE_DEBUG_FILE)) {
+        if ($this->has_log()) {
             $file = new \SplFileObject(DOCKET_CACHE_DEBUG_FILE);
             $file->seek(PHP_INT_MAX);
             $total_lines = $file->key();

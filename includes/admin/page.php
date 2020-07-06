@@ -25,11 +25,7 @@ if (is_multisite() && is_network_admin()) {
     settings_errors('general');
 }
 
-$output = '';
-if ($is_debug) {
-    $output = $this->tail_log(100);
-}
-
+$output = $this->tail_log(100);
 ?>
 <div class="wrap" id="docket-cache">
     <h1><?php _e('Docket Object Cache', 'docket-cache'); ?></h1>
@@ -103,23 +99,23 @@ if ($is_debug) {
                     <th><?php _e('Status', 'docket-cache'); ?></th>
                     <td><code><?php echo $this->status_code[$is_debug ? 1 : 0]; ?></code></td>
                 </tr>
-                <?php if (!empty($output)): ?>
                 <tr>
                     <th><?php _e('Log File', 'docket-cache'); ?></th>
-                    <td><code><?php echo DOCKET_CACHE_DEBUG_FILE; ?></code></td>
+                    <td><code><?php echo str_replace(WP_CONTENT_DIR, '/wp-content', DOCKET_CACHE_DEBUG_FILE); ?></code></td>
                 </tr>
-                <?php endif; ?>
+                <?php if (empty($output)): ?>
+                <tr>
+                    <th><?php _e('Log Data', 'docket-cache'); ?></th>
+                    <td><code><?php _e('Not available', 'docket-cache'); ?></code></td>
+                </tr>
+                <?php else: ?>
                 <tr>
                     <td colspan="2" class="output">
-                    <?php
-                        if (empty($output)) {
-                            echo '<p><code>'.__('Not available', 'docket-cache').'</code></p>';
-                        } else {
-                            echo '<textarea id="log" class="code" readonly="readonly" rows="20">'.implode("\n", array_reverse($output, true)).'</textarea>';
-                        }
-                    ?>
+                        <strong>Log Data</strong><br>
+                        <textarea id="log" class="code" readonly="readonly" rows="20"><?php echo implode("\n", array_reverse($output, true)); ?></textarea>
                     </td>
                 </tr>
+                <?php endif; ?>
             </table>
 
             <p class="submit">
