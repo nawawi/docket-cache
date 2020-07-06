@@ -257,7 +257,7 @@ class Plugin
             'plugins_loaded',
             function () {
                 load_plugin_textdomain(
-                    $this->slug,
+                    'docket-cache',
                     false,
                     $this->path.'/languages/'
                 );
@@ -290,8 +290,8 @@ class Plugin
 
             add_submenu_page(
                 $page_link,
-                __('Docket Object Cache', $this->slug),
-                __('Docket Cache', $this->slug),
+                __('Docket Object Cache', 'docket-cache'),
+                __('Docket Cache', 'docket-cache'),
                 $page_cap,
                 $this->slug,
                 function () {
@@ -322,14 +322,16 @@ class Plugin
 
                 if ($this->validate_dropin()) {
                     if (version_compare($this->plugin_data('dropin')['Version'], $this->plugin_data('plugin')['Version'], '<')) {
-                        $message = sprintf(__('The Docket Object Cache drop-in is outdated. Please <a href="%s">update it now</a>.', $this->slug), $url);
+                        $message = sprintf(__('The Docket Object Cache drop-in is outdated. Please <a href="%s">update it now</a>', 'docket-cache'), $url);
                     }
                 } else {
-                    $message = sprintf(__('An unknown object cache drop-in was found. To use Docket, <a href="%s">please replace it now</a>.', $this->slug), $url);
+                    $message = sprintf(__('An unknown object cache drop-in was found. To use Docket, <a href="%s" class="button button-secondary button-large">please replace it now</a>.', 'docket-cache'), $url);
                 }
 
                 if (isset($message)) {
-                    printf('<div class="update-nag">%s</div>', $message);
+                    echo '<div id="docket-notice" class="notice notice-warning">';
+                    echo '<p><strong>'.$message.'</strong></p>';
+                    echo '</div>';
                 }
             }
         });
@@ -439,7 +441,7 @@ class Plugin
                 sprintf(
                     '<a href="%s">%s</a>',
                     network_admin_url($this->page),
-                    __('Settings', $this->slug)
+                    __('Settings', 'docket-cache')
                 )
             );
 
@@ -504,11 +506,12 @@ class Plugin
                 }
 
                 if (is_user_logged_in() && current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options')) {
-                    foreach ($_COOKIE as $name => $value) {
-                        $cookies[] = new \WP_Http_Cookie(['name' => $name, 'value' => $value]);
+                    if (!empty($_COOKIE)) {
+                        foreach ($_COOKIE as $name => $value) {
+                            $cookies[] = new \WP_Http_Cookie(['name' => $name, 'value' => $value]);
+                        }
+                        $args['cookies'] = $cookies;
                     }
-
-                    $args['cookies'] = $cookies;
 
                     @wp_remote_get(admin_url('/'), $args);
                     foreach ($preload_admin as $path) {
@@ -519,6 +522,7 @@ class Plugin
                         @wp_remote_get(network_admin_url('/'), $args);
                         foreach ($preload_network as $path) {
                             @wp_remote_get(network_admin_url('/'.$path), $args);
+                            usleep(7500);
                         }
                     }
                 }
