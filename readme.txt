@@ -9,10 +9,10 @@ Stable tag: trunk
 License: MIT
 License URI: ./license.txt
 
-A persistent WordPress Object Cache stored on local disk.
+A file-based persistent WordPress Object Cache stored as a plain PHP code.
 
 == Description ==
-The Docket cache is a persistent WordPress Object Cache that stored on local disk. Rather than using `serialize` and `unserialize` a PHP object to store into flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance if combined with PHP OPcache.
+The Docket cache is a file-based persistent WordPress Object Cache that stored as a plain PHP code. Rather than using `serialize` and `unserialize` a PHP object to store into flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance if PHP OPcache enabled.
 
 == Configuration Options ==
 
@@ -30,6 +30,8 @@ To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for b
 
 == Screenshots ==
 1. Plugin Overview.
+2. Debug Log.
+3. Options Info.
 
 == Upgrade Notice ==
 

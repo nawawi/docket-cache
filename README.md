@@ -1,11 +1,11 @@
 
-# Docket Cache
+# ![Docket Cache](https://static.monodb.io/logo-150x150.svg) Docket Cache
 
-A persistent WordPress Object Cache stored on local disk.
+A file-based persistent WordPress Object Cache stored as a plain PHP code.
   
 ## Description
 
-The Docket cache is a persistent WordPress Object Cache that stored on local disk. Rather than using `serialize` and `unserialize` a PHP object to store into flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance if combined with PHP OPcache.
+The Docket cache is a file-based persistent WordPress Object Cache that stored as a plain PHP code. Rather than using `serialize` and `unserialize` a PHP object to store into flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance if PHP OPcache enabled.
 
 ## Installation
 
@@ -230,6 +230,10 @@ The following commands are supported:
 
     Updates the Docket object cache drop-in. Default behavior is to overwrite any existing object cache drop-in.
 
+## Screenshots
+![Overview](./.wordpress.org/screenshot-1.png)
+
+![Debug Log](./.wordpress.org/screenshot-2.png)
 
 ## How Versions Work
 
