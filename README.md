@@ -248,6 +248,8 @@ Versions are as follows: Major.Minor.Patch
 
 Anyone can contribute to Docket Cache. Please do so by posting issues when you've found something that is unexpected or sending a pull request for improvements.
 
+- [Report issues](https://github.com/nawawi/docket-cache/issues)
+- [Send Pull requests](https://github.com/nawawi/docket-cache/pulls)
 
 ## License
 
