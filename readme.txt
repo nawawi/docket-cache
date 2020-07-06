@@ -12,8 +12,11 @@ License URI: ./license.txt
 A file-based persistent WordPress Object Cache stored as a plain PHP code.
 
 == Description ==
-The Docket cache is a file-based persistent WordPress Object Cache that stored as a plain PHP code. Rather than using `serialize` and `unserialize` a PHP object to store into flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance if PHP OPcache enabled.
+The Docket cache is a file-based persistent WordPress Object Cache that stored as a plain PHP code. Intends to provide as alternative options for who can't use Redis or Memcache server.
 
+Rather than using serialize and unserialize a PHP object to store into flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance if PHP OPcache enabled.
+
+== Support & Contributions ==
 - [Report issues](https://github.com/nawawi/docket-cache/issues)
 - [Send Pull requests](https://github.com/nawawi/docket-cache/pulls)
 
