@@ -39,6 +39,7 @@ class ComposerStaticInite83f272e926b05c6a29fbd03b6aa4f65
 
     public static $classMap = array (
         'Nawawi\\Docket_Cache\\CLI\\Command' => __DIR__ . '/../../..' . '/includes/src/CLI/Command.php',
+        'Nawawi\\Docket_Cache\\Constans\\Constans' => __DIR__ . '/../../..' . '/includes/src/Constans.php',
         'Nawawi\\Docket_Cache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'Symfony\\Component\\VarExporter\\Exception\\ClassNotFoundException' => __DIR__ . '/..' . '/symfony/var-exporter/Exception/ClassNotFoundException.php',

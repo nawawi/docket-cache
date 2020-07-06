@@ -398,12 +398,20 @@ class WP_Object_Cache
     private $maxttl = 0;
 
     /**
+     * Holds the value of if wp_cli.
+     *
+     * @var bool
+     */
+    private $wpcli;
+
+    /**
      * Sets up object properties.
      */
     public function __construct()
     {
         $this->multisite = is_multisite();
         $this->blog_prefix = $this->switch_to_blog(get_current_blog_id());
+        $this->wpcli = (\defined('WP_CLI') && WP_CLI);
         $this->docket_init();
     }
 
@@ -838,7 +846,7 @@ class WP_Object_Cache
         if (!@file_exists($dir.'/index.php')) {
             $this->debug('flush', 'OK', $cnt);
 
-            if (\defined('WP_CLI') && WP_CLI) {
+            if ($this->wpcli) {
                 do_action('docket_preload');
             }
 
@@ -1000,6 +1008,19 @@ class WP_Object_Cache
 
     private function docket_init()
     {
+        $autoload = sprintf(
+                        '%s/docket-cache/includes/load.php',
+                        \defined('WP_PLUGIN_DIR') ? WP_PLUGIN_DIR : WP_CONTENT_DIR.'/plugins'
+                    );
+
+        if (!file_exists($autoload)) {
+            throw new \Exception('Docket library not found. Re-install Docket Cache plugin or delete object-cache.php.');
+        }
+
+        include_once $autoload;
+
+        Nawawi\Docket_Cache\Constans::init();
+
         if (\defined('DOCKET_CACHE_GLOBAL_GROUPS') && \is_array(DOCKET_CACHE_GLOBAL_GROUPS)) {
             $this->global_groups = DOCKET_CACHE_GLOBAL_GROUPS;
         }
@@ -1019,32 +1040,6 @@ class WP_Object_Cache
             }
         }
 
-        if (!\defined('DOCKET_CACHE_DEBUG')) {
-            \define('DOCKET_CACHE_DEBUG', false);
-        }
-
-        if (!\defined('DOCKET_CACHE_DEBUG_FILE')) {
-            \define('DOCKET_CACHE_DEBUG_FILE', WP_CONTENT_DIR.'/object-cache.log');
-        }
-
-        if (!\defined('DOCKET_CACHE_DEBUG_FLUSH')) {
-            \define('DOCKET_CACHE_DEBUG_FLUSH', true);
-        }
-
-        if (!\defined('DOCKET_CACHE_DEBUG_SIZE')) {
-            \define('DOCKET_CACHE_DEBUG_SIZE', 10000000);
-        }
-
-        $autoload = sprintf(
-                        '%s/docket-cache/includes/load.php',
-                        \defined('WP_PLUGIN_DIR') ? WP_PLUGIN_DIR : WP_CONTENT_DIR.'/plugins'
-                    );
-
-        if (!file_exists($autoload)) {
-            throw new \Exception('Docket library not found. Re-install Docket Cache plugin or delete object-cache.php.');
-        }
-
-        include_once $autoload;
         $this->store_path = \defined('DOCKET_CACHE_PATH') && is_dir(DOCKET_CACHE_PATH) && '/' !== DOCKET_CACHE_PATH ? DOCKET_CACHE_PATH : WP_CONTENT_DIR.'/cache/docket-cache/';
 
         foreach (['added', 'updated', 'deleted'] as $prefix) {
@@ -1118,6 +1113,8 @@ class WP_Object_Cache
         $log = '['.date('Y-m-d H:i:s e').'] '.$tag.': "'.$id.'" "'.trim($data).'"';
         if (!empty($_SERVER['REQUEST_URI'])) {
             $log .= ' "'.$_SERVER['REQUEST_URI'].'"';
+        } elseif ($this->wpcli) {
+            $log .= ' "wp-cli"';
         }
 
         if (isset($duplicate[$log])) {

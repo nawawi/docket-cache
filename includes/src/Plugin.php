@@ -106,7 +106,7 @@ class Plugin
     {
         if (\function_exists('opcache_get_status')) {
             $status = @opcache_get_status();
-            if (\is_array($status) && $status['opcache_enabled']) {
+            if (\is_array($status) && ($status['opcache_enabled'] || $status['file_cache_only'])) {
                 return 1;
             }
 
@@ -246,17 +246,11 @@ class Plugin
 
     private function register_plugin_hooks()
     {
-        if (!\defined('DOCKET_CACHE_PATH')) {
-            \define('DOCKET_CACHE_PATH', WP_CONTENT_DIR.'/cache/docket-cache/');
-        }
+        Constans::init();
 
-        if ('/' === DOCKET_CACHE_PATH) {
+        if (\defined('DOCKET_CACHE_PATH') && '/' === DOCKET_CACHE_PATH) {
             /* translators: %s: path name */
             throw new \Exception(sprintf(__('Invalid setting for DOCKET_CACHE_PATH: %s', 'docket-cache'), DOCKET_CACHE_PATH));
-        }
-
-        if (!\defined('DOCKET_CACHE_MAXTTL') || !\is_int(DOCKET_CACHE_MAXTTL)) {
-            \define('DOCKET_CACHE_MAXTTL', 86400);
         }
 
         add_action(

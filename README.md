@@ -46,62 +46,171 @@ The plugin supports the [GitHub Updater plugin](https://github.com/afragen/githu
 
 To adjust the configuration, define any of the following constants in your `wp-config.php` file.
 
-  * `DOCKET_CACHE_MAXTTL` (default: `86400`)
+**`DOCKET_CACHE_MAXTTL`**
 
-    Set maximum time-to-live (in seconds) for cache keys with an expiration time of `0`.
+Maximum cache time-to-live in seconds, if expiry key `0`.   
+Default:
+```
+define('DOCKET_CACHE_MAXTTL', 8600); 
+```
 
-  * `DOCKET_CACHE_IGNORED_GROUPS` (default: `['counts', 'plugins', 'themes', 'comment', 'wc_session_id', 'bp_notifications', 'bp_messages','bp_pages']`)
+**`DOCKET_CACHE_IGNORED_GROUPS`**
 
-    Set the cache groups that should not be cached.
+List of cache groups that should not be cached.  
+Default:
+```php
+define('DOCKET_CACHE_IGNORED_GROUPS',
+  [
+    'counts',
+    'plugins',
+    'themes',
+    'comment',
+    'wc_session_id',
+    'bp_notifications',
+    'bp_messages',
+    'bp_pages'
+  ]
+);
+```
 
-  * `DOCKET_CACHE_IGNORED_KEYS` (default: _not set_)
+**`DOCKET_CACHE_IGNORED_KEYS`**
 
-    Set the cache keys that should not be cached.
+List of cache keys that should not be cached.  
+Default:
+```php
+define('DOCKET_CACHE_IGNORED_KEYS', []);
+```
 
-  * `DOCKET_CACHE_DISABLED` (default: _not set_)
+**`DOCKET_CACHE_DISABLED`**
 
-    Set to `true` to disable the object cache at runtime.
+Set to `true` to disable the object cache at runtime.  
+Default:
+```php
+define('DOCKET_CACHE_DISABLED', false);
+```
 
-  * `DOCKET_CACHE_PATH` (default: `WP_CONTENT_DIR/cache/docket-cache`)
+**`DOCKET_CACHE_PATH`** 
 
-    Set the cache directory.
+Set the cache directory.
+Default:
+```php
+define('DOCKET_CACHE_PATH`', WP_CONTENT_DIR.'/cache/docket-cache');
+```
 
-  * `DOCKET_CACHE_DEBUG` (default: _not set_)
+**Debug Options**
 
-    Set to `true` to enable debug log.
+**`DOCKET_CACHE_DEBUG`**
 
-  * `DOCKET_CACHE_DEBUG_FLUSH` (default: `true`)
+Set to `true` to enable debug log.  
+Default:
+```php
+define('DOCKET_CACHE_DEBUG', false);
+```
 
-    Set to `true` to empty the log file when object cache flushed.
+**`DOCKET_CACHE_DEBUG_FLUSH`**
 
-  * `DOCKET_CACHE_DEBUG_SIZE` (default: `10000000`)
+Set to `true` to empty the log file when object cache flushed.  
+Default:
+```php
+define('DOCKET_CACHE_DEBUG_FLUSH', true);
+```
 
-    Set the maximum size of log file in byte. Default set to 10MB.
+**`DOCKET_CACHE_DEBUG_SIZE`**
 
-  * `DOCKET_CACHE_PRELOAD` (default: `false`)
+Set the maximum size of a log file in byte. Default set to 10MB.  
+Default:
+```php
+define('DOCKET_CACHE_DEBUG_SIZE', 10000000);
+```
 
-    Set to `true` to enable cache preloading after the cache has been flushed and after installation of drop-in file.
+**`DOCKET_CACHE_PRELOAD`**
 
-  * `DOCKET_CACHE_PRELOAD_ADMIN` (default: `['options-general.php', 'options-writing.php', 'options-reading.php', 'options-discussion.php', 'options-media.php', 'options-permalink.php', 'edit-comments.php', 'profile.php', 'users.php', 'upload.php', 'plugins.php', 'edit.php', 'themes.php', 'tools.php', 'widgets.php', 'update-core.php']`)
+Set to `true` to enable cache preloading, triggered after the cache has been flushed and when installation of drop-in file.  
+Default:
+```php
+define('DOCKET_CACHE_PRELOAD', false);
+```
 
-    Set the list of admin path _(/wp-admin/<path>)_ to preload.
+**`DOCKET_CACHE_PRELOAD_ADMIN`**
+
+Set the list of admin path _(/wp-admin/<path>)_ to preload.  
+Default:
+```php
+define('DOCKET_CACHE_PRELOAD_ADMIN',
+  [
+    'options-general.php',
+    'options-writing.php',
+    'options-reading.php',
+    'options-discussion.php',
+    'options-media.php',
+    'options-permalink.php',
+    'edit-comments.php',
+    'profile.php',
+    'users.php',
+    'upload.php',
+    'plugins.php',
+    'edit.php',
+    'themes.php',
+    'tools.php',
+    'widgets.php',
+    'update-core.php'
+  ]
+);
+```
 
 **Multisite Options**
 
-  * `DOCKET_CACHE_GLOBAL_GROUPS` (default: `['blog-details', 'blog-id-cache', 'blog-lookup', 'global-posts', 'networks', 'rss', 'sites', 'site-details', 'site-lookup', 'site-options', 'site-transient', 'users', 'useremail', 'userlogins', 'usermeta', 'user_meta', 'userslugs']`)
+**`DOCKET_CACHE_GLOBAL_GROUPS`**
 
-    Set the list of network-wide cache groups that should not be prefixed with the blog-id.
+Set the list of network-wide cache groups that should not be prefixed with the blog-id.
+Default:
+```php
+define('DOCKET_CACHE_GLOBAL_GROUPS',
+  [
+    'blog-details',
+    'blog-id-cache',
+    'blog-lookup',
+    'global-posts',
+    'networks',
+    'rss',
+    'sites',
+    'site-details',
+    'site-lookup',
+    'site-options',
+    'site-transient',
+    'users',
+    'useremail',
+    'userlogins',
+    'usermeta',
+    'user_meta',
+    'userslugs'
+  ]
+);
+```
 
-  * `DOCKET_CACHE_PRELOAD_NETWORK` (default: `['update-core.php', 'sites.php', 'users.php', 'themes.php', 'plugins.php', 'settings.php']`)
+**`DOCKET_CACHE_PRELOAD_NETWORK`**
 
-    Set the list of network admin path _(/wp-admin/network/<path>)_ to preload.
-
+Set the list of network admin path _(/wp-admin/network/<path>)_ to preload.
+Default:
+```php
+define('DOCKET_CACHE_PRELOAD_ADMIN',
+  [
+    'update-core.php',
+    'sites.php',
+    'users.php',
+    'themes.php',
+    'plugins.php',
+    'settings.php'
+  ]
+);
+```
 
 ## WP-CLI Commands
 
 To use the WP-CLI commands, make sure the plugin is activated:
-
-    wp plugin activate docket-cache
+```
+wp plugin activate docket-cache
+```
 
 The following commands are supported:
 

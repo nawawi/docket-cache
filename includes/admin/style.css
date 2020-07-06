@@ -43,16 +43,19 @@
     width: 100%;
 }
 
-#docket-cache .log textarea {
+#docket-cache textarea {
     width: 100%;
 	font-size: 100%;
 	font: courier;
 	vertical-align: baseline;
     margin-bottom: 10px;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: scroll;
 }
 
-@media screen and (min-width: 1110px) {
-    #docket-cache .section {
-        float: left;
-    }
+#docket-cache .section {
+    float: left;
 }
+
+
