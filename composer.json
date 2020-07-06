@@ -2,7 +2,10 @@
     "name": "nawawi/docket-cache",
     "description": "A file-based persistent WordPress Object Cache stored as a plain PHP code.",
     "keywords": [
-        "object cache"
+        "object cache",
+        "cache",
+        "wordpress plugin",
+        "flat-file"
     ],
     "type": "wordpress-plugin",
     "license": "MIT",
