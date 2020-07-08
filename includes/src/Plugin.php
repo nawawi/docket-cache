@@ -472,7 +472,7 @@ class Plugin
                     'user-agent' => 'docket-cache',
                     'body' => null,
                     'compress' => false,
-                    'decompress' => true,
+                    'decompress' => false,
                     'sslverify' => false,
                     'stream' => false,
                 ];
@@ -507,7 +507,7 @@ class Plugin
                     'settings.php',
                 ];
 
-                if (\defined('DOCKET_CACHE_PRELOAD_ADMIN') && \is_array(DOCKET_CACHE_PRELOAD_ADMIN) && !empty(OCKET_CACHE_PRELOAD_ADMIN)) {
+                if (\defined('DOCKET_CACHE_PRELOAD_ADMIN') && \is_array(DOCKET_CACHE_PRELOAD_ADMIN) && !empty(DOCKET_CACHE_PRELOAD_ADMIN)) {
                     $preload_admin = DOCKET_CACHE_PRELOAD_ADMIN;
                 }
 
@@ -536,7 +536,7 @@ class Plugin
                         }
                     }
                 }
-            }, PHP_INT_MAX, 2);
+            }, PHP_INT_MAX);
         });
     }
 
