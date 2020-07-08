@@ -1,5 +1,5 @@
 === Docket Cache ===
-Contributors: nawawijamili
+Contributors: nawawijamili,rutflare
 Tags: object cache, cache, performance, flat-file
 Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
