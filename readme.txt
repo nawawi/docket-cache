@@ -1,4 +1,4 @@
-=== Docket cache ===
+=== Docket Cache ===
 Contributors: nawawijamili
 Tags: object cache, cache, performance, flat-file
 Donate link: https://www.paypal.me/ghostbirdme/5usd

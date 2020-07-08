@@ -12,7 +12,7 @@
  * @wordpress-plugin
  * Plugin Name:         Docket Cache
  * Version:             1.0.0
- * Description:         A persistent WP Object Cache stored on local disk.
+ * Description:         A file-based persistent WordPress Object Cache stored as a plain PHP code.
  * GitHub Plugin URI:   https://github.com/nawawi/docket-cache
  * Author:              Nawawi Jamili
  * Author URI:          https://rutweb.com

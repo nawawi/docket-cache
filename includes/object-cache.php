@@ -914,6 +914,15 @@ class WP_Object_Cache
         return $data['data'];
     }
 
+    private function docket_code($data)
+    {
+        $code = '<?php ';
+        $code .= "defined('ABSPATH') || exit;".PHP_EOL;
+        $code .= 'return '.$data.';'.PHP_EOL;
+
+        return $code;
+    }
+
     private function docket_save($key, $data, $group = 'default', $expire = 0)
     {
         if (!wp_mkdir_p($this->store_path)) {
@@ -938,9 +947,7 @@ class WP_Object_Cache
         ];
 
         $data = $this->export_var($meta);
-
-        $code = '<?php ';
-        $code .= 'return '.$data.';'.PHP_EOL;
+        $code = $this->docket_code($data);
 
         if ($this->file_put($file, $code)) {
             $this->debug('set', $group.':'.$key, basename($file, '.php'));
@@ -962,8 +969,7 @@ class WP_Object_Cache
         $meta['data'] = $data;
         $data = $this->export_var($meta);
 
-        $code = '<?php ';
-        $code .= 'return '.$data.';'.PHP_EOL;
+        $code = $this->docket_code($data);
 
         return $this->file_put($file, $code);
     }
@@ -1019,7 +1025,9 @@ class WP_Object_Cache
 
         include_once $autoload;
 
-        Nawawi\Docket_Cache\Constans::init();
+        if (class_exists('Nawawi\\Docket_Cache\\Constans')) {
+            Nawawi\Docket_Cache\Constans::init();
+        }
 
         if (\defined('DOCKET_CACHE_GLOBAL_GROUPS') && \is_array(DOCKET_CACHE_GLOBAL_GROUPS)) {
             $this->global_groups = DOCKET_CACHE_GLOBAL_GROUPS;

@@ -1,4 +1,5 @@
 dist/
+wp-plugins-svn/
 composer.lock
 /includes/vendor/bin/
 /includes/vendor/composer/*.json

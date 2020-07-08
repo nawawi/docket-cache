@@ -43,7 +43,7 @@
     },
     "scripts": {
         "post-update-cmd": [
-            "wp i18n make-pot . languages/docket-cache.pot"
+            "wp i18n make-pot . languages/docket-cache.pot --exclude='dist/,wp-plugins-svn/'"
         ]
     },
     "autoload": {
