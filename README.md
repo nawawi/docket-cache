@@ -7,18 +7,24 @@ A file-based persistent WordPress Object Cache stored as a plain PHP code.
 
 The Docket cache is a file-based persistent WordPress Object Cache that stored as a plain PHP code. Intends to provide as alternative options for who can't use Redis or Memcache server.
 
-Rather than using `serialize` and `unserialize` a PHP object to store into flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance if PHP OPcache enabled.
+Rather than using `serialize` and `unserialize` a PHP object to store into flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance with PHP OPCache enabled.
 
 ## Installation
 
 To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for better performance.
 
-### Manual
+### WordPress Plugin Directory
+1. In your WordPress admin click *Plugins -> Add New*
+2. Search plugins "Docket Cache".
+3. Click *Install Now*
+4. Click *Activate* or *Network Activate* in Multisite setups.
+
+### Manually Install
  1. Download the plugin as a [ZIP file](https://github.com/nawawi/docket-cache/archive/master.zip) from GitHub.
  2. In your WordPress admin click *Plugins -> Add New -> Upload Plugin*.
  3. Upload the ZIP file.
  4. Activate the plugin.
- 5. Enable the object cache under _Settings -> Docket Cache_, or in Multisite setups under _Network Admin -> Settings -> Docket Cache_.
+ 5. Enable the object cache under *Settings -> Docket Cache*, or in Multisite setups under *Network Admin -> Settings -> Docket Cache*.
 
 ### Via WP-CLI
 
@@ -41,7 +47,7 @@ git clone https://github.com/nawawi/docket-cache
 ```
 
 ### Automatic Udates
-The plugin supports the [GitHub Updater plugin](https://github.com/afragen/github-updater) for WordPress. The plugin enables automatic updates from this GitHub Repository. You will find all information about the how and why at the [plugin wiki page](https://github.com/afragen/github-updater/wiki).
+Besides WordPress auto updates, Docket Cache supports the [GitHub Updater plugin](https://github.com/afragen/github-updater) WordPress. The plugin enables automatic updates from this GitHub Repository. You will find all information about the how and why at the [plugin wiki page](https://github.com/afragen/github-updater/wiki).
 
 
 ## Configuration Options
