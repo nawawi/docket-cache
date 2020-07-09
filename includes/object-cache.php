@@ -920,15 +920,20 @@ class WP_Object_Cache
         $fx = basename($file, '.php');
 
         $data = @include $file;
-        if (empty($data) || !isset($data['data'])) {
+        if (empty($data) && !isset($data['data'])) {
             $this->debug('err', 'invalid index', $fx);
-            @unlink($file);
+            if (!DOCKET_CACHE_DEBUG) {
+                @unlink($file);
+            }
 
             return false;
         }
 
         if (!isset($data['timeout'])) {
             $this->debug('err', 'timeout not set', $fx);
+            if (!DOCKET_CACHE_DEBUG) {
+                @unlink($file);
+            }
         } elseif ($data['timeout'] > 0 && time() >= $data['timeout']) {
             $this->debug('exp', $group.':'.$key, $fx);
             $this->docket_remove($key, $group);

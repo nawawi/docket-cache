@@ -16,8 +16,9 @@ To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for b
 ### WordPress Plugin Directory
 1. In your WordPress admin click *Plugins -> Add New*
 2. Search plugins "Docket Cache".
-3. Click *Install Now*
+3. Click *Install Now*.
 4. Click *Activate* or *Network Activate* in Multisite setups.
+5. Enable the object cache under Settings -> Docket Cache, or in Multisite setups under Network Admin -> Settings -> Docket Cache.
 
 ### Manually Install
  1. Download the plugin as a [ZIP file](https://github.com/nawawi/docket-cache/archive/master.zip) from GitHub.
@@ -212,6 +213,13 @@ define('DOCKET_CACHE_PRELOAD_ADMIN',
   ]
 );
 ```
+**`DOCKET_CACHE_ADVCPOST`**
+
+Set to true to enable Advanced Post Cache.  
+Default:
+```php
+define('DOCKET_CACHE_ADVCPOST', true);
+```
 
 ## WP-CLI Commands
 
@@ -245,11 +253,11 @@ The following commands are supported:
 
 ## How Versions Work
 
-Versions are as follows: Major.Minor.Patch
+Versions are as follows: Year.Month.Day
 
-* Major: Rewrites with completely new code-base.
-* Minor: New Features/Changes that breaks compatibility.
-* Patch: New Features/Fixes that does not break compatibility.
+* Year: Two digit year of release.
+* Month: Two digit month of release.
+* Day: Two digit day of release.
 
 
 ## Contributions

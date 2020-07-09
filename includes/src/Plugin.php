@@ -148,9 +148,12 @@ class Plugin
         if (\is_string($size)) {
             $unit = strtolower(substr($size, -1));
             switch ($unit) {
-                case 'm': return  (int) $size * 1048576;
-                case 'k': return  (int) $size * 1024;
-                case 'g': return  (int) $size * 1073741824;
+                case 'm':
+                    return  (int) $size * 1048576;
+                case 'k':
+                    return  (int) $size * 1024;
+                case 'g':
+                    return  (int) $size * 1073741824;
             }
         }
 
@@ -239,7 +242,7 @@ class Plugin
 
     public static function uninstall()
     {
-        (new self())->dropin_remove();
+        ( new self() )->dropin_remove();
     }
 
     public function deactivate()
@@ -292,252 +295,285 @@ class Plugin
     private function register_admin_hooks()
     {
         $action_name = is_multisite() ? 'network_admin_menu' : 'admin_menu';
-        add_action($action_name, function () {
-            $page_link = is_multisite() ? 'settings.php' : 'options-general.php';
-            $page_cap = is_multisite() ? 'manage_network_options' : 'manage_options';
+        add_action(
+            $action_name,
+            function () {
+                $page_link = is_multisite() ? 'settings.php' : 'options-general.php';
+                $page_cap = is_multisite() ? 'manage_network_options' : 'manage_options';
 
-            add_submenu_page(
-                $page_link,
-                __('Docket Object Cache', 'docket-cache'),
-                __('Docket Cache', 'docket-cache'),
-                $page_cap,
-                $this->slug,
-                function () {
-                    if (isset($_GET['_wpnonce'], $_GET['action'])) {
-                        $action = sanitize_text_field($_GET['action']);
+                add_submenu_page(
+                    $page_link,
+                    __('Docket Object Cache', 'docket-cache'),
+                    __('Docket Cache', 'docket-cache'),
+                    $page_cap,
+                    $this->slug,
+                    function () {
+                        if (isset($_GET['_wpnonce'], $_GET['action'])) {
+                            $action = sanitize_text_field($_GET['action']);
 
-                        foreach ($this->actions as $name) {
-                            if ($action === $name && wp_verify_nonce($_GET['_wpnonce'], $action)) {
-                                $url = wp_nonce_url(network_admin_url(add_query_arg('action', $action, $this->page)), $action);
-                                if (false === $this->access_filesystem($url)) {
-                                    return;
+                            foreach ($this->actions as $name) {
+                                if ($action === $name && wp_verify_nonce($_GET['_wpnonce'], $action)) {
+                                    $url = wp_nonce_url(network_admin_url(add_query_arg('action', $action, $this->page)), $action);
+                                    if (false === $this->access_filesystem($url)) {
+                                        return;
+                                    }
                                 }
                             }
                         }
+                        include_once $this->path.'/includes/admin/page.php';
                     }
-                    include_once $this->path.'/includes/admin/page.php';
-                }
-            );
-        });
-
-        add_action('all_admin_notices', function () {
-            if (!current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options')) {
-                return;
+                );
             }
+        );
 
-            if ($this->has_dropin()) {
-                $url = wp_nonce_url(network_admin_url(add_query_arg('action', 'docket-update-dropin', $this->page)), 'docket-update-dropin');
-
-                if ($this->validate_dropin()) {
-                    if (version_compare($this->plugin_data('dropin')['Version'], $this->plugin_data('plugin')['Version'], '<')) {
-                        /* translators: %s: url */
-                        $message = sprintf(__('The Docket Object Cache drop-in is outdated. Please <a href="%s">update it now</a>', 'docket-cache'), $url);
-                    }
-                } else {
-                    /* translators: %s: url */
-                    $message = sprintf(__('An unknown object cache drop-in was found. To use Docket, <a href="%s" class="button button-secondary button-large">please replace it now</a>.', 'docket-cache'), $url);
+        add_action(
+            'all_admin_notices',
+            function () {
+                if (!current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options')) {
+                    return;
                 }
 
-                if (isset($message)) {
-                    echo '<div id="docket-notice" class="notice notice-warning">';
-                    echo '<p><strong>'.$message.'</strong></p>';
-                    echo '</div>';
-                }
-            }
-        });
+                if ($this->has_dropin()) {
+                    $url = wp_nonce_url(network_admin_url(add_query_arg('action', 'docket-update-dropin', $this->page)), 'docket-update-dropin');
 
-        add_action('admin_enqueue_scripts', function ($hook) {
-            if ($hook === $this->screen) {
-                wp_enqueue_style($this->slug, plugin_dir_url($this->file).'includes/admin/style.css', null, $this->version);
-            }
-        });
-
-        add_action('wp_ajax_docket_preload', function () {
-            do_action('docket_preload');
-            wp_send_json_success($this->slug.': run preload');
-        });
-
-        add_action('load-'.$this->screen, function () {
-            if (isset($_GET['_wpnonce'], $_GET['action'])) {
-                $action = sanitize_text_field($_GET['action']);
-
-                foreach ($this->actions as $name) {
-                    if ($action === $name && !wp_verify_nonce($_GET['_wpnonce'], $action)) {
-                        return;
-                    }
-                }
-
-                if (\in_array($action, $this->actions)) {
-                    $url = wp_nonce_url(network_admin_url(add_query_arg('action', $action, $this->page)), $action);
-
-                    if ('docket-flush-cache' === $action) {
-                        $message = wp_cache_flush() ? 'docket-cache-flushed' : 'docket-cache-flushed-failed';
-                        $this->empty_log();
-                    }
-
-                    if ($this->access_filesystem($url, true)) {
-                        switch ($action) {
-                            case 'docket-enable-cache':
-                                $result = $this->dropin_install();
-                                $message = $result ? 'docket-cache-enabled' : 'docket-cache-enabled-failed';
-                                do_action('docket_cache_enable', $result);
-                                break;
-
-                            case 'docket-disable-cache':
-                                $result = $this->dropin_uninstall();
-                                $message = $result ? 'docket-cache-disabled' : 'docket-cache-disabled-failed';
-                                do_action('docket_cache_disable', $result);
-                                break;
-
-                            case 'docket-update-dropin':
-                                $result = $this->dropin_install();
-                                $message = $result ? 'docket-dropin-updated' : 'docket-dropin-updated-failed';
-                                do_action('docket_cache_update_dropin', $result);
-                                break;
+                    if ($this->validate_dropin()) {
+                        if (version_compare($this->plugin_data('dropin')['Version'], $this->plugin_data('plugin')['Version'], '<')) {
+                            /* translators: %s: url */
+                            $message = sprintf(__('The Docket Object Cache drop-in is outdated. Please <a href="%s">update it now</a>', 'docket-cache'), $url);
                         }
+                    } else {
+                        /* translators: %s: url */
+                        $message = sprintf(__('An unknown object cache drop-in was found. To use Docket, <a href="%s" class="button button-secondary button-large">please replace it now</a>.', 'docket-cache'), $url);
                     }
 
                     if (isset($message)) {
-                        wp_safe_redirect(network_admin_url(add_query_arg('message', $message, $this->page)));
-                        exit;
+                        echo '<div id="docket-notice" class="notice notice-warning">';
+                        echo '<p><strong>'.$message.'</strong></p>';
+                        echo '</div>';
                     }
                 }
             }
-        });
+        );
 
-        add_action('load-'.$this->screen, function () {
-            if (version_compare(PHP_VERSION, '7.2', '<')) {
-                add_settings_error(is_multisite() ? 'general' : '', $this->slug, __('This plugin requires PHP 7.2 or greater.', 'docket-cache'));
+        add_action(
+            'admin_enqueue_scripts',
+            function ($hook) {
+                if ($hook === $this->screen) {
+                    wp_enqueue_style($this->slug, plugin_dir_url($this->file).'includes/admin/style.css', null, $this->version);
+                }
             }
+        );
 
-            if (isset($_GET['message'])) {
-                $token = sanitize_text_field($_GET['message']);
-                $this->token = $token;
-                switch ($token) {
-                    case 'docket-cache-enabled':
-                        $message = __('Object cache enabled.', 'docket-cache');
-                        break;
-                    case 'docket-cache-enabled-failed':
-                        $error = __('Object cache could not be enabled.', 'docket-cache');
-                        break;
-                    case 'docket-cache-disabled':
-                        $message = __('Object cache disabled.', 'docket-cache');
-                        break;
-                    case 'docket-cache-disabled-failed':
-                        $error = __('Object cache could not be disabled.', 'docket-cache');
-                        break;
-                    case 'docket-cache-flushed':
-                        $message = __('Object cache was flushed.', 'docket-cache');
-                        break;
-                    case 'docket-cache-flushed-failed':
-                        $error = __('Object cache could not be flushed.', 'docket-cache');
-                        break;
-                    case 'docket-dropin-updated':
-                        $message = __('Updated object cache drop-in and enabled Docket object cache.', 'docket-cache');
-                        break;
-                    case 'docket-dropin-updated-failed':
-                        $error = __('Docket object cache drop-in could not be updated.', 'docket-cache');
-                        break;
+        add_action(
+            'wp_ajax_docket_preload',
+            function () {
+                do_action('docket_preload');
+                wp_send_json_success($this->slug.': run preload');
+            }
+        );
+
+        add_action(
+            'load-'.$this->screen,
+            function () {
+                if (isset($_GET['_wpnonce'], $_GET['action'])) {
+                    $action = sanitize_text_field($_GET['action']);
+
+                    foreach ($this->actions as $name) {
+                        if ($action === $name && !wp_verify_nonce($_GET['_wpnonce'], $action)) {
+                            return;
+                        }
+                    }
+
+                    if (\in_array($action, $this->actions)) {
+                        $url = wp_nonce_url(network_admin_url(add_query_arg('action', $action, $this->page)), $action);
+
+                        if ('docket-flush-cache' === $action) {
+                            $message = wp_cache_flush() ? 'docket-cache-flushed' : 'docket-cache-flushed-failed';
+                            $this->empty_log();
+                        }
+
+                        if ($this->access_filesystem($url, true)) {
+                            switch ($action) {
+                                case 'docket-enable-cache':
+                                    $result = $this->dropin_install();
+                                    $message = $result ? 'docket-cache-enabled' : 'docket-cache-enabled-failed';
+                                    do_action('docket_cache_enable', $result);
+                                    break;
+
+                                case 'docket-disable-cache':
+                                    $result = $this->dropin_uninstall();
+                                    $message = $result ? 'docket-cache-disabled' : 'docket-cache-disabled-failed';
+                                    do_action('docket_cache_disable', $result);
+                                    break;
+
+                                case 'docket-update-dropin':
+                                    $result = $this->dropin_install();
+                                    $message = $result ? 'docket-dropin-updated' : 'docket-dropin-updated-failed';
+                                    do_action('docket_cache_update_dropin', $result);
+                                    break;
+                            }
+                        }
+
+                        if (isset($message)) {
+                            wp_safe_redirect(network_admin_url(add_query_arg('message', $message, $this->page)));
+                            exit;
+                        }
+                    }
+                }
+            }
+        );
+
+        add_action(
+            'load-'.$this->screen,
+            function () {
+                if (version_compare(PHP_VERSION, '7.2', '<')) {
+                    add_settings_error(is_multisite() ? 'general' : '', $this->slug, __('This plugin requires PHP 7.2 or greater.', 'docket-cache'));
                 }
 
-                add_settings_error(is_multisite() ? 'general' : '', $this->slug, isset($message) ? $message : $error, isset($message) ? 'updated' : 'error');
+                if (isset($_GET['message'])) {
+                    $token = sanitize_text_field($_GET['message']);
+                    $this->token = $token;
+                    switch ($token) {
+                        case 'docket-cache-enabled':
+                            $message = __('Object cache enabled.', 'docket-cache');
+                            break;
+                        case 'docket-cache-enabled-failed':
+                            $error = __('Object cache could not be enabled.', 'docket-cache');
+                            break;
+                        case 'docket-cache-disabled':
+                            $message = __('Object cache disabled.', 'docket-cache');
+                            break;
+                        case 'docket-cache-disabled-failed':
+                            $error = __('Object cache could not be disabled.', 'docket-cache');
+                            break;
+                        case 'docket-cache-flushed':
+                            $message = __('Object cache was flushed.', 'docket-cache');
+                            break;
+                        case 'docket-cache-flushed-failed':
+                            $error = __('Object cache could not be flushed.', 'docket-cache');
+                            break;
+                        case 'docket-dropin-updated':
+                            $message = __('Updated object cache drop-in and enabled Docket object cache.', 'docket-cache');
+                            break;
+                        case 'docket-dropin-updated-failed':
+                            $error = __('Docket object cache drop-in could not be updated.', 'docket-cache');
+                            break;
+                    }
+
+                    add_settings_error(is_multisite() ? 'general' : '', $this->slug, isset($message) ? $message : $error, isset($message) ? 'updated' : 'error');
+                }
             }
-        });
+        );
 
         $filter_name = sprintf('%splugin_action_links_%s', is_multisite() ? 'network_admin_' : '', $this->hook);
-        add_filter($filter_name, function ($links) {
-            array_unshift(
-                $links,
-                sprintf(
-                    '<a href="%s">%s</a>',
-                    network_admin_url($this->page),
-                    __('Settings', 'docket-cache')
-                )
-            );
+        add_filter(
+            $filter_name,
+            function ($links) {
+                array_unshift(
+                    $links,
+                    sprintf(
+                        '<a href="%s">%s</a>',
+                        network_admin_url($this->page),
+                        __('Settings', 'docket-cache')
+                    )
+                );
 
-            return $links;
-        });
-
-        add_action('docket_preload', function () {
-            if (!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD) {
-                return;
+                return $links;
             }
+        );
 
-            // preload
-            add_action('shutdown', function () {
-                $args = [
-                    'blocking' => false,
-                    'timeout' => 45,
-                    'httpversion' => '1.1',
-                    'user-agent' => 'docket-cache',
-                    'body' => null,
-                    'compress' => false,
-                    'decompress' => false,
-                    'sslverify' => false,
-                    'stream' => false,
-                ];
-
-                @wp_remote_get(get_home_url(), $args);
-
-                $preload_admin = [
-                    'options-general.php',
-                    'options-writing.php',
-                    'options-reading.php',
-                    'options-discussion.php',
-                    'options-media.php',
-                    'options-permalink.php',
-                    'edit-comments.php',
-                    'profile.php',
-                    'users.php',
-                    'upload.php',
-                    'plugins.php',
-                    'edit.php',
-                    'themes.php',
-                    'tools.php',
-                    'widgets.php',
-                    'update-core.php',
-                ];
-
-                $preload_network = [
-                    'update-core.php',
-                    'sites.php',
-                    'users.php',
-                    'themes.php',
-                    'plugins.php',
-                    'settings.php',
-                ];
-
-                if (\defined('DOCKET_CACHE_PRELOAD_ADMIN') && \is_array(DOCKET_CACHE_PRELOAD_ADMIN) && !empty(DOCKET_CACHE_PRELOAD_ADMIN)) {
-                    $preload_admin = DOCKET_CACHE_PRELOAD_ADMIN;
+        add_action(
+            'docket_preload',
+            function () {
+                if (!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD) {
+                    return;
                 }
 
-                if (\defined('DOCKET_CACHE_PRELOAD_NETWORK') && \is_array(DOCKET_CACHE_PRELOAD_NETWORK) && !empty(DOCKET_CACHE_PRELOAD_NETWORK)) {
-                    $preload_network = DOCKET_CACHE_PRELOAD_NETWORK;
-                }
+                // preload
+                add_action(
+                    'shutdown',
+                    function () {
+                        $args = [
+                            'blocking' => false,
+                            'timeout' => 45,
+                            'httpversion' => '1.1',
+                            'user-agent' => 'docket-cache',
+                            'body' => null,
+                            'compress' => false,
+                            'decompress' => false,
+                            'sslverify' => false,
+                            'stream' => false,
+                        ];
 
-                if (is_user_logged_in() && current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options')) {
-                    if (!empty($_COOKIE)) {
-                        foreach ($_COOKIE as $name => $value) {
-                            $cookies[] = new \WP_Http_Cookie(['name' => $name, 'value' => $value]);
+                        @wp_remote_get(get_home_url(), $args);
+
+                        $preload_admin = [
+                            'options-general.php',
+                            'options-writing.php',
+                            'options-reading.php',
+                            'options-discussion.php',
+                            'options-media.php',
+                            'options-permalink.php',
+                            'edit-comments.php',
+                            'profile.php',
+                            'users.php',
+                            'upload.php',
+                            'plugins.php',
+                            'edit.php',
+                            'themes.php',
+                            'tools.php',
+                            'widgets.php',
+                            'update-core.php',
+                        ];
+
+                        $preload_network = [
+                            'update-core.php',
+                            'sites.php',
+                            'users.php',
+                            'themes.php',
+                            'plugins.php',
+                            'settings.php',
+                        ];
+
+                        if (\defined('DOCKET_CACHE_PRELOAD_ADMIN') && \is_array(DOCKET_CACHE_PRELOAD_ADMIN) && !empty(DOCKET_CACHE_PRELOAD_ADMIN)) {
+                            $preload_admin = DOCKET_CACHE_PRELOAD_ADMIN;
                         }
-                        $args['cookies'] = $cookies;
-                    }
 
-                    @wp_remote_get(admin_url('/'), $args);
-                    foreach ($preload_admin as $path) {
-                        @wp_remote_get(admin_url('/'.$path), $args);
-                    }
-
-                    if (is_multisite()) {
-                        @wp_remote_get(network_admin_url('/'), $args);
-                        foreach ($preload_network as $path) {
-                            @wp_remote_get(network_admin_url('/'.$path), $args);
-                            usleep(7500);
+                        if (\defined('DOCKET_CACHE_PRELOAD_NETWORK') && \is_array(DOCKET_CACHE_PRELOAD_NETWORK) && !empty(DOCKET_CACHE_PRELOAD_NETWORK)) {
+                            $preload_network = DOCKET_CACHE_PRELOAD_NETWORK;
                         }
-                    }
-                }
-            }, PHP_INT_MAX);
-        });
+
+                        if (is_user_logged_in() && current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options')) {
+                            if (!empty($_COOKIE)) {
+                                foreach ($_COOKIE as $name => $value) {
+                                    $cookies[] = new \WP_Http_Cookie(
+                                        [
+                                            'name' => $name,
+                                            'value' => $value,
+                                        ]
+                                    );
+                                }
+                                $args['cookies'] = $cookies;
+                            }
+
+                            @wp_remote_get(admin_url('/'), $args);
+                            foreach ($preload_admin as $path) {
+                                @wp_remote_get(admin_url('/'.$path), $args);
+                            }
+
+                            if (is_multisite()) {
+                                @wp_remote_get(network_admin_url('/'), $args);
+                                foreach ($preload_network as $path) {
+                                    @wp_remote_get(network_admin_url('/'.$path), $args);
+                                    usleep(7500);
+                                }
+                            }
+                        }
+                    },
+                    PHP_INT_MAX
+                );
+            }
+        );
     }
 
     private function has_log()
@@ -576,10 +612,67 @@ class Plugin
         return $output;
     }
 
+    private function register_tweaks()
+    {
+        add_action(
+            'pre_get_posts',
+            function () {
+                remove_filter('posts_clauses', '_filter_query_attachment_filenames');
+            },
+            PHP_INT_MAX
+        );
+
+        add_filter(
+            'wp_link_query_args',
+            function ($query) {
+                $query['no_found_rows'] = true;
+
+                return $query;
+            },
+            PHP_INT_MAX
+        );
+
+        add_filter('postmeta_form_keys', '__return_false');
+
+        add_action(
+            'after_setup_theme',
+            function () {
+                remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
+            }
+        );
+
+        add_action(
+            'pre_get_users',
+            function ($wpq) {
+                if (isset($wpq->query_vars['count_total']) && $wpq->query_vars['count_total']) {
+                    $wpq->query_vars['count_total'] = false;
+                    $wpq->query_vars['run_count'] = true;
+                }
+            }
+        );
+
+        add_action(
+            'pre_user_query',
+            function ($wpq) {
+                global $wpdb;
+                if (isset($wpq->query_vars['run_count']) && $wpq->query_vars['run_count']) {
+                    unset($wpq->query_vars['run_count']);
+                    $sql = "SELECT COUNT(*) $wpq->query_from $wpq->query_where";
+                    $wpq->total_users = $wpdb->get_var($sql);
+                }
+            }
+        );
+
+        if (\defined('DOCKET_CACHE_ADVCPOST') && DOCKET_CACHE_ADVCPOST && $this->has_dropin()) {
+            new Advanced_Post_Cache();
+        }
+    }
+
     public function attach()
     {
         $this->register_plugin_hooks();
         $this->register_admin_hooks();
+        $this->register_tweaks();
 
         if (\defined('WP_CLI') && WP_CLI && !\defined('Docket_Cache_CLI')) {
             \define('Docket_Cache_CLI', true);

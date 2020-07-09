@@ -40,7 +40,16 @@ To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for b
 3. Options Info.
 
 == Upgrade Notice ==
+= 20.07.09 ==
+- Versions are as follows: Year.Month.Day of new release.
+- Please do manually remove WP-content/object-cache.php and WP-content/cache/docker-cache if an error occurs during updates.
 
 == Changelog ==
+= 20.07.09 =
+- Fixed: Invalid data -> docket_update, docket_get.
+- Added: opcache_invalidate after updating cache -> opcache_flush_file.
+- Added: performance tweaks -> register_tweaks.
+- Added: Advanced Post Cache from vip-go.
+
 = 1.0.0 =
 - Initial release of the plugin.

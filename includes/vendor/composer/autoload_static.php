@@ -38,6 +38,7 @@ class ComposerStaticInite83f272e926b05c6a29fbd03b6aa4f65
     );
 
     public static $classMap = array (
+        'Nawawi\\Docket_Cache\\Advanced_Post_Cache' => __DIR__ . '/../../..' . '/includes/src/Advanced_Post_Cache.php',
         'Nawawi\\Docket_Cache\\CLI\\Command' => __DIR__ . '/../../..' . '/includes/src/CLI/Command.php',
         'Nawawi\\Docket_Cache\\Constans' => __DIR__ . '/../../..' . '/includes/src/Constans.php',
         'Nawawi\\Docket_Cache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',

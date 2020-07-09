@@ -34,8 +34,11 @@ composer.lock
 
 *.cache
 *.sh
+*.phar
 !/tests/
 /tests/*
 !/tests/*.php
 *-phar*.php
 .php_cs
+CodeSniffer.*
+note.txt

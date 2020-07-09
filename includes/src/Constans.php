@@ -37,5 +37,9 @@ class Constans
         if (!\defined('DOCKET_CACHE_DEBUG_SIZE')) {
             \define('DOCKET_CACHE_DEBUG_SIZE', 10000000);
         }
+
+        if (!\defined('DOCKET_CACHE_ADVCPOST')) {
+            \define('DOCKET_CACHE_ADVCPOST', true);
+        }
     }
 }
