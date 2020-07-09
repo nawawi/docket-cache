@@ -1,5 +1,5 @@
 
-# ![Docket Cache](./.wordpress.org/icon-128x128.png) <span style="display:inline-block;white-space:nowrap;">Docket Cache</span>
+# ![Docket Cache](./.wordpress.org/icon-128x128.png) Docket Cache
 
 A file-based persistent WordPress Object Cache stored as a plain PHP code.
   
