@@ -2,8 +2,8 @@
 /**
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
- * Version:             20200706
- * Description:         A persistent WP Object Cache stored on local disk.
+ * Version:             20200709
+ * Description:         A file-based persistent WordPress Object Cache stored as a plain PHP code.
  * Author:              Nawawi Jamili
  * Author URI:          https://rutweb.com
  * Requires at least:   5.4
@@ -735,7 +735,7 @@ class WP_Object_Cache
     {
         $is_exists = isset($this->cache[$group]) && (isset($this->cache[$group][$key]) || \array_key_exists($key, $this->cache[$group]));
         if (!$is_exists) {
-            $data = $this->docket_get($key, $group);
+            $data = $this->docket_get($key, $group, false);
             if (false !== $data) {
                 $this->cache[$group][$key] = $data;
                 $is_exists = true;
@@ -800,6 +800,23 @@ class WP_Object_Cache
         }
 
         return $key;
+    }
+
+    private function opcache_flush_file($file)
+    {
+        static $done = [];
+
+        if (isset($done[$file])) {
+            return true;
+        }
+
+        if (\function_exists('opcache_invalidate') && file_exists($file)) {
+            $done[$file] = $file;
+
+            return @opcache_invalidate($file, true);
+        }
+
+        return false;
     }
 
     private function export_var($data)
@@ -893,25 +910,33 @@ class WP_Object_Cache
         return false;
     }
 
-    private function docket_get($key, $group)
+    private function docket_get($key, $group, $is_raw = false)
     {
         $file = $this->get_file_path($key, $group);
         if (!file_exists($file)) {
             return false;
         }
+
+        $fx = basename($file, '.php');
+
         $data = @include $file;
-        if (empty($data)) {
+        if (empty($data) || !isset($data['data'])) {
+            $this->debug('err', 'invalid index', $fx);
+            @unlink($file);
+
             return false;
         }
 
-        if ($data['timeout'] > 0 && time() >= $data['timeout']) {
-            $this->debug('exp', $group.':'.$key, basename($file, '.php'));
+        if (!isset($data['timeout'])) {
+            $this->debug('err', 'timeout not set', $fx);
+        } elseif ($data['timeout'] > 0 && time() >= $data['timeout']) {
+            $this->debug('exp', $group.':'.$key, $fx);
             $this->docket_remove($key, $group);
 
             return false;
         }
 
-        return $data['data'];
+        return  $is_raw ? $data : $data['data'];
     }
 
     private function docket_code($data)
@@ -960,8 +985,8 @@ class WP_Object_Cache
 
     private function docket_update($key, $data, $group)
     {
-        $meta = $this->docket_get($key, $group);
-        if (false === $meta) {
+        $meta = $this->docket_get($key, $group, true);
+        if (false === $meta || !\is_array($meta) || !isset($meta['data'])) {
             return false;
         }
 
@@ -1005,6 +1030,7 @@ class WP_Object_Cache
         clearstatcache();
 
         if (false !== $ok) {
+            $this->opcache_flush_file($file);
             $this->chmod($file);
             $ok = true;
         }
