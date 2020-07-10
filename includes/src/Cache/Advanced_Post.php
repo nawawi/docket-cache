@@ -13,9 +13,9 @@
  *  https://github.com/Automattic/vip-go-mu-plugins-built/blob/master/advanced-post-cache/advanced-post-cache.php.
  */
 
-namespace Nawawi\Docket_Cache;
+namespace Nawawi\Docket_Cache\Cache;
 
-class Advanced_Post_Cache
+class Advanced_Post
 {
     public $prefix;
     public $group_prefix;
@@ -35,6 +35,8 @@ class Advanced_Post_Cache
     public $found_posts = false;
     public $cache_func = 'wp_cache_add';
 
+    public static $inst;
+
     public function __construct()
     {
         $this->prefix = 'docketcache_post';
@@ -42,6 +44,15 @@ class Advanced_Post_Cache
 
         $this->setup_for_blog();
         $this->setup_hooks();
+    }
+
+    public static function init()
+    {
+        if (!isset(self::$inst)) {
+            self::$inst = new self();
+        }
+
+        return self::$inst;
     }
 
     private function setup_hooks()

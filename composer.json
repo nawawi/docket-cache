@@ -36,11 +36,6 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0.x-dev"
-        }
-    },
     "scripts": {
         "post-update-cmd": [
             "wp i18n make-pot . languages/docket-cache.pot --exclude='dist/,wp-plugins-svn/'"

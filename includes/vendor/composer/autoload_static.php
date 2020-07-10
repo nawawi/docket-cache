@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInite83f272e926b05c6a29fbd03b6aa4f65
+class ComposerStaticInit71169967e8f502f7da209e4236957996
 {
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
@@ -38,8 +38,8 @@ class ComposerStaticInite83f272e926b05c6a29fbd03b6aa4f65
     );
 
     public static $classMap = array (
-        'Nawawi\\Docket_Cache\\Advanced_Post_Cache' => __DIR__ . '/../../..' . '/includes/src/Advanced_Post_Cache.php',
         'Nawawi\\Docket_Cache\\CLI\\Command' => __DIR__ . '/../../..' . '/includes/src/CLI/Command.php',
+        'Nawawi\\Docket_Cache\\Cache\\Advanced_Post' => __DIR__ . '/../../..' . '/includes/src/Cache/Advanced_Post.php',
         'Nawawi\\Docket_Cache\\Constans' => __DIR__ . '/../../..' . '/includes/src/Constans.php',
         'Nawawi\\Docket_Cache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
@@ -60,9 +60,9 @@ class ComposerStaticInite83f272e926b05c6a29fbd03b6aa4f65
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInite83f272e926b05c6a29fbd03b6aa4f65::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInite83f272e926b05c6a29fbd03b6aa4f65::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInite83f272e926b05c6a29fbd03b6aa4f65::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit71169967e8f502f7da209e4236957996::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit71169967e8f502f7da209e4236957996::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit71169967e8f502f7da209e4236957996::$classMap;
 
         }, null, ClassLoader::class);
     }

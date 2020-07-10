@@ -10,6 +10,7 @@
 
 namespace Nawawi\Docket_Cache;
 
+use Nawawi\Docket_Cache\Cache\Advanced_Post;
 use Nawawi\Docket_Cache\CLI\Command;
 
 class Plugin
@@ -124,16 +125,9 @@ class Plugin
         return 2;
     }
 
-    public function get_mem_size()
+    public function normalize_size($size)
     {
-        $mem = @ini_get('memory_limit');
-
-        return $this->normalize_size($mem);
-    }
-
-    private function normalize_size($size)
-    {
-        $size = $this->normalize_int($size);
+        $size = wp_convert_hr_to_bytes($size);
         $size1 = size_format($size, 1);
         if (false !== strpos($size1, '.0')) {
             $size1 = size_format($size);
@@ -141,23 +135,6 @@ class Plugin
         $size = str_replace([' ', 'B'], '', $size1);
 
         return $size;
-    }
-
-    private function normalize_int($size)
-    {
-        if (\is_string($size)) {
-            $unit = strtolower(substr($size, -1));
-            switch ($unit) {
-                case 'm':
-                    return  (int) $size * 1048576;
-                case 'k':
-                    return  (int) $size * 1024;
-                case 'g':
-                    return  (int) $size * 1073741824;
-            }
-        }
-
-        return (int) $size;
     }
 
     public function maybe_filesystem()
@@ -279,10 +256,6 @@ class Plugin
         register_activation_hook($this->hook, [$this, 'activate']);
         register_deactivation_hook($this->hook, [$this, 'deactivate']);
         register_uninstall_hook($this->hook, [__CLASS__, 'uninstall']);
-    }
-
-    private function has_cap()
-    {
     }
 
     private function action_query($key)
@@ -615,6 +588,18 @@ class Plugin
     private function register_tweaks()
     {
         add_action(
+            'shutdown',
+            function () {
+                $active_plugins = (array) get_option('active_plugins', []);
+                if (!empty($active_plugins) && \is_array($active_plugins) && isset($active_plugins[0]) && \in_array($this->hook, $active_plugins) && $this->hook !== $active_plugins[0]) {
+                    unset($active_plugins[array_search($this->hook, $active_plugins)]);
+                    array_unshift($active_plugins, $this->hook);
+                    update_option('active_plugins', $active_plugins);
+                }
+            }
+        );
+
+        add_action(
             'pre_get_posts',
             function () {
                 remove_filter('posts_clauses', '_filter_query_attachment_filenames');
@@ -664,7 +649,7 @@ class Plugin
         );
 
         if (\defined('DOCKET_CACHE_ADVCPOST') && DOCKET_CACHE_ADVCPOST && $this->has_dropin()) {
-            new Advanced_Post_Cache();
+            Advanced_Post::init();
         }
     }
 

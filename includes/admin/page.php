@@ -11,10 +11,10 @@ if (1 === $status && isset($this->token)) {
         case 'docket-cache-flushed':
             wp_cache_flush();
             $do_preload = true;
-        break;
+            break;
         case 'docket-cache-enabled':
             $do_preload = true;
-        break;
+            break;
     }
     if (!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD) {
         $do_preload = false;
@@ -25,7 +25,6 @@ if (is_multisite() && is_network_admin()) {
     settings_errors('general');
 }
 
-$output = $this->tail_log(100);
 ?>
 <div class="wrap" id="docket-cache">
     <h1><?php _e('Docket Object Cache', 'docket-cache'); ?></h1>
@@ -37,7 +36,7 @@ $output = $this->tail_log(100);
     </nav>
 
     <div class="tab-content">
-    <?php if (empty($tab)): ?>
+    <?php if (empty($tab)) : ?>
         <div class="section overview">
             <h2 class="title"><?php _e('Overview', 'docket-cache'); ?></h2>
 
@@ -53,11 +52,16 @@ $output = $this->tail_log(100);
                 </tr>
 
                 <tr>
-                    <th><?php _e('Memory', 'docket-cache'); ?></th>
-                    <td><code><?php echo $this->get_mem_size(); ?></code></td>
+                    <th><?php _e('PHP Memory Limit', 'docket-cache'); ?></th>
+                    <td><code><?php echo $this->normalize_size(@ini_get('memory_limit')); ?></code></td>
                 </tr>
 
-                <?php if (1 === $status): ?>
+                <tr>
+                    <th><?php _e('WP Memory Limit', 'docket-cache'); ?></th>
+                    <td><code><?php echo $this->normalize_size(WP_MEMORY_LIMIT); ?></code></td>
+                </tr>
+
+                <?php if (1 === $status) : ?>
                 <tr>
                     <th><?php _e('Cache Size', 'docket-cache'); ?></th>
                     <td><code><?php echo $this->get_dirsize(); ?></code></td>
@@ -77,7 +81,7 @@ $output = $this->tail_log(100);
 
     <?php endif; ?>
 
-    <?php if ('config' === $tab):?>
+    <?php if ('config' === $tab) : ?>
         <div class="section option">
             <h2 class="title"><?php _e('Options', 'docket-cache'); ?></h2>
 
@@ -89,7 +93,10 @@ $output = $this->tail_log(100);
         </div>
     <?php endif; ?>
 
-    <?php if ('debug' === $tab):?>
+    <?php
+    if ('debug' === $tab) :
+        $output = $this->tail_log(100);
+        ?>
 
         <div class="section<?php echo !empty($output) ? ' log' : ''; ?>">
             <h2 class="title"><?php _e('Overview', 'docket-cache'); ?></h2>
@@ -103,12 +110,12 @@ $output = $this->tail_log(100);
                     <th><?php _e('Log File', 'docket-cache'); ?></th>
                     <td><code><?php echo str_replace(WP_CONTENT_DIR, '/wp-content', DOCKET_CACHE_DEBUG_FILE); ?></code></td>
                 </tr>
-                <?php if (empty($output)): ?>
+			<?php if (empty($output)) : ?>
                 <tr>
                     <th><?php _e('Log Data', 'docket-cache'); ?></th>
                     <td><code><?php _e('Not available', 'docket-cache'); ?></code></td>
                 </tr>
-                <?php else: ?>
+                <?php else : ?>
                 <tr>
                     <td colspan="2" class="output">
                         <strong>Log Data</strong><br>
@@ -128,7 +135,7 @@ $output = $this->tail_log(100);
     </div>
 </div>
 
-<?php if ($do_preload): ?>
+<?php if ($do_preload) : ?>
 <script>
 jQuery(document).ready(function() {
     jQuery.post(ajaxurl, {"action":"docket_preload"}, function(response) {
@@ -137,4 +144,3 @@ jQuery(document).ready(function() {
 });
 </script>
 <?php endif; ?>
-

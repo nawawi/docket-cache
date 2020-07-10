@@ -42,3 +42,4 @@ composer.lock
 .php_cs
 CodeSniffer.*
 note.txt
+opcache-status.php

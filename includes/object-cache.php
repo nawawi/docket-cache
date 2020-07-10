@@ -676,11 +676,7 @@ class WP_Object_Cache
         $this->cache[$group][$key] = $data;
 
         if (!$this->is_non_persistent_groups($group) && !$this->is_non_persistent_keys($key)) {
-            $expire = (int) $expire;
-            if (0 !== $this->maxttl && 0 === $expire) {
-                $expire = $this->maxttl;
-            }
-
+            $expire = $this->set_expire($expire);
             $this->docket_save($key, $this->cache[$group][$key], $group, $expire);
         }
 
@@ -800,6 +796,21 @@ class WP_Object_Cache
         }
 
         return $key;
+    }
+
+    private function set_expire($expire = 0)
+    {
+        $expire = (int) $expire;
+        $max = ceil(log10($expire));
+        if ($max > 10 || 'NaN' === $max) {
+            $expire = 0;
+        }
+
+        if (0 !== $this->maxttl && 0 === $expire) {
+            $expire = $this->maxttl;
+        }
+
+        return $expire;
     }
 
     private function opcache_flush_file($file)
@@ -973,6 +984,8 @@ class WP_Object_Cache
         }
 
         $meta = [
+            'blog_id' => get_current_blog_id(),
+            'uri' => isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '',
             'group' => $group,
             'key' => $key,
             'type' => $type,
@@ -1000,6 +1013,7 @@ class WP_Object_Cache
         }
 
         $file = $this->get_file_path($key, $group);
+        $meta['timeout'] = $this->set_expire(0);
         $meta['data'] = $data;
         $data = $this->export_var($meta);
 
@@ -1077,10 +1091,16 @@ class WP_Object_Cache
         }
 
         if (\defined('DOCKET_CACHE_MAXTTL') && \is_int(DOCKET_CACHE_MAXTTL)) {
-            $this->maxttl = (int) DOCKET_CACHE_MAXTTL;
-            if ($this->maxttl > PHP_INT_MAX - 100) {
-                $this->maxttl = PHP_INT_MAX;
+            $expire = (int) DOCKET_CACHE_MAXTTL;
+            if ($expire < 0) {
+                $expire = 0;
+            } else {
+                $max = ceil(log10($expire));
+                if ($max > 10 || 'NaN' === $max) {
+                    $expire = 0;
+                }
             }
+            $this->maxttl = $expire;
         }
 
         $this->store_path = \defined('DOCKET_CACHE_PATH') && is_dir(DOCKET_CACHE_PATH) && '/' !== DOCKET_CACHE_PATH ? DOCKET_CACHE_PATH : WP_CONTENT_DIR.'/cache/docket-cache/';

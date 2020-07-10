@@ -6,8 +6,8 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname(dirname($vendorDir));
 
 return array(
-    'Nawawi\\Docket_Cache\\Advanced_Post_Cache' => $baseDir . '/includes/src/Advanced_Post_Cache.php',
     'Nawawi\\Docket_Cache\\CLI\\Command' => $baseDir . '/includes/src/CLI/Command.php',
+    'Nawawi\\Docket_Cache\\Cache\\Advanced_Post' => $baseDir . '/includes/src/Cache/Advanced_Post.php',
     'Nawawi\\Docket_Cache\\Constans' => $baseDir . '/includes/src/Constans.php',
     'Nawawi\\Docket_Cache\\Plugin' => $baseDir . '/includes/src/Plugin.php',
     'Stringable' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
