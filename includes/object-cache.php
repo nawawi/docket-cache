@@ -1046,9 +1046,9 @@ class WP_Object_Cache
     private function docket_init()
     {
         $autoload = sprintf(
-                        '%s/docket-cache/includes/load.php',
-                        \defined('WP_PLUGIN_DIR') ? WP_PLUGIN_DIR : WP_CONTENT_DIR.'/plugins'
-                    );
+            '%s/docket-cache/includes/load.php',
+            \defined('WP_PLUGIN_DIR') ? WP_PLUGIN_DIR : WP_CONTENT_DIR.'/plugins'
+        );
 
         if (!file_exists($autoload)) {
             throw new \Exception('Docket library not found. Re-install Docket Cache plugin or delete object-cache.php.');
@@ -1134,7 +1134,6 @@ class WP_Object_Cache
         if (!DOCKET_CACHE_DEBUG) {
             return false;
         }
-        static $duplicate = [];
 
         $flag = LOCK_EX;
         if ($is_append) {
@@ -1156,13 +1155,8 @@ class WP_Object_Cache
             $log .= ' "wp-cli"';
         }
 
-        if (isset($duplicate[$log])) {
-            return true;
-        }
-
         if (@file_put_contents($file_log, $log."\n", $flag)) {
-            $duplicate[$log] = 1;
-            $this->chmod($log);
+            $this->chmod($file_log);
 
             return true;
         }
