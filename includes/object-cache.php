@@ -968,6 +968,10 @@ class WP_Object_Cache
         $timeout = ($expire > 0 ? time() + $expire : 0);
 
         $type = \gettype($data);
+        if ('NULL' === $type && null === $data) {
+            $data = '';
+        }
+
         $meta = [
             'group' => $group,
             'key' => $key,
