@@ -137,52 +137,6 @@ class Plugin
         return $size;
     }
 
-    public function maybe_filesystem()
-    {
-        if (!isset($GLOBALS['wp_filesystem'])) {
-            if (!\function_exists('WP_Filesystem')) {
-                require_once ABSPATH.'/wp-admin/includes/file.php';
-            }
-
-            WP_Filesystem();
-        }
-
-        if (!\function_exists('WP_Filesystem')) {
-            throw new \Exception(__('WP_Filesystem not available', 'docket-cache'));
-        }
-
-        return $GLOBALS['wp_filesystem'];
-    }
-
-    public function access_filesystem($url, $silent = false)
-    {
-        $this->maybe_filesystem();
-
-        if ($silent) {
-            ob_start();
-        }
-
-        if (false === ($credentials = request_filesystem_credentials($url))) {
-            if ($silent) {
-                ob_end_clean();
-            }
-
-            return false;
-        }
-
-        if (!WP_Filesystem($credentials)) {
-            request_filesystem_credentials($url);
-
-            if ($silent) {
-                ob_end_clean();
-            }
-
-            return false;
-        }
-
-        return true;
-    }
-
     private function dropin_file()
     {
         $dt = [];
@@ -194,25 +148,29 @@ class Plugin
 
     public function dropin_install()
     {
-        $wp_filesystem = $this->maybe_filesystem();
         $src = $this->dropin_file()->src;
         $dst = $this->dropin_file()->dst;
 
-        return @$wp_filesystem->copy($src, $dst, true);
+        if ( is_writable(dirname($this->dropin_file()->dst) ) ) {
+            return @copy($src, $dst);
+        }
+
+        return false;
     }
 
     public function dropin_uninstall()
     {
-        $wp_filesystem = $this->maybe_filesystem();
         $dst = $this->dropin_file()->dst;
-
-        return @$wp_filesystem->delete($dst);
+        if ( is_writable($dst) ) {
+            return @unlink($dst);
+        }
+        return false;
     }
 
     private function dropin_remove()
     {
         wp_cache_flush();
-        if ($this->validate_dropin() && $this->access_filesystem('', true)) {
+        if ( $this->validate_dropin() ) {
             $this->dropin_uninstall();
         }
     }
@@ -281,18 +239,6 @@ class Plugin
                     $page_cap,
                     $this->slug,
                     function () {
-                        if (isset($_GET['_wpnonce'], $_GET['action'])) {
-                            $action = sanitize_text_field($_GET['action']);
-
-                            foreach ($this->actions as $name) {
-                                if ($action === $name && wp_verify_nonce($_GET['_wpnonce'], $action)) {
-                                    $url = wp_nonce_url(network_admin_url(add_query_arg('action', $action, $this->page)), $action);
-                                    if (false === $this->access_filesystem($url)) {
-                                        return;
-                                    }
-                                }
-                            }
-                        }
                         include_once $this->path.'/includes/admin/page.php';
                     }
                 );
@@ -365,7 +311,7 @@ class Plugin
                             $this->empty_log();
                         }
 
-                        if ($this->access_filesystem($url, true)) {
+                        if (is_writable(WP_CONTENT_DIR) ) {
                             switch ($action) {
                                 case 'docket-enable-cache':
                                     $result = $this->dropin_install();
