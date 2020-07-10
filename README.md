@@ -242,7 +242,7 @@ The following commands are supported:
 
     Disables the Docket object cache. Default behavior is to delete the object cache drop-in, unless an unknown object cache drop-in is present.
 
-  * `wp cache update-dropin`
+  * `wp cache update`
 
     Updates the Docket object cache drop-in. Default behavior is to overwrite any existing object cache drop-in.
 

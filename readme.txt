@@ -46,6 +46,7 @@ To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for b
 
 == Changelog ==
 = 20.07.09 =
+- Versions are as follows: Year.Month.Day of new release.
 - Fixed: Invalid data -> docket_update, docket_get.
 - Added: opcache_invalidate after updating cache -> opcache_flush_file.
 - Added: performance tweaks -> register_tweaks.
