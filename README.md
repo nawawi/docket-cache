@@ -15,7 +15,7 @@ To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for b
 
 ### WordPress Plugin Directory
 1. In your WordPress admin click *Plugins -> Add New*
-2. Search plugins "Docket Cache".
+2. Search plugins [Docket Cache](https://wordpress.org/plugins/docket-cache/).
 3. Click *Install Now*.
 4. Click *Activate* or *Network Activate* in Multisite setups.
 5. Enable the object cache under Settings -> Docket Cache, or in Multisite setups under Network Admin -> Settings -> Docket Cache.
