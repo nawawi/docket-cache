@@ -32,6 +32,7 @@ composer.lock
 /includes/vendor/**/license.txt
 /includes/vendor/**/readme.txt
 
+*.awie-bak
 *.cache
 *.sh
 *.phar

@@ -60,7 +60,7 @@ To adjust the configuration, define any of the following constants in your `wp-c
 Maximum cache time-to-live in seconds, if expiry key `0`.   
 Default:
 ```php
-define('DOCKET_CACHE_MAXTTL', 8600); 
+define('DOCKET_CACHE_MAXTTL', 0); 
 ```
 
 **`DOCKET_CACHE_IGNORED_GROUPS`**
@@ -132,41 +132,6 @@ Default:
 define('DOCKET_CACHE_DEBUG_SIZE', 10000000);
 ```
 
-**`DOCKET_CACHE_PRELOAD`**
-
-Set to `true` to enable cache preloading, triggered after the cache has been flushed and when installation of drop-in file.  
-Default:
-```php
-define('DOCKET_CACHE_PRELOAD', false);
-```
-
-**`DOCKET_CACHE_PRELOAD_ADMIN`**
-
-Set the list of admin path _(/wp-admin/<path>)_ to preload.  
-Default:
-```php
-define('DOCKET_CACHE_PRELOAD_ADMIN',
-  [
-    'options-general.php',
-    'options-writing.php',
-    'options-reading.php',
-    'options-discussion.php',
-    'options-media.php',
-    'options-permalink.php',
-    'edit-comments.php',
-    'profile.php',
-    'users.php',
-    'upload.php',
-    'plugins.php',
-    'edit.php',
-    'themes.php',
-    'tools.php',
-    'widgets.php',
-    'update-core.php'
-  ]
-);
-```
-
 **Multisite Options**
 
 **`DOCKET_CACHE_GLOBAL_GROUPS`**
@@ -197,22 +162,22 @@ define('DOCKET_CACHE_GLOBAL_GROUPS',
 );
 ```
 
-**`DOCKET_CACHE_PRELOAD_NETWORK`**
+**`DOCKET_CACHE_FLUSH_DELETE`**
 
-Set the list of network admin path _(/wp-admin/network/<path>)_ to preload.
+By default Docket Cache only empty the cache file. Set to true to delete the cache file.  
 Default:
 ```php
-define('DOCKET_CACHE_PRELOAD_ADMIN',
-  [
-    'update-core.php',
-    'sites.php',
-    'users.php',
-    'themes.php',
-    'plugins.php',
-    'settings.php'
-  ]
-);
+define('DOCKET_CACHE_FLUSH_DELETE', false);
 ```
+
+**`DOCKET_CACHE_GC`**
+
+The Docket Cache Garbage collector scheduled every 30 minutes to clean empty file more than 2 minutes. Set to false to disable garbage collector.  
+Default:
+```php
+define('DOCKET_CACHE_GC', true);
+```
+
 **`DOCKET_CACHE_ADVCPOST`**
 
 Set to true to enable Advanced Post Cache.  

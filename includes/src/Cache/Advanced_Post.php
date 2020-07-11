@@ -46,7 +46,7 @@ class Advanced_Post
         $this->setup_hooks();
     }
 
-    public static function init()
+    public static function inst()
     {
         if (!isset(self::$inst)) {
             self::$inst = new self();

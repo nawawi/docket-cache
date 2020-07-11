@@ -16,7 +16,7 @@ if (1 === $status && isset($this->token)) {
             $do_preload = true;
             break;
     }
-    if (!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD) {
+    if (!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD || 2 === $status) {
         $do_preload = false;
     }
 }
@@ -31,7 +31,9 @@ if (is_multisite() && is_network_admin()) {
 
     <nav class="nav-tab-wrapper">
         <a href="<?php echo $this->page; ?>" class="nav-tab<?php echo  empty($tab) ? ' nav-tab-active' : ''; ?>"><?php _e('Overview', 'docket-cache'); ?></a>
+        <?php if (2 !== $status) : ?>
         <a href="<?php echo $this->page; ?>&tab=debug" class="nav-tab<?php echo  'debug' === $tab ? ' nav-tab-active' : ''; ?>"><?php _e('Debug Log', 'docket-cache'); ?></a>
+        <?php endif; ?>
         <a href="<?php echo $this->page; ?>&tab=config" class="nav-tab<?php echo  'config' === $tab ? ' nav-tab-active' : ''; ?>"><?php _e('Options', 'docket-cache'); ?></a>
     </nav>
 
@@ -46,42 +48,56 @@ if (is_multisite() && is_network_admin()) {
                     <td><code><?php echo $status_text; ?></code></td>
                 </tr>
 
-                <tr>
-                    <th><?php _e('OPCache', 'docket-cache'); ?></th>
-                    <td><code><?php echo $this->status_code[$this->get_opcache_status()]; ?></code></td>
-                </tr>
+                <?php if (2 !== $status) : ?>
+                    <tr>
+                        <th><?php _e('OPCache', 'docket-cache'); ?></th>
+                        <td><code><?php echo $this->status_code[$this->get_opcache_status()]; ?></code></td>
+                    </tr>
 
-                <tr>
-                    <th><?php _e('PHP Memory Limit', 'docket-cache'); ?></th>
-                    <td><code><?php echo $this->normalize_size(@ini_get('memory_limit')); ?></code></td>
-                </tr>
+                    <tr>
+                        <th><?php _e('PHP Memory Limit', 'docket-cache'); ?></th>
+                        <td><code><?php echo $this->normalize_size(@ini_get('memory_limit')); ?></code></td>
+                    </tr>
 
-                <tr>
-                    <th><?php _e('WP Memory Limit', 'docket-cache'); ?></th>
-                    <td><code><?php echo $this->normalize_size(WP_MEMORY_LIMIT); ?></code></td>
-                </tr>
+                    <tr>
+                        <th><?php _e('WP Memory Limit', 'docket-cache'); ?></th>
+                        <td><code><?php echo $this->normalize_size(WP_MEMORY_LIMIT); ?></code></td>
+                    </tr>
 
-                <?php if (1 === $status) : ?>
-                <tr>
-                    <th><?php _e('Cache Size', 'docket-cache'); ?></th>
-                    <td><code><?php echo $this->get_dirsize(); ?></code></td>
-                </tr>
+                    <tr>
+                        <th><?php _e('Drop-in Installable', 'docket-cache'); ?></th>
+                        <td><code><?php echo is_writable(WP_CONTENT_DIR) ? __('Yes', 'docket-cache') : __('No', 'docket-cache'); ?></code></td>
+                    </tr>
+
+                    <tr>
+                        <th><?php _e('Cache Writable', 'docket-cache'); ?></th>
+                        <td><code><?php echo is_writable(DOCKET_CACHE_PATH) ? __('Yes', 'docket-cache') : __('No', 'docket-cache'); ?></code></td>
+                    </tr>
+
+                    <?php if (1 === $status) : ?>
+                    <tr>
+                        <th><?php _e('Cache Size', 'docket-cache'); ?></th>
+                        <td><code><?php echo $this->get_dirsize(); ?></code></td>
+                    </tr>
+                    <?php endif; ?>
                 <?php endif; ?>
             </table>
 
-            <p class="submit">
-            <?php if (!$this->has_dropin()) : ?>
-                <a href="<?php echo $this->action_query('enable-cache'); ?>" class="button button-primary button-large"><?php _e('Enable Object Cache', 'docket-cache'); ?></a>
-            <?php elseif ($this->validate_dropin()) : ?>
-                <a href="<?php echo $this->action_query('flush-cache'); ?>" class="button button-primary button-large"><?php _e('Flush Cache', 'docket-cache'); ?></a>&nbsp;&nbsp;
-                <a href="<?php echo $this->action_query('disable-cache'); ?>" class="button button-secondary button-large"><?php _e('Disable Object Cache', 'docket-cache'); ?></a>
+            <?php if (2 !== $status) : ?>
+                <p class="submit">
+                <?php if (!$this->has_dropin()) : ?>
+                    <a href="<?php echo $this->action_query('enable-cache'); ?>" class="button button-primary button-large"><?php _e('Enable Object Cache', 'docket-cache'); ?></a>
+                <?php elseif ($this->validate_dropin() && 1 === $status) : ?>
+                    <a href="<?php echo $this->action_query('flush-cache'); ?>" class="button button-primary button-large"><?php _e('Flush Cache', 'docket-cache'); ?></a>&nbsp;&nbsp;
+                    <a href="<?php echo $this->action_query('disable-cache'); ?>" class="button button-secondary button-large"><?php _e('Disable Object Cache', 'docket-cache'); ?></a>
+                <?php endif; ?>
+                </p>
             <?php endif; ?>
-            </p>
         </div>
 
     <?php endif; ?>
 
-    <?php if ('config' === $tab) : ?>
+    <?php if ('config' === $tab && 2 !== $status) : ?>
         <div class="section option">
             <h2 class="title"><?php _e('Options', 'docket-cache'); ?></h2>
 

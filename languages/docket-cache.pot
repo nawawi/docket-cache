@@ -9,13 +9,13 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-07-10T15:23:23+00:00\n"
+"POT-Creation-Date: 2020-07-11T13:08:05+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
 
 #. Plugin Name of the plugin
-#: includes/src/Plugin.php:280
+#: includes/src/Plugin.php:244
 msgid "Docket Cache"
 msgstr ""
 
@@ -32,87 +32,105 @@ msgid "https://rutweb.com"
 msgstr ""
 
 #: includes/admin/page.php:30
-#: includes/src/Plugin.php:279
+#: includes/src/Plugin.php:243
 msgid "Docket Object Cache"
 msgstr ""
 
 #: includes/admin/page.php:33
-#: includes/admin/page.php:41
-#: includes/admin/page.php:102
+#: includes/admin/page.php:43
+#: includes/admin/page.php:118
 msgid "Overview"
 msgstr ""
 
-#: includes/admin/page.php:34
+#: includes/admin/page.php:35
 msgid "Debug Log"
 msgstr ""
 
-#: includes/admin/page.php:35
-#: includes/admin/page.php:86
+#: includes/admin/page.php:37
+#: includes/admin/page.php:102
 msgid "Options"
 msgstr ""
 
-#: includes/admin/page.php:45
-#: includes/admin/page.php:106
+#: includes/admin/page.php:47
+#: includes/admin/page.php:122
 msgid "Status"
 msgstr ""
 
-#: includes/admin/page.php:50
+#: includes/admin/page.php:53
 msgid "OPCache"
 msgstr ""
 
-#: includes/admin/page.php:55
+#: includes/admin/page.php:58
 msgid "PHP Memory Limit"
 msgstr ""
 
-#: includes/admin/page.php:60
+#: includes/admin/page.php:63
 msgid "WP Memory Limit"
 msgstr ""
 
-#: includes/admin/page.php:66
+#: includes/admin/page.php:68
+msgid "Drop-in Installable"
+msgstr ""
+
+#: includes/admin/page.php:69
+#: includes/admin/page.php:74
+msgid "Yes"
+msgstr ""
+
+#: includes/admin/page.php:69
+#: includes/admin/page.php:74
+msgid "No"
+msgstr ""
+
+#: includes/admin/page.php:73
+msgid "Cache Writable"
+msgstr ""
+
+#: includes/admin/page.php:79
 msgid "Cache Size"
 msgstr ""
 
-#: includes/admin/page.php:74
+#: includes/admin/page.php:89
 msgid "Enable Object Cache"
 msgstr ""
 
-#: includes/admin/page.php:76
+#: includes/admin/page.php:91
 msgid "Flush Cache"
 msgstr ""
 
-#: includes/admin/page.php:77
+#: includes/admin/page.php:92
 msgid "Disable Object Cache"
 msgstr ""
 
-#: includes/admin/page.php:88
+#: includes/admin/page.php:104
 msgid "Configuration Options"
 msgstr ""
 
-#: includes/admin/page.php:89
+#: includes/admin/page.php:105
 msgid "To adjust the configuration, please see the <a href=\"https://github.com/nawawi/docket-cache#configuration-options\" rel=\"noopener\" target=\"_blank\">configuration options</a> for a full list."
 msgstr ""
 
-#: includes/admin/page.php:91
+#: includes/admin/page.php:107
 msgid "WP-CLI Commands"
 msgstr ""
 
-#: includes/admin/page.php:92
+#: includes/admin/page.php:108
 msgid "To use the WP-CLI commands, please see the <a href=\"https://github.com/nawawi/docket-cache#wp-cli-commands\" rel=\"noopener\" target=\"_blank\">WP-CLI commands</a> for a full list."
 msgstr ""
 
-#: includes/admin/page.php:110
+#: includes/admin/page.php:126
 msgid "Log File"
 msgstr ""
 
-#: includes/admin/page.php:115
+#: includes/admin/page.php:131
 msgid "Log Data"
 msgstr ""
 
-#: includes/admin/page.php:116
+#: includes/admin/page.php:132
 msgid "Not available"
 msgstr ""
 
-#: includes/admin/page.php:129
+#: includes/admin/page.php:145
 msgid "Refresh"
 msgstr ""
 
@@ -125,12 +143,12 @@ msgid "An unknown object cache drop-in was found. To use Docket object cache, ru
 msgstr ""
 
 #: includes/src/CLI/Command.php:93
-#: includes/src/Plugin.php:411
+#: includes/src/Plugin.php:363
 msgid "Object cache enabled."
 msgstr ""
 
 #: includes/src/CLI/Command.php:96
-#: includes/src/Plugin.php:414
+#: includes/src/Plugin.php:366
 msgid "Object cache could not be enabled."
 msgstr ""
 
@@ -144,17 +162,17 @@ msgid "An unknown object cache drop-in was found. To use Docket run: wp docket-c
 msgstr ""
 
 #: includes/src/CLI/Command.php:120
-#: includes/src/Plugin.php:417
+#: includes/src/Plugin.php:369
 msgid "Object cache disabled."
 msgstr ""
 
 #: includes/src/CLI/Command.php:123
-#: includes/src/Plugin.php:420
+#: includes/src/Plugin.php:372
 msgid "Object cache could not be disabled."
 msgstr ""
 
 #: includes/src/CLI/Command.php:140
-#: includes/src/Plugin.php:429
+#: includes/src/Plugin.php:381
 msgid "Updated object cache drop-in and enabled Docket object cache."
 msgstr ""
 
@@ -178,41 +196,41 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: includes/src/Plugin.php:151
-msgid "WP_Filesystem not available"
-msgstr ""
-
 #. translators: %s: path name
-#: includes/src/Plugin.php:241
+#: includes/src/Plugin.php:205
 msgid "Invalid setting for DOCKET_CACHE_PATH: %s"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:315
+#: includes/src/Plugin.php:267
 msgid "The Docket Object Cache drop-in is outdated. Please <a href=\"%s\">update it now</a>"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:319
+#: includes/src/Plugin.php:271
 msgid "An unknown object cache drop-in was found. To use Docket, <a href=\"%s\" class=\"button button-secondary button-large\">please replace it now</a>."
 msgstr ""
 
-#: includes/src/Plugin.php:403
+#: includes/src/Plugin.php:355
 msgid "This plugin requires PHP 7.2 or greater."
 msgstr ""
 
-#: includes/src/Plugin.php:423
+#: includes/src/Plugin.php:375
 msgid "Object cache was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:426
+#: includes/src/Plugin.php:378
 msgid "Object cache could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:432
+#: includes/src/Plugin.php:384
 msgid "Docket object cache drop-in could not be updated."
 msgstr ""
 
-#: includes/src/Plugin.php:450
+#: includes/src/Plugin.php:402
 msgid "Settings"
+msgstr ""
+
+#: includes/src/Plugin.php:614
+msgid "Docket Cache Garbage Collector"
 msgstr ""

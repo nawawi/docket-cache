@@ -2,7 +2,7 @@
 /**
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
- * Version:             20200709
+ * Version:             20200710
  * Description:         A file-based persistent WordPress Object Cache stored as a plain PHP code.
  * Author:              Nawawi Jamili
  * Author URI:          https://rutweb.com
@@ -24,7 +24,7 @@
  * See wp_start_object_cache() -> wp-includes/load.php.
  */
 if (\defined('DOCKET_CACHE_DISABLED') && DOCKET_CACHE_DISABLED) {
-    return;
+    !\defined('DOCKET_CACHE_HALT') && \define('DOCKET_CACHE_HALT', 1);
 }
 
 /*
@@ -34,9 +34,10 @@ if (\defined('DOCKET_CACHE_DISABLED') && DOCKET_CACHE_DISABLED) {
  *
  */
 if (version_compare(PHP_VERSION, '7.2', '<')) {
-    return;
+    !\defined('DOCKET_CACHE_HALT') && \define('DOCKET_CACHE_HALT', 1);
 }
 
+if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT):
 /**
  * Adds data to the cache, if the cache key doesn't already exist.
  *
@@ -277,17 +278,6 @@ function wp_cache_add_non_persistent_groups($groups)
     $wp_object_cache->add_non_persistent_groups($groups);
 }
 
-/**
- * Adds a key or set of keys to the list of non-persistent keys.
- *
- * @param string|array $keys a key or an array of keys to add
- */
-function wp_cache_add_non_persistent_keys($keys)
-{
-    global $wp_object_cache;
-    $wp_object_cache->add_non_persistent_keys($keys);
-}
-
 function wp_cache_stats()
 {
     global $wp_object_cache;
@@ -325,42 +315,14 @@ class WP_Object_Cache
      *
      * @var array
      */
-    protected $global_groups = [
-        'blog-details',
-        'blog-id-cache',
-        'blog-lookup',
-        'global-posts',
-        'networks',
-        'rss',
-        'sites',
-        'site-details',
-        'site-lookup',
-        'site-options',
-        'site-transient',
-        'users',
-        'useremail',
-        'userlogins',
-        'usermeta',
-        'user_meta',
-        'userslugs',
-    ];
+    protected $global_groups = [];
 
     /**
      * List of non persistent groups.
      *
      * @var array
      */
-    protected $non_persistent_groups = [
-        'user_meta',
-        'counts',
-        'plugins',
-        'themes',
-        'comment',
-        'wc_session_id',
-        'bp_notifications',
-        'bp_messages',
-        'bp_pages',
-    ];
+    protected $non_persistent_groups = [];
 
     /**
      * List of non persistent keys.
@@ -403,6 +365,8 @@ class WP_Object_Cache
      * @var bool
      */
     private $wpcli;
+
+    private $fileo;
 
     /**
      * Sets up object properties.
@@ -751,7 +715,6 @@ class WP_Object_Cache
     public function add_non_persistent_groups($groups)
     {
         $groups = (array) $groups;
-
         $this->non_persistent_groups = array_unique(array_merge($this->non_persistent_groups, $groups));
     }
 
@@ -791,7 +754,7 @@ class WP_Object_Cache
 
     private function define_key($key, $group)
     {
-        if ($this->multisite && !isset($this->global_groups[$group])) {
+        if ($this->multisite && !\array_key_exists($group, $this->global_groups)) {
             $key = $this->blog_prefix.$key;
         }
 
@@ -813,38 +776,13 @@ class WP_Object_Cache
         return $expire;
     }
 
-    private function opcache_flush_file($file)
+    private function files()
     {
-        static $done = [];
-
-        if (isset($done[$file])) {
-            return true;
+        if (!isset($this->fileo) || !\is_object($this->fileo)) {
+            $this->fileo = new Nawawi\Docket_Cache\Files();
         }
 
-        if (\function_exists('opcache_invalidate') && file_exists($file)) {
-            $done[$file] = $file;
-
-            return @opcache_invalidate($file, true);
-        }
-
-        return false;
-    }
-
-    private function export_var($data)
-    {
-        try {
-            $data = Symfony\Component\VarExporter\VarExporter::export($data);
-        } catch (\Exception $e) {
-            $error = $e->getMessage();
-            if (false !== strpos($error, 'Cannot export value of type "stdClass"')) {
-                $data = var_export($data, 1);
-                $data = str_replace('stdClass::__set_state', 'docket_cache_fix_object', $data);
-            } else {
-                $this->debug('err', __FUNCTION__, $e->getMessage());
-            }
-        }
-
-        return $data;
+        return $this->fileo;
     }
 
     private function docket_flush()
@@ -852,26 +790,23 @@ class WP_Object_Cache
         $dir = $this->store_path;
 
         clearstatcache();
+
         $dir = realpath($dir);
         $cnt = 0;
         if (false !== $dir && is_dir($dir) && is_writable($dir)) {
             $dir = realpath($dir);
-            try {
-                foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)) as $object) {
-                    $f = $object->getPathName();
-                    if (is_file($f) && is_writable($f)) {
-                        unlink($f);
-                        if ('index.php' !== basename($f)) {
-                            ++$cnt;
-                        }
+
+            foreach ($this->files()->scandir($dir) as $object) {
+                if ('index.php' !== $object->getFileName()) {
+                    if ($this->files()->unlink($object->getPathName(), false)) {
+                        ++$cnt;
                     }
                 }
-            } catch (\Exception $e) {
-                $this->debug('err', __FUNCTION__, $e->getMessage());
             }
+            $this->files()->unlink($dir.'/index.php', true);
         }
 
-        if (!@file_exists($dir.'/index.php')) {
+        if ($cnt > 0) {
             $this->debug('flush', 'OK', $cnt);
 
             if ($this->wpcli) {
@@ -905,20 +840,13 @@ class WP_Object_Cache
     {
         $file = $this->get_file_path($key, $group);
 
-        if (file_exists($file) && is_writable($file)) {
-            $file = $this->get_file_path($key, $group);
-            if (!@unlink($file)) {
-                $this->debug('err', __FUNCTION__, 'Failed to remove file: '.$file);
-
-                return false;
-            }
-
-            $this->debug('del', $group.':'.$key, basename($file, '.php'));
-
+        if (!@$this->files()->unlink($file, false)) {
             return false;
         }
 
-        return false;
+        $this->debug('del', $group.':'.$key, basename($file, '.php'));
+
+        return true;
     }
 
     private function docket_get($key, $group, $is_raw = false)
@@ -928,29 +856,36 @@ class WP_Object_Cache
             return false;
         }
 
-        $fx = basename($file, '.php');
+        $file_size = @filesize($file);
+        if (empty($file_size)) {
+            return false;
+        }
 
-        $data = @include $file;
-        if (empty($data) && !isset($data['data'])) {
-            $this->debug('err', 'invalid index', $fx);
-            if (!DOCKET_CACHE_DEBUG) {
-                @unlink($file);
-            }
+        if (!$handle = @fopen($file, 'rb')) {
+            return false;
+        }
 
+        $data = [];
+        if (flock($handle, LOCK_SH)) {
+            $data = @include $file;
+            @flock($handle, LOCK_UN);
+        }
+        @fclose($handle);
+
+        if (empty($data) || !isset($data['data'])) {
             return false;
         }
 
         if (!isset($data['timeout'])) {
-            $this->debug('err', 'timeout not set', $fx);
-            if (!DOCKET_CACHE_DEBUG) {
-                @unlink($file);
-            }
+            $data['timeout'] = $this->set_expire(0);
         } elseif ($data['timeout'] > 0 && time() >= $data['timeout']) {
-            $this->debug('exp', $group.':'.$key, $fx);
+            $this->debug('exp', $group.':'.$key, basename($file, '.php'));
             $this->docket_remove($key, $group);
 
             return false;
         }
+
+        clearstatcache();
 
         return  $is_raw ? $data : $data['data'];
     }
@@ -966,13 +901,11 @@ class WP_Object_Cache
 
     private function docket_save($key, $data, $group = 'default', $expire = 0)
     {
-        if (!wp_mkdir_p($this->store_path)) {
-            $this->debug('err', __FUNCTION__, 'Unable to create directory: '.$this->store_path);
-
+        if (!@wp_mkdir_p($this->store_path)) {
             return false;
         }
 
-        @$this->file_put($this->store_path.'/index.php', ' ');
+        @$this->files()->put($this->store_path.'/index.php', '');
 
         $file = $this->get_file_path($key, $group);
 
@@ -985,7 +918,6 @@ class WP_Object_Cache
 
         $meta = [
             'blog_id' => get_current_blog_id(),
-            'uri' => isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '',
             'group' => $group,
             'key' => $key,
             'type' => $type,
@@ -993,10 +925,10 @@ class WP_Object_Cache
             'data' => $data,
         ];
 
-        $data = $this->export_var($meta);
+        $data = $this->files()->export_var($meta);
         $code = $this->docket_code($data);
 
-        if ($this->file_put($file, $code)) {
+        if ($this->files()->put($file, $code)) {
             $this->debug('set', $group.':'.$key, basename($file, '.php'));
 
             return true;
@@ -1015,50 +947,11 @@ class WP_Object_Cache
         $file = $this->get_file_path($key, $group);
         $meta['timeout'] = $this->set_expire(0);
         $meta['data'] = $data;
-        $data = $this->export_var($meta);
+        $data = $this->files()->export_var($meta);
 
         $code = $this->docket_code($data);
 
-        return $this->file_put($file, $code);
-    }
-
-    private function chmod($file)
-    {
-        static $cache = [];
-
-        if (isset($cache[$file])) {
-            return $cache[$file];
-        }
-
-        $stat = @stat(\dirname($file));
-        $perms = $stat['mode'] & 0007777;
-        $perms = $perms & 0000666;
-        if (@chmod($file, $perms)) {
-            $cache[$file] = $perms;
-        }
-
-        clearstatcache();
-    }
-
-    private function file_put($file, $data)
-    {
-        if (!$handle = @fopen($file, 'wb')) {
-            $this->debug('err', __FUNCTION__, 'Unable to write to file: '.$file);
-
-            return false;
-        }
-
-        $ok = @fwrite($handle, $data);
-        fclose($handle);
-        clearstatcache();
-
-        if (false !== $ok) {
-            $this->opcache_flush_file($file);
-            $this->chmod($file);
-            $ok = true;
-        }
-
-        return $ok;
+        return $this->files()->put($file, $code);
     }
 
     private function docket_init()
@@ -1079,7 +972,7 @@ class WP_Object_Cache
         }
 
         if (\defined('DOCKET_CACHE_GLOBAL_GROUPS') && \is_array(DOCKET_CACHE_GLOBAL_GROUPS)) {
-            $this->global_groups = DOCKET_CACHE_GLOBAL_GROUPS;
+            $this->add_global_groups(DOCKET_CACHE_GLOBAL_GROUPS);
         }
 
         if (\defined('DOCKET_CACHE_IGNORED_GROUPS') && \is_array(DOCKET_CACHE_IGNORED_GROUPS)) {
@@ -1180,7 +1073,7 @@ class WP_Object_Cache
         }
 
         if (@file_put_contents($file_log, $log."\n", $flag)) {
-            $this->chmod($file_log);
+            $this->files()->chmod($file_log);
 
             return true;
         }
@@ -1195,3 +1088,5 @@ if (!\function_exists('docket_cache_fix_object')) {
         return (object) $arr;
     }
 }
+
+endif;

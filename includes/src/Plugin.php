@@ -32,6 +32,7 @@ class Plugin
     private $hook;
     private $page;
     private $token;
+    private $fileo;
 
     public function __construct()
     {
@@ -48,6 +49,8 @@ class Plugin
             2 => __('Not Available', 'docket-cache'),
             -1 => __('Unknown', 'docket-cache'),
         ];
+
+        $this->fileo = new Files();
     }
 
     public function has_dropin()
@@ -84,7 +87,11 @@ class Plugin
 
     public function get_status()
     {
-        if (!$this->has_dropin() || (\defined('DOCKET_CACHE_DISABLED') && DOCKET_CACHE_DISABLED)) {
+        if (\defined('DOCKET_CACHE_DISABLED') && DOCKET_CACHE_DISABLED || \defined('DOCKET_CACHE_HALT') && DOCKET_CACHE_HALT) {
+            return 2;
+        }
+
+        if (!$this->has_dropin()) {
             return 0;
         }
 
@@ -101,7 +108,7 @@ class Plugin
 
         $bytestotal = 0;
         if (false !== $dir && is_dir($dir) && is_readable($dir)) {
-            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)) as $object) {
+            foreach ($this->fileo->scandir($dir) as $object) {
                 if ('index.php' !== $object->getFileName()) {
                     $bytestotal += $object->getSize();
                 }
@@ -151,8 +158,8 @@ class Plugin
         $src = $this->dropin_file()->src;
         $dst = $this->dropin_file()->dst;
 
-        if ( is_writable(dirname($this->dropin_file()->dst) ) ) {
-            return @copy($src, $dst);
+        if (is_writable(\dirname($this->dropin_file()->dst))) {
+            return $this->fileo->copy($src, $dst);
         }
 
         return false;
@@ -161,16 +168,17 @@ class Plugin
     public function dropin_uninstall()
     {
         $dst = $this->dropin_file()->dst;
-        if ( is_writable($dst) ) {
+        if (is_writable($dst)) {
             return @unlink($dst);
         }
+
         return false;
     }
 
     private function dropin_remove()
     {
         wp_cache_flush();
-        if ( $this->validate_dropin() ) {
+        if ($this->validate_dropin()) {
             $this->dropin_uninstall();
         }
     }
@@ -183,6 +191,7 @@ class Plugin
     public function deactivate()
     {
         $this->dropin_remove();
+        $this->unregister_scheduler();
     }
 
     public function activate()
@@ -311,7 +320,7 @@ class Plugin
                             $this->empty_log();
                         }
 
-                        if (is_writable(WP_CONTENT_DIR) ) {
+                        if (is_writable(WP_CONTENT_DIR)) {
                             switch ($action) {
                                 case 'docket-enable-cache':
                                     $result = $this->dropin_install();
@@ -412,6 +421,8 @@ class Plugin
                 add_action(
                     'shutdown',
                     function () {
+                        wp_load_alloptions();
+
                         $args = [
                             'blocking' => false,
                             'timeout' => 45,
@@ -512,19 +523,12 @@ class Plugin
         $limit = (int) $limit;
         $output = [];
         if ($this->has_log()) {
-            $file = new \SplFileObject(DOCKET_CACHE_DEBUG_FILE);
-            $file->seek(PHP_INT_MAX);
-            $total_lines = $file->key();
-            $total_lines = $total_lines > $limit ? $total_lines - $limit : $total_lines;
-            if ($total_lines > 0) {
-                $reader = new \LimitIterator($file, $total_lines);
-                foreach ($reader as $line) {
-                    $line = trim($line);
-                    if (empty($line)) {
-                        continue;
-                    }
-                    $output[] = $line;
+            foreach ($this->fileo->tail(DOCKET_CACHE_DEBUG_FILE, $limit) as $line) {
+                $line = trim($line);
+                if (empty($line)) {
+                    continue;
                 }
+                $output[] = $line;
             }
         }
 
@@ -595,8 +599,58 @@ class Plugin
         );
 
         if (\defined('DOCKET_CACHE_ADVCPOST') && DOCKET_CACHE_ADVCPOST && $this->has_dropin()) {
-            Advanced_Post::init();
+            Advanced_Post::inst();
         }
+    }
+
+    private function register_scheduler()
+    {
+        add_action(
+            'init',
+            function () {
+                add_filter(
+                    'cron_schedules',
+                    function ($schedules) {
+                        $schedules = [
+                            'docket_cache_gc' => [
+                                'interval' => 30 * MINUTE_IN_SECONDS,
+                                'display' => __('Docket Cache Garbage Collector', 'docket-cache'),
+                            ],
+                        ];
+
+                        return $schedules;
+                    }
+                );
+
+                add_action(
+                    'docket_cache_gc',
+                    function () {
+                        $dir = realpath(DOCKET_CACHE_PATH);
+                        if (false !== $dir && is_dir($dir) && is_readable($dir)) {
+                            clearstatcache();
+                            foreach ($this->fileo->scandir($dir) as $object) {
+                                if ('php' === $object->getExtension() && 'index.php' !== $object->getFileName()) {
+                                    $fm = time() + 120;
+                                    $fx = $object->getPathName();
+                                    if (0 === $object->getSize() && $fm >= filemtime($fx)) {
+                                        $this->fileo->unlink($fx, true);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                );
+
+                if (!wp_next_scheduled('docket_cache_gc')) {
+                    wp_schedule_event(time(), 'docket_cache_gc', 'docket_cache_gc');
+                }
+            }
+        );
+    }
+
+    private function unregister_scheduler()
+    {
+        wp_clear_scheduled_hook('docket_cache_gc');
     }
 
     public function attach()
@@ -604,6 +658,7 @@ class Plugin
         $this->register_plugin_hooks();
         $this->register_admin_hooks();
         $this->register_tweaks();
+        $this->register_scheduler();
 
         if (\defined('WP_CLI') && WP_CLI && !\defined('Docket_Cache_CLI')) {
             \define('Docket_Cache_CLI', true);
