@@ -605,6 +605,10 @@ class Plugin
 
     private function register_scheduler()
     {
+        if (!\defined('DOCKET_CACHE_GC') || !DOCKET_CACHE_GC) {
+            return;
+        }
+
         add_action(
             'init',
             function () {

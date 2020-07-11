@@ -46,6 +46,10 @@ class Constans
             \define('DOCKET_CACHE_FLUSH_DELETE', false);
         }
 
+        if (!\defined('DOCKET_CACHE_GC')) {
+            \define('DOCKET_CACHE_GC', true);
+        }
+
         if (!\defined('DOCKET_CACHE_GLOBAL_GROUPS')) {
             \define(
                 'DOCKET_CACHE_GLOBAL_GROUPS',
