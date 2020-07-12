@@ -3,7 +3,7 @@
 
 $status = $this->get_status();
 $status_text = $this->status_code[$status];
-$is_debug = (\defined('DOCKET_CACHE_DEBUG') && DOCKET_CACHE_DEBUG && \defined('DOCKET_CACHE_DEBUG_FILE'));
+$is_debug = DOCKET_CACHE_DEBUG && DOCKET_CACHE_DEBUG_FILE;
 $tab = isset($_GET['tab']) ? $_GET['tab'] : '';
 $do_preload = false;
 if (1 === $status && isset($this->token)) {
@@ -115,7 +115,7 @@ if (is_multisite() && is_network_admin()) {
         ?>
 
         <div class="section<?php echo !empty($output) ? ' log' : ''; ?>">
-            <h2 class="title"><?php _e('Overview', 'docket-cache'); ?></h2>
+            <h2 class="title"><?php _e('Debug Log ', 'docket-cache'); ?></h2>
 
             <table class="form-table">
                 <tr>

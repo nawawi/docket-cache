@@ -81,51 +81,46 @@ class Files
             if (false !== strpos($error, 'Cannot export value of type "stdClass"')) {
                 $data = var_export($data, 1);
                 $data = str_replace('stdClass::__set_state', '(object)', $data);
+            } else {
+                return false;
             }
         }
 
         return $data;
     }
 
-    public function log($file, $data, $is_append = false)
-    {
-        $flag = 'wb';
-        if ($is_append) {
-            $flag = 'ab';
-        }
-
-        if (\is_array($data)) {
-            $log['timestamp'] = date('Y-m-d H:i:s e');
-            $log = $this->export_var(array_merge($log, $data));
-        } else {
-            $log = '['.date('Y-m-d H:i:s e').'] '.trim($data)."\n";
-        }
-
-        return $this->put($file, $log, $flag);
-
-        return false;
-    }
-
     public function unlink($file, $del = false)
     {
-        if (!$handle = @fopen($file, 'cb')) {
-            return false;
+        $ok = false;
+
+        $handle = @fopen($file, 'cb');
+        if ($handle) {
+            if (@flock($handle, LOCK_EX | LOCK_NB)) {
+                $ok = @ftruncate($handle, 0);
+                @flock($handle, LOCK_UN);
+            }
+            @fclose($handle);
         }
 
-        if (@flock($handle, LOCK_EX | LOCK_NB)) {
-            @ftruncate($handle, 0);
-            @flock($handle, LOCK_UN);
-        }
-        @fclose($handle);
-
-        if (\defined('DOCKET_CACHE_FLUSH_DELETE') && DOCKET_CACHE_FLUSH_DELETE || $del) {
-            return @unlink($file);
+        if ((\defined('DOCKET_CACHE_FLUSH_DELETE') && DOCKET_CACHE_FLUSH_DELETE || $del) && @unlink($file)) {
+            $ok = true;
         }
 
+        if (false === $ok) {
+            // if failed, try to remove on shutdown instead of truncate
+            add_action(
+                'shutdown',
+                function () use ($file) {
+                    @unlink($file);
+                }
+            );
+        }
+
+        // always true
         return true;
     }
 
-    public function put($file, $data, $flag = 'wb')
+    public function put($file, $data, $flag = 'cb')
     {
         if (!$handle = @fopen($file, $flag)) {
             return false;
@@ -133,19 +128,51 @@ class Files
 
         $ok = false;
         if (@flock($handle, LOCK_EX | LOCK_NB)) {
-            $ok = @fwrite($handle, $data);
+            $len = \strlen($data);
+            $cnt = @fwrite($handle, $data);
             @fflush($handle);
             @flock($handle, LOCK_UN);
+            if ($len === $cnt) {
+                $ok = true;
+            }
         }
         @fclose($handle);
         clearstatcache();
 
-        if (false !== $ok) {
-            $this->opcache_flush($file);
-            $this->chmod($file);
-            $ok = true;
+        if (false === $ok) {
+            $this->unlink($file, true);
+
+            return -1;
         }
 
+        $this->opcache_flush($file);
+        $this->chmod($file);
+
+        return $ok;
+    }
+
+    public function dump($file, $data)
+    {
+        $dir = \dirname($file);
+        $tmpname = 'dump_'.uniqid().'_'.basename($file);
+
+        add_action(
+            'shutdown',
+            function () use ($tmpname) {
+                @unlink($tmpname);
+            }
+        );
+
+        $ok = $this->put($tmpname, $data);
+        if (true === $ok) {
+            if (@rename($tmpname, $file)) {
+                $this->chmod($file);
+
+                return true;
+            }
+        }
+
+        // maybe -1, true, false
         return $ok;
     }
 
@@ -164,6 +191,33 @@ class Files
         }
 
         return false;
+    }
+
+    public function log($tag, $id, $data, $caller = '')
+    {
+        $file = DOCKET_CACHE_DEBUG_FILE;
+        if (file_exists($file)) {
+            if (DOCKET_CACHE_DEBUG_FLUSH && 'flush' === strtolower($id) || filesize($file) >= (int) DOCKET_CACHE_DEBUG_SIZE) {
+                $this->put($file, '', 'cb');
+            }
+        }
+
+        $meta = [];
+        $meta['timestamp'] = date('Y-m-d H:i:s e');
+        if (!empty($caller)) {
+            $meta['caller'] = $caller;
+        }
+
+        if (\is_array($data)) {
+            $log = $this->export_var(array_merge($meta, $data));
+        } else {
+            $log = '['.$meta['timestamp'].'] '.$tag.': "'.$id.'" "'.trim($data).'"';
+            if (isset($meta['caller'])) {
+                $log .= ' "'.$meta['caller'].'"';
+            }
+        }
+
+        return @$this->put($file, $log.PHP_EOL, 'ab');
     }
 
     public static function inst()

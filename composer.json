@@ -28,7 +28,7 @@
         "source": "https://github.com/nawawi/docket-cache"
     },
     "require": {
-        "php": ">=7.2",
+        "php": ">=7.2.5",
         "symfony/var-exporter": "^5.0"
     },
     "suggest": {

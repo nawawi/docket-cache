@@ -4,7 +4,7 @@ Tags: object cache, cache, performance, flat-file
 Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.4.2
-Requires PHP: 7.2
+Requires PHP: 7.2.5
 Stable tag: trunk
 License: MIT
 License URI: ./license.txt

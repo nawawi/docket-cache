@@ -17,7 +17,7 @@
  * Author:              Nawawi Jamili
  * Author URI:          https://rutweb.com
  * Requires at least:   5.4
- * Requires PHP:        7.2
+ * Requires PHP:        7.2.5
  * Network:             true
  * License:             MIT
  * License URI:         https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt

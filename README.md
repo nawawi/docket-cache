@@ -11,7 +11,7 @@ Rather than using `serialize` and `unserialize` a PHP object to store into flat 
 
 ## Installation
 
-To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for better performance.
+To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPcache for better performance.
 
 ### WordPress Plugin Directory
 1. In your WordPress admin click *Plugins -> Add New*

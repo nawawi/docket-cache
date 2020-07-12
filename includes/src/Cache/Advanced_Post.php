@@ -224,7 +224,7 @@ class Advanced_Post
             return $sql;
         }
 
-        $this->cache_key = 'sql-'.substr(md5($sql), 0, 12);
+        $this->cache_key = 'query-'.substr(md5($sql), 0, 12);
         $this->all_post_ids = wp_cache_get($this->cache_key, $this->cache_group);
         if ('NA' !== $this->found_posts) {
             $this->found_posts = wp_cache_get("{$this->cache_key}_found", $this->cache_group);

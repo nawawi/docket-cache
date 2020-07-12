@@ -546,7 +546,8 @@ class Plugin
                     array_unshift($active_plugins, $this->hook);
                     update_option('active_plugins', $active_plugins);
                 }
-            }
+            },
+            PHP_INT_MAX
         );
 
         add_action(
@@ -569,37 +570,145 @@ class Plugin
 
         add_filter('postmeta_form_keys', '__return_false');
 
-        add_action(
-            'after_setup_theme',
-            function () {
-                remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
-            }
-        );
+        if (DOCKET_CACHE_MISC_TWEAKS) {
+            // wp: optimize heartbeat settings
+            add_filter(
+                'heartbeat_settings',
+                function () {
+                    $settings['autostart'] = false;
+                    $settings['interval'] = 90;
 
-        add_action(
-            'pre_get_users',
-            function ($wpq) {
-                if (isset($wpq->query_vars['count_total']) && $wpq->query_vars['count_total']) {
-                    $wpq->query_vars['count_total'] = false;
-                    $wpq->query_vars['run_count'] = true;
+                    return $settings;
+                },
+                PHP_INT_MAX
+            );
+
+            // wc: action_scheduler_migration_dependencies_met
+            add_filter('action_scheduler_migration_dependencies_met', '__return_false');
+
+            // wp: if only one post is found by the search results, redirect user to that post
+            add_action(
+                'template_redirect',
+                function () {
+                    if (is_search()) {
+                        global $wp_query;
+                        if (1 === (int) $wp_query->post_count && 1 === (int) $wp_query->max_num_pages) {
+                            wp_redirect(get_permalink($wp_query->posts['0']->ID));
+                            exit;
+                        }
+                    }
+                },
+                PHP_INT_MAX
+            );
+
+            // wp: hide update notifications to non-admin users
+            add_action(
+                'admin_head',
+                function () {
+                    if (!current_user_can('update_core')) {
+                        remove_action('admin_notices', 'update_nag', 3);
+                    }
+                },
+                PHP_INT_MAX
+            );
+
+            // wp: header junk
+            add_action(
+                'after_setup_theme',
+                function () {
+                    remove_action('wp_head', 'rsd_link');
+                    remove_action('wp_head', 'wp_generator');
+                    remove_action('wp_head', 'feed_links', 2);
+                    remove_action('wp_head', 'feed_links_extra', 3);
+                    remove_action('wp_head', 'index_rel_link');
+                    remove_action('wp_head', 'wlwmanifest_link');
+                    remove_action('wp_head', 'start_post_rel_link', 10, 0);
+                    remove_action('wp_head', 'parent_post_rel_link', 10, 0);
+                    remove_action('wp_head', 'adjacent_posts_rel_link', 10, 0);
+                    remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
+                    remove_action('wp_head', 'wp_shortlink_wp_head', 10, 0);
+                },
+                PHP_INT_MAX
+            );
+
+            // wp: disable pingback
+            add_action(
+                'pre_ping',
+                function (&$links) {
+                    foreach ($links as $l => $link) {
+                        if (0 === strpos($link, get_option('home'))) {
+                            unset($links[$l]);
+                        }
+                    }
+                },
+                PHP_INT_MAX
+            );
+
+            // wp: disable and remove do_pings
+            // https://wp-mix.com/wordpress-clean-up-do_pings/
+            add_action(
+                'init',
+                function () {
+                    if (isset($_GET['doing_wp_cron'])) {
+                        remove_action('do_pings', 'do_all_pings');
+                        wp_clear_scheduled_hook('do_pings');
+                    }
+                },
+                PHP_INT_MAX
+            );
+
+            // wc: remove counts slowing down the dashboard
+            remove_filter('wp_count_comments', ['WC_Comments', 'wp_count_comments'], 10);
+
+            // wc: remove order count from admin menu
+            add_filter('woocommerce_include_processing_order_count_in_menu', '__return_false');
+
+            // jetpack: enables object caching for the response sent by instagram when querying for instagram image html
+            // https://developer.jetpack.com/hooks/instagram_cache_oembed_api_response_body/
+            add_filter('instagram_cache_oembed_api_response_body', '__return_true');
+
+            // wp: disable xmlrpc
+            // https://www.wpbeginner.com/plugins/how-to-disable-xml-rpc-in-wordpress/
+            // https://kinsta.com/blog/xmlrpc-php/
+            add_filter('xmlrpc_enabled', '__return_false');
+            add_filter('pre_update_option_enable_xmlrpc', '__return_false');
+            add_filter('pre_option_enable_xmlrpc', '__return_zero');
+            add_action(
+                'init',
+                function () {
+                    if (isset($_SERVER['REQUEST_URI']) && '/xmlrpc.php' === $_SERVER['REQUEST_URI']) {
+                        http_response_code(403);
+                        exit('xmlrpc.php not available.');
+                    }
+                },
+                PHP_INT_MAX
+            );
+        }
+
+        // wp_cache: advanced cache post
+        if ($this->has_dropin()) {
+            if (DOCKET_CACHE_ADVCPOST) {
+                Advanced_Post::inst();
+            }
+        }
+    }
+
+    public function garbage_collector()
+    {
+        $dir = realpath(DOCKET_CACHE_PATH);
+        if (false !== $dir && is_dir($dir) && is_readable($dir)) {
+            clearstatcache();
+            foreach ($this->fileo->scandir($dir) as $object) {
+                $fn = $object->getFileName();
+                if ('php' === $object->getExtension() && 'index.php' !== $fn) {
+                    $fm = time() + 120;
+                    $fx = $object->getPathName();
+
+                    if ($fm >= filemtime($fx) && (0 === $object->getSize() || 'dump_' === substr($fn, 0, 5))) {
+                        $this->fileo->unlink($fx, true);
+                    }
                 }
             }
-        );
-
-        add_action(
-            'pre_user_query',
-            function ($wpq) {
-                global $wpdb;
-                if (isset($wpq->query_vars['run_count']) && $wpq->query_vars['run_count']) {
-                    unset($wpq->query_vars['run_count']);
-                    $sql = "SELECT COUNT(*) $wpq->query_from $wpq->query_where";
-                    $wpq->total_users = $wpdb->get_var($sql);
-                }
-            }
-        );
-
-        if (\defined('DOCKET_CACHE_ADVCPOST') && DOCKET_CACHE_ADVCPOST && $this->has_dropin()) {
-            Advanced_Post::inst();
         }
     }
 
@@ -626,24 +735,7 @@ class Plugin
                     }
                 );
 
-                add_action(
-                    'docket_cache_gc',
-                    function () {
-                        $dir = realpath(DOCKET_CACHE_PATH);
-                        if (false !== $dir && is_dir($dir) && is_readable($dir)) {
-                            clearstatcache();
-                            foreach ($this->fileo->scandir($dir) as $object) {
-                                if ('php' === $object->getExtension() && 'index.php' !== $object->getFileName()) {
-                                    $fm = time() + 120;
-                                    $fx = $object->getPathName();
-                                    if (0 === $object->getSize() && $fm >= filemtime($fx)) {
-                                        $this->fileo->unlink($fx, true);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                );
+                add_action('docket_cache_gc', [$this, 'garbage_collector']);
 
                 if (!wp_next_scheduled('docket_cache_gc')) {
                     wp_schedule_event(time(), 'docket_cache_gc', 'docket_cache_gc');
