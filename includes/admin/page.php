@@ -15,6 +15,9 @@ if (1 === $status && isset($this->token)) {
         case 'docket-cache-enabled':
             $do_preload = true;
             break;
+        case 'docket-log-flushed':
+            $this->empty_log();
+            break;
     }
     if (!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD || 2 === $status) {
         $do_preload = false;
