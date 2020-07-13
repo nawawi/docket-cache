@@ -42,7 +42,6 @@ class ComposerStaticInit71169967e8f502f7da209e4236957996
         'Nawawi\\Docket_Cache\\Cache\\Advanced_Post' => __DIR__ . '/../../..' . '/includes/src/Cache/Advanced_Post.php',
         'Nawawi\\Docket_Cache\\Constans' => __DIR__ . '/../../..' . '/includes/src/Constans.php',
         'Nawawi\\Docket_Cache\\Files' => __DIR__ . '/../../..' . '/includes/src/Files.php',
-        'Nawawi\\Docket_Cache\\Filesystem\\Filesystem' => __DIR__ . '/../../..' . '/includes/src/Filesystem.php',
         'Nawawi\\Docket_Cache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'Symfony\\Component\\VarExporter\\Exception\\ClassNotFoundException' => __DIR__ . '/..' . '/symfony/var-exporter/Exception/ClassNotFoundException.php',

@@ -346,13 +346,6 @@ class WP_Object_Cache
     private $multisite;
 
     /**
-     * List of filetered groups.
-     *
-     * @var array
-     */
-    protected $filtered_groups = [];
-
-    /**
      * The cache path.
      *
      * @var string
@@ -643,7 +636,6 @@ class WP_Object_Cache
             $group = 'default';
         }
 
-        $this->maybe_filtered_group($group, $expire, $key);
         $key = $this->define_key($key, $group);
 
         if (\is_object($data)) {
@@ -652,7 +644,7 @@ class WP_Object_Cache
 
         $this->cache[$group][$key] = $data;
 
-        if (!$this->is_non_persistent_groups($group) && !$this->is_non_persistent_keys($key)) {
+        if (!$this->is_non_persistent_groups($group) && !$this->is_non_persistent_keys($key) || $this->is_filtered_groups($group, $key)) {
             $expire = $this->set_expire($expire);
             $this->docket_save($key, $this->cache[$group][$key], $group, $expire);
         }
@@ -738,10 +730,6 @@ class WP_Object_Cache
      */
     protected function is_non_persistent_groups($group)
     {
-        if ($this->maybe_filtered_group($group)) {
-            return false;
-        }
-
         return !empty($this->non_persistent_groups) && \in_array($group, $this->non_persistent_groups);
     }
 
@@ -778,22 +766,30 @@ class WP_Object_Cache
         return $key;
     }
 
-    private function maybe_filtered_group($group, &$expire = '', $key = '')
+    private function is_filtered_groups($group, $key)
     {
-        $allowed_keys = [
-            'posts-page',
-            'posts-post',
-        ];
+        if (!DOCKET_CACHE_FILTERED_GROUPS) {
+            return false;
+        }
 
-        if (!empty($this->filtered_groups) && \in_array($group, $this->filtered_groups) && \in_array($key, $allowed_keys)) {
-            if (!empty($expire)) {
-                $expire = 30; // seconds
-            }
-
+        $key = str_replace($this->blog_prefix, '', $key);
+        if ('counts' === $group && \in_array($key, ['posts-post', 'posts-page'])) {
             return true;
         }
 
         return false;
+    }
+
+    public function flush_filtered_groups()
+    {
+        if (!DOCKET_CACHE_FILTERED_GROUPS) {
+            return false;
+        }
+
+        wp_cache_delete('posts-page', 'counts');
+        wp_cache_delete('posts-post', 'counts');
+
+        return true;
     }
 
     private function sanitize_second($time)
@@ -803,7 +799,7 @@ class WP_Object_Cache
             $time = 0;
         } else {
             $max = ceil(log10($time));
-            if ($time > 10 || 'NaN' === $max) {
+            if ($max > 10 || 'NaN' === $max) {
                 $time = 0;
             }
         }
@@ -849,7 +845,7 @@ class WP_Object_Cache
 
     private function debug($tag, $id, $data)
     {
-        if (!DOCKET_CACHE_DEBUG) {
+        if (!DOCKET_CACHE_LOG) {
             return false;
         }
 
@@ -1015,7 +1011,7 @@ class WP_Object_Cache
         }
 
         $file = $this->get_file_path($key, $group);
-        $meta['timeout'] = $this->set_expire(0);
+        $meta['timeout'] = $this->set_expire($meta['timeout']);
         $meta['data'] = $data;
 
         if (true === $this->docket_code($file, $meta)) {
@@ -1028,7 +1024,6 @@ class WP_Object_Cache
     private function docket_init()
     {
         // Sometime, some hosting server keep telling this constant not define.
-        // This is wp default constant, should already defined before reach to us.
         // See wp-includes/default-constants.php
         if (!\defined('WP_CONTENT_DIR')) {
             \define('WP_CONTENT_DIR', ABSPATH.'wp-content');
@@ -1038,16 +1033,18 @@ class WP_Object_Cache
             \define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins');
         }
 
-        $autoload = sprintf('%s/docket-cache/includes/load.php', WP_PLUGIN_DIR);
+        $autoload = WP_PLUGIN_DIR.'/docket-cache/includes/load.php';
 
         if (!file_exists($autoload)) {
-            throw new \Exception('Docket Cache library not found. Please re-install Docket Cache plugin or delete object-cache.php.');
+            trigger_error('Docket Cache library not found. Please re-install Docket Cache plugin or delete object-cache.php.', E_USER_ERROR);
+            exit;
         }
 
         include_once $autoload;
 
         if (!class_exists('Nawawi\\Docket_Cache\\Constans')) {
-            throw new \Exception('Failed to load Docket Cache library. Please re-install Docket Cache plugin or delete object-cache.php.');
+            trigger_error('Failed to load Docket Cache library. Please re-install Docket Cache plugin or delete object-cache.php.', E_USER_ERROR);
+            exit;
         }
 
         Nawawi\Docket_Cache\Constans::init();
@@ -1062,10 +1059,6 @@ class WP_Object_Cache
 
         if (\is_array(DOCKET_CACHE_IGNORED_KEYS)) {
             $this->non_persistent_keys = DOCKET_CACHE_IGNORED_KEYS;
-        }
-
-        if (\is_array(DOCKET_CACHE_FILTERED_GROUPS)) {
-            $this->filtered_groups = DOCKET_CACHE_FILTERED_GROUPS;
         }
 
         if (\is_int(DOCKET_CACHE_MAXTTL)) {
@@ -1121,6 +1114,21 @@ class WP_Object_Cache
                 2
             );
         }
+
+        add_action('save_post', function ($post_id, $post, $update) {
+            wp_cache_delete('posts-page', 'counts');
+            wp_cache_delete('posts-post', 'counts');
+        }, -PHP_INT_MAX, 3);
+
+        add_action('edit_post', function ($post_id, $post) {
+            wp_cache_delete('posts-page', 'counts');
+            wp_cache_delete('posts-post', 'counts');
+        }, -PHP_INT_MAX, 2);
+
+        add_action('delete_post', function ($post_id) {
+            wp_cache_delete('posts-page', 'counts');
+            wp_cache_delete('posts-post', 'counts');
+        }, -PHP_INT_MAX);
     }
 }
 

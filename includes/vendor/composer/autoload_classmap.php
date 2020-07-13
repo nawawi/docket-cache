@@ -10,7 +10,6 @@ return array(
     'Nawawi\\Docket_Cache\\Cache\\Advanced_Post' => $baseDir . '/includes/src/Cache/Advanced_Post.php',
     'Nawawi\\Docket_Cache\\Constans' => $baseDir . '/includes/src/Constans.php',
     'Nawawi\\Docket_Cache\\Files' => $baseDir . '/includes/src/Files.php',
-    'Nawawi\\Docket_Cache\\Filesystem\\Filesystem' => $baseDir . '/includes/src/Filesystem.php',
     'Nawawi\\Docket_Cache\\Plugin' => $baseDir . '/includes/src/Plugin.php',
     'Stringable' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
     'Symfony\\Component\\VarExporter\\Exception\\ClassNotFoundException' => $vendorDir . '/symfony/var-exporter/Exception/ClassNotFoundException.php',

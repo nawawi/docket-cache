@@ -195,9 +195,9 @@ class Files
 
     public function log($tag, $id, $data, $caller = '')
     {
-        $file = DOCKET_CACHE_DEBUG_FILE;
+        $file = DOCKET_CACHE_LOG_FILE;
         if (file_exists($file)) {
-            if (DOCKET_CACHE_DEBUG_FLUSH && 'flush' === strtolower($id) || filesize($file) >= (int) DOCKET_CACHE_DEBUG_SIZE) {
+            if (DOCKET_CACHE_LOG_FLUSH && 'flush' === strtolower($id) || filesize($file) >= (int) DOCKET_CACHE_LOG_SIZE) {
                 $this->put($file, '', 'cb');
             }
         }

@@ -26,6 +26,7 @@ class Plugin
         'docket-disable-cache',
         'docket-flush-cache',
         'docket-update-dropin',
+        'docket-flush-log',
     ];
 
     public $status_code;
@@ -339,11 +340,27 @@ class Plugin
                                     $message = $result ? 'docket-dropin-updated' : 'docket-dropin-updated-failed';
                                     do_action('docket_cache_update_dropin', $result);
                                     break;
+
+                                case 'docket-flush-log':
+                                    $result = $this->empty_log();
+                                    $message = $result ? 'docket-log-flushed' : 'docket-log-flushed-failed';
+                                    do_action('docket_cache_flush_log', $result);
+                                    break;
                             }
                         }
 
                         if (isset($message)) {
-                            wp_safe_redirect(network_admin_url(add_query_arg('message', $message, $this->page)));
+                            $query = add_query_arg('message', $message, $this->page);
+                            if ('docket-flush-log' === $action) {
+                                $query = add_query_arg(
+                                    [
+                                        'message' => $message,
+                                        'tab' => 'log',
+                                    ],
+                                    $this->page
+                                );
+                            }
+                            wp_safe_redirect(network_admin_url($query));
                             exit;
                         }
                     }
@@ -385,6 +402,12 @@ class Plugin
                             break;
                         case 'docket-dropin-updated-failed':
                             $error = __('Docket object cache drop-in could not be updated.', 'docket-cache');
+                            break;
+                        case 'docket-log-flushed':
+                            $message = __('Cache log was flushed.', 'docket-cache');
+                            break;
+                        case 'docket-log-flushed-failed':
+                            $error = __('Cache log could not be flushed.', 'docket-cache');
                             break;
                     }
 
@@ -508,14 +531,16 @@ class Plugin
 
     private function has_log()
     {
-        return  \defined('DOCKET_CACHE_DEBUG_FILE') && is_file(DOCKET_CACHE_DEBUG_FILE) && is_readable(DOCKET_CACHE_DEBUG_FILE);
+        return  \defined('DOCKET_CACHE_LOG_FILE') && is_file(DOCKET_CACHE_LOG_FILE) && is_readable(DOCKET_CACHE_LOG_FILE);
     }
 
     private function empty_log()
     {
         if ($this->has_log()) {
-            @unlink(DOCKET_CACHE_DEBUG_FILE);
+            return @unlink(DOCKET_CACHE_LOG_FILE);
         }
+
+        return false;
     }
 
     private function tail_log($limit = 100)
@@ -523,7 +548,7 @@ class Plugin
         $limit = (int) $limit;
         $output = [];
         if ($this->has_log()) {
-            foreach ($this->fileo->tail(DOCKET_CACHE_DEBUG_FILE, $limit) as $line) {
+            foreach ($this->fileo->tail(DOCKET_CACHE_LOG_FILE, $limit) as $line) {
                 $line = trim($line);
                 if (empty($line)) {
                     continue;
@@ -582,9 +607,6 @@ class Plugin
                 },
                 PHP_INT_MAX
             );
-
-            // wc: action_scheduler_migration_dependencies_met
-            add_filter('action_scheduler_migration_dependencies_met', '__return_false');
 
             // wp: if only one post is found by the search results, redirect user to that post
             add_action(
@@ -657,12 +679,6 @@ class Plugin
                 PHP_INT_MAX
             );
 
-            // wc: remove counts slowing down the dashboard
-            remove_filter('wp_count_comments', ['WC_Comments', 'wp_count_comments'], 10);
-
-            // wc: remove order count from admin menu
-            add_filter('woocommerce_include_processing_order_count_in_menu', '__return_false');
-
             // jetpack: enables object caching for the response sent by instagram when querying for instagram image html
             // https://developer.jetpack.com/hooks/instagram_cache_oembed_api_response_body/
             add_filter('instagram_cache_oembed_api_response_body', '__return_true');
@@ -683,6 +699,44 @@ class Plugin
                 },
                 PHP_INT_MAX
             );
+
+            if (class_exists('woocommerce')) {
+                // wc: remove counts slowing down the dashboard
+                remove_filter('wp_count_comments', ['WC_Comments', 'wp_count_comments'], 10);
+
+                // wc: remove order count from admin menu
+                add_filter('woocommerce_include_processing_order_count_in_menu', '__return_false');
+
+                // wc: remove Processing Order Count in wp-admin
+                //add_filter('woocommerce_menu_order_count', '__return_false');
+
+                // wc: action_scheduler_migration_dependencies_met
+                add_filter('action_scheduler_migration_dependencies_met', '__return_false');
+
+                // wc: disable background image regeneration
+                add_filter('woocommerce_background_image_regeneration', '__return_false');
+
+                // wc: remove marketplace suggestions
+                // https://rudrastyh.com/woocommerce/remove-marketplace-suggestions.html
+                add_filter('woocommerce_allow_marketplace_suggestions', '__return_false');
+
+                // wc: remove connect your store to WooCommerce.com admin notice
+                add_filter('woocommerce_helper_suppress_admin_notices', '__return_true');
+
+                // wc: disable the WooCommerce Admin
+                //add_filter('woocommerce_admin_disabled', '__return_true');
+
+                // wc: disable the WooCommere Marketing Hub
+                add_filter(
+                    'woocommerce_admin_features',
+                    function ($features) {
+                        $marketing = array_search('marketing', $features);
+                        unset($features[$marketing]);
+
+                        return $features;
+                    }
+                );
+            }
         }
 
         // wp_cache: advanced cache post
@@ -727,7 +781,7 @@ class Plugin
                         $schedules = [
                             'docket_cache_gc' => [
                                 'interval' => 30 * MINUTE_IN_SECONDS,
-                                'display' => __('Docket Cache Garbage Collector', 'docket-cache'),
+                                'display' => __('Docket Cache Garbage Collector Run Every 30 minutes', 'docket-cache'),
                             ],
                         ];
 

@@ -15,24 +15,22 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPcache for
 
 ### WordPress Plugin Directory
 1. In your WordPress admin click *Plugins -> Add New*
-2. Search plugins [Docket Cache](https://wordpress.org/plugins/docket-cache/).
-3. Click *Install Now*.
-4. Click *Activate* or *Network Activate* in Multisite setups.
-5. Enable the object cache under Settings -> Docket Cache, or in Multisite setups under Network Admin -> Settings -> Docket Cache.
+2. Search plugins ["Docket Cache"](https://wordpress.org/plugins/docket-cache/) and click Install Now.
+3. Click *Activate* or *Network Activate* in Multisite setups.
+4. Enable the object cache under Settings -> Docket Cache, or in Multisite setups under Network Admin -> Settings -> Docket Cache.
 
-### Manually Install
+### Manual Installation
  1. Download the plugin as a [ZIP file](https://github.com/nawawi/docket-cache/archive/master.zip) from GitHub.
  2. In your WordPress admin click *Plugins -> Add New -> Upload Plugin*.
- 3. Upload the ZIP file.
- 4. Activate the plugin.
- 5. Enable the object cache under *Settings -> Docket Cache*, or in Multisite setups under *Network Admin -> Settings -> Docket Cache*.
+ 3. Upload the ZIP file and Activate the plugin.
+ 4. Enable the object cache under *Settings -> Docket Cache*, or in Multisite setups under *Network Admin -> Settings -> Docket Cache*.
 
 ### Via WP-CLI
 
 [`WP-CLI`](http://wp-cli.org/) is the official command-line interface for WordPress. You can install `docket-cache` using the `wp` command like this:
 
 ```
-wp plugin install --activate https://github.com/nawawi/docket-cache/archive/master.zip
+wp plugin install --activate https://github.com/nawawi/docket-cache/archive/master.zip --force
 ```
 
 ### Via Composer
@@ -106,30 +104,30 @@ Default:
 define('DOCKET_CACHE_PATH`', WP_CONTENT_DIR.'/cache/docket-cache');
 ```
 
-**Debug Options**
+**Log Options**
 
-**`DOCKET_CACHE_DEBUG`**
+**`DOCKET_CACHE_LOG`**
 
-Set to `true` to enable debug log.  
+Set to `true` to enable cache log.  
 Default:
 ```php
-define('DOCKET_CACHE_DEBUG', false);
+define('DOCKET_CACHE_LOG', false);
 ```
 
-**`DOCKET_CACHE_DEBUG_FLUSH`**
+**`DOCKET_CACHE_LOG_FLUSH`**
 
 Set to `true` to empty the log file when object cache flushed.  
 Default:
 ```php
-define('DOCKET_CACHE_DEBUG_FLUSH', true);
+define('DOCKET_CACHE_LOG_FLUSH', true);
 ```
 
-**`DOCKET_CACHE_DEBUG_SIZE`**
+**`DOCKET_CACHE_LOG_SIZE`**
 
 Set the maximum size of a log file in byte. Default set to 10MB.  
 Default:
 ```php
-define('DOCKET_CACHE_DEBUG_SIZE', 10000000);
+define('DOCKET_CACHE_LOG_SIZE', 10000000);
 ```
 
 **Multisite Options**

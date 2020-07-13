@@ -30,16 +30,16 @@ class Constans
         self::maybe_define('DOCKET_CACHE_MAXTTL', 0);
 
         // debug on/off
-        self::maybe_define('DOCKET_CACHE_DEBUG', false);
+        self::maybe_define('DOCKET_CACHE_LOG', false);
 
         // debug file
-        self::maybe_define('DOCKET_CACHE_DEBUG_FILE', WP_CONTENT_DIR.'/object-cache.log');
+        self::maybe_define('DOCKET_CACHE_LOG_FILE', WP_CONTENT_DIR.'/object-cache.log');
 
         // empty file when cache flushed
-        self::maybe_define('DOCKET_CACHE_DEBUG_FLUSH', true);
+        self::maybe_define('DOCKET_CACHE_LOG_FLUSH', true);
 
         // debug file max size
-        self::maybe_define('DOCKET_CACHE_DEBUG_SIZE', 10000000);
+        self::maybe_define('DOCKET_CACHE_LOG_SIZE', 10000000);
 
         // truncate or delete cache file
         self::maybe_define('DOCKET_CACHE_FLUSH_DELETE', false);
@@ -90,13 +90,8 @@ class Constans
         // cache ignored keys
         self::maybe_define('DOCKET_CACHE_IGNORED_KEYS', []);
 
-        // this group will handle conditionally
-        self::maybe_define(
-            'DOCKET_CACHE_FILTERED_GROUPS',
-            [
-                'counts',
-            ]
-        );
+        // this will handle conditionally
+        self::maybe_define('DOCKET_CACHE_FILTERED_GROUPS', true);
 
         // misc tweaks
         self::maybe_define('DOCKET_CACHE_MISC_TWEAKS', true);

@@ -3,7 +3,7 @@
 
 $status = $this->get_status();
 $status_text = $this->status_code[$status];
-$is_debug = DOCKET_CACHE_DEBUG && DOCKET_CACHE_DEBUG_FILE;
+$is_log = DOCKET_CACHE_LOG && DOCKET_CACHE_LOG_FILE;
 $tab = isset($_GET['tab']) ? $_GET['tab'] : '';
 $do_preload = false;
 if (1 === $status && isset($this->token)) {
@@ -32,7 +32,7 @@ if (is_multisite() && is_network_admin()) {
     <nav class="nav-tab-wrapper">
         <a href="<?php echo $this->page; ?>" class="nav-tab<?php echo  empty($tab) ? ' nav-tab-active' : ''; ?>"><?php _e('Overview', 'docket-cache'); ?></a>
         <?php if (2 !== $status) : ?>
-        <a href="<?php echo $this->page; ?>&tab=debug" class="nav-tab<?php echo  'debug' === $tab ? ' nav-tab-active' : ''; ?>"><?php _e('Debug Log', 'docket-cache'); ?></a>
+        <a href="<?php echo $this->page; ?>&tab=log" class="nav-tab<?php echo  'log' === $tab ? ' nav-tab-active' : ''; ?>"><?php _e('Cache Log', 'docket-cache'); ?></a>
         <?php endif; ?>
         <a href="<?php echo $this->page; ?>&tab=config" class="nav-tab<?php echo  'config' === $tab ? ' nav-tab-active' : ''; ?>"><?php _e('Options', 'docket-cache'); ?></a>
     </nav>
@@ -110,31 +110,34 @@ if (is_multisite() && is_network_admin()) {
     <?php endif; ?>
 
     <?php
-    if ('debug' === $tab) :
+    if ('log' === $tab) :
         $output = $this->tail_log(100);
         ?>
 
         <div class="section<?php echo !empty($output) ? ' log' : ''; ?>">
-            <h2 class="title"><?php _e('Debug Log ', 'docket-cache'); ?></h2>
+            <h2 class="title"><?php _e('Cache Log ', 'docket-cache'); ?></h2>
 
             <table class="form-table">
                 <tr>
                     <th><?php _e('Status', 'docket-cache'); ?></th>
-                    <td><code><?php echo $this->status_code[$is_debug ? 1 : 0]; ?></code></td>
+                    <td><code><?php echo $this->status_code[$is_log ? 1 : 0]; ?></code></td>
                 </tr>
                 <tr>
-                    <th><?php _e('Log File', 'docket-cache'); ?></th>
-                    <td><code><?php echo str_replace(WP_CONTENT_DIR, '/wp-content', DOCKET_CACHE_DEBUG_FILE); ?></code></td>
+                    <th><?php _e('File', 'docket-cache'); ?></th>
+                    <td><code><?php echo str_replace(WP_CONTENT_DIR, '/wp-content', DOCKET_CACHE_LOG_FILE); ?></code></td>
                 </tr>
 			<?php if (empty($output)) : ?>
                 <tr>
-                    <th><?php _e('Log Data', 'docket-cache'); ?></th>
+                    <th><?php _e('Data', 'docket-cache'); ?></th>
                     <td><code><?php _e('Not available', 'docket-cache'); ?></code></td>
                 </tr>
                 <?php else : ?>
                 <tr>
+                    <th><?php _e('Size', 'docket-cache'); ?></th>
+                    <td><code><?php echo $this->normalize_size(filesize(DOCKET_CACHE_LOG_FILE)); ?></code></td>
+                </tr>
+                <tr>
                     <td colspan="2" class="output">
-                        <strong>Log Data</strong><br>
                         <textarea id="log" class="code" readonly="readonly" rows="20"><?php echo implode("\n", array_reverse($output, true)); ?></textarea>
                     </td>
                 </tr>
@@ -142,7 +145,8 @@ if (is_multisite() && is_network_admin()) {
             </table>
 
             <p class="submit">
-                <a href="<?php echo network_admin_url(add_query_arg('tab', $tab, $this->page)); ?>" class="button button-primary button-large"><?php _e('Refresh', 'docket-cache'); ?></a>&nbsp;
+                <a href="<?php echo $this->action_query('flush-log'); ?>" class="button button-primary button-large"><?php _e('Flush Log', 'docket-cache'); ?></a>&nbsp;
+                <a href="<?php echo network_admin_url(add_query_arg('tab', $tab, $this->page)); ?>" class="button button-secondary button-large"><?php _e('Refresh', 'docket-cache'); ?></a>
             </p>
         </div>
 
