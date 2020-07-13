@@ -2,7 +2,7 @@
 /**
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
- * Version:             20200710
+ * Version:             20200714
  * Description:         A file-based persistent WordPress Object Cache stored as a plain PHP code.
  * Author:              Nawawi Jamili
  * Author URI:          https://rutweb.com

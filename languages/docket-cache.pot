@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Docket Cache plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 20.07.09\n"
+"Project-Id-Version: Docket Cache 20.07.14\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-07-13T17:14:01+00:00\n"
+"POT-Creation-Date: 2020-07-13T17:27:55+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -31,117 +31,117 @@ msgstr ""
 msgid "https://rutweb.com"
 msgstr ""
 
-#: includes/admin/page.php:30
+#: includes/admin/page.php:33
 #: includes/src/Plugin.php:260
 msgid "Docket Object Cache"
 msgstr ""
 
-#: includes/admin/page.php:33
-#: includes/admin/page.php:43
+#: includes/admin/page.php:36
+#: includes/admin/page.php:46
 msgid "Overview"
 msgstr ""
 
-#: includes/admin/page.php:35
+#: includes/admin/page.php:38
 msgid "Cache Log"
 msgstr ""
 
-#: includes/admin/page.php:37
-#: includes/admin/page.php:102
+#: includes/admin/page.php:40
+#: includes/admin/page.php:105
 msgid "Options"
 msgstr ""
 
-#: includes/admin/page.php:47
-#: includes/admin/page.php:122
+#: includes/admin/page.php:50
+#: includes/admin/page.php:125
 msgid "Status"
 msgstr ""
 
-#: includes/admin/page.php:53
+#: includes/admin/page.php:56
 msgid "OPCache"
 msgstr ""
 
-#: includes/admin/page.php:58
+#: includes/admin/page.php:61
 msgid "PHP Memory Limit"
 msgstr ""
 
-#: includes/admin/page.php:63
+#: includes/admin/page.php:66
 msgid "WP Memory Limit"
 msgstr ""
 
-#: includes/admin/page.php:68
+#: includes/admin/page.php:71
 msgid "Drop-in Installable"
 msgstr ""
 
-#: includes/admin/page.php:69
-#: includes/admin/page.php:74
+#: includes/admin/page.php:72
+#: includes/admin/page.php:77
 msgid "Yes"
 msgstr ""
 
-#: includes/admin/page.php:69
-#: includes/admin/page.php:74
+#: includes/admin/page.php:72
+#: includes/admin/page.php:77
 msgid "No"
 msgstr ""
 
-#: includes/admin/page.php:73
+#: includes/admin/page.php:76
 msgid "Cache Writable"
 msgstr ""
 
-#: includes/admin/page.php:79
+#: includes/admin/page.php:82
 msgid "Cache Size"
 msgstr ""
 
-#: includes/admin/page.php:89
+#: includes/admin/page.php:92
 msgid "Enable Object Cache"
 msgstr ""
 
-#: includes/admin/page.php:91
+#: includes/admin/page.php:94
 msgid "Flush Cache"
 msgstr ""
 
-#: includes/admin/page.php:92
+#: includes/admin/page.php:95
 msgid "Disable Object Cache"
 msgstr ""
 
-#: includes/admin/page.php:104
+#: includes/admin/page.php:107
 msgid "Configuration Options"
 msgstr ""
 
-#: includes/admin/page.php:105
+#: includes/admin/page.php:108
 msgid "To adjust the configuration, please see the <a href=\"https://github.com/nawawi/docket-cache#configuration-options\" rel=\"noopener\" target=\"_blank\">configuration options</a> for a full list."
 msgstr ""
 
-#: includes/admin/page.php:107
+#: includes/admin/page.php:110
 msgid "WP-CLI Commands"
 msgstr ""
 
-#: includes/admin/page.php:108
+#: includes/admin/page.php:111
 msgid "To use the WP-CLI commands, please see the <a href=\"https://github.com/nawawi/docket-cache#wp-cli-commands\" rel=\"noopener\" target=\"_blank\">WP-CLI commands</a> for a full list."
 msgstr ""
 
-#: includes/admin/page.php:118
+#: includes/admin/page.php:121
 msgid "Cache Log "
 msgstr ""
 
-#: includes/admin/page.php:126
+#: includes/admin/page.php:129
 msgid "File"
 msgstr ""
 
-#: includes/admin/page.php:131
+#: includes/admin/page.php:134
 msgid "Data"
 msgstr ""
 
-#: includes/admin/page.php:132
+#: includes/admin/page.php:135
 msgid "Not available"
 msgstr ""
 
-#: includes/admin/page.php:136
+#: includes/admin/page.php:139
 msgid "Size"
 msgstr ""
 
-#: includes/admin/page.php:148
+#: includes/admin/page.php:151
 msgid "Flush Log"
 msgstr ""
 
-#: includes/admin/page.php:149
+#: includes/admin/page.php:152
 msgid "Refresh"
 msgstr ""
 
