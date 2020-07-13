@@ -99,5 +99,11 @@ class Constans
         // misc tweaks
         self::maybe_define('DOCKET_CACHE_MISC_TWEAKS', true);
         self::maybe_define('DOCKET_CACHE_ADVCPOST', true);
+
+        // backwards-compatible
+        self::maybe_define('DOCKET_CACHE_DEBUG', DOCKET_CACHE_LOG);
+        self::maybe_define('DOCKET_CACHE_DEBUG_FILE', DOCKET_CACHE_LOG_FILE);
+        self::maybe_define('DOCKET_CACHE_DEBUG_FLUSH', DOCKET_CACHE_LOG_FLUSH);
+        self::maybe_define('DOCKET_CACHE_DEBUG_SIZE', DOCKET_CACHE_LOG_SIZE);
     }
 }
