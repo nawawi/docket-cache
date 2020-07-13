@@ -156,6 +156,27 @@ function wp_cache_get($key, $group = '', $force = false, &$found = null)
 }
 
 /**
+ * Retrieves multiple values from the cache in one call.
+ *
+ * @see WP_Object_Cache::get_multiple()
+ *
+ * @global WP_Object_Cache $wp_object_cache Object cache global instance.
+ *
+ * @param array  $keys  array of keys under which the cache contents are stored
+ * @param string $group Optional. Where the cache contents are grouped. Default empty.
+ * @param bool   $force Optional. Whether to force an update of the local cache
+ *                      from the persistent cache. Default false.
+ *
+ * @return array array of values organized into groups
+ */
+function wp_cache_get_multiple($keys, $group = '', $force = false)
+{
+    global $wp_object_cache;
+
+    return $wp_object_cache->get_multiple($keys, $group, $force);
+}
+
+/**
  * Increment numeric cache item's value.
  *
  * @see WP_Object_Cache::incr()
@@ -548,6 +569,27 @@ class WP_Object_Cache
         ++$this->cache_misses;
 
         return false;
+    }
+
+    /**
+     * Retrieves multiple values from the cache in one call.
+     *
+     * @param array  $keys  array of keys under which the cache contents are stored
+     * @param string $group Optional. Where the cache contents are grouped. Default 'default'.
+     * @param bool   $force Optional. Whether to force an update of the local cache
+     *                      from the persistent cache. Default false.
+     *
+     * @return array array of values organized into groups
+     */
+    public function get_multiple($keys, $group = 'default', $force = false)
+    {
+        $values = [];
+
+        foreach ($keys as $key) {
+            $values[$key] = $this->get($key, $group, $force);
+        }
+
+        return $values;
     }
 
     /**
