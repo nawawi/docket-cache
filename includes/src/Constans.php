@@ -29,16 +29,16 @@ class Constans
         // cache maxttl
         self::maybe_define('DOCKET_CACHE_MAXTTL', 0);
 
-        // debug on/off
+        // log on/off
         self::maybe_define('DOCKET_CACHE_LOG', false);
 
-        // debug file
+        // log file
         self::maybe_define('DOCKET_CACHE_LOG_FILE', WP_CONTENT_DIR.'/object-cache.log');
 
         // empty file when cache flushed
         self::maybe_define('DOCKET_CACHE_LOG_FLUSH', true);
 
-        // debug file max size
+        // log file max size
         self::maybe_define('DOCKET_CACHE_LOG_SIZE', 10000000);
 
         // truncate or delete cache file
@@ -92,6 +92,9 @@ class Constans
 
         // this will handle conditionally
         self::maybe_define('DOCKET_CACHE_FILTERED_GROUPS', true);
+
+        // preload
+        self::maybe_define('DOCKET_CACHE_PRELOAD', false);
 
         // misc tweaks
         self::maybe_define('DOCKET_CACHE_MISC_TWEAKS', true);

@@ -124,7 +124,7 @@ if (is_multisite() && is_network_admin()) {
                 </tr>
                 <tr>
                     <th><?php _e('File', 'docket-cache'); ?></th>
-                    <td><code><?php echo str_replace(WP_CONTENT_DIR, '/wp-content', DOCKET_CACHE_LOG_FILE); ?></code></td>
+                    <td><code><?php echo $this->sanitize_rootpath(DOCKET_CACHE_LOG_FILE); ?></code></td>
                 </tr>
 			<?php if (empty($output)) : ?>
                 <tr>
@@ -134,7 +134,7 @@ if (is_multisite() && is_network_admin()) {
                 <?php else : ?>
                 <tr>
                     <th><?php _e('Size', 'docket-cache'); ?></th>
-                    <td><code><?php echo $this->normalize_size(filesize(DOCKET_CACHE_LOG_FILE)); ?></code></td>
+                    <td><code><?php echo $this->get_logsize(); ?></code></td>
                 </tr>
                 <tr>
                     <td colspan="2" class="output">

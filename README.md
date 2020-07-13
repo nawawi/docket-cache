@@ -184,6 +184,14 @@ Default:
 define('DOCKET_CACHE_ADVCPOST', true);
 ```
 
+**`DOCKET_CACHE_PRELOAD`**
+
+Set to true to enable cache preloading.  
+Default:
+```php
+define('DOCKET_CACHE_PRELOAD', false);
+```
+
 ## WP-CLI Commands
 
 To use the WP-CLI commands, make sure the plugin is activated:
@@ -208,6 +216,14 @@ The following commands are supported:
   * `wp cache update`
 
     Updates the Docket object cache drop-in. Default behavior is to overwrite any existing object cache drop-in.
+
+  * `wp cache flush`
+
+    Flushes the object cache.
+
+  * `wp cache preload`
+
+    Run cache preload.
 
 ## Screenshots
 ![Overview](./.wordpress.org/screenshot-1.png)

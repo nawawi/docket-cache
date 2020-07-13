@@ -161,6 +161,26 @@ class Command extends WP_CLI_Command
     }
 
     /**
+     * Run cache preload.
+     *
+     * Default behavior is to overwrite any existing object cache drop-in.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache preload
+     *
+     * @subcommand preload
+     */
+    public function run_preload()
+    {
+        if (!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD) {
+            $this->halt_error(__('Cache preloading not enabled.', 'docket-cache'));
+        }
+        do_action('docket_preload');
+        $this->halt_status(__('Preloading will happen shortly.', 'docket-cache'));
+    }
+
+    /**
      * Attempts to determine which object cache is being used.
      *
      * Note that the guesses made by this function are based on the

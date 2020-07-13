@@ -33,7 +33,8 @@ class Plugin
     private $hook;
     private $page;
     private $token;
-    private $fileo;
+    private $wpcli;
+    private $fs;
 
     public function __construct()
     {
@@ -51,7 +52,8 @@ class Plugin
             -1 => __('Unknown', 'docket-cache'),
         ];
 
-        $this->fileo = new Files();
+        $this->wpcli = (\defined('WP_CLI') && WP_CLI);
+        $this->fs = new Files();
     }
 
     public function has_dropin()
@@ -109,7 +111,7 @@ class Plugin
 
         $bytestotal = 0;
         if (false !== $dir && is_dir($dir) && is_readable($dir)) {
-            foreach ($this->fileo->scandir($dir) as $object) {
+            foreach ($this->fs->scandir($dir) as $object) {
                 if ('index.php' !== $object->getFileName()) {
                     $bytestotal += $object->getSize();
                 }
@@ -117,6 +119,16 @@ class Plugin
         }
 
         return $this->normalize_size($bytestotal);
+    }
+
+    public function get_logsize()
+    {
+        return $this->has_log() ? $this->normalize_size(filesize(DOCKET_CACHE_LOG_FILE)) : 0;
+    }
+
+    public function sanitize_rootpath($path)
+    {
+        return str_replace([WP_CONTENT_DIR, ABSPATH], ['/wp-content', '/'], $path);
     }
 
     public function get_opcache_status()
@@ -160,7 +172,7 @@ class Plugin
         $dst = $this->dropin_file()->dst;
 
         if (is_writable(\dirname($this->dropin_file()->dst))) {
-            return $this->fileo->copy($src, $dst);
+            return $this->fs->copy($src, $dst);
         }
 
         return false;
@@ -198,6 +210,7 @@ class Plugin
     public function activate()
     {
         wp_cache_flush();
+        $this->unregister_scheduler();
     }
 
     private function register_plugin_hooks()
@@ -318,7 +331,6 @@ class Plugin
 
                         if ('docket-flush-cache' === $action) {
                             $message = wp_cache_flush() ? 'docket-cache-flushed' : 'docket-cache-flushed-failed';
-                            $this->empty_log();
                         }
 
                         if (is_writable(WP_CONTENT_DIR)) {
@@ -496,7 +508,7 @@ class Plugin
                             $preload_network = DOCKET_CACHE_PRELOAD_NETWORK;
                         }
 
-                        if (is_user_logged_in() && current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options')) {
+                        if (is_user_logged_in() && current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options') || $this->wpcli) {
                             if (!empty($_COOKIE)) {
                                 foreach ($_COOKIE as $name => $value) {
                                     $cookies[] = new \WP_Http_Cookie(
@@ -511,13 +523,21 @@ class Plugin
 
                             @wp_remote_get(admin_url('/'), $args);
                             foreach ($preload_admin as $path) {
-                                @wp_remote_get(admin_url('/'.$path), $args);
+                                $url = admin_url('/'.$path);
+                                if ($this->wpcli) {
+                                    fwrite(STDOUT, 'Fetch: '.$url."\n");
+                                }
+                                @wp_remote_get($url, $args);
                             }
 
                             if (is_multisite()) {
                                 @wp_remote_get(network_admin_url('/'), $args);
                                 foreach ($preload_network as $path) {
-                                    @wp_remote_get(network_admin_url('/'.$path), $args);
+                                    $url = network_admin_url('/'.$path);
+                                    if ($this->wpcli) {
+                                        fwrite(STDOUT, 'Fetch: '.$url."\n");
+                                    }
+                                    @wp_remote_get($url, $args);
                                     usleep(7500);
                                 }
                             }
@@ -548,7 +568,7 @@ class Plugin
         $limit = (int) $limit;
         $output = [];
         if ($this->has_log()) {
-            foreach ($this->fileo->tail(DOCKET_CACHE_LOG_FILE, $limit) as $line) {
+            foreach ($this->fs->tail(DOCKET_CACHE_LOG_FILE, $limit) as $line) {
                 $line = trim($line);
                 if (empty($line)) {
                     continue;
@@ -752,14 +772,14 @@ class Plugin
         $dir = realpath(DOCKET_CACHE_PATH);
         if (false !== $dir && is_dir($dir) && is_readable($dir)) {
             clearstatcache();
-            foreach ($this->fileo->scandir($dir) as $object) {
+            foreach ($this->fs->scandir($dir) as $object) {
                 $fn = $object->getFileName();
                 if ('php' === $object->getExtension() && 'index.php' !== $fn) {
                     $fm = time() + 120;
                     $fx = $object->getPathName();
 
                     if ($fm >= filemtime($fx) && (0 === $object->getSize() || 'dump_' === substr($fn, 0, 5))) {
-                        $this->fileo->unlink($fx, true);
+                        $this->fs->unlink($fx, true);
                     }
                 }
             }
@@ -810,7 +830,7 @@ class Plugin
         $this->register_tweaks();
         $this->register_scheduler();
 
-        if (\defined('WP_CLI') && WP_CLI && !\defined('Docket_Cache_CLI')) {
+        if ($this->wpcli && !\defined('Docket_Cache_CLI')) {
             \define('Docket_Cache_CLI', true);
             $cli = new Command($this);
             \WP_CLI::add_command('cache update', [$cli, 'update_dropin']);
@@ -818,6 +838,7 @@ class Plugin
             \WP_CLI::add_command('cache disable', [$cli, 'disable']);
             \WP_CLI::add_command('cache status', [$cli, 'status']);
             \WP_CLI::add_command('cache type', [$cli, 'type']);
+            \WP_CLI::add_command('cache preload', [$cli, 'run_preload']);
         }
     }
 }
