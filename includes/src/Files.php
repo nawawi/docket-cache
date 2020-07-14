@@ -154,18 +154,18 @@ class Files
     public function dump($file, $data)
     {
         $dir = \dirname($file);
-        $tmpname = 'dump_'.uniqid().'_'.basename($file);
-
+        $tmpfile = $dir.'/'.'dump_'.uniqid().'_'.basename($file);
+        $this->log(__FUNCTION__,$file, $tmpfile);
         add_action(
             'shutdown',
-            function () use ($tmpname) {
-                @unlink($tmpname);
+            function () use ($tmpfile) {
+                @unlink($tmpfile);
             }
         );
 
-        $ok = $this->put($tmpname, $data);
+        $ok = $this->put($tmpfile, $data);
         if (true === $ok) {
-            if (@rename($tmpname, $file)) {
+            if (@rename($tmpfile, $file)) {
                 $this->chmod($file);
 
                 return true;
@@ -197,7 +197,7 @@ class Files
     {
         $file = DOCKET_CACHE_LOG_FILE;
         if (file_exists($file)) {
-            if (DOCKET_CACHE_LOG_FLUSH && 'flush' === strtolower($id) || filesize($file) >= (int) DOCKET_CACHE_LOG_SIZE) {
+            if (DOCKET_CACHE_LOG_FLUSH && 'flush' === strtolower($id) || @filesize($file) >= (int) DOCKET_CACHE_LOG_SIZE) {
                 $this->put($file, '', 'cb');
             }
         }
