@@ -155,7 +155,6 @@ class Files
     {
         $dir = \dirname($file);
         $tmpfile = $dir.'/'.'dump_'.uniqid().'_'.basename($file);
-        $this->log(__FUNCTION__,$file, $tmpfile);
         add_action(
             'shutdown',
             function () use ($tmpfile) {
