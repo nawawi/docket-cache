@@ -2,36 +2,42 @@
 #docket-cache .form-table td,
 #docket-cache .form-table th,
 #docket-cache .form-table tr {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+    border-collapse: collapse;
+    border-spacing: 0;
 }
 
-#docket-cache table {
-	border-collapse: collapse;
-	border-spacing: 0;
+#docket-cache .form-table {
+    width: 100%;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
 }
 
 #docket-cache .form-table th {
-    font-weight: bold;
+    font-weight: 600;
+}
+
+#docket-cache .form-table tr:not(:last-child) td {
+    border-bottom: 1px solid #ddd;
+}
+
+#docket-cache .overview .form-table td,
+#docket-cache .log .form-table td {
+    font-family: Consolas, Monaco, monospace;
+    unicode-bidi: embed;
+    font-size: 13px;
 }
 
 #docket-cache .form-table th,
 #docket-cache .form-table td {
-    padding-top:7px;
-    padding-bottom: 7px;;
-}
-
-#docket-cache .form-table td code {
-    display: block;
-    min-width: 150px;
-    padding-left: 7px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    margin:0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    vertical-align: middle;
 }
 
 #docket-cache .button {
@@ -45,16 +51,72 @@
 
 #docket-cache textarea {
     width: 100%;
-	font-size: 100%;
-	font: courier;
-	vertical-align: baseline;
+    font-size: 100%;
+    font: courier;
+    vertical-align: baseline;
     margin-top: 15px;
     margin-bottom: 0;
     white-space: pre;
     overflow-wrap: normal;
     overflow-x: scroll;
+    outline: none;
 }
 
-#docket-cache .section {
-    float: left;
+#docket-cache .config p {
+    font-size: 14px;
+}
+
+#docket-cache .config .form-table th,
+#docket-cache .config .form-table td {
+    vertical-align: top;
+}
+
+#docket-cache .config .form-table th {
+    width: 20%;
+    padding-top: 12px;
+}
+
+#docket-cache .config .form-table td {
+    padding-top: 4px;
+}
+
+#docket-cache .config .form-table small {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+#docket-cache .config .form-table small {
+    font-size: 13px;
+}
+
+#docket-cache .config .form-table code {
+    font-size: 12px;
+}
+
+#docket-cache h2.title {
+    padding: 0;
+    margin-top: 25px;
+    text-transform: uppercase;
+    font-size:16px;
+}
+
+@media only screen and (min-width: 700px) {
+    #docket-cache .nav-tab {
+        min-width: 100px;
+        text-align: center;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    #docket-cache .config .form-table th {
+        width: 100%;
+    }
+
+    #docket-cache .form-table th {
+        padding-bottom: 0;
+    }
+
+    #docket-cache .form-table td {
+        padding-top: 0;
+    }
 }
