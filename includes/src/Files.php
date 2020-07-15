@@ -10,11 +10,14 @@
 
 namespace Nawawi\Docket_Cache;
 
-use Symfony\Component\VarExporter\VarExporter;
+use Nawawi\Symfony\Component\VarExporter\VarExporter;
 
-class Files
+final class Files
 {
-    public static $inst;
+    public function filesize($file)
+    {
+        return @sprintf('%u', @filesize($file));
+    }
 
     public function chmod($file)
     {
@@ -53,9 +56,13 @@ class Files
         return false;
     }
 
-    public function scandir($dir)
+    public function scanfiles($dir, $maxdepth = 0)
     {
-        return new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS));
+        $diriterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \RecursiveDirectoryIterator::KEY_AS_FILENAME | \RecursiveDirectoryIterator::CURRENT_AS_FILEINFO);
+        $object = new \RegexIterator(new \RecursiveIteratorIterator($diriterator), '@^(dump_)?([a-z0-9]+)\-([a-z0-9]+).*\.php$@', \RegexIterator::MATCH, \RegexIterator::USE_KEY);
+        $object->setMaxDepth($maxdepth);
+
+        return $object;
     }
 
     public function tail($filepath, $limit = 100)
@@ -102,7 +109,10 @@ class Files
             @fclose($handle);
         }
 
-        if ((\defined('DOCKET_CACHE_FLUSH_DELETE') && DOCKET_CACHE_FLUSH_DELETE || $del) && @unlink($file)) {
+        // bcoz we empty the file
+        $this->opcache_flush($file);
+
+        if ((DOCKET_CACHE_FLUSH_DELETE || $del) && @unlink($file)) {
             $ok = true;
         }
 
@@ -175,6 +185,28 @@ class Files
         return $ok;
     }
 
+    public function cachedir_flush($dir)
+    {
+        clearstatcache();
+        $cnt = 0;
+        $dir = realpath($dir);
+        if (false !== $dir && is_dir($dir) && is_writable($dir) && 'docket-cache' === basename($dir)) {
+            foreach ($this->scanfiles($dir) as $object) {
+                $this->unlink($object->getPathName(), false);
+                ++$cnt;
+            }
+            $this->unlink($dir.'/index.php', true);
+        }
+
+        if ($cnt > 0) {
+            if (DOCKET_CACHE_WPCLI) {
+                do_action('docket_preload');
+            }
+        }
+
+        return $cnt;
+    }
+
     public function opcache_flush($file)
     {
         static $done = [];
@@ -196,13 +228,14 @@ class Files
     {
         $file = DOCKET_CACHE_LOG_FILE;
         if (file_exists($file)) {
-            if (DOCKET_CACHE_LOG_FLUSH && 'flush' === strtolower($id) || @filesize($file) >= (int) DOCKET_CACHE_LOG_SIZE) {
+            if (DOCKET_CACHE_LOG_FLUSH && 'flush' === strtolower($id) || $this->filesize($file) >= (int) DOCKET_CACHE_LOG_SIZE) {
                 $this->put($file, '', 'cb');
             }
         }
 
         $meta = [];
         $meta['timestamp'] = date('Y-m-d H:i:s e');
+
         if (!empty($caller)) {
             $meta['caller'] = $caller;
         }
@@ -210,21 +243,9 @@ class Files
         if (\is_array($data)) {
             $log = $this->export_var(array_merge($meta, $data));
         } else {
-            $log = '['.$meta['timestamp'].'] '.$tag.': "'.$id.'" "'.trim($data).'"';
-            if (isset($meta['caller'])) {
-                $log .= ' "'.$meta['caller'].'"';
-            }
+            $log = '['.$meta['timestamp'].'] '.$tag.': "'.$id.'" "'.trim($data).'" "'.$caller.'"';
         }
 
         return @$this->put($file, $log.PHP_EOL, 'ab');
-    }
-
-    public static function inst()
-    {
-        if (!isset(self::$inst)) {
-            self::$inst = new self();
-        }
-
-        return self::$inst;
     }
 }
