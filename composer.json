@@ -43,10 +43,19 @@
     },
     "autoload": {
         "psr-4": {
-            "Nawawi\\Docket_Cache\\": "includes/src"
+            "Nawawi\\Docket_Cache\\": "includes/src",
+            "Nawawi\\Symfony\\Polyfill\\Php80\\": "includes/vendor/symfony/polyfill-php80",
+            "Nawawi\\Symfony\\Component\\VarExporter\\": "includes/vendor/symfony/var-exporter"
         },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ],
        "classmap": [
-            "includes/src"
+            "includes/src",
+            "includes/vendor/symfony/polyfill-php80/Resources/stubs"
+        ],
+        "files": [
+            "includes/vendor/symfony/polyfill-php80/bootstrap.php"
         ]
      },
     "config": {
