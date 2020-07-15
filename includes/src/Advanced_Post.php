@@ -13,7 +13,7 @@
  *  https://github.com/Automattic/vip-go-mu-plugins-built/blob/master/advanced-post-cache/advanced-post-cache.php.
  */
 
-namespace Nawawi\Docket_Cache\Cache;
+namespace Nawawi\Docket_Cache;
 
 class Advanced_Post
 {
@@ -39,8 +39,8 @@ class Advanced_Post
 
     public function __construct()
     {
-        $this->prefix = 'docketcache_post';
-        $this->group_prefix = $this->prefix.'_';
+        $this->prefix = 'docketcache-post';
+        $this->group_prefix = $this->prefix.'-';
 
         $this->setup_for_blog();
         $this->setup_hooks();

@@ -8,7 +8,7 @@
  * @see    https://github.com/nawawi/docket-cache
  */
 
-namespace Nawawi\Docket_Cache\CLI;
+namespace Nawawi\Docket_Cache;
 
 use WP_CLI;
 use WP_CLI_Command;
@@ -43,19 +43,8 @@ class Command extends WP_CLI_Command
         WP_CLI::halt($status);
     }
 
-    /**
-     * Display the Docket object cache status enable or disable.
-     *
-     * ## EXAMPLES
-     *
-     *  wp cache status
-     */
-    public function status()
+    private function status_color($status, $text)
     {
-        $status = $this->plugin->get_status();
-        $text = $this->plugin->status_code[$status];
-        $halt = 1;
-
         switch ($status) {
             case 1:
                 $text = WP_CLI::colorize("%g{$text}%n");
@@ -65,7 +54,26 @@ class Command extends WP_CLI_Command
                 break;
         }
 
-        $this->halt_status('Status: '.$text);
+        return $text;
+    }
+
+    /**
+     * Display the Docket object cache status enable or disable.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache status
+     */
+    public function status()
+    {
+        $info = (object) $this->plugin->get_info();
+        $halt = $info->status_code ? 0 : 1;
+
+        WP_CLI::line("Status\t: ".$this->status_color($info->status_code, $info->status_text));
+        WP_CLI::line("OPcache\t: ".$this->status_color($info->opcache_code, $info->opcache_text));
+        WP_CLI::line("Path\t: ".$info->cache_path);
+        WP_CLI::line("Size\t: ".$info->cache_size);
+        WP_CLI::halt($halt);
     }
 
     /**
@@ -173,7 +181,7 @@ class Command extends WP_CLI_Command
      */
     public function run_preload()
     {
-        if (!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD) {
+        if (!DOCKET_CACHE_PRELOAD) {
             $this->halt_error(__('Cache preloading not enabled.', 'docket-cache'));
         }
         do_action('docket_preload');
