@@ -705,18 +705,6 @@ final class Plugin
         add_filter('postmeta_form_keys', '__return_false');
 
         if (DOCKET_CACHE_MISC_TWEAKS) {
-            // wp: optimize heartbeat settings
-            add_filter(
-                'heartbeat_settings',
-                function () {
-                    $settings['autostart'] = false;
-                    $settings['interval'] = 90;
-
-                    return $settings;
-                },
-                PHP_INT_MAX
-            );
-
             // wp: if only one post is found by the search results, redirect user to that post
             add_action(
                 'template_redirect',

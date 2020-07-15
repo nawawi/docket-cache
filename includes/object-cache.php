@@ -1237,7 +1237,7 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
                     -PHP_INT_MAX
                 );
 
-                add_action(
+                /*add_action(
                     'wp_login',
                     function ($login) {
                         $this->flush_filtered_groups('wp_login', \func_get_args());
@@ -1281,7 +1281,7 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
                     },
                     -PHP_INT_MAX,
                     3
-                );
+                );*/
             }
         }
     }
