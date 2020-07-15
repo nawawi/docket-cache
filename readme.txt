@@ -29,10 +29,12 @@ To adjust the configuration, please see the [configuration options](https://gith
 To use the WP-CLI commands, please see the [WP-CLI commands](https://github.com/nawawi/docket-cache#wp-cli-commands) for a full list.
 
 == Installation ==
-To use Docket Cache require minimum PHP 7.2, WordPress 5.4 and PHP OPcache for better performance.
+To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPcache for better performance.
 
-1. Install and activate plugin.
-2. Enable the object cache under _Settings -> Docket Cache_, or in Multisite setups under _Network Admin -> Settings -> Docket Cache_.
+1. In your WordPress admin click *Plugins -> Add New*
+2. Search plugins "Docket Cache" and click Install Now.
+3. Click *Activate* or *Network Activate* in Multisite setups.
+4. Enable the object cache under Settings -> Docket Cache, or in Multisite setups under Network Admin -> Settings -> Docket Cache.
 
 == Screenshots ==
 1. Plugin Overview.
