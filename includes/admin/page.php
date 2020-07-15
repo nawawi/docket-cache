@@ -240,7 +240,7 @@ if (is_multisite() && is_network_admin()) {
                     <th>DOCKET_CACHE_ADVCPOST</th>
                     <td>
                         <p>
-                            Set to <code>true</code> to enable Advanced Post Cache. 
+                            Set to <code>true</code> to enable Advanced Post Cache.
                         </p>
                         <small>Default: <code>true</code></small>
                     </td>
@@ -250,7 +250,7 @@ if (is_multisite() && is_network_admin()) {
                     <th>DOCKET_CACHE_MISC_TWEAKS</th>
                     <td>
                         <p>
-                            Set to <code>true</code> to enable miscellaneous WordPress performance tweaks.  
+                            Set to <code>true</code> to enable miscellaneous WordPress performance tweaks.
                         </p>
                         <small>Default: <code>true</code></small>
                     </td>
