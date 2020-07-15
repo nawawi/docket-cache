@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\VarExporter;
+namespace Nawawi\Symfony\Component\VarExporter;
 
-use Symfony\Component\VarExporter\Exception\ExceptionInterface;
-use Symfony\Component\VarExporter\Internal\Exporter;
-use Symfony\Component\VarExporter\Internal\Hydrator;
-use Symfony\Component\VarExporter\Internal\Registry;
-use Symfony\Component\VarExporter\Internal\Values;
+use Nawawi\Symfony\Component\VarExporter\Exception\ExceptionInterface;
+use Nawawi\Symfony\Component\VarExporter\Internal\Exporter;
+use Nawawi\Symfony\Component\VarExporter\Internal\Hydrator;
+use Nawawi\Symfony\Component\VarExporter\Internal\Registry;
+use Nawawi\Symfony\Component\VarExporter\Internal\Values;
 
 /**
  * Exports serializable PHP values to PHP code.

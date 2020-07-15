@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\VarExporter\Exception;
+namespace Nawawi\Symfony\Component\VarExporter\Exception;
 
 class ClassNotFoundException extends \Exception implements ExceptionInterface
 {

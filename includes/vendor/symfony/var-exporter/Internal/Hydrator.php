@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\VarExporter\Internal;
+namespace Nawawi\Symfony\Component\VarExporter\Internal;
 
-use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
+use Nawawi\Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>

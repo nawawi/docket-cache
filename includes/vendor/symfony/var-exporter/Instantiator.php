@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\VarExporter;
+namespace Nawawi\Symfony\Component\VarExporter;
 
-use Symfony\Component\VarExporter\Exception\ExceptionInterface;
-use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
-use Symfony\Component\VarExporter\Internal\Hydrator;
-use Symfony\Component\VarExporter\Internal\Registry;
+use Nawawi\Symfony\Component\VarExporter\Exception\ExceptionInterface;
+use Nawawi\Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
+use Nawawi\Symfony\Component\VarExporter\Internal\Hydrator;
+use Nawawi\Symfony\Component\VarExporter\Internal\Registry;
 
 /**
  * A utility class to create objects without calling their constructor.
