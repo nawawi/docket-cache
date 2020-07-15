@@ -53,12 +53,47 @@ Besides WordPress auto updates, Docket Cache supports the [GitHub Updater plugin
 
 To adjust the configuration, define any of the following constants in your `wp-config.php` file.
 
+**`DOCKET_CACHE_DISABLED`**
+
+Set to `true` to disable the object cache at runtime.  
+Default:
+```php
+define('DOCKET_CACHE_DISABLED', false);
+```
+
 **`DOCKET_CACHE_MAXTTL`**
 
 Maximum cache time-to-live in seconds, if expiry key `0`.   
 Default:
 ```php
 define('DOCKET_CACHE_MAXTTL', 0); 
+```
+**`DOCKET_CACHE_GLOBAL_GROUPS`**
+
+List of cache groups that shared cache with others site in Multisite setups.
+Default:
+```php
+define('DOCKET_CACHE_GLOBAL_GROUPS',
+  [
+    'blog-details',
+    'blog-id-cache',
+    'blog-lookup',
+    'global-posts',
+    'networks',
+    'rss',
+    'sites',
+    'site-details',
+    'site-lookup',
+    'site-options',
+    'site-transient',
+    'users',
+    'useremail',
+    'userlogins',
+    'usermeta',
+    'user_meta',
+    'userslugs'
+  ]
+);
 ```
 
 **`DOCKET_CACHE_IGNORED_GROUPS`**
@@ -88,14 +123,6 @@ Default:
 define('DOCKET_CACHE_IGNORED_KEYS', []);
 ```
 
-**`DOCKET_CACHE_DISABLED`**
-
-Set to `true` to disable the object cache at runtime.  
-Default:
-```php
-define('DOCKET_CACHE_DISABLED', false);
-```
-
 **`DOCKET_CACHE_PATH`** 
 
 Set the cache directory.
@@ -104,14 +131,20 @@ Default:
 define('DOCKET_CACHE_PATH`', WP_CONTENT_DIR.'/cache/docket-cache');
 ```
 
-**Log Options**
-
 **`DOCKET_CACHE_LOG`**
 
 Set to `true` to enable cache log.  
 Default:
 ```php
 define('DOCKET_CACHE_LOG', false);
+```
+
+**`DOCKET_CACHE_LOG_FILE`**
+
+Set the file of log.
+Default:
+```php
+define('DOCKET_CACHE_LOG_FILE`', WP_CONTENT_DIR.'/object-cache.log');
 ```
 
 **`DOCKET_CACHE_LOG_FLUSH`**
@@ -128,36 +161,6 @@ Set the maximum size of a log file in byte. Default set to 10MB.
 Default:
 ```php
 define('DOCKET_CACHE_LOG_SIZE', 10000000);
-```
-
-**Multisite Options**
-
-**`DOCKET_CACHE_GLOBAL_GROUPS`**
-
-Set the list of network-wide cache groups that should not be prefixed with the blog-id.
-Default:
-```php
-define('DOCKET_CACHE_GLOBAL_GROUPS',
-  [
-    'blog-details',
-    'blog-id-cache',
-    'blog-lookup',
-    'global-posts',
-    'networks',
-    'rss',
-    'sites',
-    'site-details',
-    'site-lookup',
-    'site-options',
-    'site-transient',
-    'users',
-    'useremail',
-    'userlogins',
-    'usermeta',
-    'user_meta',
-    'userslugs'
-  ]
-);
 ```
 
 **`DOCKET_CACHE_FLUSH_DELETE`**
@@ -182,6 +185,14 @@ Set to true to enable Advanced Post Cache.
 Default:
 ```php
 define('DOCKET_CACHE_ADVCPOST', true);
+```
+
+**`DOCKET_CACHE_MISC_TWEAKS`**
+
+Set to true to enable miscellaneous WordPress performance tweaks.  
+Default:
+```php
+define('DOCKET_CACHE_MISC_TWEAKS', true);
 ```
 
 **`DOCKET_CACHE_PRELOAD`**
