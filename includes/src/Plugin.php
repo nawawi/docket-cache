@@ -64,12 +64,7 @@ final class Plugin
             'RequiresPHP' => 'Requires PHP',
         ];
 
-        $key = md5(__FUNCTION__.$file);
-        $plugin_data = wp_cache_get($key, 'docketcache-self');
-        if (empty($plugin_data)) {
-            $plugin_data = get_file_data($file, $default_headers);
-        }
-        wp_cache_set($key, $plugin_data, 'docketcache-self', 60);
+        $plugin_data = get_file_data($file, $default_headers);
         if ($as_object) {
             $plugin_data = (object) $plugin_data;
         }
