@@ -42,6 +42,9 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPcache for
 3. Options Info.
 
 == Upgrade Notice ==
+= 20.07.16 =
+- Please do manually remove wp-content/object-cache.php and wp-content/cache/docker-cache if an error occurs during updates.
+
 = 20.07.14 =
 - DOCKET_CACHE_DEBUG has been renamed to  DOCKET_CACHE_LOG.
 - Please do manually remove wp-content/object-cache.php and wp-content/cache/docker-cache if an error occurs during updates.
@@ -51,6 +54,15 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPcache for
 - Please do manually remove wp-content/object-cache.php and wp-content/cache/docker-cache if an error occurs during updates.
 
 == Changelog ==
+= 20.07.16 =
+- Fixed: misc tweaks, remove heartbeat, had issue with elementor
+- Fixed: run opcache_flush when truncate cache files
+- Fixed: cache path always suffix with docket-cache
+- Fixed: add prefix NAWAWI at vendor namespace to avoid conflict with others plugins
+- Added: compat.php to fix older cache files
+- Updated: admin page
+- Updated: dropin follow plugin version
+
 = 20.07.14 =
 - Fixed: wrong conditional -> sanitize_second
 - Fixed: using class method instead of closure function
