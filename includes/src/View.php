@@ -23,7 +23,7 @@ final class View
     {
         return [
              'DOCKET_CACHE_MAXTTL' => [
-                 __('Set to true to disable the object cache at runtime.', 'docket-cache'),
+                 __('Maximum cache time-to-live in seconds.', 'docket-cache'),
                  __('Default: 0', 'docket-cache'),
              ],
              'DOCKET_CACHE_SIZE' => [
