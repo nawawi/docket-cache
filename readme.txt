@@ -39,55 +39,10 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPcache for
 == Screenshots ==
 1. Plugin Overview.
 2. Cache Log.
-3. Options Info.
+3. Setting Instruction.
 
 == Upgrade Notice ==
-= 20.07.16 =
-- Please do manually remove wp-content/object-cache.php and wp-content/cache/docker-cache if an error occurs during updates.
-
-= 20.07.14 =
-- DOCKET_CACHE_DEBUG has been renamed to  DOCKET_CACHE_LOG.
-- Please do manually remove wp-content/object-cache.php and wp-content/cache/docker-cache if an error occurs during updates.
-
-= 20.07.09 ==
-- Versions are as follows: Year.Month.Day of new release.
-- Please do manually remove wp-content/object-cache.php and wp-content/cache/docker-cache if an error occurs during updates.
+Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
-= 20.07.16 =
-- Fixed: misc tweaks, remove heartbeat, had issue with elementor
-- Fixed: run opcache_flush when truncate cache files
-- Fixed: cache path always suffix with docket-cache
-- Fixed: add prefix NAWAWI at vendor namespace to avoid conflict with others plugins
-- Added: compat.php to fix older cache files
-- Updated: admin page
-- Updated: dropin follow plugin version
-
-= 20.07.14 =
-- Fixed: wrong conditional -> sanitize_second
-- Fixed: using class method instead of closure function
-- Fixed: cache file, write to temp file first to avoid data half write
-- Fixed: dont cache if size more than 1MB.
-- Fixed: null type data, set data to empty -> object-cache.php
-- Fixed: chmod wrong file -> object-cache.php
-- Fixed: file locking when read write cache file
-- Fixed: only truncate when flush the cache files
-- Fixed: DOCKET_CACHE_DISABLED doesnt work
-- Added: tweaks for woocommerce
-- Added: filtered_group to cache group with conditional
-- Added: class Files to handle most of filesystem functions
-- Added: garbage collector
-- Added: DOCKET_CACHE_GC constant to disable garbage collector
-- Added: DOCKET_CACHE_FLUSH_DELETE to enable remove rather than truncate when flush
-- Updated: replace DOCKET_CACHE_DEBUG* to DOCKET_CACHE_LOG*
-- Updated: using trigger_error instead of throw Exception when library not found -> object-cache.php
-
-= 20.07.09 =
-- Versions are as follows: Year.Month.Day of new release.
-- Fixed: Invalid data -> docket_update, docket_get.
-- Added: opcache_invalidate after updating cache -> opcache_flush_file.
-- Added: performance tweaks -> register_tweaks.
-- Added: Advanced Post Cache from vip-go.
-
-= 1.0.0 =
-- Initial release of the plugin.
+Please refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) to view changelog.
