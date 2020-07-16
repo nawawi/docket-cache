@@ -239,7 +239,9 @@ The following commands are supported:
 ## Screenshots
 ![Overview](./.wordpress.org/screenshot-1.png)
 
-![Debug Log](./.wordpress.org/screenshot-2.png)
+![Cache Log](./.wordpress.org/screenshot-2.png)
+
+![Config](./.wordpress.org/screenshot-3.png)
 
 ## How Versions Work
 
