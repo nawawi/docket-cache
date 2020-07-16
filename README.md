@@ -115,14 +115,6 @@ define('DOCKET_CACHE_IGNORED_GROUPS',
 );
 ```
 
-**`DOCKET_CACHE_IGNORED_KEYS`**
-
-List of cache keys that should not be cached.  
-Default:
-```php
-define('DOCKET_CACHE_IGNORED_KEYS', []);
-```
-
 **`DOCKET_CACHE_PATH`** 
 
 Set the cache directory.
