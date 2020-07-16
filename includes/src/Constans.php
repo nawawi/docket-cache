@@ -8,7 +8,7 @@
  * @see    https://github.com/nawawi/docket-cache
  */
 
-namespace Nawawi\Docket_Cache;
+namespace Nawawi\DocketCache;
 
 class Constans
 {
@@ -29,8 +29,8 @@ class Constans
     public static function init()
     {
         // optional config
-        if (file_exists(WP_CONTENT_DIR.'/docket-cache-config.php') && is_readable(WP_CONTENT_DIR.'/docket-cache-config.php')) {
-            include_once WP_CONTENT_DIR.'/docket-cache-config.php';
+        if (file_exists(WP_CONTENT_DIR.'/docket-cache-data/config.php') && is_readable(WP_CONTENT_DIR.'/docket-cache-data/config.php')) {
+            include_once WP_CONTENT_DIR.'/docket-cache-data/config.php';
         }
 
         // cache dir
@@ -114,7 +114,6 @@ class Constans
                     'posts-page',
                     'posts-post',
                 ],
-                /*'user_meta' => false,*/
             ]
         );
 
@@ -127,11 +126,5 @@ class Constans
 
         // wp-cli
         self::maybe_define('DOCKET_CACHE_WPCLI', (\defined('WP_CLI') && WP_CLI));
-
-        // backwards-compatible
-        self::maybe_define('DOCKET_CACHE_DEBUG', DOCKET_CACHE_LOG);
-        self::maybe_define('DOCKET_CACHE_DEBUG_FILE', DOCKET_CACHE_LOG_FILE);
-        self::maybe_define('DOCKET_CACHE_DEBUG_FLUSH', DOCKET_CACHE_LOG_FLUSH);
-        self::maybe_define('DOCKET_CACHE_DEBUG_SIZE', DOCKET_CACHE_LOG_SIZE);
     }
 }

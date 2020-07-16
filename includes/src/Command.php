@@ -8,7 +8,7 @@
  * @see    https://github.com/nawawi/docket-cache
  */
 
-namespace Nawawi\Docket_Cache;
+namespace Nawawi\DocketCache;
 
 use WP_CLI;
 use WP_CLI_Command;

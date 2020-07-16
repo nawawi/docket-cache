@@ -15,7 +15,7 @@ class ComposerStaticInit71169967e8f502f7da209e4236957996
         array (
             'Nawawi\\Symfony\\Polyfill\\Php80\\' => 30,
             'Nawawi\\Symfony\\Component\\VarExporter\\' => 37,
-            'Nawawi\\Docket_Cache\\' => 20,
+            'Nawawi\\DocketCache\\' => 19,
         ),
     );
 
@@ -28,18 +28,19 @@ class ComposerStaticInit71169967e8f502f7da209e4236957996
         array (
             0 => __DIR__ . '/..' . '/symfony/var-exporter',
         ),
-        'Nawawi\\Docket_Cache\\' => 
+        'Nawawi\\DocketCache\\' => 
         array (
             0 => __DIR__ . '/../../..' . '/includes/src',
         ),
     );
 
     public static $classMap = array (
-        'Nawawi\\Docket_Cache\\Advanced_Post' => __DIR__ . '/../../..' . '/includes/src/Advanced_Post.php',
-        'Nawawi\\Docket_Cache\\Command' => __DIR__ . '/../../..' . '/includes/src/Command.php',
-        'Nawawi\\Docket_Cache\\Constans' => __DIR__ . '/../../..' . '/includes/src/Constans.php',
-        'Nawawi\\Docket_Cache\\Files' => __DIR__ . '/../../..' . '/includes/src/Files.php',
-        'Nawawi\\Docket_Cache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',
+        'Nawawi\\DocketCache\\Advanced_Post' => __DIR__ . '/../../..' . '/includes/src/Advanced_Post.php',
+        'Nawawi\\DocketCache\\Command' => __DIR__ . '/../../..' . '/includes/src/Command.php',
+        'Nawawi\\DocketCache\\Constans' => __DIR__ . '/../../..' . '/includes/src/Constans.php',
+        'Nawawi\\DocketCache\\Filesystem' => __DIR__ . '/../../..' . '/includes/src/Filesystem.php',
+        'Nawawi\\DocketCache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',
+        'Nawawi\\DocketCache\\View' => __DIR__ . '/../../..' . '/includes/src/View.php',
         'Nawawi\\Symfony\\Component\\VarExporter\\Exception\\ClassNotFoundException' => __DIR__ . '/..' . '/symfony/var-exporter/Exception/ClassNotFoundException.php',
         'Nawawi\\Symfony\\Component\\VarExporter\\Exception\\ExceptionInterface' => __DIR__ . '/..' . '/symfony/var-exporter/Exception/ExceptionInterface.php',
         'Nawawi\\Symfony\\Component\\VarExporter\\Exception\\NotInstantiableTypeException' => __DIR__ . '/..' . '/symfony/var-exporter/Exception/NotInstantiableTypeException.php',

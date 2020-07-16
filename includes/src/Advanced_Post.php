@@ -13,7 +13,7 @@
  *  https://github.com/Automattic/vip-go-mu-plugins-built/blob/master/advanced-post-cache/advanced-post-cache.php.
  */
 
-namespace Nawawi\Docket_Cache;
+namespace Nawawi\DocketCache;
 
 class Advanced_Post
 {

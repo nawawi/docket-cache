@@ -8,22 +8,90 @@
  * @see    https://github.com/nawawi/docket-cache
  */
 
-namespace Nawawi\Docket_Cache;
+namespace Nawawi\DocketCache;
 
 final class Plugin
 {
+    /**
+     * Plugin file.
+     *
+     * @var string
+     */
     public $file;
+
+    /**
+     * Plugin slug.
+     *
+     * @var string
+     */
     public $slug;
+
+    /**
+     * Plugin path.
+     *
+     * @var string
+     */
     public $path;
 
+    /**
+     * Plugin valid page uri.
+     *
+     * @var string
+     */
+    public $page;
+
+    /**
+     * Plugin action token.
+     *
+     * @var string
+     */
+    public $token;
+
+    /**
+     * Plugin screen name.
+     *
+     * @var string
+     */
     private $screen;
+
+    /**
+     * List of valid action.
+     *
+     * @var array
+     */
     private $actions;
+
+    /**
+     * Plugin slug file.
+     *
+     * @var string
+     */
     private $hook;
-    private $page;
-    private $token;
-    private $fs;
+
+    /**
+     * Filesystem() instance.
+     *
+     * @var object
+     */
+    private $filesystem;
+
+    /**
+     * View() instance.
+     *
+     * @var object
+     */
+    private $view;
+
+    /**
+     * The cache path.
+     *
+     * @var string
+     */
     private $cache_path;
 
+    /**
+     * constructor.
+     */
     public function __construct()
     {
         $this->slug = 'docket-cache';
@@ -40,16 +108,22 @@ final class Plugin
             'docket-update-dropin',
             'docket-flush-log',
         ];
+
         Constans::init();
-        $this->fs = new Files();
+        $this->filesystem = new Filesystem();
+        $this->view = new View($this);
         $this->cache_path = is_dir(DOCKET_CACHE_PATH) && '/' !== DOCKET_CACHE_PATH ? rtrim(DOCKET_CACHE_PATH, '/\\').'/' : WP_CONTENT_DIR.'/cache/docket-cache/';
-        if ('docket-cache' !== basename($this->cache_path)) {
+        if (!$this->filesystem->is_docketcachedir($this->cache_path)) {
             $this->cache_path = rtim($this->cache_path, '/').'docket-cache/';
         }
     }
 
-    public function get_plugin_data($file, $as_object = true)
+    /**
+     * plugin_meta.
+     */
+    public function plugin_meta($file = '')
     {
+        $file = !empty($file) ? $file : $this->file;
         $default_headers = [
             'Name' => 'Plugin Name',
             'PluginURI' => 'Plugin URI',
@@ -64,14 +138,12 @@ final class Plugin
             'RequiresPHP' => 'Requires PHP',
         ];
 
-        $plugin_data = get_file_data($file, $default_headers);
-        if ($as_object) {
-            $plugin_data = (object) $plugin_data;
-        }
-
-        return $plugin_data;
+        return get_file_data($file, $default_headers);
     }
 
+    /**
+     * get_info.
+     */
     public function get_info()
     {
         $status_code = [
@@ -102,12 +174,26 @@ final class Plugin
          ];
     }
 
+    /**
+     * sanitize_rootpath.
+     */
+    public function sanitize_rootpath($path)
+    {
+        return rtrim(str_replace([WP_CONTENT_DIR, ABSPATH], ['/'.basename(WP_CONTENT_DIR), '/'], $path), '/');
+    }
+
+    /**
+     * has_dropin.
+     */
     public function has_dropin()
     {
         return file_exists(WP_CONTENT_DIR.'/object-cache.php');
     }
 
-    private function plugin_data($key)
+    /**
+     * dropin_meta.
+     */
+    private function dropin_meta($key)
     {
         static $cache = [];
 
@@ -115,25 +201,31 @@ final class Plugin
             return $cache[$key];
         }
 
-        $cache['dropin'] = $this->get_plugin_data(WP_CONTENT_DIR.'/object-cache.php', false);
-        $cache['plugin'] = $this->get_plugin_data($this->path.'/includes/object-cache.php', false);
+        $cache['dropin'] = $this->plugin_meta(WP_CONTENT_DIR.'/object-cache.php');
+        $cache['plugin'] = $this->plugin_meta($this->path.'/includes/object-cache.php');
 
         return $cache[$key];
     }
 
+    /**
+     * validate_dropin.
+     */
     public function validate_dropin()
     {
         if (!$this->has_dropin()) {
             return false;
         }
 
-        if (0 !== strcmp($this->plugin_data('dropin')['PluginURI'], $this->plugin_data('plugin')['PluginURI'])) {
+        if (0 !== strcmp($this->dropin_meta('dropin')['PluginURI'], $this->dropin_meta('plugin')['PluginURI'])) {
             return false;
         }
 
         return true;
     }
 
+    /**
+     * get_status.
+     */
     public function get_status()
     {
         if (\defined('DOCKET_CACHE_DISABLED') && DOCKET_CACHE_DISABLED || \defined('DOCKET_CACHE_HALT') && DOCKET_CACHE_HALT) {
@@ -151,13 +243,14 @@ final class Plugin
         return 3;
     }
 
+    /**
+     * get_dirsize.
+     */
     public function get_dirsize()
     {
-        $dir = realpath($this->cache_path);
-
         $bytestotal = 0;
-        if (false !== $dir && is_dir($dir) && is_readable($dir) && 'docket-cache' === basename($dir)) {
-            foreach ($this->fs->scanfiles($dir) as $object) {
+        if ($this->filesystem->is_docketcachedir($this->cache_path)) {
+            foreach ($this->filesystem->scanfiles($this->cache_path) as $object) {
                 $bytestotal += $object->getSize();
             }
         }
@@ -165,16 +258,17 @@ final class Plugin
         return $this->normalize_size($bytestotal);
     }
 
+    /**
+     * get_logsize.
+     */
     public function get_logsize()
     {
-        return $this->has_log() ? $this->normalize_size($this->fs->filesize(DOCKET_CACHE_LOG_FILE)) : 0;
+        return $this->has_log() ? $this->normalize_size($this->filesystem->filesize(DOCKET_CACHE_LOG_FILE)) : 0;
     }
 
-    public function sanitize_rootpath($path)
-    {
-        return str_replace([WP_CONTENT_DIR, ABSPATH], ['/wp-content', '/'], $path);
-    }
-
+    /**
+     * get_opcache_status.
+     */
     public function get_opcache_status()
     {
         if (\function_exists('opcache_get_status')) {
@@ -189,6 +283,9 @@ final class Plugin
         return 2;
     }
 
+    /**
+     * normalize_size.
+     */
     public function normalize_size($size)
     {
         $size = wp_convert_hr_to_bytes($size);
@@ -201,20 +298,28 @@ final class Plugin
         return $size;
     }
 
-    // always true
-    private function flush_cache()
+    /**
+     * flush_cache.
+     */
+    public function flush_cache()
     {
-        $this->fs->cachedir_flush($this->cache_path);
+        $this->filesystem->cachedir_flush($this->cache_path);
 
         return true;
     }
 
-    private function has_log()
+    /**
+     * has_log.
+     */
+    public function has_log()
     {
         return  is_file(DOCKET_CACHE_LOG_FILE) && is_readable(DOCKET_CACHE_LOG_FILE);
     }
 
-    private function flush_log()
+    /**
+     * flush_log.
+     */
+    public function flush_log()
     {
         if ($this->has_log()) {
             return @unlink(DOCKET_CACHE_LOG_FILE);
@@ -223,12 +328,15 @@ final class Plugin
         return false;
     }
 
-    private function tail_log($limit = 100)
+    /**
+     * tail_log.
+     */
+    public function tail_log($limit = 100)
     {
         $limit = (int) $limit;
         $output = [];
         if ($this->has_log()) {
-            foreach ($this->fs->tail(DOCKET_CACHE_LOG_FILE, $limit) as $line) {
+            foreach ($this->filesystem->tail(DOCKET_CACHE_LOG_FILE, $limit) as $line) {
                 $line = trim($line);
                 if (empty($line)) {
                     continue;
@@ -240,40 +348,9 @@ final class Plugin
         return $output;
     }
 
-    private function page_tab_query($index)
-    {
-        return network_admin_url(add_query_arg('index', $index, $this->page));
-    }
-
-    private function page_tab_index()
-    {
-        return !empty($_GET['index']) ? sanitize_text_field($_GET['index']) : 'default';
-    }
-
-    private function page_is_tab($index)
-    {
-        return $index === $this->page_tab_index();
-    }
-
-    private function page_active_tab($index)
-    {
-        if ($this->page_is_tab($index)) {
-            return ' nav-tab-active';
-        }
-
-        return '';
-    }
-
-    private function page_nav_tabs()
-    {
-        $html = '<nav class="nav-tab-wrapper">';
-        $html .= '<a href="'.$this->page_tab_query('default').'" class="nav-tab'.$this->page_active_tab('default').'">'.__('Overview', 'docket-cache').'</a>';
-        $html .= '<a href="'.$this->page_tab_query('log').'" class="nav-tab'.$this->page_active_tab('log').'">'.__('Cache Log', 'docket-cache').'</a>';
-        $html .= '<a href="'.$this->page_tab_query('config').'" class="nav-tab'.$this->page_active_tab('config').'">'.__('Config', 'docket-cache').'</a>';
-        $html .= '</nav>';
-        echo $html;
-    }
-
+    /**
+     * dropin_file.
+     */
     private function dropin_file()
     {
         $dt = [];
@@ -283,18 +360,24 @@ final class Plugin
         return (object) $dt;
     }
 
+    /**
+     * dropin_install.
+     */
     public function dropin_install()
     {
         $src = $this->dropin_file()->src;
         $dst = $this->dropin_file()->dst;
 
         if (is_writable(\dirname($this->dropin_file()->dst))) {
-            return $this->fs->copy($src, $dst);
+            return $this->filesystem->copy($src, $dst);
         }
 
         return false;
     }
 
+    /**
+     * dropin_uninstall.
+     */
     public function dropin_uninstall()
     {
         $dst = $this->dropin_file()->dst;
@@ -305,6 +388,9 @@ final class Plugin
         return false;
     }
 
+    /**
+     * dropin_remove.
+     */
     private function dropin_remove()
     {
         wp_cache_flush();
@@ -313,23 +399,35 @@ final class Plugin
         }
     }
 
+    /**
+     * uninstall.
+     */
     public static function uninstall()
     {
         ( new self() )->dropin_remove();
     }
 
+    /**
+     * deactivate.
+     */
     public function deactivate()
     {
         $this->dropin_remove();
-        $this->unregister_scheduler();
+        $this->unregister_garbage_collector();
     }
 
+    /**
+     * activate.
+     */
     public function activate()
     {
         wp_cache_flush();
-        $this->unregister_scheduler();
+        $this->unregister_garbage_collector();
     }
 
+    /**
+     * register_plugin_hooks.
+     */
     private function register_plugin_hooks()
     {
         add_action(
@@ -349,7 +447,10 @@ final class Plugin
         register_uninstall_hook($this->hook, [__CLASS__, 'uninstall']);
     }
 
-    private function action_query($key)
+    /**
+     * action_query.
+     */
+    public function action_query($key)
     {
         $key = str_replace('docket-cache', '', $key);
         $key = 'docket-'.$key;
@@ -357,6 +458,9 @@ final class Plugin
         return wp_nonce_url(network_admin_url(add_query_arg('action', $key, $this->page)), $key);
     }
 
+    /**
+     * register_admin_hooks.
+     */
     private function register_admin_hooks()
     {
         $action_name = is_multisite() ? 'network_admin_menu' : 'admin_menu';
@@ -373,7 +477,7 @@ final class Plugin
                     $page_cap,
                     $this->slug,
                     function () {
-                        include_once $this->path.'/includes/admin/page.php';
+                        $this->view->index();
                     }
                 );
             }
@@ -390,7 +494,7 @@ final class Plugin
                     $url = $this->action_query('update-dropin');
 
                     if ($this->validate_dropin()) {
-                        if (version_compare($this->plugin_data('dropin')['Version'], $this->plugin_data('plugin')['Version'], '<') || false === strpos($this->plugin_data('dropin')['Version'], '.')) {
+                        if (version_compare($this->dropin_meta('dropin')['Version'], $this->dropin_meta('plugin')['Version'], '<') || false === strpos($this->dropin_meta('dropin')['Version'], '.')) {
                             /* translators: %s: url */
                             $message = sprintf(__('<strong>Docket Cache:</strong> The object-cache.php drop-in is outdated. Please click "Re-Install" to update it now.<p style="padding:0;"><a href="%s" class="button button-primary">Re-Install</a>', 'docket-cache'), $url);
                         }
@@ -416,7 +520,20 @@ final class Plugin
             'admin_enqueue_scripts',
             function ($hook) {
                 if ($hook === $this->screen) {
-                    wp_enqueue_style($this->slug, plugin_dir_url($this->file).'includes/admin/style.css', null, str_replace('.', '', $this->get_plugin_data($this->file)->Version));
+                    $plugin_url = plugin_dir_url($this->file);
+                    $version = str_replace('.', '', $this->plugin_meta()['Version']);
+                    wp_enqueue_style($this->slug, $plugin_url.'includes/admin/style.css', null, $version);
+                    wp_enqueue_script($this->slug, $plugin_url.'includes/admin/script.js', ['jquery'], $version);
+                    wp_localize_script(
+                        $this->slug,
+                        'docket_cache_config',
+                        [
+                            'ajaxurl' => admin_url('admin-ajax.php'),
+                            'token' => wp_create_nonce('docketcache-token-nonce'),
+                            'slug' => $this->slug,
+                            'log' => DOCKET_CACHE_LOG,
+                        ]
+                    );
                 }
             }
         );
@@ -424,8 +541,12 @@ final class Plugin
         add_action(
             'wp_ajax_docket_preload',
             function () {
+                if (!check_ajax_referer('docketcache-token-nonce', 'token', false)) {
+                    wp_send_json_error('Invalid security token sent.');
+                    exit;
+                }
                 do_action('docket_preload');
-                wp_send_json_success($this->slug.': run preload');
+                wp_send_json_success($this->slug.': pong preload');
             }
         );
 
@@ -498,8 +619,9 @@ final class Plugin
         add_action(
             'load-'.$this->screen,
             function () {
-                if (version_compare(PHP_VERSION, '7.2', '<')) {
-                    add_settings_error(is_multisite() ? 'general' : '', $this->slug, __('This plugin requires PHP 7.2 or greater.', 'docket-cache'));
+                if (version_compare(PHP_VERSION, $this->plugin_meta()['RequiresPHP'], '<')) {
+                    /* translators: %s: php version */
+                    add_settings_error(is_multisite() ? 'general' : '', $this->slug, sprintf(__('This plugin requires PHP %s or greater.', 'docket-cache'), $this->plugin_meta()['RequiresPHP']));
                 }
 
                 if (isset($_GET['message'])) {
@@ -664,8 +786,12 @@ final class Plugin
         );
     }
 
+    /**
+     * register_tweaks.
+     */
     private function register_tweaks()
     {
+        // set first
         add_action(
             'shutdown',
             function () {
@@ -839,23 +965,29 @@ final class Plugin
         }
     }
 
+    /**
+     * garbage_collector.
+     */
     public function garbage_collector()
     {
-        $dir = realpath($this->cache_path);
-        if (false !== $dir && is_dir($dir) && is_readable($dir) && 'docket-cache' === basename($dir)) {
+        if ($this->filesystem->is_docketcachedir($this->cache_path)) {
             clearstatcache();
-            foreach ($this->fs->scanfiles($dir) as $object) {
+            foreach ($this->filesystem->scanfiles($this->cache_path) as $object) {
                 $fn = $object->getFileName();
                 $fx = $object->getPathName();
+                $fs = $object->getSize();
                 $fm = time() + 120;
-                if ($fm >= filemtime($fx) && (0 === $object->getSize() || 'dump_' === substr($fn, 0, 5))) {
-                    $this->fs->unlink($fx, true);
+                if ($fm >= filemtime($fx) && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
+                    $this->filesystem->unlink($fx, true);
                 }
             }
         }
     }
 
-    private function register_scheduler()
+    /**
+     * register_garbage_collector.
+     */
+    private function register_garbage_collector()
     {
         if (!DOCKET_CACHE_GC) {
             return;
@@ -887,20 +1019,26 @@ final class Plugin
         );
     }
 
-    private function unregister_scheduler()
+    /**
+     * unregister_garbage_collector.
+     */
+    private function unregister_garbage_collector()
     {
         wp_clear_scheduled_hook('docket_cache_gc');
     }
 
+    /**
+     * attach.
+     */
     public function attach()
     {
         $this->register_plugin_hooks();
         $this->register_admin_hooks();
         $this->register_tweaks();
-        $this->register_scheduler();
+        $this->register_garbage_collector();
 
-        if (DOCKET_CACHE_WPCLI && !\defined('Docket_Cache_CLI')) {
-            \define('Docket_Cache_CLI', true);
+        if (DOCKET_CACHE_WPCLI && !\defined('DocketCache_CLI')) {
+            \define('DocketCache_CLI', true);
             $cli = new Command($this);
             \WP_CLI::add_command('cache update', [$cli, 'update_dropin']);
             \WP_CLI::add_command('cache enable', [$cli, 'enable']);

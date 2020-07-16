@@ -1,20 +1,31 @@
 <?php
+/**
+ * Docket Cache.
+ *
+ * @author  Nawawi Jamili
+ * @license MIT
+ *
+ * @see    https://github.com/nawawi/docket-cache
+ */
+
+namespace Nawawi\DocketCache;
+
 \defined('ABSPATH') || exit;
 
-$info = (object) $this->get_info();
+$info = (object) $this->plugin->get_info();
 
 $do_preload = false;
-if (1 === $info->status_code && isset($this->token)) {
-    switch ($this->token) {
+if (1 === $info->status_code && isset($this->plugin->token)) {
+    switch ($this->plugin->token) {
         case 'docket-cache-flushed':
-            $this->flush_cache();
+            $this->plugin->flush_cache();
             $do_preload = true;
             break;
         case 'docket-cache-enabled':
             $do_preload = true;
             break;
         case 'docket-log-flushed':
-            $this->flush_log();
+            $this->plugin->flush_log();
             break;
     }
     if (!DOCKET_CACHE_PRELOAD || 2 === $info->status_code) {
@@ -27,11 +38,11 @@ if (is_multisite() && is_network_admin()) {
 }
 ?>
 <div class="wrap" id="docket-cache">
-    <h1><?php _e('Docket Object Cache', 'docket-cache'); ?></h1>
-    <?php $this->page_nav_tabs(); ?>
+    <h1><?php _e('Docket Object Cache', 'docket-cache'); ?><span id="docket-cache-spinner" class="spinner is-active"></span></h1>
+    <?php $this->tab_nav(); ?>
 
     <div class="tab-content">
-        <?php if ($this->page_is_tab('default')) : ?>
+        <?php if ($this->tab_current('default')) : ?>
         <div class="section overview">
             <h2 class="title"><?php _e('Overview', 'docket-cache'); ?></h2>
 
@@ -72,197 +83,64 @@ if (is_multisite() && is_network_admin()) {
                 </tr>
 
                 <tr>
-                    <th><?php _e('Cache Size', 'docket-cache'); ?></th>
+                    <th><?php _e('Total Cache Size', 'docket-cache'); ?></th>
                     <td><?php echo $info->cache_size; ?></td>
                 </tr>
 
             </table>
 
             <p class="submit">
-                <?php if (!$this->has_dropin()) : ?>
+                <?php if (!$this->plugin->has_dropin()) : ?>
                 <?php if ($info->cache_size > 0) : ?>
-                <a href="<?php echo $this->action_query('flush-cache'); ?>" class="button button-secondary button-large"><?php _e('Flush Cache', 'docket-cache'); ?></a>&nbsp;&nbsp;
+                <a href="<?php echo $this->plugin->action_query('flush-cache'); ?>" class="button button-secondary button-large"><?php _e('Flush Cache', 'docket-cache'); ?></a>&nbsp;&nbsp;
                 <?php endif; ?>
                 <?php if (2 !== $info->status_code) : ?>
-                <a href="<?php echo $this->action_query('enable-cache'); ?>" class="button button-primary button-large"><?php _e('Enable Object Cache', 'docket-cache'); ?></a>
+                <a href="<?php echo $this->plugin->action_query('enable-cache'); ?>" class="button button-primary button-large"><?php _e('Enable Object Cache', 'docket-cache'); ?></a>
                 <?php endif; ?>
-                <?php elseif ($this->validate_dropin()) : ?>
+                <?php elseif ($this->plugin->validate_dropin()) : ?>
                 <?php if ($info->cache_size > 0) : ?>
-                <a href="<?php echo $this->action_query('flush-cache'); ?>" class="button button-primary button-large"><?php _e('Flush Cache', 'docket-cache'); ?></a>&nbsp;&nbsp;
+                <a href="<?php echo $this->plugin->action_query('flush-cache'); ?>" class="button button-primary button-large"><?php _e('Flush Cache', 'docket-cache'); ?></a>&nbsp;&nbsp;
                 <?php endif; ?>
-                <a href="<?php echo $this->action_query('disable-cache'); ?>" class="button button-secondary button-large"><?php _e('Disable Object Cache', 'docket-cache'); ?></a>
+                <a href="<?php echo $this->plugin->action_query('disable-cache'); ?>" class="button button-secondary button-large"><?php _e('Disable Object Cache', 'docket-cache'); ?></a>
                 <?php endif; ?>
             </p>
         </div>
 
         <?php endif; ?>
 
-        <?php if ($this->page_is_tab('config')) : ?>
+        <?php
+        if ($this->tab_current('config')) :
+
+            ?>
         <div class="section config">
             <h2 class="title"><?php _e('Configuration', 'docket-cache'); ?></h2>
             <p>
-                In order to change the setting of Docket Cache, the following PHP constants can be defined in your wp-config.php file.
+                <?php _e('The following PHP constants can be defined in your <a href="https://wordpress.org/support/article/editing-wp-config-php/" rel="noopener" target="_blank">wp-config.php</a> file, in order to change the behavior of Docket Cache.', 'docket-cache'); ?>
             </p>
 
             <table class="form-table">
+                <?php
+                foreach ($this->config_desc() as $key => $texts) :
+                    ?>
                 <tr>
-                    <th>DOCKET_CACHE_DISABLED</th>
+                    <th><?php echo $key; ?></th>
                     <td>
                         <p>
-                            Set to <code>true</code> to disable the object cache at runtime.
+                            <?php echo $texts[0]; ?>
                         </p>
-                        <small>Default: <code>false</code></small>
+                        <small><?php echo $texts[1]; ?></small>
                     </td>
                 </tr>
-
-                <tr>
-                    <th>DOCKET_CACHE_MAXTTL</th>
-                    <td>
-                        <p>
-                            Maximum cache time-to-live in seconds
-                        </p>
-                        <small>Default: <code>0</code></small>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>DOCKET_CACHE_SIZE</th>
-                    <td>
-                        <p>
-                            Set the size of a cache file in byte.
-                        </p>
-                        <small>Default: <code>3000000</code> (3MB)</small>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>DOCKET_CACHE_PATH</th>
-                    <td>
-                        <p>
-                            Set the cache directory.
-                        </p>
-                        <small>Default: <code>WP_CONTENT_DIR/cache/docket-cache</code></small>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>DOCKET_CACHE_FLUSH_DELETE</th>
-                    <td>
-                        <p>
-                            Set to <code>true</code> to delete cache files instead of only truncated.
-                        </p>
-                        <small>Default: <code>false</code></small>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>DOCKET_CACHE_GLOBAL_GROUPS</th>
-                    <td>
-                        <p>
-                            List of cache groups that shared cache with others site in Multisite setups.
-                        </p>
-                        <small>Default: <code>['blog-details','blog-id-cache','blog-lookup','global-posts','networks','rss','sites','site-details','site-lookup','site-options','site-transient','users','useremail','userlogins','usermeta','user_meta','userslugs']</code></small>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>DOCKET_CACHE_IGNORED_GROUPS</th>
-                    <td>
-                        <p>
-                            List of cache groups that should not be cached.
-                        </p>
-                        <small>Default: <code>['counts', 'plugins', 'themes', 'comment', 'wc_session_id', 'bp_notifications', 'bp_messages', 'bp_pages']</code></small>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>DOCKET_CACHE_IGNORED_KEYS</th>
-                    <td>
-                        <p>
-                            List of cache keys that should not be cached.
-                        </p>
-                        <small>Default: <em>not set</em></small>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>DOCKET_CACHE_LOG</th>
-                    <td>
-                        <p>
-                            Set to <code>true</code> to enable cache log.
-                        </p>
-                        <small>Default: <code>false</code></small>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>DOCKET_CACHE_LOG_SIZE</th>
-                    <td>
-                        <p>
-                            Set the maximum size of a log file in byte.
-                        </p>
-                        <small>Default: <code>10000000</code> (10MB)</small>
-                    </td>
-                </tr>
-
-
-                <tr>
-                    <th>DOCKET_CACHE_LOG_FILE</th>
-                    <td>
-                        <p>
-                            Set the file of log.
-                        </p>
-                        <small>Default: <code>WP_CONTENT_DIR/object-cache.log</code></small>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>DOCKET_CACHE_LOG_FLUSH</th>
-                    <td>
-                        <p>
-                            Set to <code>true</code> to empty the log file when object cache flushed.
-                        </p>
-                        <small>Default: <code>true</code></small>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>DOCKET_CACHE_GC</th>
-                    <td>
-                        <p>
-                            Set to <code>true</code> to enable the garbage collector runs every 30 minutes to remove any leftover cache.
-                        </p>
-                        <small>Default: <code>true</code></small>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>DOCKET_CACHE_ADVCPOST</th>
-                    <td>
-                        <p>
-                            Set to <code>true</code> to enable Advanced Post Cache.
-                        </p>
-                        <small>Default: <code>true</code></small>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>DOCKET_CACHE_MISC_TWEAKS</th>
-                    <td>
-                        <p>
-                            Set to <code>true</code> to enable miscellaneous WordPress performance tweaks.
-                        </p>
-                        <small>Default: <code>true</code></small>
-                    </td>
-                </tr>
-
+                <?php endforeach; ?>
             </table>
         </div>
         <?php endif; ?>
 
         <?php
-        if ($this->page_is_tab('log')) :
-            $output = $this->tail_log(100);
+        if ($this->tab_current('log')) :
+            $default_order = !empty($_GET['order']) ? $_GET['order'] : 'desc';
+            $default_line = !empty($_GET['line']) && \is_int($_GET['line']) && (int) $_GET['line'] > 0 && (int) $_GET['line'] <= 500 ? $_GET['line'] : '100';
+            $output = $this->plugin->tail_log($default_line);
             ?>
 
         <div class="section<?php echo !empty($output) ? ' log' : ''; ?>">
@@ -285,11 +163,11 @@ if (is_multisite() && is_network_admin()) {
                 <?php else : ?>
                 <tr>
                     <th><?php _e('Size', 'docket-cache'); ?></th>
-                    <td><?php echo $this->get_logsize(); ?></td>
+                    <td><?php echo $this->plugin->get_logsize(); ?></td>
                 </tr>
                 <tr>
                     <td colspan="2" class="noborder">
-                        <textarea id="log" class="code" readonly="readonly" rows="20" wrap="off"><?php echo implode("\n", array_reverse($output, true)); ?></textarea>
+                        <textarea id="log" class="code" readonly="readonly" rows="20" wrap="off"><?php echo implode("\n", 'desc' === $default_order ? array_reverse($output, true) : $output); ?></textarea>
                     </td>
                 </tr>
                 <?php endif; ?>
@@ -297,9 +175,34 @@ if (is_multisite() && is_network_admin()) {
 
             <p class="submit">
                 <?php if (!empty($output)) : ?>
-                <a href="<?php echo $this->action_query('flush-log'); ?>" class="button button-primary button-large"><?php _e('Flush Log', 'docket-cache'); ?></a>&nbsp;
+                <select id="order">
+                    <?php
+                    $default = $default_order;
+                    foreach (['asc', 'desc'] as $order) {
+                        $selected = $order === $default ? ' selected' : '';
+                        echo '<option value="'.$order.'"'.$selected.'>'.strtoupper($order).'</option>';
+                    }
+                    ?>
+                </select>
+                <select id="line">
+                    <?php
+                    $default = $default_line;
+                    foreach (['10', '50', '100', '300', '500'] as $line) {
+                        $selected = $line === $default ? ' selected' : '';
+                        echo '<option value="'.$line.'"'.$selected.'>'.$line.'</option>';
+                    }
+                    ?>
+                </select>
+                <br>
+                <a href="<?php echo $this->plugin->action_query('flush-log'); ?>" class="button button-primary button-large"><?php _e('Flush Log', 'docket-cache'); ?></a>&nbsp;
                 <?php endif; ?>
-                <a href="<?php echo $this->page_tab_query('log'); ?>" class="button button-<?php echo !empty($output) ? 'secondary' : 'primary'; ?> button-large"><?php _e('Refresh', 'docket-cache'); ?></a>
+                <a href="<?php echo $this->tab_query('log'); ?>" class="button button-<?php echo !empty($output) ? 'secondary' : 'primary'; ?> button-large" id="refresh"><?php _e('Refresh', 'docket-cache'); ?></a>
+
+                <?php
+                if (!$info->log_enable) :
+                    _e('Click config tab to get how to enable caching log', 'docket-cache');
+                endif;
+                ?>
             </p>
         </div>
 
@@ -307,15 +210,12 @@ if (is_multisite() && is_network_admin()) {
 
     </div>
 </div>
+<div id="docket-cache-overlay"></div>
 
 <?php if ($do_preload) : ?>
 <script>
     jQuery( document ).ready( function() {
-        jQuery.post( ajaxurl, {
-            "action": "docket_preload"
-        }, function( response ) {
-            console.log( response.data + ' ' + response.success );
-        } );
+        docket_cache_preload( docket_cache_config );
     } );
 </script>
 <?php endif; ?>

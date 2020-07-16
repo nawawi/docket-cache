@@ -16,3 +16,14 @@ if (!class_exists('Symfony\\Component\\VarExporter\\Internal\\Hydrator')) {
 if (!class_exists('Symfony\\Component\\VarExporter\\Internal\\Registry')) {
     class_alias('Nawawi\Symfony\Component\VarExporter\Internal\Registry', 'Symfony\Component\VarExporter\Internal\Registry');
 }
+
+if (class_exists('Nawawi\\Symfony\\Component\\VarExporter\\VarExporter')) {
+    class_alias('Nawawi\Symfony\Component\VarExporter\VarExporter', 'Nawawi\DocketCache\Exporter\VarExporter');
+}
+if (class_exists('Nawawi\\Symfony\\Component\\VarExporter\\Internal\\Hydrator')) {
+    class_alias('Nawawi\Symfony\Component\VarExporter\Internal\Hydrator', 'Nawawi\DocketCache\Exporter\Hydrator');
+}
+
+if (class_exists('Nawawi\\Symfony\\Component\\VarExporter\\Internal\\Registry')) {
+    class_alias('Nawawi\Symfony\Component\VarExporter\Internal\Registry', 'Nawawi\DocketCache\Exporter\Registry');
+}

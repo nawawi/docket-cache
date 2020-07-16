@@ -8,15 +8,20 @@
  * @see    https://github.com/nawawi/docket-cache
  */
 
-namespace Nawawi\Docket_Cache;
+namespace Nawawi\DocketCache;
 
-use Nawawi\Symfony\Component\VarExporter\VarExporter;
+use Nawawi\DocketCache\Exporter\VarExporter;
 
-final class Files
+final class Filesystem
 {
+    public function is_docketcachedir($dir)
+    {
+        return 'docket-cache' === basename($dir);
+    }
+
     public function filesize($file)
     {
-        return @sprintf('%u', @filesize($file));
+        return file_exists($file) ? @sprintf('%u', @filesize($file)) : 0;
     }
 
     public function chmod($file)
@@ -58,11 +63,16 @@ final class Files
 
     public function scanfiles($dir, $maxdepth = 0)
     {
-        $diriterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \RecursiveDirectoryIterator::KEY_AS_FILENAME | \RecursiveDirectoryIterator::CURRENT_AS_FILEINFO);
-        $object = new \RegexIterator(new \RecursiveIteratorIterator($diriterator), '@^(dump_)?([a-z0-9]+)\-([a-z0-9]+).*\.php$@', \RegexIterator::MATCH, \RegexIterator::USE_KEY);
-        $object->setMaxDepth($maxdepth);
+        $dir = realpath($dir);
+        if (false !== $dir && is_dir($dir) && is_readable($dir)) {
+            $diriterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \RecursiveDirectoryIterator::KEY_AS_FILENAME | \RecursiveDirectoryIterator::CURRENT_AS_FILEINFO);
+            $object = new \RegexIterator(new \RecursiveIteratorIterator($diriterator), '@^(dump_)?([a-z0-9]+)\-([a-z0-9]+).*\.php$@', \RegexIterator::MATCH, \RegexIterator::USE_KEY);
+            $object->setMaxDepth($maxdepth);
 
-        return $object;
+            return $object;
+        }
+
+        return [];
     }
 
     public function tail($filepath, $limit = 100)
@@ -172,10 +182,14 @@ final class Files
             }
         );
 
+        // alias
+        $data = str_replace('\Nawawi\Symfony\Component\VarExporter\Internal\\', '\Nawawi\DocketCache\Exporter\\', $data);
+
         $ok = $this->put($tmpfile, $data);
         if (true === $ok) {
             if (@rename($tmpfile, $file)) {
                 $this->chmod($file);
+                $this->opcache_compile($file);
 
                 return true;
             }
@@ -190,7 +204,7 @@ final class Files
         clearstatcache();
         $cnt = 0;
         $dir = realpath($dir);
-        if (false !== $dir && is_dir($dir) && is_writable($dir) && 'docket-cache' === basename($dir)) {
+        if (false !== $dir && is_dir($dir) && is_writable($dir) && $this->is_docketcachedir($dir)) {
             foreach ($this->scanfiles($dir) as $object) {
                 $this->unlink($object->getPathName(), false);
                 ++$cnt;
@@ -224,6 +238,23 @@ final class Files
         return false;
     }
 
+    public function opcache_compile($file)
+    {
+        static $done = [];
+
+        if (isset($done[$file])) {
+            return true;
+        }
+
+        if (\function_exists('opcache_compile_file') && 'php' === substr($file, -3) && file_exists($file)) {
+            $done[$file] = $file;
+
+            return @opcache_compile_file($file);
+        }
+
+        return false;
+    }
+
     public function log($tag, $id, $data, $caller = '')
     {
         $file = DOCKET_CACHE_LOG_FILE;
@@ -231,6 +262,10 @@ final class Files
             if (DOCKET_CACHE_LOG_FLUSH && 'flush' === strtolower($id) || $this->filesize($file) >= (int) DOCKET_CACHE_LOG_SIZE) {
                 $this->put($file, '', 'cb');
             }
+        }
+
+        if (false !== strpos($caller, '?page=docket-cache&index=log&order=')) {
+            $caller = @preg_replace('@index=log\&order=.*@', 'index=log', $caller);
         }
 
         $meta = [];

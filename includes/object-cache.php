@@ -24,18 +24,44 @@
  * If false, prevent functions and classes from being defined.
  * See wp_start_object_cache() -> wp-includes/load.php.
  */
-if (\defined('DOCKET_CACHE_DISABLED') && DOCKET_CACHE_DISABLED) {
-    !\defined('DOCKET_CACHE_HALT') && \define('DOCKET_CACHE_HALT', 1);
+if (!\defined('DOCKET_CACHE_HALT') && \defined('DOCKET_CACHE_DISABLED') && DOCKET_CACHE_DISABLED) {
+    \define('DOCKET_CACHE_HALT', true);
 }
 
 /*
  * Check for minimum php version.
  * If not match, prevent functions and classes from being defined.
  * See wp_start_object_cache() -> wp-includes/load.php.
- *
  */
-if (version_compare(PHP_VERSION, '7.2.5', '<')) {
-    !\defined('DOCKET_CACHE_HALT') && \define('DOCKET_CACHE_HALT', 1);
+if (!\defined('DOCKET_CACHE_HALT') && version_compare(PHP_VERSION, '7.2.5', '<')) {
+    \define('DOCKET_CACHE_HALT', true);
+}
+
+/*
+ * Determine if we can load Docket Cache Library.
+ * If failed, prevent functions and classes from being defined.
+ * See wp_start_object_cache() -> wp-includes/load.php.
+ */
+if (!\defined('DOCKET_CACHE_HALT')) {
+    if (!\defined('WP_CONTENT_DIR')) {
+        \define('WP_CONTENT_DIR', ABSPATH.'wp-content');
+    }
+
+    if (!\defined('WP_PLUGIN_DIR')) {
+        \define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins');
+    }
+
+    if (!\defined('DOCKET_CACHE_AUTOLOAD')) {
+        \define('DOCKET_CACHE_AUTOLOAD', WP_PLUGIN_DIR.'/docket-cache/includes/load.php');
+    }
+
+    if (is_file(DOCKET_CACHE_AUTOLOAD) && is_readable(DOCKET_CACHE_AUTOLOAD)) {
+        include_once DOCKET_CACHE_AUTOLOAD;
+    }
+
+    if (!class_exists('Nawawi\\DocketCache\\Plugin') || !class_exists('Nawawi\\DocketCache\\Constans')) {
+        \define('DOCKET_CACHE_HALT', true);
+    }
 }
 
 if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
@@ -399,11 +425,11 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
         private $filtered_groups = false;
 
         /**
-         * Files() instance.
+         * Filesystem() instance.
          *
          * @var object
          */
-        private $fs;
+        private $filesystem;
 
         /**
          * Sets up object properties.
@@ -938,13 +964,13 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
                 $caller = 'wp-cli';
             }
 
-            return $this->fs->log($tag, $id, $data, $caller);
+            return $this->filesystem->log($tag, $id, $data, $caller);
         }
 
         private function docket_flush()
         {
             $dir = $this->cache_path;
-            $cnt = $this->fs->cachedir_flush($dir);
+            $cnt = $this->filesystem->cachedir_flush($dir);
             if ($cnt > 0) {
                 $this->debug('run', __FUNCTION__, 'Files: '.$cnt);
 
@@ -963,21 +989,19 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
         private function docket_remove($key, $group)
         {
             $file = $this->get_file_path($key, $group);
-            $this->fs->unlink($file, false);
+            $this->filesystem->unlink($file, false);
             $this->debug('del', $this->get_item_hash($file), $group.':'.$key);
         }
 
         private function docket_remove_group($group)
         {
-            $dir = realpath($this->cache_path);
             $match = $this->item_hash($group).'-';
-
-            if (false !== $dir && is_dir($dir) && is_readable($dir) && 'docket-cache' === basename($dir)) {
-                foreach ($this->fs->scanfiles($dir) as $object) {
+            if ($this->filesystem->is_docketcachedir($this->cache_path)) {
+                foreach ($this->filesystem->scanfiles($this->cache_path) as $object) {
                     $fn = $object->getFileName();
                     $fx = $object->getPathName();
                     if ($match === substr($fn, 0, \strlen($match))) {
-                        $this->fs->unlink($fx, false);
+                        $this->filesystem->unlink($fx, false);
                         $this->debug('del', $this->get_item_hash($fx), $group.':*');
                         unset($this->cache[$group]);
                     }
@@ -989,7 +1013,7 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
         {
             $file = $this->get_file_path($key, $group);
 
-            if (!file_exists($file) || empty($this->fs->filesize($file))) {
+            if (!file_exists($file) || empty($this->filesystem->filesize($file))) {
                 return false;
             }
 
@@ -1014,7 +1038,7 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
                 $data['timeout'] = $this->maybe_expire(0);
             } elseif ($data['timeout'] > 0 && time() >= $data['timeout']) {
                 $this->debug('exp', $this->get_item_hash($file), $group.':'.$key);
-                $this->fs->unlink($file, false);
+                $this->filesystem->unlink($file, false);
 
                 return false;
             }
@@ -1028,7 +1052,7 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
         {
             $fname = $this->get_item_hash($file);
 
-            $data = $this->fs->export_var($arr, $error);
+            $data = $this->filesystem->export_var($arr, $error);
             if (false === $data) {
                 $this->debug('err', $fname, 'Failed to export var: '.$error);
 
@@ -1043,7 +1067,7 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
             }
 
             $code = $this->code_stub($data);
-            $stat = $this->fs->dump($file, $code);
+            $stat = $this->filesystem->dump($file, $code);
             if (-1 === $stat) {
                 $this->debug('err', $fname, 'Failed to write');
 
@@ -1059,7 +1083,7 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
                 return false;
             }
 
-            @$this->fs->put($this->cache_path.'index.php', $this->code_stub(time()));
+            @$this->filesystem->put($this->cache_path.'index.php', $this->code_stub(time()));
 
             $file = $this->get_file_path($key, $group);
 
@@ -1106,32 +1130,8 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
 
         private function docket_init()
         {
-            // Sometime, some hosting server keep telling this constant not define.
-            // See wp-includes/default-constants.php
-            if (!\defined('WP_CONTENT_DIR')) {
-                \define('WP_CONTENT_DIR', ABSPATH.'wp-content');
-            }
-
-            if (!\defined('WP_PLUGIN_DIR')) {
-                \define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins');
-            }
-
-            $autoload = WP_PLUGIN_DIR.'/docket-cache/includes/load.php';
-
-            if (!file_exists($autoload)) {
-                trigger_error('Docket Cache library not found. Please re-install Docket Cache plugin or delete object-cache.php.', E_USER_ERROR);
-                exit;
-            }
-
-            include_once $autoload;
-
-            if (!class_exists('Nawawi\\Docket_Cache\\Constans')) {
-                trigger_error('Failed to load Docket Cache library. Please re-install Docket Cache plugin or delete object-cache.php.', E_USER_ERROR);
-                exit;
-            }
-
-            Nawawi\Docket_Cache\Constans::init();
-            $this->fs = new Nawawi\Docket_Cache\Files();
+            Nawawi\DocketCache\Constans::init();
+            $this->filesystem = new Nawawi\DocketCache\Filesystem();
 
             if (\is_int(DOCKET_CACHE_MAXSIZE) && DOCKET_CACHE_MAXSIZE > 1000000) {
                 $this->cache_maxsize = DOCKET_CACHE_MAXSIZE;
@@ -1158,7 +1158,7 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
             }
 
             $this->cache_path = is_dir(DOCKET_CACHE_PATH) && '/' !== DOCKET_CACHE_PATH ? rtrim(DOCKET_CACHE_PATH, '/\\').'/' : WP_CONTENT_DIR.'/cache/docket-cache/';
-            if ('docket-cache' !== basename($this->cache_path)) {
+            if (!$this->filesystem->is_docketcachedir($this->cache_path)) {
                 $this->cache_path = rtim($this->cache_path, '/').'docket-cache/';
             }
 

@@ -25,7 +25,7 @@
  * Domain Path:         /languages
  */
 
-namespace Nawawi\Docket_Cache;
+namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') && !\defined('DOCKET_CACHE_FILE') || exit;
 

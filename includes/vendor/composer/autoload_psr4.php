@@ -8,5 +8,5 @@ $baseDir = dirname(dirname($vendorDir));
 return array(
     'Nawawi\\Symfony\\Polyfill\\Php80\\' => array($vendorDir . '/symfony/polyfill-php80'),
     'Nawawi\\Symfony\\Component\\VarExporter\\' => array($vendorDir . '/symfony/var-exporter'),
-    'Nawawi\\Docket_Cache\\' => array($baseDir . '/includes/src'),
+    'Nawawi\\DocketCache\\' => array($baseDir . '/includes/src'),
 );

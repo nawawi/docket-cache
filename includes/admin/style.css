@@ -1,3 +1,11 @@
+/**
+ * Docket Cache.
+ *
+ * @author  Nawawi Jamili
+ * @license MIT
+ *
+ * @see    https://github.com/nawawi/docket-cache
+ */
 #docket-cache .form-table,
 #docket-cache .form-table td,
 #docket-cache .form-table th,
@@ -13,7 +21,6 @@
 }
 
 #docket-cache .form-table {
-    width: 100%;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
 }
@@ -47,6 +54,11 @@
 
 #docket-cache .log {
     width: 100%;
+}
+
+#docket-cache .log select {
+    display: inline-block;
+    margin-bottom: 10px;
 }
 
 #docket-cache textarea {
@@ -119,4 +131,28 @@
     #docket-cache .form-table td {
         padding-top: 0;
     }
+}
+
+#docket-cache-spinner {
+    float: none;
+    width: auto;
+    height: auto;
+    padding: 10px 0 10px 50px;
+    background-position: 20px 0;
+    margin: 0;
+    display: none;
+}
+
+#docket-cache-overlay {
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: transparent;
+    z-index: 999999;
+    cursor: pointer;
 }

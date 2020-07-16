@@ -43,7 +43,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Nawawi\\Docket_Cache\\": "includes/src",
+            "Nawawi\\DocketCache\\": "includes/src",
             "Nawawi\\Symfony\\Polyfill\\Php80\\": "includes/vendor/symfony/polyfill-php80",
             "Nawawi\\Symfony\\Component\\VarExporter\\": "includes/vendor/symfony/var-exporter"
         },
