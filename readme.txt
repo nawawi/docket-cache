@@ -16,6 +16,8 @@ The Docket cache is a file-based persistent WordPress Object Cache that stored a
 
 Rather than using serialize and unserialize a PHP object to store into flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance with PHP OPCache enabled.
 
+Please refer to the WordPress documentation about [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
+
 == Support & Contributions ==
 - [Report issues](https://github.com/nawawi/docket-cache/issues)
 - [Send Pull requests](https://github.com/nawawi/docket-cache/pulls)
