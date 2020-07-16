@@ -505,7 +505,7 @@ final class Plugin
                 }
 
                 if (2 === $this->get_status() && get_current_screen()->id === $this->screen) {
-                    $message = __('<strong>Docket Cache:</strong> The object-cache.php drop-in has been disabled via DOCKET_CACHE_DISABLED constant.', 'docket-cache');
+                    $message = __('The object-cache.php drop-in has been disabled at runtime.', 'docket-cache');
                 }
 
                 if (isset($message)) {

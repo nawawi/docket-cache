@@ -139,7 +139,14 @@ if (is_multisite() && is_network_admin()) {
         <?php
         if ($this->tab_current('log')) :
             $default_order = !empty($_GET['order']) ? $_GET['order'] : 'desc';
-            $default_line = !empty($_GET['line']) && \is_int($_GET['line']) && (int) $_GET['line'] > 0 && (int) $_GET['line'] <= 500 ? $_GET['line'] : '100';
+            $default_line = !empty($_GET['line']) ? $_GET['line'] : 100;
+            $default_line = (int) $default_line;
+            if ($default_line < 10) {
+                $default_line = 10;
+            }
+            if ($default_line > 500) {
+                $default_line = 500;
+            }
             $output = $this->plugin->tail_log($default_line);
             ?>
 
@@ -177,18 +184,16 @@ if (is_multisite() && is_network_admin()) {
                 <?php if (!empty($output)) : ?>
                 <select id="order">
                     <?php
-                    $default = $default_order;
                     foreach (['asc', 'desc'] as $order) {
-                        $selected = $order === $default ? ' selected' : '';
+                        $selected = ($order === $default_order ? ' selected' : '');
                         echo '<option value="'.$order.'"'.$selected.'>'.strtoupper($order).'</option>';
                     }
                     ?>
                 </select>
                 <select id="line">
                     <?php
-                    $default = $default_line;
                     foreach (['10', '50', '100', '300', '500'] as $line) {
-                        $selected = $line === $default ? ' selected' : '';
+                        $selected = ((int) $line === $default_line ? ' selected' : '');
                         echo '<option value="'.$line.'"'.$selected.'>'.$line.'</option>';
                     }
                     ?>

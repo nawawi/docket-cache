@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-07-16T18:10:17+00:00\n"
+"POT-Creation-Date: 2020-07-16T18:55:50+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -42,7 +42,7 @@ msgid "Overview"
 msgstr ""
 
 #: includes/admin/page.php:51
-#: includes/admin/page.php:151
+#: includes/admin/page.php:158
 msgid "Status"
 msgstr ""
 
@@ -95,35 +95,35 @@ msgstr ""
 msgid "The following PHP constants can be defined in your <a href=\"https://wordpress.org/support/article/editing-wp-config-php/\" rel=\"noopener\" target=\"_blank\">wp-config.php</a> file, in order to change the behavior of Docket Cache."
 msgstr ""
 
-#: includes/admin/page.php:147
+#: includes/admin/page.php:154
 msgid "Cache Log "
 msgstr ""
 
-#: includes/admin/page.php:155
+#: includes/admin/page.php:162
 msgid "File"
 msgstr ""
 
-#: includes/admin/page.php:160
+#: includes/admin/page.php:167
 msgid "Data"
 msgstr ""
 
-#: includes/admin/page.php:161
+#: includes/admin/page.php:168
 msgid "Not available"
 msgstr ""
 
-#: includes/admin/page.php:165
+#: includes/admin/page.php:172
 msgid "Size"
 msgstr ""
 
-#: includes/admin/page.php:197
+#: includes/admin/page.php:202
 msgid "Flush Log"
 msgstr ""
 
-#: includes/admin/page.php:199
+#: includes/admin/page.php:204
 msgid "Refresh"
 msgstr ""
 
-#: includes/admin/page.php:203
+#: includes/admin/page.php:208
 msgid "Click config tab to get how to enable caching log"
 msgstr ""
 
@@ -218,7 +218,7 @@ msgid "<strong>Docket Cache:</strong> An unknown object-cache.php drop-in was fo
 msgstr ""
 
 #: includes/src/Plugin.php:508
-msgid "<strong>Docket Cache:</strong> The object-cache.php drop-in has been disabled via DOCKET_CACHE_DISABLED constant."
+msgid "The object-cache.php drop-in has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: php version
