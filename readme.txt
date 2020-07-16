@@ -45,4 +45,7 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPcache for
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
-Please refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) to view changelog.
+- Please refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) to view changelog.
+- Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
+
+
