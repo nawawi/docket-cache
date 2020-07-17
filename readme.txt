@@ -18,7 +18,7 @@ Rather than using [serialize](https://www.php.net/manual/en/function.serialize.p
 
 Kindly, please refer to the WordPress documentation about [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
 
-== Whay this plugin? ==
+== Why this plugin? ==
 When come to persistent Object Cache in WordPress, the most reliable solution is used with [Redis](https://redis.io/) or [Memcached](https://memcached.org/) server. However, that solution is not available to low cost or shared hosting server.
 
 The only solutions is to store the object cache into a file-based. With WordPress, exporting the PHP object is not easy, most plugin that implements file-based solution will serialize and unserialize the object to store and retrieve the data.
