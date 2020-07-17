@@ -5,22 +5,22 @@ A file-based persistent WordPress Object Cache stored as a plain PHP code.
   
 ## Description
 
-The Docket cache is a file-based persistent WordPress Object Cache that stored as a plain PHP code. Intends to provide as alternative options for who can't use Redis or Memcached server.
+The Docket cache is a file-based persistent WordPress Object Cache that is stored as a plain PHP code. Intends to provide an alternative option for those who can't use Redis or Memcached server.
 
-Rather than using [serialize](https://www.php.net/manual/en/function.serialize.php) and [unserialize](https://www.php.net/manual/en/function.unserialize.php) a PHP object to store into flat files. This plugin stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance with PHP OPCache enabled.
+Rather than using [serialize](https://www.php.net/manual/en/function.serialize.php) and [unserialize](https://www.php.net/manual/en/function.unserialize.php) a PHP object to store into flat files, this plugin stores data by converting the object into plain PHP code which results in faster data retrieval and better performance with PHP OPCache enabled.
 
-Kindly, please refer to the WordPress documentation about [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
+Kindly refer to the WordPress documentation on [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
 
-## Why this plugin?
-When come to persistent Object Cache in WordPress, the most reliable solution is used with [Redis](https://redis.io/) or [Memcached](https://memcached.org/) server. However, that solution are not available to low cost or shared hosting server.
+## Why use this plugin?
+When it comes to reliable persistent Object Cache in WordPress, [Redis](https://redis.io/) or [Memcached](https://memcached.org/) comes on top. However, those solutions are not available to low cost or shared hosting servers.
 
-The only solutions are to store the object cache into a file-based. With WordPress, exporting the PHP object are not easy, most plugin that implements file-based solution will serialize and unserialize the object to store and retrieve the data.
+The only solution is to store the object caches into files. With WordPress, exporting the PHP objects are not easy, most plugin that implements file-based solution will serialize and unserialize the object to store and retrieve the data.
 
-The Docket Cache makes it better by converting the object cache into plain PHP code. This solution more faster, since WodPress only retrieve the stored cache same as it load it's own library.
+The Docket Cache makes it better by converting the object cache into plain PHP code. This solution is faster since WordPress only retrieves the stored caches at the same time it loads its library.
 
 ## Installation
 
-To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPCache for better performance.
+To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPCache for best performance.
 
 ### WordPress Plugin Directory
 1. In your WordPress admin click *Plugins -> Add New*
@@ -54,8 +54,8 @@ Go to your WordPress plugins folder `cd wp-content/plugins`
 git clone https://github.com/nawawi/docket-cache
 ```
 
-### Automatic Udates
-Besides WordPress auto updates, Docket Cache supports the [GitHub Updater plugin](https://github.com/afragen/github-updater) WordPress. The plugin enables automatic updates from this GitHub Repository. You will find all information about the how and why at the [plugin wiki page](https://github.com/afragen/github-updater/wiki).
+### Automatic Update
+Besides WordPress's auto-update feature, Docket Cache supports the [GitHub Updater plugin](https://github.com/afragen/github-updater) WordPress. The plugin enables automatic updates from this GitHub Repository. You will find all information about the how and why at the [plugin wiki page](https://github.com/afragen/github-updater/wiki).
 
 
 ## Configuration Options
@@ -79,7 +79,7 @@ define('DOCKET_CACHE_MAXTTL', 0);
 ```
 **`DOCKET_CACHE_GLOBAL_GROUPS`**
 
-List of cache groups that shared cache with others site in Multisite setups.
+Lists of cache groups that share cache with other sites in a Multisite setup.
 Default:
 ```php
 define('DOCKET_CACHE_GLOBAL_GROUPS',
@@ -137,7 +137,7 @@ define('DOCKET_CACHE_LOG', false);
 
 **`DOCKET_CACHE_LOG_FILE`**
 
-Set the file of log.
+Set the log file.
 Default:
 ```php
 define('DOCKET_CACHE_LOG_FILE`', WP_CONTENT_DIR.'/object-cache.log');
@@ -145,7 +145,7 @@ define('DOCKET_CACHE_LOG_FILE`', WP_CONTENT_DIR.'/object-cache.log');
 
 **`DOCKET_CACHE_LOG_FLUSH`**
 
-Set to `true` to empty the log file when object cache flushed.  
+Set to `true` to empty the log file when the object cache is flushed.  
 Default:
 ```php
 define('DOCKET_CACHE_LOG_FLUSH', true);
@@ -153,7 +153,7 @@ define('DOCKET_CACHE_LOG_FLUSH', true);
 
 **`DOCKET_CACHE_LOG_SIZE`**
 
-Set the maximum size of a log file in byte. Default set to 10MB.  
+Set the maximum size of a log file in bytes. Default set to 10MB.  
 Default:
 ```php
 define('DOCKET_CACHE_LOG_SIZE', 10000000);
@@ -169,7 +169,7 @@ define('DOCKET_CACHE_FLUSH_DELETE', false);
 
 **`DOCKET_CACHE_GC`**
 
-The Docket Cache Garbage collector scheduled every 30 minutes to clean empty file more than 2 minutes. Set to false to disable garbage collector.  
+The Docket Cache Garbage collector is scheduled to run every 30 minutes to clean empty files that are more than 2 minutes old. Set to false to disable the garbage collector.  
 Default:
 ```php
 define('DOCKET_CACHE_GC', true);
@@ -214,15 +214,15 @@ The following commands are supported:
 
   * `wp cache enable`
 
-    Enables the Docket object cache. Default behavior is to create the object cache drop-in, unless an unknown object cache drop-in is present.
+    Enables the Docket object cache. Default behavior is to create the object cache drop-in unless an unknown object cache drop-in is present.
 
   * `wp cache disable`
 
-    Disables the Docket object cache. Default behavior is to delete the object cache drop-in, unless an unknown object cache drop-in is present.
+    Disables the Docket object cache. The default behavior is to delete the object cache drop-in unless an unknown object cache drop-in is present.
 
   * `wp cache update`
 
-    Updates the Docket object cache drop-in. Default behavior is to overwrite any existing object cache drop-in.
+    Updates the Docket object cache drop-in. The default behavior is to overwrite any existing object cache drop-in.
 
   * `wp cache flush`
 
@@ -243,9 +243,9 @@ The following commands are supported:
 
 Versions are as follows: Year.Month.Day
 
-* Year: Two digit year of release.
-* Month: Two digit month of release.
-* Day: Two digit day of release.
+* Year: Two digits year of release.
+* Month: Two digits month of release.
+* Day: Two digits day of release.
 
 
 ## Contributions
