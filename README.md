@@ -5,15 +5,22 @@ A file-based persistent WordPress Object Cache stored as a plain PHP code.
   
 ## Description
 
-The Docket cache is a file-based persistent WordPress Object Cache that stored as a plain PHP code. Intends to provide as alternative options for who can't use Redis or Memcache server.
+The Docket cache is a file-based persistent WordPress Object Cache that stored as a plain PHP code. Intends to provide as alternative options for who can't use Redis or Memcached server.
 
-Rather than using `serialize` and `unserialize` a PHP object to store into flat files, Docket Cache stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance with PHP OPCache enabled.
+Rather than using [serialize](https://www.php.net/manual/en/function.serialize.php) and [unserialize](https://www.php.net/manual/en/function.unserialize.php) a PHP object to store into flat files. This plugin stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance with PHP OPCache enabled.
 
-Please refer to the WordPress documentation about [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
+Kindly, please refer to the WordPress documentation about [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
+
+## Whay this plugin?
+When come to persistent Object Cache in WordPress, the most reliable solution is used with [Redis](https://redis.io/) or [Memcached](https://memcached.org/) server. However, that solution is not available to low cost or shared hosting server.
+
+The only solutions is to store the object cache into a file-based. With WordPress, exporting the PHP object is not easy, most plugin that implements file-based solution will serialize and unserialize the object to store and retrieve the data.
+
+The Docket Cache makes it better by converting the object cache into plain PHP code. This solution more faster, since WodPress only retrieve the stored cache same as it load it's own library.
 
 ## Installation
 
-To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPcache for better performance.
+To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPCache for better performance.
 
 ### WordPress Plugin Directory
 1. In your WordPress admin click *Plugins -> Add New*
