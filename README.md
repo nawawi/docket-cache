@@ -16,7 +16,7 @@ When it comes to reliable persistent Object Cache in WordPress, [Redis](https://
 
 The only solution is to store the object caches into files. With WordPress, exporting the PHP objects are not easy, most plugin that implements file-based solution will serialize and unserialize the object to store and retrieve the data.
 
-The Docket Cache makes it better by converting the object cache into plain PHP code. This solution is faster since WordPress only retrieves the stored caches at the same time it loads its library.
+The Docket Cache is better because it converts the object cache into plain PHP code. This solution is faster since WordPress can use the cache directly without running other operation.
 
 ## Installation
 
