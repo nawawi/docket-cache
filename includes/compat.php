@@ -17,6 +17,10 @@ if (!class_exists('Symfony\\Component\\VarExporter\\Internal\\Registry')) {
     class_alias('Nawawi\Symfony\Component\VarExporter\Internal\Registry', 'Symfony\Component\VarExporter\Internal\Registry');
 }
 
+if (!class_exists('Nawawi\\Docket_Cache\\Constans')) {
+    class_alias('Nawawi\DocketCache\Constans', 'Nawawi\Docket_Cache\Constans');
+}
+
 if (class_exists('Nawawi\\Symfony\\Component\\VarExporter\\VarExporter')) {
     class_alias('Nawawi\Symfony\Component\VarExporter\VarExporter', 'Nawawi\DocketCache\Exporter\VarExporter');
 }

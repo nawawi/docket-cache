@@ -29,8 +29,10 @@ class Constans
     public static function init()
     {
         // optional config
-        if (file_exists(WP_CONTENT_DIR.'/docket-cache-data/config.php') && is_readable(WP_CONTENT_DIR.'/docket-cache-data/config.php')) {
-            include_once WP_CONTENT_DIR.'/docket-cache-data/config.php';
+        self::maybe_define('DOCKET_CACHE_DATA_PATH', WP_CONTENT_DIR.'/docket-cache-data');
+
+        if (file_exists(DOCKET_CACHE_DATA_PATH.'/config.php') && is_readable(DOCKET_CACHE_DATA_PATH.'/config.php')) {
+            @include_once DOCKET_CACHE_DATA_PATH.'/config.php';
         }
 
         // cache dir
@@ -126,5 +128,11 @@ class Constans
 
         // wp-cli
         self::maybe_define('DOCKET_CACHE_WPCLI', (\defined('WP_CLI') && WP_CLI));
+
+        // backwards-compatible
+        self::maybe_define('DOCKET_CACHE_DEBUG', DOCKET_CACHE_LOG);
+        self::maybe_define('DOCKET_CACHE_DEBUG_FILE', DOCKET_CACHE_LOG_FILE);
+        self::maybe_define('DOCKET_CACHE_DEBUG_FLUSH', DOCKET_CACHE_LOG_FLUSH);
+        self::maybe_define('DOCKET_CACHE_DEBUG_SIZE', DOCKET_CACHE_LOG_SIZE);
     }
 }
