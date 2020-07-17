@@ -21,6 +21,10 @@ if (!class_exists('Nawawi\\Docket_Cache\\Constans')) {
     class_alias('Nawawi\DocketCache\Constans', 'Nawawi\Docket_Cache\Constans');
 }
 
+if (!class_exists('Nawawi\\Docket_Cache\\Files')) {
+    class_alias('Nawawi\DocketCache\Filesystem', 'Nawawi\Docket_Cache\Files');
+}
+
 if (class_exists('Nawawi\\Symfony\\Component\\VarExporter\\VarExporter')) {
     class_alias('Nawawi\Symfony\Component\VarExporter\VarExporter', 'Nawawi\DocketCache\Exporter\VarExporter');
 }
