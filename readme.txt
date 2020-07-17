@@ -12,18 +12,18 @@ License URI: ./license.txt
 A file-based persistent WordPress Object Cache stored as a plain PHP code.
 
 == Description ==
-The Docket cache is a file-based persistent WordPress Object Cache that stored as a plain PHP code. Intends to provide as alternative options for who can't use Redis or Memcached server.
+The Docket cache is a file-based persistent WordPress Object Cache that is stored as a plain PHP code. Intends to provide an alternative option for those who can't use Redis or Memcached server.
 
-Rather than using [serialize](https://www.php.net/manual/en/function.serialize.php) and [unserialize](https://www.php.net/manual/en/function.unserialize.php) a PHP object to store into flat files. This plugin stores the data by converting the object into plain PHP code, resulting faster data retrieving and better performance with PHP OPCache enabled.
+Rather than using [serialize](https://www.php.net/manual/en/function.serialize.php) and [unserialize](https://www.php.net/manual/en/function.unserialize.php) a PHP object to store into flat files, this plugin stores data by converting the object into plain PHP code which results in faster data retrieval and better performance with PHP OPCache enabled.
 
-Kindly, please refer to the WordPress documentation about [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
+Kindly refer to the WordPress documentation on [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
 
 == Why this plugin? ==
-When come to persistent Object Cache in WordPress, the most reliable solution is used with [Redis](https://redis.io/) or [Memcached](https://memcached.org/) server. However, that solution are not available to low cost or shared hosting server.
+When it comes to reliable persistent Object Cache in WordPress, [Redis](https://redis.io/) or [Memcached](https://memcached.org/) comes on top. However, those solutions are not available to low cost or shared hosting servers.
 
-The only solutions are to store the object cache into a file-based. With WordPress, exporting the PHP object are not easy, most plugin that implements file-based solution will serialize and unserialize the object to store and retrieve the data.
+The only solution is to store the object caches into files. With WordPress, exporting the PHP objects are not easy, most plugin that implements file-based solution will serialize and unserialize the object to store and retrieve the data.
 
-The Docket Cache makes it better by converting the object cache into plain PHP code. This solution more faster, since WodPress only retrieve the stored cache same as it load it's own library.
+The Docket Cache makes it better by converting the object cache into plain PHP code. This solution is faster since WordPress only retrieves the stored caches at the same time it loads its library.
 
 == Development ==
 - [Report issues](https://github.com/nawawi/docket-cache/issues)
@@ -39,7 +39,7 @@ To adjust the configuration, please see the [configuration options](https://gith
 To use the WP-CLI commands, please see the [WP-CLI commands](https://github.com/nawawi/docket-cache#wp-cli-commands) for a full list.
 
 == Installation ==
-To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPcache for better performance.
+To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPCache for best performance.
 
 1. In your WordPress admin click *Plugins -> Add New*
 2. Search plugins "Docket Cache" and click Install Now.
@@ -52,10 +52,10 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPcache for
 3. Setting Instruction.
 
 == Upgrade Notice ==
-Kindly, please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
+Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
 - Please refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) to view changelog.
-- Kindly, please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
+- Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 
