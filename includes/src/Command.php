@@ -10,6 +10,8 @@
 
 namespace Nawawi\DocketCache;
 
+\defined('ABSPATH') || exit;
+
 use WP_CLI;
 use WP_CLI_Command;
 
@@ -181,7 +183,7 @@ class Command extends WP_CLI_Command
      */
     public function run_preload()
     {
-        if (!DOCKET_CACHE_PRELOAD) {
+        if (!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD) {
             $this->halt_error(__('Cache preloading not enabled.', 'docket-cache'));
         }
         do_action('docket_preload');

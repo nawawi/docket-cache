@@ -10,6 +10,8 @@
 
 namespace Nawawi\DocketCache;
 
+\defined('ABSPATH') || exit;
+
 use Nawawi\DocketCache\Exporter\VarExporter;
 
 final class Filesystem
@@ -75,18 +77,33 @@ final class Filesystem
         return [];
     }
 
-    public function tail($filepath, $limit = 100)
+    public function tail($filepath, $limit = 100, $do_last = true)
     {
         $limit = (int) $limit;
         $file = new \SplFileObject($filepath);
         $file->seek(PHP_INT_MAX);
         $total_lines = $file->key();
-        $total_lines = $total_lines > $limit ? $total_lines - $limit : $total_lines;
-        if ($total_lines > 0) {
-            return new \LimitIterator($file, $total_lines);
+
+        if ($limit > $total_lines) {
+            $limit = $total_lines;
         }
 
-        return [];
+        if ($do_last) {
+            $total_lines = $total_lines > $limit ? $total_lines - $limit : $total_lines;
+        } else {
+            $total_lines = $limit;
+        }
+
+        $object = [];
+        if ($total_lines > 0) {
+            if ($do_last) {
+                $object = new \LimitIterator($file, $total_lines);
+            } else {
+                $object = new \LimitIterator($file, 0, $total_lines);
+            }
+        }
+
+        return $object;
     }
 
     public function export_var($data, &$error = '')
@@ -189,6 +206,8 @@ final class Filesystem
         if (true === $ok) {
             if (@rename($tmpfile, $file)) {
                 $this->chmod($file);
+
+                // compile
                 $this->opcache_compile($file);
 
                 return true;
@@ -253,6 +272,32 @@ final class Filesystem
         }
 
         return false;
+    }
+
+    public function cache_get($file)
+    {
+        if (!file_exists($file) || empty($this->filesize($file))) {
+            return false;
+        }
+
+        if (!$handle = @fopen($file, 'rb')) {
+            return false;
+        }
+
+        $data = [];
+
+        // include when we can read, try to avoid fatal error.
+        if (flock($handle, LOCK_SH)) {
+            $data = @include $file;
+            @flock($handle, LOCK_UN);
+        }
+        @fclose($handle);
+
+        if (empty($data) || !isset($data['data'])) {
+            return false;
+        }
+
+        return $data;
     }
 
     public function log($tag, $id, $data, $caller = '')

@@ -3,7 +3,7 @@
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
  * Plugin URI:          http://wordpress.org/plugins/docket-cache/
- * Version:             20.07.17
+ * Version:             20.07.19
  * Description:         A file-based persistent WordPress Object Cache stored as a plain PHP code.
  * Author:              Nawawi Jamili
  * Author URI:          https://rutweb.com
@@ -12,14 +12,15 @@
  * License:             MIT
  * License URI:         https://opensource.org/licenses/MIT
  */
+\defined('ABSPATH') || exit;
 
-/**
+/*
  * Based on:
  *  wp-includes/cache.php
  *  wp-includes/class-wp-object-cache.php.
  */
 
-/**
+/*
  * Check if caching is not disabled.
  * If false, prevent functions and classes from being defined.
  * See wp_start_object_cache() -> wp-includes/load.php.
@@ -62,9 +63,18 @@ if (!\defined('DOCKET_CACHE_HALT')) {
     if (!class_exists('Nawawi\\DocketCache\\Plugin') || !class_exists('Nawawi\\DocketCache\\Constans')) {
         \define('DOCKET_CACHE_HALT', true);
     }
+
+    // delay 20 seconds
+    $file_delay = WP_CONTENT_DIR.'/object-cache-delay.txt';
+    if (!\defined('DOCKET_CACHE_HALT') && !\defined('DOCKET_CACHE_DELAY') && @file_exists($file_delay)) {
+        \define('DOCKET_CACHE_DELAY', true);
+        if (time() > @filemtime($file_delay)) {
+            @unlink($file_delay);
+        }
+    }
 }
 
-if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
+if ((!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) && !\defined('DOCKET_CACHE_DELAY')) :
     /**
      * Adds data to the cache, if the cache key doesn't already exist.
      *
@@ -745,10 +755,13 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
             $ret .= "<strong>Cache Misses:</strong> {$this->cache_misses}<br />";
             $ret .= '</p>';
             $ret .= '<ul>';
+            $total = 0;
             foreach ($this->cache as $group => $cache) {
                 $ret .= '<li><strong>Group:</strong> '.esc_html($group).' - ( '.number_format(\strlen(serialize($cache)) / KB_IN_BYTES, 2).'K )</li>';
+                $total += \strlen(serialize($cache));
             }
             $ret .= '</ul>';
+            echo '<p>total: '.number_format($total / KB_IN_BYTES).'</p>';
             echo $ret;
         }
 
@@ -1013,24 +1026,8 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
         {
             $file = $this->get_file_path($key, $group);
 
-            if (!file_exists($file) || empty($this->filesystem->filesize($file))) {
-                return false;
-            }
-
-            if (!$handle = @fopen($file, 'rb')) {
-                return false;
-            }
-
-            $data = [];
-
-            // include when we can read, try to avoid fatal error.
-            if (flock($handle, LOCK_SH)) {
-                $data = @include $file;
-                @flock($handle, LOCK_UN);
-            }
-            @fclose($handle);
-
-            if (empty($data) || !isset($data['data'])) {
+            $data = $this->filesystem->cache_get($file);
+            if (false === $data) {
                 return false;
             }
 
@@ -1236,52 +1233,30 @@ if (!\defined('DOCKET_CACHE_HALT') || !DOCKET_CACHE_HALT) :
                     },
                     -PHP_INT_MAX
                 );
+            }
 
-                /*add_action(
-                    'wp_login',
-                    function ($login) {
-                        $this->flush_filtered_groups('wp_login', \func_get_args());
-                    },
-                    PHP_INT_MAX
-                );
+            // banner
+            if (!is_admin() && DOCKET_CACHE_COMMENT) {
+                if (
+                    (\defined('DOING_CRON') && DOING_CRON) ||
+                    (\defined('DOING_AJAX') && DOING_AJAX) ||
+                    (\defined('REST_REQUEST') && REST_REQUEST) ||
+                    (\defined('JSON_REQUEST') && JSON_REQUEST) ||
+                    (\defined('IFRAME_REQUEST') && IFRAME_REQUEST) ||
+                    (\defined('XMLRPC_REQUEST') && XMLRPC_REQUEST) ||
+                    (\defined('WC_API_REQUEST') && WC_API_REQUEST) ||
+                    DOCKET_CACHE_WPCLI ||
+                    (\function_exists('wp_is_json_request') && wp_is_json_request())) {
+                    return;
+                }
 
                 add_action(
-                    'wp_logout',
+                    'shutdown',
                     function () {
-                        $this->flush_filtered_groups('wp_logout', \func_get_args());
+                        echo "\n<!-- Performance optimized by Docket Object Cache: https://wordpress.org/plugins/docket-cache -->\n";
                     },
                     PHP_INT_MAX
                 );
-
-                add_action(
-                    'clear_auth_cookie',
-                    function () {
-                        $this->flush_filtered_groups('clear_auth_cookie', \func_get_args());
-                    },
-                    PHP_INT_MAX
-                );
-
-                add_action(
-                    'profile_update',
-                    function ($user_id, $old_user_data) {
-                        $this->flush_filtered_groups('profile_update', \func_get_args());
-                    },
-                    -PHP_INT_MAX,
-                    2
-                );
-
-                add_filter(
-                    'insert_user_meta',
-                    function ($meta, $user, $update) {
-                        if ($update) {
-                            $this->flush_filtered_groups('insert_user_meta', \func_get_args());
-                        }
-
-                        return $meta;
-                    },
-                    -PHP_INT_MAX,
-                    3
-                );*/
             }
         }
     }

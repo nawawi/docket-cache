@@ -35,11 +35,12 @@ class ComposerStaticInit71169967e8f502f7da209e4236957996
     );
 
     public static $classMap = array (
-        'Nawawi\\DocketCache\\Advanced_Post' => __DIR__ . '/../../..' . '/includes/src/Advanced_Post.php',
+        'Nawawi\\DocketCache\\AdvancedPost' => __DIR__ . '/../../..' . '/includes/src/AdvancedPost.php',
         'Nawawi\\DocketCache\\Command' => __DIR__ . '/../../..' . '/includes/src/Command.php',
         'Nawawi\\DocketCache\\Constans' => __DIR__ . '/../../..' . '/includes/src/Constans.php',
         'Nawawi\\DocketCache\\Filesystem' => __DIR__ . '/../../..' . '/includes/src/Filesystem.php',
         'Nawawi\\DocketCache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',
+        'Nawawi\\DocketCache\\PrivateRepo' => __DIR__ . '/../../..' . '/includes/src/PrivateRepo.php',
         'Nawawi\\DocketCache\\View' => __DIR__ . '/../../..' . '/includes/src/View.php',
         'Nawawi\\Symfony\\Component\\VarExporter\\Exception\\ClassNotFoundException' => __DIR__ . '/..' . '/symfony/var-exporter/Exception/ClassNotFoundException.php',
         'Nawawi\\Symfony\\Component\\VarExporter\\Exception\\ExceptionInterface' => __DIR__ . '/..' . '/symfony/var-exporter/Exception/ExceptionInterface.php',

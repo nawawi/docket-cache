@@ -6,11 +6,12 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname(dirname($vendorDir));
 
 return array(
-    'Nawawi\\DocketCache\\Advanced_Post' => $baseDir . '/includes/src/Advanced_Post.php',
+    'Nawawi\\DocketCache\\AdvancedPost' => $baseDir . '/includes/src/AdvancedPost.php',
     'Nawawi\\DocketCache\\Command' => $baseDir . '/includes/src/Command.php',
     'Nawawi\\DocketCache\\Constans' => $baseDir . '/includes/src/Constans.php',
     'Nawawi\\DocketCache\\Filesystem' => $baseDir . '/includes/src/Filesystem.php',
     'Nawawi\\DocketCache\\Plugin' => $baseDir . '/includes/src/Plugin.php',
+    'Nawawi\\DocketCache\\PrivateRepo' => $baseDir . '/includes/src/PrivateRepo.php',
     'Nawawi\\DocketCache\\View' => $baseDir . '/includes/src/View.php',
     'Nawawi\\Symfony\\Component\\VarExporter\\Exception\\ClassNotFoundException' => $vendorDir . '/symfony/var-exporter/Exception/ClassNotFoundException.php',
     'Nawawi\\Symfony\\Component\\VarExporter\\Exception\\ExceptionInterface' => $vendorDir . '/symfony/var-exporter/Exception/ExceptionInterface.php',

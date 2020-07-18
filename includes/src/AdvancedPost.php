@@ -15,7 +15,9 @@
 
 namespace Nawawi\DocketCache;
 
-class Advanced_Post
+\defined('ABSPATH') || exit;
+
+class AdvancedPost
 {
     public $prefix;
     public $group_prefix;

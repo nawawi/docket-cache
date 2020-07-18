@@ -28,7 +28,7 @@ if (1 === $info->status_code && isset($this->plugin->token)) {
             $this->plugin->flush_log();
             break;
     }
-    if (!DOCKET_CACHE_PRELOAD || 2 === $info->status_code) {
+    if ((!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD) || 2 === $info->status_code) {
         $do_preload = false;
     }
 }
@@ -138,19 +138,16 @@ if (is_multisite() && is_network_admin()) {
 
         <?php
         if ($this->tab_current('log')) :
-            $default_order = !empty($_GET['order']) ? $_GET['order'] : 'desc';
+            $default_order = !empty($_GET['order']) ? $_GET['order'] : 'last';
+            $default_sort = !empty($_GET['sort']) ? $_GET['sort'] : 'desc';
             $default_line = !empty($_GET['line']) ? $_GET['line'] : 100;
             $default_line = (int) $default_line;
-            if ($default_line < 10) {
-                $default_line = 10;
-            }
-            if ($default_line > 500) {
-                $default_line = 500;
-            }
-            $output = $this->plugin->tail_log($default_line);
+            $output = $this->plugin->read_log($default_line, 'last' === $default_order ? true : false);
+            $output_empty = empty($output);
+            $output_size = !$output_empty ? \count($output) : 0;
             ?>
 
-        <div class="section<?php echo !empty($output) ? ' log' : ''; ?>">
+        <div class="section<?php echo !$output_empty ? ' log' : ''; ?>">
             <h2 class="title"><?php _e('Cache Log ', 'docket-cache'); ?></h2>
 
             <table class="form-table">
@@ -162,29 +159,29 @@ if (is_multisite() && is_network_admin()) {
                     <th><?php _e('File', 'docket-cache'); ?></th>
                     <td><?php echo $info->log_file; ?></td>
                 </tr>
-                <?php if (empty($output)) : ?>
+                <?php if ($output_empty) : ?>
                 <tr>
                     <th><?php _e('Data', 'docket-cache'); ?></th>
                     <td><?php _e('Not available', 'docket-cache'); ?></td>
                 </tr>
                 <?php else : ?>
                 <tr>
-                    <th><?php _e('Size', 'docket-cache'); ?></th>
+                    <th class="border"><?php _e('Size', 'docket-cache'); ?></th>
                     <td><?php echo $this->plugin->get_logsize(); ?></td>
                 </tr>
                 <tr>
-                    <td colspan="2" class="noborder">
-                        <textarea id="log" class="code" readonly="readonly" rows="20" wrap="off"><?php echo implode("\n", 'desc' === $default_order ? array_reverse($output, true) : $output); ?></textarea>
+                    <td colspan="2">
+                        <textarea id="log" class="code" readonly="readonly" rows="<?php echo $output_size < 20 ? $output_size : 20; ?>" wrap="off"><?php echo implode("\n", 'desc' === $default_sort ? array_reverse($output, true) : $output); ?></textarea>
                     </td>
                 </tr>
                 <?php endif; ?>
             </table>
 
             <p class="submit">
-                <?php if (!empty($output)) : ?>
+                <?php if (!$output_empty) : ?>
                 <select id="order">
                     <?php
-                    foreach (['asc', 'desc'] as $order) {
+                    foreach (['first', 'last'] as $order) {
                         $selected = ($order === $default_order ? ' selected' : '');
                         echo '<option value="'.$order.'"'.$selected.'>'.strtoupper($order).'</option>';
                     }
@@ -198,21 +195,22 @@ if (is_multisite() && is_network_admin()) {
                     }
                     ?>
                 </select>
+                <select id="sort">
+                    <?php
+                    foreach (['asc', 'desc'] as $sort) {
+                        $selected = ($sort === $default_sort ? ' selected' : '');
+                        echo '<option value="'.$sort.'"'.$selected.'>'.strtoupper($sort).'</option>';
+                    }
+                    ?>
+                </select>
                 <br>
                 <a href="<?php echo $this->plugin->action_query('flush-log'); ?>" class="button button-primary button-large"><?php _e('Flush Log', 'docket-cache'); ?></a>&nbsp;
                 <?php endif; ?>
-                <a href="<?php echo $this->tab_query('log'); ?>" class="button button-<?php echo !empty($output) ? 'secondary' : 'primary'; ?> button-large" id="refresh"><?php _e('Refresh', 'docket-cache'); ?></a>
-
-                <?php
-                if (!$info->log_enable) :
-                    _e('Click config tab to get how to enable caching log', 'docket-cache');
-                endif;
-                ?>
+                <a href="<?php echo $this->tab_query('log'); ?>" class="button button-<?php echo !$output_empty ? 'secondary' : 'primary'; ?> button-large" id="refresh"><?php _e('Refresh', 'docket-cache'); ?></a>
             </p>
         </div>
 
         <?php endif; ?>
-
     </div>
 </div>
 <div id="docket-cache-overlay"></div>

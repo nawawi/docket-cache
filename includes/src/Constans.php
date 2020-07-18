@@ -10,7 +10,9 @@
 
 namespace Nawawi\DocketCache;
 
-class Constans
+\defined('ABSPATH') || exit;
+
+final class Constans
 {
     public static function is_defined_array($name)
     {
@@ -28,6 +30,10 @@ class Constans
 
     public static function init()
     {
+        // compat
+        self::maybe_define('WP_CONTENT_DIR', ABSPATH.'wp-content');
+        self::maybe_define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins');
+
         // optional config
         self::maybe_define('DOCKET_CACHE_DATA_PATH', WP_CONTENT_DIR.'/docket-cache-data');
 
@@ -93,11 +99,6 @@ class Constans
                 'themes',
                 'counts',
                 'plugins',
-                'comment',
-                'wc_session_id',
-                'bp_notifications',
-                'bp_messages',
-                'bp_pages',
             ]
         );
 
@@ -119,15 +120,18 @@ class Constans
             ]
         );
 
-        // preload
-        self::maybe_define('DOCKET_CACHE_PRELOAD', false);
-
         // misc tweaks
         self::maybe_define('DOCKET_CACHE_MISC_TWEAKS', true);
         self::maybe_define('DOCKET_CACHE_ADVCPOST', true);
 
         // wp-cli
         self::maybe_define('DOCKET_CACHE_WPCLI', (\defined('WP_CLI') && WP_CLI));
+
+        // banner
+        self::maybe_define('DOCKET_CACHE_COMMENT', true);
+
+        // page loader
+        self::maybe_define('DOCKET_CACHE_PAGELOADER', true);
 
         // backwards-compatible
         self::maybe_define('DOCKET_CACHE_DEBUG', DOCKET_CACHE_LOG);

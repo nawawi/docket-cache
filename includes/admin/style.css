@@ -66,12 +66,17 @@
     font-size: 100%;
     font: courier;
     vertical-align: baseline;
-    margin-top: 15px;
+    margin-top: 4px;
     margin-bottom: 0;
     white-space: pre;
-    overflow-wrap: normal;
-    overflow-x: scroll;
+    overflow: auto;
     outline: none;
+    background-color: white;
+}
+
+#docket-cache textarea:focus {
+    outline: none;
+    box-shadow: none !important;
 }
 
 #docket-cache .config p {
@@ -155,4 +160,16 @@
     background-color: transparent;
     z-index: 999999;
     cursor: pointer;
+}
+
+#docket-cache .noborder {
+    border: none !important;
+}
+
+#docket-cache .border {
+    border-bottom: 1px solid #ddd !important;
+}
+
+#docket-cache .log p.submit {
+    margin-top: 12px;
 }

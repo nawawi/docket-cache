@@ -29,7 +29,6 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 - [Report issues](https://github.com/nawawi/docket-cache/issues)
 - [Send Pull requests](https://github.com/nawawi/docket-cache/pulls)
 - [Changelog](https://github.com/nawawi/docket-cache/releases)
-- [Contributors](https://github.com/nawawi/docket-cache/graphs/contributors)
 
 == Configuration Options ==
 

@@ -62,13 +62,6 @@ Besides WordPress's auto-update feature, Docket Cache supports the [GitHub Updat
 
 To adjust the configuration, define any of the following constants in your `wp-config.php` file.
 
-**`DOCKET_CACHE_DISABLED`**
-
-Set to `true` to disable the object cache at runtime.  
-Default:
-```php
-define('DOCKET_CACHE_DISABLED', false);
-```
 
 **`DOCKET_CACHE_MAXTTL`**
 
@@ -77,9 +70,34 @@ Default:
 ```php
 define('DOCKET_CACHE_MAXTTL', 0); 
 ```
+
+**`DOCKET_CACHE_SIZE`**
+
+Set the maximum size of cache in bytes. Default set to 3MB.  
+Default:
+```php
+define('DOCKET_CACHE_SIZE', 3000000);
+```
+
+**`DOCKET_CACHE_PATH`** 
+
+Set the cache directory.  
+Default:
+```php
+define('DOCKET_CACHE_PATH`', WP_CONTENT_DIR.'/cache/docket-cache');
+```
+
+**`DOCKET_CACHE_FLUSH_DELETE`**
+
+By default Docket Cache only empty the cache file. Set to true to delete the cache file.  
+Default:
+```php
+define('DOCKET_CACHE_FLUSH_DELETE', false);
+```
+
 **`DOCKET_CACHE_GLOBAL_GROUPS`**
 
-Lists of cache groups that share cache with other sites in a Multisite setup.
+Lists of cache groups that share cache with other sites in a Multisite setup.  
 Default:
 ```php
 define('DOCKET_CACHE_GLOBAL_GROUPS',
@@ -119,14 +137,6 @@ define('DOCKET_CACHE_IGNORED_GROUPS',
 );
 ```
 
-**`DOCKET_CACHE_PATH`** 
-
-Set the cache directory.
-Default:
-```php
-define('DOCKET_CACHE_PATH`', WP_CONTENT_DIR.'/cache/docket-cache');
-```
-
 **`DOCKET_CACHE_LOG`**
 
 Set to `true` to enable cache log.  
@@ -137,7 +147,7 @@ define('DOCKET_CACHE_LOG', false);
 
 **`DOCKET_CACHE_LOG_FILE`**
 
-Set the log file.
+Set the log file.  
 Default:
 ```php
 define('DOCKET_CACHE_LOG_FILE`', WP_CONTENT_DIR.'/object-cache.log');
@@ -159,14 +169,6 @@ Default:
 define('DOCKET_CACHE_LOG_SIZE', 10000000);
 ```
 
-**`DOCKET_CACHE_FLUSH_DELETE`**
-
-By default Docket Cache only empty the cache file. Set to true to delete the cache file.  
-Default:
-```php
-define('DOCKET_CACHE_FLUSH_DELETE', false);
-```
-
 **`DOCKET_CACHE_GC`**
 
 The Docket Cache Garbage collector is scheduled to run every 30 minutes to clean empty files that are more than 2 minutes old. Set to false to disable the garbage collector.  
@@ -185,7 +187,7 @@ define('DOCKET_CACHE_ADVCPOST', true);
 
 **`DOCKET_CACHE_MISC_TWEAKS`**
 
-Set to true to enable miscellaneous WordPress performance tweaks.  
+Set to true to enable miscellaneous WordPress performance tweaks.   
 Default:
 ```php
 define('DOCKET_CACHE_MISC_TWEAKS', true);
@@ -197,6 +199,14 @@ Set to true to enable cache preloading.
 Default:
 ```php
 define('DOCKET_CACHE_PRELOAD', false);
+```
+
+**`DOCKET_CACHE_DISABLED`**
+
+Set to `true` to disable the object cache at runtime. No object cache at this time.   
+Default:
+```php
+define('DOCKET_CACHE_DISABLED', false);
 ```
 
 ## WP-CLI Commands
