@@ -9,13 +9,13 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-07-18T18:44:07+00:00\n"
+"POT-Creation-Date: 2020-07-18T19:37:08+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
 
 #. Plugin Name of the plugin
-#: includes/src/Plugin.php:559
+#: includes/src/Plugin.php:567
 msgid "Docket Cache"
 msgstr ""
 
@@ -32,7 +32,7 @@ msgid "https://rutweb.com"
 msgstr ""
 
 #: includes/admin/page.php:41
-#: includes/src/Plugin.php:558
+#: includes/src/Plugin.php:566
 msgid "Docket Object Cache"
 msgstr ""
 
@@ -80,12 +80,12 @@ msgid "Flush Cache"
 msgstr ""
 
 #: includes/admin/page.php:98
-#: includes/src/Plugin.php:771
+#: includes/src/Plugin.php:779
 msgid "Enable Object Cache"
 msgstr ""
 
 #: includes/admin/page.php:104
-#: includes/src/Plugin.php:775
+#: includes/src/Plugin.php:783
 msgid "Disable Object Cache"
 msgstr ""
 
@@ -134,12 +134,12 @@ msgid "An unknown object cache drop-in was found. To use Docket object cache, ru
 msgstr ""
 
 #: includes/src/Command.php:103
-#: includes/src/Plugin.php:720
+#: includes/src/Plugin.php:728
 msgid "Object cache enabled."
 msgstr ""
 
 #: includes/src/Command.php:106
-#: includes/src/Plugin.php:723
+#: includes/src/Plugin.php:731
 msgid "Object cache could not be enabled."
 msgstr ""
 
@@ -153,17 +153,17 @@ msgid "An unknown object cache drop-in was found. To use Docket run: wp docket-c
 msgstr ""
 
 #: includes/src/Command.php:130
-#: includes/src/Plugin.php:726
+#: includes/src/Plugin.php:734
 msgid "Object cache disabled."
 msgstr ""
 
 #: includes/src/Command.php:133
-#: includes/src/Plugin.php:729
+#: includes/src/Plugin.php:737
 msgid "Object cache could not be disabled."
 msgstr ""
 
 #: includes/src/Command.php:150
-#: includes/src/Plugin.php:738
+#: includes/src/Plugin.php:746
 msgid "Updated object cache drop-in and enabled Docket object cache."
 msgstr ""
 
@@ -206,53 +206,53 @@ msgid "No"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:582
+#: includes/src/Plugin.php:590
 msgid "<strong>Docket Cache:</strong> The object-cache.php drop-in is outdated. Please click \"Re-Install\" to update it now.<p style=\"padding:0;\"><a href=\"%s\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:586
+#: includes/src/Plugin.php:594
 msgid "<strong>Docket Cache:</strong> An unknown object-cache.php drop-in was found. Please click \"Install\" to use Docket Cache.<p style=\"margin-bottom:0;\"><a href=\"%s\" class=\"button button-primary\">Install</a></p>"
 msgstr ""
 
-#: includes/src/Plugin.php:591
+#: includes/src/Plugin.php:599
 msgid "The object-cache.php drop-in has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: php version
-#: includes/src/Plugin.php:712
+#: includes/src/Plugin.php:720
 msgid "This plugin requires PHP %s or greater."
 msgstr ""
 
-#: includes/src/Plugin.php:732
+#: includes/src/Plugin.php:740
 msgid "Object cache was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:735
+#: includes/src/Plugin.php:743
 msgid "Object cache could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:741
+#: includes/src/Plugin.php:749
 msgid "Docket object cache drop-in could not be updated."
 msgstr ""
 
-#: includes/src/Plugin.php:744
+#: includes/src/Plugin.php:752
 msgid "Cache log was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:747
+#: includes/src/Plugin.php:755
 msgid "Cache log could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:765
+#: includes/src/Plugin.php:773
 msgid "Settings"
 msgstr ""
 
-#: includes/src/Plugin.php:779
+#: includes/src/Plugin.php:787
 msgid "Install Drop-in"
 msgstr ""
 
-#: includes/src/Plugin.php:1110
+#: includes/src/Plugin.php:1118
 msgid "Docket Cache Garbage Collector Run Every 30 minutes"
 msgstr ""
 

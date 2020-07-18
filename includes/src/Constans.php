@@ -130,6 +130,9 @@ final class Constans
         // banner
         self::maybe_define('DOCKET_CACHE_COMMENT', true);
 
+        // preload
+        self::maybe_define('DOCKET_CACHE_PRELOAD', false);
+
         // page loader
         self::maybe_define('DOCKET_CACHE_PAGELOADER', true);
 

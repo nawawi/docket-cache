@@ -435,6 +435,7 @@ final class Plugin
         $this->flush_cache();
         if ($this->validate_dropin()) {
             $this->dropin_uninstall();
+            $this->flush_log();
         }
     }
 
@@ -498,9 +499,16 @@ final class Plugin
                     return;
                 }
 
-                if ('plugin' === $options['type'] && !empty($options['plugins']) && \is_array($options['plugins']) && isset($options['plugins'][$this->hook])) {
-                    // replace with our dropin
-                    $this->dropin_install(true);
+                if ('plugin' === $options['type'] && !empty($options['plugins'])) {
+                    if (!\is_array($options['plugins'])) {
+                        return;
+                    }
+                    foreach ($options['plugins'] as $plugin) {
+                        if ($plugin === $this->hook) {
+                            $this->dropin_install(true);
+                            break;
+                        }
+                    }
                 }
             },
             PHP_INT_MAX,
