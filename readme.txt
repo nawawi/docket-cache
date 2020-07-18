@@ -64,7 +64,8 @@ This is an improved version based on previous releases.
 - Sorting option by first and last line at cache log page.
 - Prevent fatal error at drop-in file.
 
-* Kindly refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) for details.
-* Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
+
+Kindly refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) for details.
+Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 
