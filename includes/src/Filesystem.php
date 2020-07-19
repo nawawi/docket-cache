@@ -23,7 +23,7 @@ final class Filesystem
 
     public function filesize($file)
     {
-        return file_exists($file) ? @sprintf('%u', @filesize($file)) : 0;
+        return @is_file($file) ? @sprintf('%u', @filesize($file)) : 0;
     }
 
     public function chmod($file)
@@ -248,7 +248,7 @@ final class Filesystem
             return true;
         }
 
-        if (\function_exists('opcache_invalidate') && 'php' === substr($file, -3) && file_exists($file)) {
+        if (\function_exists('opcache_invalidate') && 'php' === substr($file, -3) && @is_file($file)) {
             $done[$file] = $file;
 
             return @opcache_invalidate($file, true);
@@ -265,7 +265,7 @@ final class Filesystem
             return true;
         }
 
-        if (\function_exists('opcache_compile_file') && 'php' === substr($file, -3) && file_exists($file)) {
+        if (\function_exists('opcache_compile_file') && 'php' === substr($file, -3) && @is_file($file)) {
             $done[$file] = $file;
 
             return @opcache_compile_file($file);
@@ -276,7 +276,7 @@ final class Filesystem
 
     public function cache_get($file)
     {
-        if (!file_exists($file) || empty($this->filesize($file))) {
+        if (!@is_file($file) || empty($this->filesize($file))) {
             return false;
         }
 
@@ -303,7 +303,7 @@ final class Filesystem
     public function log($tag, $id, $data, $caller = '')
     {
         $file = DOCKET_CACHE_LOG_FILE;
-        if (file_exists($file)) {
+        if (@is_file($file)) {
             if (DOCKET_CACHE_LOG_FLUSH && 'flush' === strtolower($id) || $this->filesize($file) >= (int) DOCKET_CACHE_LOG_SIZE) {
                 $this->put($file, '', 'cb');
             }

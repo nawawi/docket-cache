@@ -18,7 +18,7 @@ Rather than using [serialize](https://www.php.net/manual/en/function.serialize.p
 
 Kindly refer to the WordPress documentation on [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
 
-== Why this plugin? ==
+== Why use this plugin? ==
 When it comes to reliable persistent Object Cache in WordPress, [Redis](https://redis.io/) or [Memcached](https://memcached.org/) comes on top. However, those solutions are not available to low cost or shared hosting servers.
 
 The only solution is to store the object caches into files. With WordPress, exporting the PHP objects are not easy, most plugin that implements file-based solution will serialize and unserialize the object to store and retrieve the data.
@@ -32,11 +32,11 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 
 == Configuration Options ==
 
-To adjust the configuration, please see the [configuration options](https://github.com/nawawi/docket-cache#configuration-options) for a full list.
+To adjust the configuration, please see the [configuration wiki](https://github.com/nawawi/docket-cache/wiki/Constants) page for details.
 
 == WP-CLI Commands ==
 
-To use the WP-CLI commands, please see the [WP-CLI commands](https://github.com/nawawi/docket-cache#wp-cli-commands) for a full list.
+To use the WP-CLI commands, please see the [WP-CLI wiki](https://github.com/nawawi/docket-cache/wiki/WP-CLI) page for available commands.
 
 == Installation ==
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPCache for best performance.

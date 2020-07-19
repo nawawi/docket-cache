@@ -37,7 +37,7 @@ final class Constans
         // optional config
         self::maybe_define('DOCKET_CACHE_DATA_PATH', WP_CONTENT_DIR.'/docket-cache-data');
 
-        if (file_exists(DOCKET_CACHE_DATA_PATH.'/config.php') && is_readable(DOCKET_CACHE_DATA_PATH.'/config.php')) {
+        if (@is_file(DOCKET_CACHE_DATA_PATH.'/config.php') && is_readable(DOCKET_CACHE_DATA_PATH.'/config.php')) {
             @include_once DOCKET_CACHE_DATA_PATH.'/config.php';
         }
 

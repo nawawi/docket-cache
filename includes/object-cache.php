@@ -66,7 +66,7 @@ if (!\defined('DOCKET_CACHE_HALT')) {
 
     // delay 20 seconds
     $file_delay = WP_CONTENT_DIR.'/object-cache-delay.txt';
-    if (!\defined('DOCKET_CACHE_HALT') && !\defined('DOCKET_CACHE_DELAY') && @file_exists($file_delay)) {
+    if (!\defined('DOCKET_CACHE_HALT') && !\defined('DOCKET_CACHE_DELAY') && @is_file($file_delay)) {
         \define('DOCKET_CACHE_DELAY', true);
         if (time() > @filemtime($file_delay)) {
             @unlink($file_delay);

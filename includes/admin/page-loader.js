@@ -6,11 +6,18 @@
  *
  * @see    https://github.com/nawawi/docket-cache
  */
-(function($) {
-    $( window ).on(
-        'beforeunload',
-        function() {
-            $( 'body' ).addClass( 'docket-cache-page-loading' );
-		}
-    );
-})( jQuery );
+( function( $ ) {
+    $( window )
+        .on(
+            'beforeunload',
+            function() {
+                window.setTimeout(
+                    function() {
+                        $( 'body' )
+                            .addClass( 'docket-cache-page-loading' );
+                    },
+                    750
+                );
+            }
+        );
+} )( jQuery );

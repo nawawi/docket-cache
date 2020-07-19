@@ -184,7 +184,7 @@ final class Plugin
      */
     public function has_dropin()
     {
-        return file_exists(WP_CONTENT_DIR.'/object-cache.php');
+        return @is_file(WP_CONTENT_DIR.'/object-cache.php');
     }
 
     /**
@@ -377,7 +377,7 @@ final class Plugin
     public function dropin_undelay()
     {
         $file_delay = $this->dropin_file()->ext;
-        if (file_exists($file_delay)) {
+        if (@is_file($file_delay)) {
             @unlink($file_delay);
         }
     }
@@ -388,7 +388,7 @@ final class Plugin
     public function dropin_delay_expire()
     {
         $file_delay = $this->dropin_file()->ext;
-        if (file_exists($file_delay) && time() > @filemtime($file_delay)) {
+        if (@is_file($file_delay) && time() > @filemtime($file_delay)) {
             $this->dropin_undelay();
         }
     }
@@ -418,6 +418,11 @@ final class Plugin
     public function dropin_uninstall()
     {
         $dst = $this->dropin_file()->dst;
+
+        if (!@is_file($dst)) {
+            return true;
+        }
+
         if (is_writable($dst)) {
             $this->dropin_undelay();
 

@@ -50,14 +50,14 @@
         "exclude-from-classmap": [
             "/Tests/"
         ],
-       "classmap": [
+        "classmap": [
             "includes/src",
             "includes/vendor/symfony/polyfill-php80/Resources/stubs"
         ],
         "files": [
             "includes/vendor/symfony/polyfill-php80/bootstrap.php"
         ]
-     },
+    },
     "config": {
         "vendor-dir": "includes/vendor",
         "optimize-autoloader": true
