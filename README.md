@@ -60,6 +60,12 @@ Anyone can contribute to Docket Cache. Please do so by posting issues when you'v
 - [Report issues](https://github.com/nawawi/docket-cache/issues)
 - [Send Pull requests](https://github.com/nawawi/docket-cache/pulls)
 
+## Thanks
+
+- Thanks to [GitHub](https://github.com) for hosting the code and a provides a good infrastructure.
+- Thanks to [Symfony Components](https://github.com/symfony) for release and maintaining reusable code.
+- Thanks to [WordPress.org](https://wordpres.org) for beautiful designs, powerful features, and the freedom to build anything we want.
+
 ## License
 
 Docket cache is open-sourced software licensed under the [MIT license](https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt).
