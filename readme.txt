@@ -1,6 +1,6 @@
 === Docket Cache ===
 Contributors: nawawijamili,rutflare
-Tags: object cache, cache, performance, flat-file
+Tags: cache, database, opcache, optimizing, object cache, performance, redis, memcached, keydb, speed
 Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.4.2

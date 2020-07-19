@@ -616,7 +616,7 @@ final class Plugin
             'admin_enqueue_scripts',
             function ($hook) {
                 $plugin_url = plugin_dir_url($this->file);
-                $version = str_replace('.', '', $this->plugin_meta()['Version']);
+                $version = str_replace('.', '', $this->plugin_meta()['Version']).'x'.date('d');
                 if ($hook === $this->screen) {
                     wp_enqueue_style($this->slug, $plugin_url.'includes/admin/style.css', null, $version);
                     wp_enqueue_script($this->slug, $plugin_url.'includes/admin/script.js', ['jquery'], $version, true);
