@@ -49,7 +49,8 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPCache for
 == Screenshots ==
 1. Plugin Overview.
 2. Cache Log.
-3. Setting Instruction.
+3. Configuration Options.
+4. Cache File.
 
 == Upgrade Notice ==
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
