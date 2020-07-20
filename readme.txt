@@ -61,7 +61,6 @@ Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docke
 This is an improved version based on previous releases.
 
 - Cache performance, replace file_exists with is_file.
-- Fixed: Ajax issue with Beaver Builder
 
 = 20.07.19 =
 
