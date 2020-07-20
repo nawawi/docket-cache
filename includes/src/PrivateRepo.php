@@ -66,6 +66,12 @@ final class PrivateRepo
 
         if (!is_wp_error($remote) && isset($remote['response']['code']) && 200 === $remote['response']['code'] && !empty($remote['body'])) {
             $remote = json_decode($remote['body']);
+            if (null === $remote) {
+                delete_transient($this->transient);
+
+                return false;
+            }
+
             $res = (object) [];
 
             $res->name = $remote->name;

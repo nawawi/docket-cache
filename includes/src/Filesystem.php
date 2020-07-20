@@ -23,7 +23,11 @@ final class Filesystem
 
     public function filesize($file)
     {
-        return @is_file($file) ? @sprintf('%u', @filesize($file)) : 0;
+        if (!@is_file($file)) {
+            return 0;
+        }
+
+        return sprintf('%u', @filesize($file));
     }
 
     public function chmod($file)
@@ -34,9 +38,9 @@ final class Filesystem
             return $cache[$file];
         }
 
-        if (is_file($file) && \defined('FS_CHMOD_FILE')) {
+        if (@is_file($file) && \defined('FS_CHMOD_FILE')) {
             $perms = FS_CHMOD_FILE;
-        } elseif (is_dir($file) && \defined('FS_CHMOD_DIR')) {
+        } elseif (@is_dir($file) && \defined('FS_CHMOD_DIR')) {
             $perms = FS_CHMOD_DIR;
         } else {
             $stat = @stat(\dirname($file));
@@ -125,6 +129,11 @@ final class Filesystem
 
     public function unlink($file, $del = false)
     {
+        // skip if not exist
+        if (!@is_file($file)) {
+            return true;
+        }
+
         $ok = false;
 
         $handle = @fopen($file, 'cb');

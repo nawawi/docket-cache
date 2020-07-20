@@ -19,7 +19,7 @@ Rather than using [serialize](https://www.php.net/manual/en/function.serialize.p
 Kindly refer to the WordPress documentation on [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
 
 == Why use this plugin? ==
-When it comes to reliable persistent Object Cache in WordPress, [Redis](https://redis.io/) or [Memcached](https://memcached.org/) comes on top. However, those solutions are not available to low cost or shared hosting servers.
+When it comes to reliable persistent Object Cache in WordPress, [Redis](https://redis.io/) or [Memcached](https://memcached.org/) comes on top. However, those solutions are rarely available at low cost or shared hosting servers.
 
 The only solution is to store the object caches into files. With WordPress, exporting the PHP objects are not easy, most plugin that implements file-based solution will serialize and unserialize the object to store and retrieve the data.
 
@@ -56,6 +56,13 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPCache for
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.07.20 =
+
+This is an improved version based on previous releases.
+
+- Cache performance, replace file_exists with is_file.
+- Fixed: Ajax issue with Beaver Builder
+
 = 20.07.19 =
 
 This is an improved version based on previous releases.
@@ -67,6 +74,7 @@ This is an improved version based on previous releases.
 
 
 Kindly refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) for details.
+
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 
