@@ -19,9 +19,33 @@ final class Constans
         return \defined($name) && \is_array($name) && !empty($name);
     }
 
+    // optional config
+    private static function get_user_config($name)
+    {
+        if (!\defined('DOCKET_CACHE_DATA_PATH')) {
+            \define('DOCKET_CACHE_DATA_PATH', WP_CONTENT_DIR.'/docket-cache-data');
+        }
+
+        $config = [];
+        if (@is_file(DOCKET_CACHE_DATA_PATH.'/constants.php') && is_readable(DOCKET_CACHE_DATA_PATH.'/constants.php')) {
+            $config = @include DOCKET_CACHE_DATA_PATH.'/constants.php';
+        }
+
+        if (!empty($config) && !empty($config[$name])) {
+            return $config[$name];
+        }
+
+        return false;
+    }
+
     public static function maybe_define($name, $value)
     {
         if (!\defined($name)) {
+            $nv = self::get_user_config($name);
+            if (!empty($nv)) {
+                $value = 'enable' === $nv ? true : false;
+            }
+
             return @\define($name, $value);
         }
 
@@ -33,13 +57,6 @@ final class Constans
         // compat
         self::maybe_define('WP_CONTENT_DIR', ABSPATH.'wp-content');
         self::maybe_define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins');
-
-        // optional config
-        self::maybe_define('DOCKET_CACHE_DATA_PATH', WP_CONTENT_DIR.'/docket-cache-data');
-
-        if (@is_file(DOCKET_CACHE_DATA_PATH.'/config.php') && is_readable(DOCKET_CACHE_DATA_PATH.'/config.php')) {
-            @include_once DOCKET_CACHE_DATA_PATH.'/config.php';
-        }
 
         // cache dir
         self::maybe_define('DOCKET_CACHE_PATH', WP_CONTENT_DIR.'/cache/docket-cache/');

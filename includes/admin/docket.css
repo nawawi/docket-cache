@@ -7,6 +7,7 @@
  * @see    https://github.com/nawawi/docket-cache
  */
 #docket-cache .form-table,
+#docket-cache .form-table tbody,
 #docket-cache .form-table td,
 #docket-cache .form-table th,
 #docket-cache .form-table tr {
@@ -70,13 +71,7 @@
     margin-bottom: 0;
     white-space: pre;
     overflow: auto;
-    outline: none;
     background-color: white;
-}
-
-#docket-cache textarea:focus {
-    outline: none;
-    box-shadow: none !important;
 }
 
 #docket-cache .config p {
@@ -89,7 +84,7 @@
 }
 
 #docket-cache .config .form-table th {
-    width: 20%;
+    min-width: 300px;
     padding-top: 12px;
 }
 
@@ -100,9 +95,6 @@
 #docket-cache .config .form-table small {
     display: inline-block;
     margin-top: 10px;
-}
-
-#docket-cache .config .form-table small {
     font-size: 13px;
 }
 
@@ -110,32 +102,40 @@
     font-size: 12px;
 }
 
+#docket-cache .config .form-table th.const {
+    font-weight: normal;
+}
+
+#docket-cache .config .table-scroll {
+    display: block;
+    width: 100%;
+    height: 280px;
+    overflow: auto;
+}
+
+
+#docket-cache .form-table-selection td,
+#docket-cache .form-table-selection th {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    vertical-align: middle !important;
+}
+
+#docket-cache .form-table-selection select {
+    margin-top: 6px;
+    margin-bottom: 6px;
+    min-width: 80px;
+    font-family: Consolas, Monaco, monospace;
+    unicode-bidi: embed;
+    font-size: 12px;
+}
+
 #docket-cache h2.title {
     padding: 0;
     margin-top: 25px;
     text-transform: uppercase;
+    font-weight: normal;
     font-size: 16px;
-}
-
-@media only screen and (min-width: 700px) {
-    #docket-cache .nav-tab {
-        min-width: 100px;
-        text-align: center;
-    }
-}
-
-@media only screen and (max-width: 600px) {
-    #docket-cache .config .form-table th {
-        width: 100%;
-    }
-
-    #docket-cache .form-table th {
-        padding-bottom: 0;
-    }
-
-    #docket-cache .form-table td {
-        padding-top: 0;
-    }
 }
 
 #docket-cache-spinner {
@@ -166,10 +166,47 @@
     border: none !important;
 }
 
+#docket-cache .noborder-b {
+    border-bottom: none !important;
+}
+
 #docket-cache .border {
     border-bottom: 1px solid #ddd !important;
 }
 
 #docket-cache .log p.submit {
     margin-top: 12px;
+}
+
+#docket-cache textarea:focus,
+#docket-cache select:focus,
+#docket-cache a:focus {
+    outline: none;
+    box-shadow: none !important;
+}
+
+#docket-cache .nav-tab {
+    margin-left: 0;
+    margin-right: 4px;
+}
+
+@media only screen and (min-width: 700px) {
+    #docket-cache .nav-tab {
+        min-width: 100px;
+        text-align: center;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    #docket-cache .config .form-table th {
+        width: 100%;
+    }
+
+    #docket-cache .form-table th {
+        padding-bottom: 0;
+    }
+
+    #docket-cache .form-table td {
+        padding-top: 0;
+    }
 }

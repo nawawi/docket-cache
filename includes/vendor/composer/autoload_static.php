@@ -38,6 +38,7 @@ class ComposerStaticInit71169967e8f502f7da209e4236957996
         'Nawawi\\DocketCache\\AdvancedPost' => __DIR__ . '/../../..' . '/includes/src/AdvancedPost.php',
         'Nawawi\\DocketCache\\Command' => __DIR__ . '/../../..' . '/includes/src/Command.php',
         'Nawawi\\DocketCache\\Constans' => __DIR__ . '/../../..' . '/includes/src/Constans.php',
+        'Nawawi\\DocketCache\\Dropin' => __DIR__ . '/../../..' . '/includes/src/Dropin.php',
         'Nawawi\\DocketCache\\Filesystem' => __DIR__ . '/../../..' . '/includes/src/Filesystem.php',
         'Nawawi\\DocketCache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',
         'Nawawi\\DocketCache\\PrivateRepo' => __DIR__ . '/../../..' . '/includes/src/PrivateRepo.php',

@@ -10,13 +10,13 @@
  * Requires at least:   5.4
  * Requires PHP:        7.2.5
  * License:             MIT
- * License URI:         https://opensource.org/licenses/MIT
+ * License URI:         https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
  */
 \defined('ABSPATH') || exit;
 
 /*
  * Check if caching is not disabled.
- * If false, prevent functions and classes from being defined.
+ * If true, prevent functions and classes from being defined.
  * See wp_start_object_cache() -> wp-includes/load.php.
  */
 if (\defined('DOCKET_CACHE_DISABLED') && DOCKET_CACHE_DISABLED) {
@@ -83,7 +83,7 @@ if (!class_exists('Nawawi\\DocketCache\\Plugin') || !class_exists('Nawawi\\Docke
  */
 if (@is_file(WP_CONTENT_DIR.'/object-cache-delay.txt')) {
     if (time() > @filemtime(WP_CONTENT_DIR.'/object-cache-delay.txt')) {
-        @unlink(WP_CONTENT_DIR.'/object-cache-delay.txt');
+        @rename(WP_CONTENT_DIR.'/object-cache-delay.txt', WP_CONTENT_DIR.'/object-cache-after-delay.txt');
     }
 
     return;

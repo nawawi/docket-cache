@@ -15,13 +15,15 @@ namespace Nawawi\DocketCache;
 final class View
 {
     private $plugin;
+    private $info;
+    private $do_preload;
 
-    public function __construct($plugin)
+    public function __construct(Plugin $plugin)
     {
         $this->plugin = $plugin;
     }
 
-    private function config_desc()
+    private function constants_desc()
     {
         return [
              'DOCKET_CACHE_MAXTTL' => [
@@ -64,14 +66,14 @@ final class View
                  /* translators: %s: value of WP_CONTENT_DIR */
                  sprintf(__('Default: %s/object-cache.log', 'docket-cache'), $this->plugin->sanitize_rootpath(WP_CONTENT_DIR)),
              ],
-             /*'DOCKET_CACHE_LOG_FLUSH' => [
+             'DOCKET_CACHE_LOG_FLUSH' => [
                  __('Set to true to empty the log file when the object cache is flushed.', 'docket-cache'),
                  __('Default: true', 'docket-cache'),
              ],
              'DOCKET_CACHE_GC' => [
                  __('The Docket Cache Garbage collector is scheduled to run every 30 minutes to clean empty files that are more than 2 minutes old. Set to false to disable the garbage collector.', 'docket-cache'),
                  __('Default: true', 'docket-cache'),
-             ],*/
+             ],
              'DOCKET_CACHE_ADVCPOST' => [
                  __('Set to true to enable Advanced Post Cache.', 'docket-cache'),
                  __('Default: true', 'docket-cache'),
@@ -80,14 +82,14 @@ final class View
                  __('Set to true to enable miscellaneous WordPress performance tweaks.', 'docket-cache'),
                  __('Default: true', 'docket-cache'),
              ],
-             /* 'DOCKET_CACHE_PRELOAD' => [
+             'DOCKET_CACHE_PRELOAD' => [
                  __('Set to true to enable cache preloading.', 'docket-cache'),
                  __('Default: false', 'docket-cache'),
              ],
              'DOCKET_CACHE_COMMENT' => [
                  __('Set to true to enable the HTML footer comment that promote this plugin.', 'docket-cache'),
                  __('Default: true', 'docket-cache'),
-             ],*/
+             ],
              'DOCKET_CACHE_PAGELOADER' => [
                  __('Set to true to enable a loading bar when the page is loading.', 'docket-cache'),
                  __('Default: true', 'docket-cache'),
@@ -99,25 +101,55 @@ final class View
          ];
     }
 
+    private function parse_query()
+    {
+        $ret = (object) [];
+        $ret->default_order = !empty($_GET['order']) ? $_GET['order'] : 'last';
+        $ret->default_sort = !empty($_GET['sort']) ? $_GET['sort'] : 'desc';
+        $ret->default_line = !empty($_GET['line']) ? $_GET['line'] : 100;
+
+        $ret->default_line = (int) $ret->default_line;
+        $ret->output = $this->read_log($ret->default_line, 'last' === $ret->default_order ? true : false);
+        $ret->output_empty = empty($ret->output);
+        $ret->output_size = !$ret->output_empty ? \count($ret->output) : 0;
+
+        return $ret;
+    }
+
+    private function page($index)
+    {
+        $this->info = (object) $this->plugin->get_info();
+        $file = $this->plugin->path.'/includes/admin/'.$index.'.php';
+        if (@is_file($file)) {
+            include_once $file;
+        }
+    }
+
     public function index()
     {
-        include_once $this->plugin->path.'/includes/admin/page.php';
-        $this->plugin->dropin_undelay();
+        $this->do_preload = false;
+        $this->page('wrap');
+        $this->plugin->dropin->undelay();
+    }
+
+    private function tab_content()
+    {
+        $this->page($this->is_index());
     }
 
     private function tab_query($index)
     {
-        return network_admin_url(add_query_arg('index', $index, $this->plugin->page));
+        return network_admin_url(add_query_arg('idx', $index, $this->plugin->page));
     }
 
-    private function tab_index()
+    private function is_index()
     {
-        return !empty($_GET['index']) ? sanitize_text_field($_GET['index']) : 'default';
+        return !empty($_GET['idx']) ? sanitize_text_field($_GET['idx']) : 'overview';
     }
 
     private function tab_current($index)
     {
-        return $index === $this->tab_index();
+        return $index === $this->is_index();
     }
 
     private function tab_active($index)
@@ -132,10 +164,49 @@ final class View
     private function tab_nav()
     {
         $html = '<nav class="nav-tab-wrapper">';
-        $html .= '<a href="'.$this->tab_query('default').'" class="nav-tab'.$this->tab_active('default').'">'.__('Overview', 'docket-cache').'</a>';
+        $html .= '<a href="'.$this->tab_query('overview').'" class="nav-tab'.$this->tab_active('overview').'">'.__('Overview', 'docket-cache').'</a>';
         $html .= '<a href="'.$this->tab_query('log').'" class="nav-tab'.$this->tab_active('log').'">'.__('Cache Log', 'docket-cache').'</a>';
-        $html .= '<a href="'.$this->tab_query('config').'" class="nav-tab'.$this->tab_active('config').'">'.__('Config', 'docket-cache').'</a>';
+        $html .= '<a href="'.$this->tab_query('config').'" class="nav-tab'.$this->tab_active('config').'">'.__('Configure', 'docket-cache').'</a>';
         $html .= '</nav>';
         echo $html;
+    }
+
+    /**
+     * read_log.
+     */
+    private function read_log($limit = 100, $do_last = true)
+    {
+        $limit = (int) $limit;
+        $output = [];
+        if ($this->plugin->has_log()) {
+            foreach ($this->plugin->tail(DOCKET_CACHE_LOG_FILE, $limit, $do_last) as $line) {
+                $line = trim($line);
+                if (empty($line)) {
+                    continue;
+                }
+                $output[] = $line;
+            }
+        }
+
+        return $output;
+    }
+
+    private function config_select_bool($name, $default)
+    {
+        $default = $default ? 'enable' : 'disable';
+        $html = '<select id="'.$name.'" class="config-select">';
+        foreach ([
+            'default' => __('Default', 'docket-cache'),
+            'enable' => __('Enable', 'docket-cache'),
+            'disable' => __('Disable', 'docket-cache'),
+        ] as $n => $v) {
+            $action = $n.'-'.$name;
+            $url = $this->plugin->action_query($action, ['idx' => 'config']);
+            $selected = $n === $default ? ' selected' : '';
+            $html .= '<option value="'.$n.'" data-action-link="'.$url.'"'.$selected.'>'.$v.'</option>';
+        }
+        $html .= '</select>';
+
+        return $html;
     }
 }

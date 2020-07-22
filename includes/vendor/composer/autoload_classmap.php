@@ -9,6 +9,7 @@ return array(
     'Nawawi\\DocketCache\\AdvancedPost' => $baseDir . '/includes/src/AdvancedPost.php',
     'Nawawi\\DocketCache\\Command' => $baseDir . '/includes/src/Command.php',
     'Nawawi\\DocketCache\\Constans' => $baseDir . '/includes/src/Constans.php',
+    'Nawawi\\DocketCache\\Dropin' => $baseDir . '/includes/src/Dropin.php',
     'Nawawi\\DocketCache\\Filesystem' => $baseDir . '/includes/src/Filesystem.php',
     'Nawawi\\DocketCache\\Plugin' => $baseDir . '/includes/src/Plugin.php',
     'Nawawi\\DocketCache\\PrivateRepo' => $baseDir . '/includes/src/PrivateRepo.php',

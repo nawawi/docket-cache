@@ -14,7 +14,7 @@ namespace Nawawi\DocketCache;
 
 use Nawawi\DocketCache\Exporter\VarExporter;
 
-final class Filesystem
+class Filesystem
 {
     public function is_docketcachedir($dir)
     {
@@ -211,6 +211,8 @@ final class Filesystem
         // alias
         $data = str_replace('\Nawawi\Symfony\Component\VarExporter\Internal\\', '\Nawawi\DocketCache\Exporter\\', $data);
 
+        $this->opcache_flush($file);
+
         $ok = $this->put($tmpfile, $data);
         if (true === $ok) {
             if (@rename($tmpfile, $file)) {
@@ -225,28 +227,6 @@ final class Filesystem
 
         // maybe -1, true, false
         return $ok;
-    }
-
-    public function cachedir_flush($dir)
-    {
-        clearstatcache();
-        $cnt = 0;
-        $dir = realpath($dir);
-        if (false !== $dir && is_dir($dir) && is_writable($dir) && $this->is_docketcachedir($dir)) {
-            foreach ($this->scanfiles($dir) as $object) {
-                $this->unlink($object->getPathName(), false);
-                ++$cnt;
-            }
-            $this->unlink($dir.'/index.php', true);
-        }
-
-        if ($cnt > 0) {
-            if (DOCKET_CACHE_WPCLI) {
-                do_action('docket_preload');
-            }
-        }
-
-        return $cnt;
     }
 
     public function opcache_flush($file)
@@ -283,6 +263,43 @@ final class Filesystem
         return false;
     }
 
+    public function cachedir_flush($dir)
+    {
+        clearstatcache();
+        $cnt = 0;
+        $dir = realpath($dir);
+        if (false !== $dir && is_dir($dir) && is_writable($dir) && $this->is_docketcachedir($dir)) {
+            foreach ($this->scanfiles($dir) as $object) {
+                $this->unlink($object->getPathName(), false);
+                ++$cnt;
+            }
+            $this->unlink($dir.'/index.php', true);
+        }
+
+        if ($cnt > 0) {
+            if (DOCKET_CACHE_WPCLI) {
+                do_action('docket_preload');
+            }
+        }
+
+        return $cnt;
+    }
+
+    /**
+     * cache_size.
+     */
+    public function cache_size($dir)
+    {
+        $bytestotal = 0;
+        if ($this->is_docketcachedir($dir)) {
+            foreach ($this->scanfiles($dir) as $object) {
+                $bytestotal += $object->getSize();
+            }
+        }
+
+        return $bytestotal;
+    }
+
     public function cache_get($file)
     {
         if (!@is_file($file) || empty($this->filesize($file))) {
@@ -309,6 +326,44 @@ final class Filesystem
         return $data;
     }
 
+    public function config_key()
+    {
+        return ['log', 'preload', 'advcpost', 'misc_tweaks', 'pageloader'];
+    }
+
+    public function config_save($name, $value)
+    {
+        if (!@wp_mkdir_p(DOCKET_CACHE_DATA_PATH)) {
+            return false;
+        }
+
+        $config = [];
+        $file = DOCKET_CACHE_DATA_PATH.'/constants.php';
+        if (@is_file($file)) {
+            $config = @include $file;
+        }
+
+        if (\in_array($name, $this->config_key())) {
+            $nx = 'DOCKET_CACHE_'.strtoupper($name);
+
+            if ('default' === $value) {
+                unset($config[$nx]);
+            } else {
+                $config[$nx] = $value;
+            }
+        }
+
+        if (empty($config)) {
+            return false;
+        }
+
+        $code = '<?php ';
+        $code .= "defined('ABSPATH') || exit;".PHP_EOL;
+        $code .= 'return '.$this->export_var($config).';';
+
+        return $this->dump($file, $code);
+    }
+
     public function log($tag, $id, $data, $caller = '')
     {
         $file = DOCKET_CACHE_LOG_FILE;
@@ -318,8 +373,8 @@ final class Filesystem
             }
         }
 
-        if (false !== strpos($caller, '?page=docket-cache&index=log&order=')) {
-            $caller = @preg_replace('@index=log\&order=.*@', 'index=log', $caller);
+        if (false !== strpos($caller, '?page=docket-cache')) {
+            return false;
         }
 
         $meta = [];

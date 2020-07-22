@@ -6,19 +6,6 @@
  *
  * @see    https://github.com/nawawi/docket-cache
  */
-function docket_cache_preload( config ) {
-    console.log( config.slug + ': ping preload' );
-    jQuery.post(
-        config.ajaxurl, {
-            "action": "docket_preload",
-            "token": config.token,
-        },
-        function( response ) {
-            console.log( response.data + ' -> ' + response.success );
-        }
-    );
-};
-
 ( function( $ ) {
     $( document )
         .ready(
@@ -42,9 +29,13 @@ function docket_cache_preload( config ) {
                                 .children( 'option:selected' )
                                 .val();
 
+                            var dt = Math.floor( Date.now() / 1000 );
                             url = url.replace( /\&order=.*/, '' );
-                            url = url + '&order=' + order + '&sort=' + sort + '&line=' + line;
-                            window.location.assign( url );
+                            if ( order ) {
+                                url = url + '&order=' + order + '&sort=' + sort + '&line=' + line;
+                            }
+                            url = url + '&dt=' + dt;
+                            window.location.replace( url );
                             return false;
                         }
                     );
@@ -111,6 +102,19 @@ function docket_cache_preload( config ) {
                         'change',
                         function() {
                             spinner();
+                        }
+                    );
+
+                $selector.find( '.config' )
+                    .find( 'select.config-select' )
+                    .on(
+                        'change',
+                        function() {
+                            var $self = $( this );
+                            var link = $self.children( 'option:selected' )
+                                .attr( 'data-action-link' );
+                            window.location.replace( link );
+                            return false;
                         }
                     );
 
