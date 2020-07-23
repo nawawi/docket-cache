@@ -38,13 +38,13 @@ You can manage this plugin through command line when activated.
 To use the WP-CLI commands, please see the [WP-CLI wiki](https://github.com/nawawi/docket-cache/wiki/WP-CLI) page for available commands.
 
 ## Screenshots
-![Overview](./.wordpress.org/screenshot-1.png)
+![Overview](./.wordpress.org/screenshot-1.png) Plugin Overview.
 
-![Cache Log](./.wordpress.org/screenshot-2.png)
+![Cache Log](./.wordpress.org/screenshot-2.png) Cache Log.
 
-![Configuration Options](./.wordpress.org/screenshot-3.png)
+![Configuration Options](./.wordpress.org/screenshot-3.png) Configuration Options.
 
-![Cache File](./.wordpress.org/screenshot-4.png)
+![Cache File](./.wordpress.org/screenshot-4.png) Cache File.
 
 ## How Versions Work
 
