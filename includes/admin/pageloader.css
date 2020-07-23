@@ -1,0 +1,31 @@
+/**
+ * Docket Cache.
+ *
+ * @author  Nawawi Jamili
+ * @license MIT
+ *
+ * @see    https://github.com/nawawi/docket-cache
+ */
+@keyframes docket-cache-page-load {
+    from {
+        background-color: #ffc422;
+    }
+
+    to {
+        background-color: #c0392b;
+    }
+}
+
+.docket-cache-page-loading::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    z-index: 99999999;
+    height: 2px;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background-color: #06D;
+    animation: docket-cache-page-load infinite ease-out 2s;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, .2);
+}
