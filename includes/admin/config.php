@@ -16,7 +16,7 @@ namespace Nawawi\DocketCache;
     <h2 class="title"><?php _e('Configuration', 'docket-cache'); ?></h2>
 
     <h3><?php _e('Options', 'docket-cache'); ?></h3>
-    <p><?php _e('The basic option allows you to quickly change the default behavior. This option overwrites by constants if defined.', 'docket-cache'); ?></p>
+    <p><?php _e('This option allows you to quickly change basic configuration, overwrites by constants if defined.', 'docket-cache'); ?></p>
     <table class="form-table noborder-b form-table-selection">
         <tr>
             <th><?php _e('Cache Log', 'docket-cache'); ?></th>

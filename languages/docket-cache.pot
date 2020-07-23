@@ -9,12 +9,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-07-22T21:37:05+00:00\n"
+"POT-Creation-Date: 2020-07-23T01:22:14+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
 
 #. Plugin Name of the plugin
+#: includes/admin/wrap.php:39
+#: includes/src/Plugin.php:444
 #: includes/src/Plugin.php:445
 msgid "Docket Cache"
 msgstr ""
@@ -40,7 +42,7 @@ msgid "Options"
 msgstr ""
 
 #: includes/admin/config.php:19
-msgid "The basic option allows you to quickly change the default behavior. This option overwrites by constants if defined."
+msgid "This option allows you to quickly change basic configuration, overwrites by constants if defined."
 msgstr ""
 
 #: includes/admin/config.php:22
@@ -145,18 +147,13 @@ msgid "Flush Cache"
 msgstr ""
 
 #: includes/admin/overview.php:69
-#: includes/src/Plugin.php:677
+#: includes/src/Plugin.php:678
 msgid "Enable Object Cache"
 msgstr ""
 
 #: includes/admin/overview.php:78
-#: includes/src/Plugin.php:681
+#: includes/src/Plugin.php:682
 msgid "Disable Object Cache"
-msgstr ""
-
-#: includes/admin/wrap.php:39
-#: includes/src/Plugin.php:444
-msgid "Docket Object Cache"
 msgstr ""
 
 #: includes/src/Command.php:95
@@ -168,12 +165,12 @@ msgid "An unknown object cache drop-in was found. To use Docket object cache, ru
 msgstr ""
 
 #: includes/src/Command.php:103
-#: includes/src/Plugin.php:612
+#: includes/src/Plugin.php:611
 msgid "Object cache enabled."
 msgstr ""
 
 #: includes/src/Command.php:106
-#: includes/src/Plugin.php:615
+#: includes/src/Plugin.php:614
 msgid "Object cache could not be enabled."
 msgstr ""
 
@@ -187,17 +184,17 @@ msgid "An unknown object cache drop-in was found. To use Docket run: wp docket-c
 msgstr ""
 
 #: includes/src/Command.php:130
-#: includes/src/Plugin.php:618
+#: includes/src/Plugin.php:617
 msgid "Object cache disabled."
 msgstr ""
 
 #: includes/src/Command.php:133
-#: includes/src/Plugin.php:621
+#: includes/src/Plugin.php:620
 msgid "Object cache could not be disabled."
 msgstr ""
 
 #: includes/src/Command.php:150
-#: includes/src/Plugin.php:630
+#: includes/src/Plugin.php:629
 msgid "Updated object cache drop-in and enabled Docket object cache."
 msgstr ""
 
@@ -213,30 +210,29 @@ msgstr ""
 msgid "Preloading will happen shortly."
 msgstr ""
 
-#: includes/src/Plugin.php:139
+#: includes/src/Plugin.php:136
 msgid "Disabled"
 msgstr ""
 
-#: includes/src/Plugin.php:140
-#: includes/src/View.php:200
-msgid "Enable"
+#: includes/src/Plugin.php:137
+msgid "Enabled"
 msgstr ""
 
-#: includes/src/Plugin.php:141
+#: includes/src/Plugin.php:138
 msgid "Not Available"
 msgstr ""
 
-#: includes/src/Plugin.php:142
+#: includes/src/Plugin.php:139
 msgid "Unknown"
 msgstr ""
 
-#: includes/src/Plugin.php:154
-#: includes/src/Plugin.php:155
+#: includes/src/Plugin.php:151
+#: includes/src/Plugin.php:152
 msgid "Yes"
 msgstr ""
 
-#: includes/src/Plugin.php:154
-#: includes/src/Plugin.php:155
+#: includes/src/Plugin.php:151
+#: includes/src/Plugin.php:152
 msgid "No"
 msgstr ""
 
@@ -255,55 +251,55 @@ msgid "The object-cache.php drop-in has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: php version
-#: includes/src/Plugin.php:604
+#: includes/src/Plugin.php:603
 msgid "This plugin requires PHP %s or greater."
 msgstr ""
 
-#: includes/src/Plugin.php:624
+#: includes/src/Plugin.php:623
 msgid "Object cache was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:627
+#: includes/src/Plugin.php:626
 msgid "Object cache could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:633
+#: includes/src/Plugin.php:632
 msgid "Docket object cache drop-in could not be updated."
 msgstr ""
 
-#: includes/src/Plugin.php:636
+#: includes/src/Plugin.php:635
 msgid "Cache log was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:639
+#: includes/src/Plugin.php:638
 msgid "Cache log could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:642
+#: includes/src/Plugin.php:641
 msgid "Option enabled."
 msgstr ""
 
-#: includes/src/Plugin.php:645
+#: includes/src/Plugin.php:644
 msgid "Option disabled."
 msgstr ""
 
-#: includes/src/Plugin.php:648
+#: includes/src/Plugin.php:647
 msgid "Option resets to default."
 msgstr ""
 
-#: includes/src/Plugin.php:651
+#: includes/src/Plugin.php:650
 msgid "Failed to change options."
 msgstr ""
 
-#: includes/src/Plugin.php:671
+#: includes/src/Plugin.php:672
 msgid "Settings"
 msgstr ""
 
-#: includes/src/Plugin.php:685
+#: includes/src/Plugin.php:686
 msgid "Install Drop-in"
 msgstr ""
 
-#: includes/src/Plugin.php:1016
+#: includes/src/Plugin.php:1017
 msgid "Docket Cache Garbage Collector Run Every 30 minutes"
 msgstr ""
 
@@ -425,6 +421,10 @@ msgstr ""
 
 #: includes/src/View.php:199
 msgid "Default"
+msgstr ""
+
+#: includes/src/View.php:200
+msgid "Enable"
 msgstr ""
 
 #: includes/src/View.php:201

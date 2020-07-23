@@ -36,7 +36,7 @@ if (is_multisite() && is_network_admin()) {
 }
 ?>
 <div class="wrap" id="docket-cache">
-    <h1 class="title"><?php _e('Docket Object Cache', 'docket-cache'); ?><span id="docket-cache-spinner" class="spinner is-active"></span></h1>
+    <h1 class="title"><?php _e('Docket Cache', 'docket-cache'); ?><span id="docket-cache-spinner" class="spinner is-active"></span></h1>
     <?php $this->tab_nav(); ?>
 
     <div class="tab-content">

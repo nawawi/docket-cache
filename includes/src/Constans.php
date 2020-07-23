@@ -148,7 +148,7 @@ final class Constans
         self::maybe_define('DOCKET_CACHE_COMMENT', true);
 
         // preload
-        self::maybe_define('DOCKET_CACHE_PRELOAD', false);
+        self::maybe_define('DOCKET_CACHE_PRELOAD', true);
 
         // page loader
         self::maybe_define('DOCKET_CACHE_PAGELOADER', true);

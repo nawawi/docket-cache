@@ -93,9 +93,6 @@ final class Plugin extends Filesystem
         $this->file = DOCKET_CACHE_FILE;
         $this->hook = plugin_basename($this->file);
         $this->path = realpath(plugin_dir_path($this->file));
-        $this->page = (is_multisite() ? 'settings.php?page=' : 'options-general.php?page=').$this->slug;
-
-        $this->screen = 'settings_page_docket-cache';
     }
 
     /**
@@ -137,7 +134,7 @@ final class Plugin extends Filesystem
     {
         $status_code = [
              0 => __('Disabled', 'docket-cache'),
-             1 => __('Enable', 'docket-cache'),
+             1 => __('Enabled', 'docket-cache'),
              2 => __('Not Available', 'docket-cache'),
              3 => __('Unknown', 'docket-cache'),
          ];
@@ -313,6 +310,9 @@ final class Plugin extends Filesystem
 
     private function register_init()
     {
+        $this->page = (is_multisite() ? 'settings.php?page=' : 'options-general.php?page=').$this->slug;
+        $this->screen = 'settings_page_docket-cache';
+
         Constans::init();
 
         $this->cache_path = is_dir(DOCKET_CACHE_PATH) && '/' !== DOCKET_CACHE_PATH ? rtrim(DOCKET_CACHE_PATH, '/\\').'/' : WP_CONTENT_DIR.'/cache/docket-cache/';
@@ -441,7 +441,7 @@ final class Plugin extends Filesystem
 
                 add_submenu_page(
                     $page_link,
-                    __('Docket Object Cache', 'docket-cache'),
+                    __('Docket Cache', 'docket-cache'),
                     __('Docket Cache', 'docket-cache'),
                     $page_cap,
                     $this->slug,
@@ -490,9 +490,9 @@ final class Plugin extends Filesystem
             function ($hook) {
                 $plugin_url = plugin_dir_url($this->file);
                 $version = str_replace('.', '', $this->plugin_meta()['Version']).'x'.date('d');
-                wp_enqueue_script($this->slug, $plugin_url.'includes/admin/worker.js', ['jquery'], $version, true);
+                wp_enqueue_script($this->slug.'-worker', $plugin_url.'includes/admin/worker.js', ['jquery'], $version, false);
                 wp_localize_script(
-                    $this->slug,
+                    $this->slug.'-worker',
                     'docket_cache_config',
                     [
                         'ajaxurl' => admin_url('admin-ajax.php'),
@@ -501,15 +501,14 @@ final class Plugin extends Filesystem
                         'log' => DOCKET_CACHE_LOG,
                     ]
                 );
-
                 if ($hook === $this->screen) {
-                    wp_enqueue_style($this->slug, $plugin_url.'includes/admin/docket.css', null, $version);
-                    wp_enqueue_script($this->slug, $plugin_url.'includes/admin/docket.js', ['jquery'], $version, true);
+                    wp_enqueue_style($this->slug.'-core', $plugin_url.'includes/admin/docket.css', null, $version);
+                    wp_enqueue_script($this->slug.'-core', $plugin_url.'includes/admin/docket.js', ['jquery'], $version, true);
                 }
 
                 if (DOCKET_CACHE_PAGELOADER) {
-                    wp_enqueue_style($this->slug.'-loader', $plugin_url.'includes/admin/page-loader.css', null, $version);
-                    wp_enqueue_script($this->slug.'-loader', $plugin_url.'includes/admin/page-loader.js', ['jquery'], $version, true);
+                    wp_enqueue_style($this->slug.'-loader', $plugin_url.'includes/admin/pageloader.css', null, $version);
+                    wp_enqueue_script($this->slug.'-loader', $plugin_url.'includes/admin/pageloader.js', ['jquery'], $version, true);
                 }
             }
         );
@@ -653,7 +652,9 @@ final class Plugin extends Filesystem
                     }
 
                     if (isset($message) || isset($error)) {
-                        add_settings_error(is_multisite() ? 'general' : '', $this->slug, isset($message) ? $message : $error, isset($message) ? 'updated' : 'error');
+                        $msg = isset($message) ? $message : $error;
+                        $type = isset($message) ? 'updated' : 'error';
+                        add_settings_error(is_multisite() ? 'general' : '', $this->slug, $msg, $type);
                     }
                 }
             }
@@ -695,7 +696,7 @@ final class Plugin extends Filesystem
         add_action(
             'docket_preload',
             function () {
-                if (!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD) {
+                if (!DOCKET_CACHE_PRELOAD) {
                     return;
                 }
 
