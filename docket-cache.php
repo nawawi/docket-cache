@@ -15,7 +15,7 @@
  * Description:         A file-based persistent WordPress Object Cache stored as a plain PHP code.
  * GitHub Plugin URI:   https://github.com/nawawi/docket-cache
  * Author:              Nawawi Jamili
- * Author URI:          https://rutweb.com
+ * Author URI:          https://profiles.wordpress.org/nawawijamili
  * Requires at least:   5.4
  * Requires PHP:        7.2.5
  * Network:             true

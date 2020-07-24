@@ -6,7 +6,7 @@
  * Version:             20.07.24
  * Description:         A file-based persistent WordPress Object Cache stored as a plain PHP code.
  * Author:              Nawawi Jamili
- * Author URI:          https://rutweb.com
+ * Author URI:          https://profiles.wordpress.org/nawawijamili
  * Requires at least:   5.4
  * Requires PHP:        7.2.5
  * License:             MIT
