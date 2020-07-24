@@ -1020,6 +1020,7 @@ class WP_Object_Cache
             return false;
         }
 
+        @$this->filesystem->placeholder($this->cache_path);
         @$this->filesystem->put($this->cache_path.'index.php', $this->code_stub(time()));
 
         $file = $this->get_file_path($key, $group);

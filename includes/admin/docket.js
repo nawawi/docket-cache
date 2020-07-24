@@ -30,11 +30,11 @@
                                 .val();
 
                             var dt = Math.floor( Date.now() / 1000 );
-                            url = url.replace( /\&order=.*/, '' );
+                            url = url.replace( /\&sorting=.*/, '' );
                             if ( order ) {
-                                url = url + '&order=' + order + '&sort=' + sort + '&line=' + line;
+                                url = url + '&srt=' + order + '-' + sort + '-' + line;
                             }
-                            url = url + '&dt=' + dt;
+                            url = url + '&t=' + dt;
                             window.location.replace( url );
                             return false;
                         }

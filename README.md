@@ -67,6 +67,7 @@ Anyone can contribute to Docket Cache. Please do so by posting issues when you'v
 - Thanks to [GitHub](https://github.com) for hosting the code and a provides a good infrastructure.
 - Thanks to [Symfony Components](https://github.com/symfony) for release and maintaining reusable code.
 - Thanks to [WordPress.org](https://wordpres.org) for beautiful designs, powerful features, and the freedom to build anything we want.
+- Thank you to all who have contributed to this plugin.
 
 ## License
 

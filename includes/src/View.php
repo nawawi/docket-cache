@@ -92,7 +92,7 @@ final class View
              ],
              'DOCKET_CACHE_PAGELOADER' => [
                  __('Set to true to enable a loading bar when the page is loading.', 'docket-cache'),
-                 __('Default: true', 'docket-cache'),
+                 __('Default: false', 'docket-cache'),
              ],
              'DOCKET_CACHE_DISABLED' => [
                  __('Set to true to bypass caching object at runtime. No object cache at this time.', 'docket-cache'),
@@ -104,11 +104,19 @@ final class View
     private function parse_query()
     {
         $ret = (object) [];
-        $ret->default_order = !empty($_GET['order']) ? $_GET['order'] : 'last';
-        $ret->default_sort = !empty($_GET['sort']) ? $_GET['sort'] : 'desc';
-        $ret->default_line = !empty($_GET['line']) ? $_GET['line'] : 100;
+        $ret->default_order = 'last';
+        $ret->default_sort = 'desc';
+        $ret->default_line = 100;
 
-        $ret->default_line = (int) $ret->default_line;
+        if (!empty($_GET['srt'])) {
+            $srt = explode('-', $_GET['srt']);
+            if (3 >= \count($srt)) {
+                $ret->default_order = $srt[0];
+                $ret->default_sort = $srt[1];
+                $ret->default_line = (int) $srt[2];
+            }
+        }
+
         $ret->output = $this->read_log($ret->default_line, 'last' === $ret->default_order ? true : false);
         $ret->output_empty = empty($ret->output);
         $ret->output_size = !$ret->output_empty ? \count($ret->output) : 0;

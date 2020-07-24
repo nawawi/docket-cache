@@ -34,6 +34,10 @@ if (1 === $this->info->status_code && isset($this->plugin->token)) {
 if (is_multisite() && is_network_admin()) {
     settings_errors('general');
 }
+
+if ($this->do_preload) {
+    echo $this->plugin->code_preload();
+}
 ?>
 <div class="wrap" id="docket-cache">
     <h1 class="title"><?php _e('Docket Cache', 'docket-cache'); ?><span id="docket-cache-spinner" class="spinner is-active"></span></h1>
@@ -46,8 +50,3 @@ if (is_multisite() && is_network_admin()) {
     </div>
 </div>
 <div id="docket-cache-overlay"></div>
-
-<?php
-if ($this->do_preload) {
-            echo $this->plugin->code_preload();
-        }

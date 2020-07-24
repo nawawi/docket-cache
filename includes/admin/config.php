@@ -15,8 +15,8 @@ namespace Nawawi\DocketCache;
 <div class="section config">
     <h2 class="title"><?php _e('Configuration', 'docket-cache'); ?></h2>
 
-    <h3><?php _e('Options', 'docket-cache'); ?></h3>
-    <p><?php _e('This option allows you to quickly change basic configuration, overwrites by constants if defined.', 'docket-cache'); ?></p>
+    <h3 class="title"><?php _e('Options', 'docket-cache'); ?></h3>
+    <p class="desc"><?php _e('This option allows you to quickly change basic configuration, overwrites by constants if defined.', 'docket-cache'); ?></p>
     <table class="form-table noborder-b form-table-selection">
         <tr>
             <th><?php _e('Cache Log', 'docket-cache'); ?></th>
@@ -51,8 +51,8 @@ namespace Nawawi\DocketCache;
     </table>
 
     <br class="break">
-    <h3><?php _e('Constants', 'docket-cache'); ?></h3>
-    <p>
+    <h3 class="title"><?php _e('Constants', 'docket-cache'); ?></h3>
+    <p class="desc">
         <?php
             /* translators: %s: link to wp-config.php  */
             printf(__('The following PHP constants can be defined in your %s file, in order to change the default behavior.', 'docket-cache'), '<a href="https://wordpress.org/support/article/editing-wp-config-php/" rel="noopener" target="_blank">wp-config.php</a>');

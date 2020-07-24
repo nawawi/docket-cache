@@ -57,7 +57,9 @@ class Filesystem
 
     public function copy($src, $dst)
     {
+        $this->opcache_flush($src);
         $this->opcache_flush($dst);
+
         if (@copy($src, $dst)) {
             $this->chmod($dst);
 
@@ -209,7 +211,11 @@ class Filesystem
         );
 
         // alias
-        $data = str_replace('\Nawawi\Symfony\Component\VarExporter\Internal\\', '\Nawawi\DocketCache\Exporter\\', $data);
+        $data = str_replace(
+            '\Nawawi\Symfony\Component\VarExporter\Internal\\',
+            '\Nawawi\DocketCache\Exporter\\',
+            $data
+        );
 
         $this->opcache_flush($file);
 
@@ -229,6 +235,16 @@ class Filesystem
         return $ok;
     }
 
+    public function placeholder($path)
+    {
+        if (!@is_dir($path)) {
+            return false;
+        }
+
+        $file = $path.'/index.html';
+        $this->put($file, '<!-- placeholder -->');
+    }
+
     public function opcache_flush($file)
     {
         static $done = [];
@@ -237,7 +253,7 @@ class Filesystem
             return true;
         }
 
-        if (\function_exists('opcache_invalidate') && 'php' === substr($file, -3) && @is_file($file)) {
+        if (\function_exists('opcache_invalidate') && '.php' === substr($file, -4) && @is_file($file)) {
             $done[$file] = $file;
 
             return @opcache_invalidate($file, true);
@@ -254,7 +270,7 @@ class Filesystem
             return true;
         }
 
-        if (\function_exists('opcache_compile_file') && 'php' === substr($file, -3) && @is_file($file)) {
+        if (\function_exists('opcache_compile_file') && '.php' === substr($file, -4) && @is_file($file)) {
             $done[$file] = $file;
 
             return @opcache_compile_file($file);
@@ -263,20 +279,24 @@ class Filesystem
         return false;
     }
 
-    public function cachedir_flush($dir)
+    public function cachedir_flush($dir, $cleanup = false)
     {
         clearstatcache();
         $cnt = 0;
         $dir = realpath($dir);
         if (false !== $dir && is_dir($dir) && is_writable($dir) && $this->is_docketcachedir($dir)) {
             foreach ($this->scanfiles($dir) as $object) {
-                $this->unlink($object->getPathName(), false);
+                $this->unlink($object->getPathName(), $cleanup ? true : false);
                 ++$cnt;
             }
             $this->unlink($dir.'/index.php', true);
+
+            if ($cleanup) {
+                $this->unlink($dir.'/index.html', true);
+            }
         }
 
-        if ($cnt > 0) {
+        if (!$cleanup && $cnt > 0) {
             if (DOCKET_CACHE_WPCLI) {
                 do_action('docket_preload');
             }
@@ -326,44 +346,6 @@ class Filesystem
         return $data;
     }
 
-    public function config_key()
-    {
-        return ['log', 'preload', 'advcpost', 'misc_tweaks', 'pageloader'];
-    }
-
-    public function config_save($name, $value)
-    {
-        if (!@wp_mkdir_p(DOCKET_CACHE_DATA_PATH)) {
-            return false;
-        }
-
-        $config = [];
-        $file = DOCKET_CACHE_DATA_PATH.'/constants.php';
-        if (@is_file($file)) {
-            $config = @include $file;
-        }
-
-        if (\in_array($name, $this->config_key())) {
-            $nx = 'DOCKET_CACHE_'.strtoupper($name);
-
-            if ('default' === $value) {
-                unset($config[$nx]);
-            } else {
-                $config[$nx] = $value;
-            }
-        }
-
-        if (empty($config)) {
-            return false;
-        }
-
-        $code = '<?php ';
-        $code .= "defined('ABSPATH') || exit;".PHP_EOL;
-        $code .= 'return '.$this->export_var($config).';';
-
-        return $this->dump($file, $code);
-    }
-
     public function log($tag, $id, $data, $caller = '')
     {
         $file = DOCKET_CACHE_LOG_FILE;
@@ -374,7 +356,7 @@ class Filesystem
         }
 
         if (false !== strpos($caller, '?page=docket-cache')) {
-            return false;
+            $caller = @preg_replace('@\?page=docket-cache.*@', '?page=docket-cache', $caller);
         }
 
         $meta = [];

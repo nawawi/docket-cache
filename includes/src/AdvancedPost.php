@@ -21,34 +21,44 @@ class AdvancedPost
 {
     public $prefix;
     public $group_prefix;
-    public $do_flush_cache = true;
+    public $do_flush_cache;
+    public $need_to_flush_cache;
+    public $cache_incr;
+    public $cache_group;
+    public $cache_key;
+    public $all_post_ids;
+    public $cached_post_ids;
+    public $cached_posts;
+    public $found_posts;
+    public $cache_func;
 
-    public $need_to_flush_cache = true;
-
-    /* Per cache-clear data */
-    public $cache_incr = 0;
-    public $cache_group = '';
-
-    /* Per query data */
-    public $cache_key = '';
-    public $all_post_ids = false;
-    public $cached_post_ids = [];
-    public $cached_posts = [];
-    public $found_posts = false;
-    public $cache_func = 'wp_cache_add';
-
-    public static $inst;
+    private static $inst;
 
     public function __construct()
     {
         $this->prefix = 'docketcache-post';
         $this->group_prefix = $this->prefix.'-';
 
+        $this->do_flush_cache = true;
+        $this->need_to_flush_cache = true;
+
+        /* Per cache-clear data */
+        $this->cache_incr = 0;
+        $this->cache_group = '';
+
+        /* Per query data */
+        $this->cache_key = '';
+        $this->all_post_ids = false;
+        $this->cached_post_ids = [];
+        $this->cached_posts = [];
+        $this->found_posts = false;
+        $this->cache_func = 'wp_cache_add';
+
         $this->setup_for_blog();
         $this->setup_hooks();
     }
 
-    public static function inst()
+    public static function init()
     {
         if (!isset(self::$inst)) {
             self::$inst = new self();
@@ -136,7 +146,7 @@ class AdvancedPost
         add_filter(
             'media_library_months_with_files',
             function () {
-                $cache_group = $this->prefix.'_media';
+                $cache_group = $this->prefix.'-media';
 
                 $months = wp_cache_get('media_library_months_with_files', $cache_group);
 
@@ -170,7 +180,11 @@ class AdvancedPost
                     )
                 );
 
-                $cache_group = $this->prefix.'_media';
+                if (empty($months)) {
+                    return;
+                }
+
+                $cache_group = $this->prefix.'-media';
                 $months = array_shift(array_values($months));
 
                 if (!$months->year == get_the_time('Y', $post_id) && !$months->month == get_the_time('m', $post_id)) {
@@ -229,7 +243,8 @@ class AdvancedPost
         $this->cache_key = 'query-'.substr(md5($sql), 0, 12);
         $this->all_post_ids = wp_cache_get($this->cache_key, $this->cache_group);
         if ('NA' !== $this->found_posts) {
-            $this->found_posts = wp_cache_get("{$this->cache_key}_found", $this->cache_group);
+            $cache_key = $this->cache_key.'-found';
+            $this->found_posts = wp_cache_get($cache_key, $this->cache_group);
         }
 
         if ($this->all_post_ids xor $this->found_posts) {
@@ -346,7 +361,8 @@ class AdvancedPost
             return (int) $this->found_posts;
         }
 
-        \call_user_func($this->cache_func, "{$this->cache_key}_found", (int) $found_posts, $this->cache_group);
+        $cache_key = $this->cache_key.'-found';
+        \call_user_func($this->cache_func, $cache_key, (int) $found_posts, $this->cache_group);
         $this->need_to_flush_cache = true;
 
         return $found_posts;

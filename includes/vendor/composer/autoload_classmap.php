@@ -7,8 +7,11 @@ $baseDir = dirname(dirname($vendorDir));
 
 return array(
     'Nawawi\\DocketCache\\AdvancedPost' => $baseDir . '/includes/src/AdvancedPost.php',
+    'Nawawi\\DocketCache\\Bepart' => $baseDir . '/includes/src/Bepart.php',
+    'Nawawi\\DocketCache\\Canopt' => $baseDir . '/includes/src/Canopt.php',
     'Nawawi\\DocketCache\\Command' => $baseDir . '/includes/src/Command.php',
     'Nawawi\\DocketCache\\Constans' => $baseDir . '/includes/src/Constans.php',
+    'Nawawi\\DocketCache\\Crawler' => $baseDir . '/includes/src/Crawler.php',
     'Nawawi\\DocketCache\\Dropin' => $baseDir . '/includes/src/Dropin.php',
     'Nawawi\\DocketCache\\Filesystem' => $baseDir . '/includes/src/Filesystem.php',
     'Nawawi\\DocketCache\\Plugin' => $baseDir . '/includes/src/Plugin.php',

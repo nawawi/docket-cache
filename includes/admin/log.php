@@ -76,7 +76,7 @@ $log = $this->parse_query();
         <?php endif; ?>
 
         <?php if ($this->info->log_enable || !$log->output_empty) : ?>
-        <a href="<?php echo $this->tab_query('log'); ?>" class="button button-<?php echo !$log->output_empty ? 'secondary' : 'primary'; ?> button-large" id="refresh"><?php _e('Refresh', 'docket-cache'); ?></a>
+        <a href="<?php echo $this->tab_query('log'); ?>" class="button button-secondary button-refresh  button-large" id="refresh"><?php _e('Refresh', 'docket-cache'); ?></a>
         <?php endif; ?>
     </p>
 </div>

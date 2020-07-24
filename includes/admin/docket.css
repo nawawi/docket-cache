@@ -53,6 +53,10 @@
     text-align: center;
 }
 
+#docket-cache .button-refresh {
+    background: #ffffff;
+}
+
 #docket-cache .log {
     width: 100%;
 }
@@ -136,6 +140,15 @@
     text-transform: uppercase;
     font-weight: normal;
     font-size: 16px;
+}
+
+#docket-cache h3.title {
+    margin-bottom: 0;
+}
+
+#docket-cache p.desc {
+    margin-top: 8px;
+    font-size: 13px;
 }
 
 #docket-cache-spinner {

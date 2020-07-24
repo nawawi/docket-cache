@@ -12,13 +12,13 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 
-final class Dropin
+final class Dropin extends Bepart
 {
-    private $plugin;
+    private $path;
 
-    public function __construct(Plugin $plugin)
+    public function __construct($path)
     {
-        $this->plugin = $plugin;
+        $this->path = $path;
     }
 
     /**
@@ -27,7 +27,7 @@ final class Dropin
     private function resc()
     {
         $dt = [];
-        $dt['src'] = $this->plugin->path.'/includes/object-cache.php';
+        $dt['src'] = $this->path.'/includes/object-cache.php';
         $dt['dst'] = WP_CONTENT_DIR.'/object-cache.php';
         $dt['halt'] = WP_CONTENT_DIR.'/object-cache-delay.txt';
         $dt['after'] = WP_CONTENT_DIR.'/object-cache-after-delay.txt';
@@ -54,8 +54,8 @@ final class Dropin
             return $cache[$key];
         }
 
-        $cache['dropin'] = $this->plugin->plugin_meta(WP_CONTENT_DIR.'/object-cache.php');
-        $cache['plugin'] = $this->plugin->plugin_meta($this->plugin->path.'/includes/object-cache.php');
+        $cache['dropin'] = $this->plugin_meta(WP_CONTENT_DIR.'/object-cache.php');
+        $cache['plugin'] = $this->plugin_meta($this->path.'/includes/object-cache.php');
 
         return $cache[$key];
     }
@@ -91,7 +91,7 @@ final class Dropin
     {
         $time = time() + 5;
         $file_delay = $this->resc()->halt;
-        if ($this->plugin->put($file_delay, $time)) {
+        if ($this->put($file_delay, $time)) {
             @touch($file_delay, $time);
         }
     }
@@ -105,6 +105,8 @@ final class Dropin
         $after_delay = $this->resc()->after;
         if (@is_file($file_delay)) {
             @unlink($file_delay);
+        }
+        if (@is_file($file_delay)) {
             @unlink($after_delay);
         }
     }
@@ -126,10 +128,11 @@ final class Dropin
         $after_delay = $this->resc()->after;
         if (@is_file($after_delay)) {
             if (@unlink($after_delay)) {
-                // pass to admin_footer
-                return $this->plugin->code_preload();
+                return $this->code_preload();
             }
         }
+
+        return false;
     }
 
     /**
@@ -140,12 +143,12 @@ final class Dropin
         $src = $this->resc()->src;
         $dst = $this->resc()->dst;
 
-        if (is_writable(\dirname($this->resc()->dst))) {
+        if (is_writable(\dirname($dst))) {
             if ($delay) {
                 $this->delay();
             }
 
-            return $this->plugin->copy($src, $dst);
+            return $this->copy($src, $dst);
         }
 
         return false;
@@ -169,17 +172,5 @@ final class Dropin
         }
 
         return false;
-    }
-
-    /**
-     * remove.
-     */
-    public function remove()
-    {
-        $this->plugin->flush_cache();
-        if ($this->validate()) {
-            $this->uninstall();
-            $this->plugin->flush_log();
-        }
     }
 }

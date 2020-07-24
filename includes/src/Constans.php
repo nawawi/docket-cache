@@ -19,31 +19,23 @@ final class Constans
         return \defined($name) && \is_array($name) && !empty($name);
     }
 
-    // optional config
-    private static function get_user_config($name)
-    {
-        if (!\defined('DOCKET_CACHE_DATA_PATH')) {
-            \define('DOCKET_CACHE_DATA_PATH', WP_CONTENT_DIR.'/docket-cache-data');
-        }
-
-        $config = [];
-        if (@is_file(DOCKET_CACHE_DATA_PATH.'/constants.php') && is_readable(DOCKET_CACHE_DATA_PATH.'/constants.php')) {
-            $config = @include DOCKET_CACHE_DATA_PATH.'/constants.php';
-        }
-
-        if (!empty($config) && !empty($config[$name])) {
-            return $config[$name];
-        }
-
-        return false;
-    }
-
-    public static function maybe_define($name, $value)
+    public static function maybe_define($name, $value, $user_config = true)
     {
         if (!\defined($name)) {
-            $nv = self::get_user_config($name);
-            if (!empty($nv)) {
-                $value = 'enable' === $nv ? true : false;
+            if ($user_config && class_exists('Nawawi\\DocketCache\\Canopt')) {
+                $nv = Canopt::init()->get($name);
+                if (!empty($nv) && 'default' !== $nv) {
+                    switch ($nv) {
+                        case 'enable':
+                            $nv = true;
+                            break;
+                        case 'disable':
+                            $nv = false;
+                            break;
+                    }
+
+                    $value = $nv;
+                }
             }
 
             return @\define($name, $value);
@@ -55,11 +47,14 @@ final class Constans
     public static function init()
     {
         // compat
-        self::maybe_define('WP_CONTENT_DIR', ABSPATH.'wp-content');
-        self::maybe_define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins');
+        self::maybe_define('WP_CONTENT_DIR', ABSPATH.'wp-content', false);
+        self::maybe_define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins', false);
+
+        // data dir
+        self::maybe_define('DOCKET_CACHE_DATA_PATH', WP_CONTENT_DIR.'/docket-cache-data/', false);
 
         // cache dir
-        self::maybe_define('DOCKET_CACHE_PATH', WP_CONTENT_DIR.'/cache/docket-cache/');
+        self::maybe_define('DOCKET_CACHE_PATH', WP_CONTENT_DIR.'/cache/docket-cache/', false);
 
         // cache file max size: 3MB, min 1MB
         self::maybe_define('DOCKET_CACHE_MAXSIZE', 3000000);
@@ -148,7 +143,7 @@ final class Constans
         self::maybe_define('DOCKET_CACHE_COMMENT', true);
 
         // preload
-        self::maybe_define('DOCKET_CACHE_PRELOAD', true);
+        self::maybe_define('DOCKET_CACHE_PRELOAD', false);
 
         // page loader
         self::maybe_define('DOCKET_CACHE_PAGELOADER', true);

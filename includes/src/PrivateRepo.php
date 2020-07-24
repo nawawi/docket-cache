@@ -37,11 +37,18 @@ final class PrivateRepo
 
     private function remote_data()
     {
-        if (false == $remote = get_transient($this->transient)) {
+        $remote = false;
+
+        if (!isset($_GET['force-check'])) {
+            $remote = get_transient($this->transient);
+        }
+
+        if (false === $remote) {
             $remote = wp_remote_get(
                 $this->repo,
                 [
                     'timeout' => 10,
+                    'user-agent' => 'docket-cache/'.$this->version,
                     'headers' => [
                         'Accept' => 'application/json',
                     ],
@@ -64,7 +71,7 @@ final class PrivateRepo
 
         $remote = $this->remote_data();
 
-        if (!is_wp_error($remote) && isset($remote['response']['code']) && 200 === $remote['response']['code'] && !empty($remote['body'])) {
+        if ($remote && !is_wp_error($remote) && isset($remote['response']['code']) && 200 === $remote['response']['code'] && !empty($remote['body'])) {
             $remote = json_decode($remote['body']);
             if (null === $remote) {
                 delete_transient($this->transient);

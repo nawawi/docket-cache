@@ -12,7 +12,7 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 
-final class Plugin extends Filesystem
+final class Plugin extends Bepart
 {
     /**
      * Plugin file.
@@ -78,6 +78,13 @@ final class Plugin extends Filesystem
     private $view;
 
     /**
+     * Canopt() instance.
+     *
+     * @var object
+     */
+    public $canopt;
+
+    /**
      * The cache path.
      *
      * @var string
@@ -93,38 +100,7 @@ final class Plugin extends Filesystem
         $this->file = DOCKET_CACHE_FILE;
         $this->hook = plugin_basename($this->file);
         $this->path = realpath(plugin_dir_path($this->file));
-    }
-
-    /**
-     * plugin_meta.
-     */
-    public function plugin_meta($file = '')
-    {
-        $file = !empty($file) ? $file : $this->file;
-
-        static $cache = [];
-
-        if (isset($cache[$file])) {
-            return $cache[$file];
-        }
-
-        $default_headers = [
-            'Name' => 'Plugin Name',
-            'PluginURI' => 'Plugin URI',
-            'Version' => 'Version',
-            'Description' => 'Description',
-            'Author' => 'Author',
-            'AuthorURI' => 'Author URI',
-            'TextDomain' => 'Text Domain',
-            'DomainPath' => 'Domain Path',
-            'Network' => 'Network',
-            'RequiresWP' => 'Requires at least',
-            'RequiresPHP' => 'Requires PHP',
-        ];
-
-        $cache[$file] = get_file_data($file, $default_headers);
-
-        return $cache[$file];
+        $this->register_init();
     }
 
     /**
@@ -234,7 +210,7 @@ final class Plugin extends Filesystem
     public function flush_cache()
     {
         $this->dropin->delay();
-        $this->cachedir_flush($this->cache_path);
+        $this->cachedir_flush($this->cache_path, false);
 
         return true;
     }
@@ -259,17 +235,18 @@ final class Plugin extends Filesystem
         return false;
     }
 
-    public function code_preload()
+    /**
+     * cleanup.
+     */
+    private function cleanup()
     {
-        $code = '<script>';
-        $code .= 'try {';
-        $code .= 'jQuery( document ).ready( function() {';
-        $code .= 'docket_cache_preload( docket_cache_config );';
-        $code .= '});';
-        $code .= '}catch(e) {};';
-        $code .= '</script>';
+        if ($this->dropin->validate()) {
+            $this->dropin->uninstall();
+        }
 
-        return $code;
+        $this->dropin->undelay();
+        $this->cachedir_flush($this->cache_path, true);
+        $this->flush_log();
     }
 
     /**
@@ -277,7 +254,7 @@ final class Plugin extends Filesystem
      */
     public static function uninstall()
     {
-        ( new self() )->dropin->remove();
+        ( new self() )->cleanup();
     }
 
     /**
@@ -285,7 +262,7 @@ final class Plugin extends Filesystem
      */
     public function deactivate()
     {
-        $this->dropin->remove();
+        $this->cleanup();
         $this->unregister_garbage_collector();
     }
 
@@ -320,8 +297,9 @@ final class Plugin extends Filesystem
             $this->cache_path = rtim($this->cache_path, '/').'docket-cache/';
         }
 
-        $this->dropin = new Dropin($this);
+        $this->dropin = new Dropin($this->path);
         $this->view = new View($this);
+        $this->canopt = new Canopt();
     }
 
     /**
@@ -354,7 +332,13 @@ final class Plugin extends Filesystem
                     }
                     foreach ($options['plugins'] as $plugin) {
                         if ($plugin === $this->hook) {
-                            $this->dropin->install(true);
+                            add_action(
+                                'shutdown',
+                                function () {
+                                    $this->dropin->install(true);
+                                },
+                                PHP_INT_MAX
+                            );
                             break;
                         }
                     }
@@ -365,7 +349,7 @@ final class Plugin extends Filesystem
         );
 
         add_action(
-            'admin_footer',
+            'admin_head',
             function () {
                 $output = $this->dropin->after_delay();
                 if (!empty($output)) {
@@ -376,7 +360,7 @@ final class Plugin extends Filesystem
         );
 
         if (\defined('DOCKET_CACHE_PRIVATEREPO') && class_exists('Nawawi\\DocketCache\\PrivateRepo')) {
-            new PrivateRepo($this->slug, $this->hook, $this->plugin_meta()['Version'], DOCKET_CACHE_PRIVATEREPO);
+            new PrivateRepo($this->slug, $this->hook, $this->plugin_meta($this->file)['Version'], DOCKET_CACHE_PRIVATEREPO);
         }
 
         register_activation_hook($this->hook, [$this, 'activate']);
@@ -397,7 +381,7 @@ final class Plugin extends Filesystem
              'docket-flush-log',
          ];
 
-        foreach ($this->config_key() as $key) {
+        foreach ($this->canopt->keys() as $key) {
             $keys[] = 'docket-default-'.$key;
             $keys[] = 'docket-enable-'.$key;
             $keys[] = 'docket-disable-'.$key;
@@ -417,7 +401,6 @@ final class Plugin extends Filesystem
         $args = array_merge(
             [
                 'action' => $key,
-                'dt' => time(),
             ],
             $args_extra
         );
@@ -425,6 +408,33 @@ final class Plugin extends Filesystem
         $query = add_query_arg($args, $this->page);
 
         return wp_nonce_url(network_admin_url($query), $key);
+    }
+
+    /**
+     * fastcgi_close.
+     */
+    public function fastcgi_close()
+    {
+        if ((\PHP_SAPI === 'fpm-fcgi')
+            && \function_exists('fastcgi_finish_request')) {
+            @session_write_close();
+            @fastcgi_finish_request();
+        }
+    }
+
+    /**
+     * ajax_response_continue.
+     */
+    public function ajax_response_continue($msg, $success = true)
+    {
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=UTF-8');
+        }
+
+        $response = ['success' => $success];
+        $response['data'] = $msg;
+        echo wp_json_encode($response);
+        $this->fastcgi_close();
     }
 
     /**
@@ -463,13 +473,15 @@ final class Plugin extends Filesystem
                     $url = $this->action_query('update-dropin');
 
                     if ($this->dropin->validate()) {
-                        if ($this->dropin->is_outdated()) {
+                        if ($this->dropin->is_outdated() && !$this->dropin->install(false)) {
                             /* translators: %s: url */
                             $message = sprintf(__('<strong>Docket Cache:</strong> The object-cache.php drop-in is outdated. Please click "Re-Install" to update it now.<p style="padding:0;"><a href="%s" class="button button-primary">Re-Install</a>', 'docket-cache'), $url);
                         }
                     } else {
-                        /* translators: %s: url */
-                        $message = sprintf(__('<strong>Docket Cache:</strong> An unknown object-cache.php drop-in was found. Please click "Install" to use Docket Cache.<p style="margin-bottom:0;"><a href="%s" class="button button-primary">Install</a></p>', 'docket-cache'), $url);
+                        if (!$this->dropin->install(false) ) {
+                            /* translators: %s: url */
+                            $message = sprintf(__('<strong>Docket Cache:</strong> An unknown object-cache.php drop-in was found. Please click "Install" to use Docket Cache.<p style="margin-bottom:0;"><a href="%s" class="button button-primary">Install</a></p>', 'docket-cache'), $url);
+                        }
                     }
                 }
 
@@ -489,7 +501,7 @@ final class Plugin extends Filesystem
             'admin_enqueue_scripts',
             function ($hook) {
                 $plugin_url = plugin_dir_url($this->file);
-                $version = str_replace('.', '', $this->plugin_meta()['Version']).'x'.date('d');
+                $version = str_replace('.', '', $this->plugin_meta($this->file)['Version']).'x'.date('d');
                 wp_enqueue_script($this->slug.'-worker', $plugin_url.'includes/admin/worker.js', ['jquery'], $version, false);
                 wp_localize_script(
                     $this->slug.'-worker',
@@ -498,7 +510,7 @@ final class Plugin extends Filesystem
                         'ajaxurl' => admin_url('admin-ajax.php'),
                         'token' => wp_create_nonce('docketcache-token-nonce'),
                         'slug' => $this->slug,
-                        'log' => DOCKET_CACHE_LOG,
+                        'log' => DOCKET_CACHE_LOG ? 'true' : 'false',
                     ]
                 );
                 if ($hook === $this->screen) {
@@ -520,8 +532,15 @@ final class Plugin extends Filesystem
                     wp_send_json_error('Invalid security token sent.');
                     exit;
                 }
-                do_action('docket_preload');
-                wp_send_json_success($this->slug.': pong preload');
+
+                if ( $this->dropin->validate() ) {
+                    $this->ajax_response_continue($this->slug.': pong preload');
+                    do_action('docket_preload');
+                    exit;
+                }
+
+                wp_send_json_success($this->slug.': pong preload not available');
+                exit;
             }
         );
 
@@ -569,9 +588,9 @@ final class Plugin extends Filesystem
                             if (empty($message) && preg_match('@^docket-(default|enable|disable)-([a-z_]+)$@', $action, $mm)) {
                                 $nk = $mm[1];
                                 $nx = $mm[2];
-                                if (\in_array($nx, $this->config_key())) {
+                                if (\in_array($nx, $this->canopt->keys())) {
                                     $okmsg = 'default' === $nk ? 'docket-option-default' : 'docket-option-'.$nk;
-                                    $message = $this->config_save($nx, $nk) ? $okmsg : 'docket-option-failed';
+                                    $message = $this->canopt->save($nx, $nk) ? $okmsg : 'docket-option-failed';
                                 }
                             }
                         }
@@ -579,7 +598,6 @@ final class Plugin extends Filesystem
                         if (!empty($message)) {
                             $args = [
                                 'message' => $message,
-                                'dt' => time(),
                             ];
 
                             if (!empty($_GET['idx'])) {
@@ -598,9 +616,9 @@ final class Plugin extends Filesystem
         add_action(
             'load-'.$this->screen,
             function () {
-                if (version_compare(PHP_VERSION, $this->plugin_meta()['RequiresPHP'], '<')) {
+                if (version_compare(PHP_VERSION, $this->plugin_meta($this->file)['RequiresPHP'], '<')) {
                     /* translators: %s: php version */
-                    add_settings_error(is_multisite() ? 'general' : '', $this->slug, sprintf(__('This plugin requires PHP %s or greater.', 'docket-cache'), $this->plugin_meta()['RequiresPHP']));
+                    add_settings_error(is_multisite() ? 'general' : '', $this->slug, sprintf(__('This plugin requires PHP %s or greater.', 'docket-cache'), $this->plugin_meta($this->file)['RequiresPHP']));
                 }
 
                 if (isset($_GET['message'])) {
@@ -697,6 +715,13 @@ final class Plugin extends Filesystem
             'docket_preload',
             function () {
                 if (!DOCKET_CACHE_PRELOAD) {
+                    // preload minima
+                    wp_load_alloptions();
+                    wp_count_comments(0);
+                    @Crawler::fetch(get_home_url());
+                    @Crawler::fetch(admin_url('/index.php'));
+                    @Crawler::fetch(network_admin_url('/index.php'));
+
                     return;
                 }
 
@@ -705,20 +730,9 @@ final class Plugin extends Filesystem
                     'shutdown',
                     function () {
                         wp_load_alloptions();
+                        wp_count_comments(0);
 
-                        $args = [
-                            'blocking' => false,
-                            'timeout' => 45,
-                            'httpversion' => '1.1',
-                            'user-agent' => 'docket-cache',
-                            'body' => null,
-                            'compress' => false,
-                            'decompress' => false,
-                            'sslverify' => false,
-                            'stream' => false,
-                        ];
-
-                        @wp_remote_get(get_home_url(), $args);
+                        @Crawler::fetch(get_home_url());
 
                         $preload_admin = [
                             'options-general.php',
@@ -756,38 +770,25 @@ final class Plugin extends Filesystem
                             $preload_network = DOCKET_CACHE_PRELOAD_NETWORK;
                         }
 
-                        if (is_user_logged_in() && current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options') || DOCKET_CACHE_WPCLI) {
-                            if (!empty($_COOKIE)) {
-                                foreach ($_COOKIE as $name => $value) {
-                                    $cookies[] = new \WP_Http_Cookie(
-                                        [
-                                            'name' => $name,
-                                            'value' => $value,
-                                        ]
-                                    );
-                                }
-                                $args['cookies'] = $cookies;
+                        @Crawler::fetch_admin(admin_url('/index.php'));
+                        foreach ($preload_admin as $path) {
+                            $url = admin_url('/'.$path);
+                            if (DOCKET_CACHE_WPCLI) {
+                                fwrite(STDOUT, 'Fetch: '.$url."\n");
                             }
+                            @Crawler::fetch_admin($url);
+                            usleep(7500);
+                        }
 
-                            @wp_remote_get(admin_url('/'), $args);
-                            foreach ($preload_admin as $path) {
-                                $url = admin_url('/'.$path);
+                        if (is_multisite()) {
+                            @Crawler::fetch_admin(network_admin_url('/index.php'));
+                            foreach ($preload_network as $path) {
+                                $url = network_admin_url('/'.$path);
                                 if (DOCKET_CACHE_WPCLI) {
                                     fwrite(STDOUT, 'Fetch: '.$url."\n");
                                 }
-                                @wp_remote_get($url, $args);
-                            }
-
-                            if (is_multisite()) {
-                                @wp_remote_get(network_admin_url('/'), $args);
-                                foreach ($preload_network as $path) {
-                                    $url = network_admin_url('/'.$path);
-                                    if (DOCKET_CACHE_WPCLI) {
-                                        fwrite(STDOUT, 'Fetch: '.$url."\n");
-                                    }
-                                    @wp_remote_get($url, $args);
-                                    usleep(7500);
-                                }
+                                @Crawler::fetch_admin($url);
+                                usleep(7500);
                             }
                         }
                     },
@@ -971,7 +972,7 @@ final class Plugin extends Filesystem
         // wp_cache: advanced cache post
         if ($this->dropin->exists()) {
             if (DOCKET_CACHE_ADVCPOST && class_exists('Nawawi\\DocketCache\\AdvancedPost')) {
-                AdvancedPost::inst();
+                AdvancedPost::init();
             }
         }
     }
@@ -1058,7 +1059,6 @@ final class Plugin extends Filesystem
      */
     public function attach()
     {
-        $this->register_init();
         $this->register_plugin_hooks();
         $this->register_admin_hooks();
         $this->register_tweaks();
