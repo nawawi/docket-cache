@@ -96,7 +96,7 @@ class Command extends WP_CLI_Command
                 WP_CLI::halt(0);
             }
 
-            $this->halt_error(__('An unknown object cache drop-in was found. To use Docket object cache, run: wp docket-cache update-dropin.', 'docket-cache'));
+            $this->halt_error(__('An unknown object cache drop-in was found. To use Docket object cache, run: wp cache update.', 'docket-cache'));
         }
 
         if ($this->plugin->dropin->install()) {
@@ -123,7 +123,7 @@ class Command extends WP_CLI_Command
         }
 
         if (!$this->plugin->dropin->validate()) {
-            $this->halt_error(__('An unknown object cache drop-in was found. To use Docket run: wp docket-cache update-dropin.', 'docket-cache'));
+            $this->halt_error(__('An unknown object cache drop-in was found. To use Docket run: wp cache update.', 'docket-cache'));
         }
 
         if ($this->plugin->dropin->uninstall()) {
