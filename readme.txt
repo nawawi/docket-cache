@@ -67,7 +67,6 @@ This is an improved version based on previous releases.
 - Added basic configuration interface.
 - improved cache read/write.
 
-== Changelog ==
 = 20.07.20 =
 
 This is an improved version based on previous releases.
