@@ -49,9 +49,12 @@ $log = $this->parse_query();
         <?php if (!$log->output_empty) : ?>
         <select id="order">
             <?php
-            foreach (['first', 'last'] as $order) {
+            foreach ([
+                'first' => __('FIRST', 'docket-cache'),
+                'last' => __('LAST', 'docket-cache'),
+            ] as $order => $text) {
                 $selected = ($order === $log->default_order ? ' selected' : '');
-                echo '<option value="'.$order.'"'.$selected.'>'.strtoupper($order).'</option>';
+                echo '<option value="'.$order.'"'.$selected.'>'.esc_html($text).'</option>';
             }
             ?>
         </select>
@@ -65,9 +68,16 @@ $log = $this->parse_query();
         </select>
         <select id="sort">
             <?php
-            foreach (['asc', 'desc'] as $sort) {
+            foreach ([
+                'asc' => __('ASCENDING', 'docket-cache'),
+                'desc' => __('DESCENDING', 'docket-cache'),
+            ] as $sort => $text) {
                 $selected = ($sort === $log->default_sort ? ' selected' : '');
-                echo '<option value="'.$sort.'"'.$selected.'>'.strtoupper($sort).'</option>';
+                $text = esc_html($text);
+                if (\in_array($text, ['ASCENDING', 'DESCENDING'])) {
+                    $text = 'desc' === $sort ? substr($text, 0, 4) : substr($text, 0, 3);
+                }
+                echo '<option value="'.$sort.'"'.$selected.'>'.$text.'</option>';
             }
             ?>
         </select>

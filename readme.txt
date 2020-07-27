@@ -60,6 +60,13 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPCache for
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.07.27 =
+
+This is an improved version based on previous releases.
+
+- Added delete expired transients before replace dropin
+- Fixed rarely condition, check wp function if exists before use at drop-in file to avoid fatal error, mostly if using apache mod_fcgid
+
 = 20.07.24 =
 
 This is an improved version based on previous releases.
@@ -73,17 +80,8 @@ This is an improved version based on previous releases.
 
 - Cache performance, replace file_exists with is_file.
 
-= 20.07.19 =
 
-This is an improved version based on previous releases.
-
-- Automatically enable object cache when plugin activate.
-- Delay caching object when installing drop-in file.
-- Sorting option by first and last line at cache log page.
-- Prevent fatal error at drop-in file.
-
-
-Kindly refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) for details.
+Changelog limit to 3 releases. Kindly refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) for previous Changelog.
 
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 

@@ -242,6 +242,10 @@ class Filesystem
         }
 
         $file = $path.'/index.html';
+        if (@is_file($file)) {
+            return false;
+        }
+
         $this->put($file, '<!-- placeholder -->');
     }
 
@@ -289,10 +293,9 @@ class Filesystem
                 $this->unlink($object->getPathName(), $cleanup ? true : false);
                 ++$cnt;
             }
-            $this->unlink($dir.'/index.php', true);
 
             if ($cleanup) {
-                $this->unlink($dir.'/index.html', true);
+                $this->unlink($dir.'/index.php', true);
             }
         }
 

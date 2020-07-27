@@ -17,6 +17,7 @@ final class View
     private $plugin;
     private $info;
     private $do_preload;
+    private $do_flush;
 
     public function __construct(Plugin $plugin)
     {
@@ -136,6 +137,7 @@ final class View
     public function index()
     {
         $this->do_preload = false;
+        $this->do_flush = false;
         $this->page('wrap');
         $this->plugin->dropin->undelay();
     }

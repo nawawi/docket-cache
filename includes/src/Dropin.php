@@ -87,9 +87,9 @@ final class Dropin extends Bepart
     /**
      * delay.
      */
-    public function delay()
+    public function delay($seconds = 5)
     {
-        $time = time() + 5;
+        $time = time() + (int) $seconds;
         $file_delay = $this->resc()->halt;
         if ($this->put($file_delay, $time)) {
             @touch($file_delay, $time);
@@ -106,7 +106,7 @@ final class Dropin extends Bepart
         if (@is_file($file_delay)) {
             @unlink($file_delay);
         }
-        if (@is_file($file_delay)) {
+        if (@is_file($after_delay)) {
             @unlink($after_delay);
         }
     }
@@ -128,7 +128,7 @@ final class Dropin extends Bepart
         $after_delay = $this->resc()->after;
         if (@is_file($after_delay)) {
             if (@unlink($after_delay)) {
-                return $this->code_preload();
+                return $this->code_worker(['flush', 'preload']);
             }
         }
 
@@ -157,18 +157,20 @@ final class Dropin extends Bepart
     /**
      * uninstall.
      */
-    public function uninstall()
+    public function uninstall($delay = false)
     {
-        $dst = $this->resc()->dst;
+        $file = $this->resc()->dst;
 
         $this->undelay();
 
-        if (!@is_file($dst)) {
+        if (!@is_file($file)) {
             return true;
         }
 
-        if (is_writable($dst)) {
-            return @unlink($dst);
+        $this->opcache_flush($file);
+
+        if (is_writable($file) && @unlink($file)) {
+            return true;
         }
 
         return false;

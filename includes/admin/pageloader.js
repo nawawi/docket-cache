@@ -13,8 +13,12 @@
             function() {
                 window.setTimeout(
                     function() {
-                        $( 'body' )
-                            .addClass( 'docket-cache-page-loading' );
+                        var uh = window.location.href;
+                        if ( uh.match( /\/update.*\.php/ ) === null ) {
+                            $( 'body' )
+                                .removeClass( 'docket-cache-page-loading' )
+                                .addClass( 'docket-cache-page-loading' );
+                        }
                     },
                     750
                 );

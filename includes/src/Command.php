@@ -71,10 +71,10 @@ class Command extends WP_CLI_Command
         $info = (object) $this->plugin->get_info();
         $halt = $info->status_code ? 0 : 1;
 
-        WP_CLI::line("Status\t: ".$this->status_color($info->status_code, $info->status_text));
-        WP_CLI::line("OPcache\t: ".$this->status_color($info->opcache_code, $info->opcache_text));
-        WP_CLI::line("Path\t: ".$info->cache_path);
-        WP_CLI::line("Size\t: ".$info->cache_size);
+        WP_CLI::line("Object Cache\t: ".$this->status_color($info->status_code, $info->status_text));
+        WP_CLI::line("OPCache\t\t: ".$this->status_color($info->opcache_code, $info->opcache_text));
+        WP_CLI::line("Cache Path\t: ".$info->cache_path);
+        WP_CLI::line("Cache Size\t: ".$info->cache_size);
         WP_CLI::halt($halt);
     }
 

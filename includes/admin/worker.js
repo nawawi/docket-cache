@@ -6,17 +6,18 @@
  *
  * @see    https://github.com/nawawi/docket-cache
  */
-function docket_cache_preload( config ) {
-    if ( config.log ) {
-        console.log( config.slug + ': ping preload' );
+function docket_cache_worker( name, config ) {
+    if ( config.debug ) {
+        console.log( config.slug + ':worker: ping ' + name );
     }
     jQuery.post(
         config.ajaxurl, {
-            "action": "docket_preload",
+            "action": "docket_worker",
             "token": config.token,
+            "type": name
         },
         function( response ) {
-            if ( config.log ) {
+            if ( config.debug ) {
                 console.log( response.data + ' -> ' + response.success );
             }
         }

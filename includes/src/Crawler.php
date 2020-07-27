@@ -14,11 +14,11 @@ namespace Nawawi\DocketCache;
 
 final class Crawler
 {
-    private static $version = '20.07.24';
+    private static $version = '20.07.27';
 
     public static function fetch_admin($url, $param = [])
     {
-        if (is_user_logged_in() && current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options') || DOCKET_CACHE_WPCLI) {
+        if (is_user_logged_in() && current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options')) {
             return self::fetch($url, $param);
         }
 
@@ -40,6 +40,7 @@ final class Crawler
         ];
 
         if (!empty($_COOKIE) && class_exists('\\WP_Http_Cookie')) {
+            $cookies = [];
             foreach ($_COOKIE as $name => $value) {
                 $cookies[] = new \WP_Http_Cookie(
                     [
@@ -48,7 +49,10 @@ final class Crawler
                     ]
                 );
             }
-            $args['cookies'] = $cookies;
+
+            if (!empty($cookies)) {
+                $args['cookies'] = $cookies;
+            }
         }
 
         if (!empty($param) && \is_array($param)) {

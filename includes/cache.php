@@ -1020,8 +1020,14 @@ class WP_Object_Cache
             return false;
         }
 
-        @$this->filesystem->placeholder($this->cache_path);
-        @$this->filesystem->put($this->cache_path.'index.php', $this->code_stub(time()));
+        if (!@is_file($this->cache_path.'index.php')) {
+            @$this->filesystem->put($this->cache_path.'index.php', $this->code_stub(time()));
+        }
+
+        // if transient and without expiry, set to 12 hours in our cache
+        if (\in_array($group, ['site-transient', 'transient']) && 0 === $expire) {
+            $expire = 12 * HOUR_IN_SECONDS;
+        }
 
         $file = $this->get_file_path($key, $group);
 
@@ -1181,7 +1187,7 @@ class WP_Object_Cache
             add_action(
                 'wp_head',
                 function () {
-                    if (!is_user_logged_in()) {
+                    if (\function_exists('is_user_logged_in') && !is_user_logged_in()) {
                         !\defined('DOCKET_CACHE_COMMENT_TRUE') && \define('DOCKET_CACHE_COMMENT_TRUE', time());
                     }
                 },
@@ -1191,7 +1197,7 @@ class WP_Object_Cache
             add_action(
                 'shutdown',
                 function () {
-                    if (!is_user_logged_in() && \defined('DOCKET_CACHE_COMMENT_TRUE')) {
+                    if (\defined('DOCKET_CACHE_COMMENT_TRUE') && (\function_exists('is_user_logged_in') && !is_user_logged_in())) {
                         echo "\n<!-- Performance optimized by Docket Object Cache: https://wordpress.org/plugins/docket-cache -->\n";
                     }
                 },

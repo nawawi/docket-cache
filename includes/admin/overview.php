@@ -17,7 +17,7 @@ namespace Nawawi\DocketCache;
 
     <table class="form-table">
         <tr>
-            <th><?php _e('Status', 'docket-cache'); ?></th>
+            <th><?php _e('Object Cache', 'docket-cache'); ?></th>
             <td><?php echo $this->info->status_text; ?></td>
         </tr>
 

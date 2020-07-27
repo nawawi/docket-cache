@@ -48,14 +48,22 @@ class Bepart extends Filesystem
         return $cache[$file];
     }
 
-    public function code_preload()
+    public function code_worker($types = '')
     {
-        $code = '<script>';
-        $code .= 'try {';
-        $code .= 'jQuery( document ).ready( function() {';
-        $code .= 'docket_cache_preload( docket_cache_config );';
-        $code .= '});';
-        $code .= '}catch(e) {};';
+        $types = (array) $types;
+        if (empty($types)) {
+            return;
+        }
+
+        $code = '<script>'.PHP_EOL;
+        $code .= 'if ( "undefined" !== typeof(jQuery) && "undefined" !== typeof(docket_cache_config) && "function" === typeof(docket_cache_worker) ) {'.PHP_EOL;
+        $code .= '    jQuery( document ).ready( function() {'.PHP_EOL;
+        $code .= '        var config = docket_cache_config;'.PHP_EOL;
+        foreach ($types as $type) {
+            $code .= '        docket_cache_worker( "'.$type.'", config );'.PHP_EOL;
+        }
+        $code .= '    });'.PHP_EOL;
+        $code .= '}'.PHP_EOL;
         $code .= '</script>';
 
         return $code;

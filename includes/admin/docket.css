@@ -223,3 +223,8 @@
         padding-top: 0;
     }
 }
+
+#wpfooter #footer-left,
+#wpfooter #footer-upgrade {
+    font-size: 12px !important;
+}

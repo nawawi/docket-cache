@@ -179,7 +179,7 @@ final class Plugin extends Bepart
     {
         if (\function_exists('opcache_get_status')) {
             $status = @opcache_get_status();
-            if (\is_array($status) && ($status['opcache_enabled'] || $status['file_cache_only'])) {
+            if (\is_array($status) && (!empty($status['opcache_enabled']) || !empty($status['file_cache_only']))) {
                 return 1;
             }
 
@@ -349,7 +349,7 @@ final class Plugin extends Bepart
         );
 
         add_action(
-            'admin_head',
+            'admin_footer',
             function () {
                 $output = $this->dropin->after_delay();
                 if (!empty($output)) {
@@ -437,6 +437,11 @@ final class Plugin extends Bepart
         $this->fastcgi_close();
     }
 
+    public function our_screen()
+    {
+        return  substr(get_current_screen()->id, 0, \strlen($this->screen)) === $this->screen;
+    }
+
     /**
      * register_admin_hooks.
      */
@@ -473,19 +478,19 @@ final class Plugin extends Bepart
                     $url = $this->action_query('update-dropin');
 
                     if ($this->dropin->validate()) {
-                        if ($this->dropin->is_outdated() && !$this->dropin->install(false)) {
+                        if ($this->dropin->is_outdated() && !$this->dropin->install(true)) {
                             /* translators: %s: url */
                             $message = sprintf(__('<strong>Docket Cache:</strong> The object-cache.php drop-in is outdated. Please click "Re-Install" to update it now.<p style="padding:0;"><a href="%s" class="button button-primary">Re-Install</a>', 'docket-cache'), $url);
                         }
                     } else {
-                        if (!$this->dropin->install(false) ) {
+                        if (!$this->dropin->install(true)) {
                             /* translators: %s: url */
                             $message = sprintf(__('<strong>Docket Cache:</strong> An unknown object-cache.php drop-in was found. Please click "Install" to use Docket Cache.<p style="margin-bottom:0;"><a href="%s" class="button button-primary">Install</a></p>', 'docket-cache'), $url);
                         }
                     }
                 }
 
-                if (2 === $this->get_status() && get_current_screen()->id === $this->screen) {
+                if (2 === $this->get_status() && $this->our_screen()) {
                     $message = __('The object-cache.php drop-in has been disabled at runtime.', 'docket-cache');
                 }
 
@@ -501,7 +506,7 @@ final class Plugin extends Bepart
             'admin_enqueue_scripts',
             function ($hook) {
                 $plugin_url = plugin_dir_url($this->file);
-                $version = str_replace('.', '', $this->plugin_meta($this->file)['Version']).'x'.date('d');
+                $version = str_replace('.', '', $this->plugin_meta($this->file)['Version']).'x'.(\defined('WP_DEBUG') && WP_DEBUG ? date('his') : date('d'));
                 wp_enqueue_script($this->slug.'-worker', $plugin_url.'includes/admin/worker.js', ['jquery'], $version, false);
                 wp_localize_script(
                     $this->slug.'-worker',
@@ -510,7 +515,7 @@ final class Plugin extends Bepart
                         'ajaxurl' => admin_url('admin-ajax.php'),
                         'token' => wp_create_nonce('docketcache-token-nonce'),
                         'slug' => $this->slug,
-                        'log' => DOCKET_CACHE_LOG ? 'true' : 'false',
+                        'debug' => \defined('WP_DEBUG') && WP_DEBUG ? 'true' : 'false',
                     ]
                 );
                 if ($hook === $this->screen) {
@@ -526,22 +531,60 @@ final class Plugin extends Bepart
         );
 
         add_action(
-            'wp_ajax_docket_preload',
+            'wp_ajax_docket_worker',
             function () {
-                if (!check_ajax_referer('docketcache-token-nonce', 'token', false)) {
+                if (!check_ajax_referer('docketcache-token-nonce', 'token', false) && !isset($_POST['type'])) {
                     wp_send_json_error('Invalid security token sent.');
                     exit;
                 }
 
-                if ( $this->dropin->validate() ) {
-                    $this->ajax_response_continue($this->slug.': pong preload');
-                    do_action('docket_preload');
+                $type = sanitize_text_field($_POST['type']);
+
+                if ($this->dropin->validate()) {
+                    if ('preload' === $type) {
+                        $this->ajax_response_continue($this->slug.':worker: pong '.$type);
+                        do_action('docket_preload');
+                        exit;
+                    }
+                }
+
+                if ('flush' === $type) {
+                    $this->ajax_response_continue($this->slug.':worker: pong '.$type);
+                    if (\function_exists('delete_expired_transients')) {
+                        delete_expired_transients(true);
+                    }
                     exit;
                 }
 
-                wp_send_json_success($this->slug.': pong preload not available');
+                wp_send_json_error($this->slug.':worker: "'.$type.'" not available');
                 exit;
             }
+        );
+
+        add_filter(
+            'admin_footer_text',
+            function ($text) {
+                if ($this->our_screen()) {
+                    /* translators: %s: version */
+                    $text = $this->plugin_meta($this->file)['Name'].' '.sprintf(__('Version %s', 'docket-cache'), $this->plugin_meta($this->file)['Version']);
+                }
+
+                return $text;
+            },
+            PHP_INT_MAX
+        );
+
+        add_filter(
+            'update_footer',
+            function ($text) {
+                if ($this->our_screen()) {
+                    /* translators: %s: version */
+                    $text = 'WordPress '.' '.sprintf(__('Version %s', 'docket-cache'), $GLOBALS['wp_version']);
+                }
+
+                return $text;
+            },
+            PHP_INT_MAX
         );
 
         add_action(
@@ -718,9 +761,6 @@ final class Plugin extends Bepart
                     // preload minima
                     wp_load_alloptions();
                     wp_count_comments(0);
-                    @Crawler::fetch(get_home_url());
-                    @Crawler::fetch(admin_url('/index.php'));
-                    @Crawler::fetch(network_admin_url('/index.php'));
 
                     return;
                 }
@@ -747,6 +787,8 @@ final class Plugin extends Bepart
                             'upload.php',
                             'plugins.php',
                             'edit.php',
+                            'edit-tags.php?taxonomy=category',
+                            'edit-tags.php?taxonomy=post_tag',
                             'themes.php',
                             'tools.php',
                             'widgets.php',
@@ -771,24 +813,25 @@ final class Plugin extends Bepart
                         }
 
                         @Crawler::fetch_admin(admin_url('/index.php'));
-                        foreach ($preload_admin as $path) {
-                            $url = admin_url('/'.$path);
-                            if (DOCKET_CACHE_WPCLI) {
-                                fwrite(STDOUT, 'Fetch: '.$url."\n");
+                        if (!DOCKET_CACHE_WPCLI) {
+                            foreach ($preload_admin as $path) {
+                                $url = admin_url('/'.$path);
+                                if (!DOCKET_CACHE_WPCLI) {
+                                    @Crawler::fetch_admin($url);
+                                }
+
+                                usleep(7500);
                             }
-                            @Crawler::fetch_admin($url);
-                            usleep(7500);
                         }
 
                         if (is_multisite()) {
                             @Crawler::fetch_admin(network_admin_url('/index.php'));
-                            foreach ($preload_network as $path) {
-                                $url = network_admin_url('/'.$path);
-                                if (DOCKET_CACHE_WPCLI) {
-                                    fwrite(STDOUT, 'Fetch: '.$url."\n");
+                            if (!DOCKET_CACHE_WPCLI) {
+                                foreach ($preload_network as $path) {
+                                    $url = network_admin_url('/'.$path);
+                                    @Crawler::fetch_admin($url);
+                                    usleep(7500);
                                 }
-                                @Crawler::fetch_admin($url);
-                                usleep(7500);
                             }
                         }
                     },

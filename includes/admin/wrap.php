@@ -12,15 +12,16 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 
-$this->do_preload = false;
 if (1 === $this->info->status_code && isset($this->plugin->token)) {
     switch ($this->plugin->token) {
         case 'docket-cache-flushed':
             $this->plugin->flush_cache();
             $this->do_preload = true;
+            $this->do_flush = true;
             break;
         case 'docket-cache-enabled':
             $this->do_preload = true;
+            $this->do_flush = true;
             break;
         case 'docket-log-flushed':
             $this->plugin->flush_log();
@@ -36,7 +37,9 @@ if (is_multisite() && is_network_admin()) {
 }
 
 if ($this->do_preload) {
-    echo $this->plugin->code_preload();
+    echo $this->plugin->code_worker(['flush', 'preload']);
+} elseif ($this->do_flush) {
+    echo $this->plugin->code_worker('flush');
 }
 ?>
 <div class="wrap" id="docket-cache">
