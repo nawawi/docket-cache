@@ -14,7 +14,7 @@ namespace Nawawi\DocketCache;
 
 final class Crawler
 {
-    private static $version = '20.07.27';
+    private static $version = '20.07.29';
 
     public static function fetch_admin($url, $param = [])
     {

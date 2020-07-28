@@ -3,7 +3,7 @@
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
  * Plugin URI:          http://wordpress.org/plugins/docket-cache/
- * Version:             20.07.27
+ * Version:             20.07.29
  * Description:         A file-based persistent WordPress Object Cache stored as a plain PHP code.
  * Author:              Nawawi Jamili
  * Author URI:          https://profiles.wordpress.org/nawawijamili
@@ -53,7 +53,9 @@ if (!\defined('WP_PLUGIN_DIR')) {
  * If failed, prevent WP Object Cache functions and classes from being defined.
  * See wp_start_object_cache() -> wp-includes/load.php.
  */
-if (!@is_file(WP_PLUGIN_DIR.'/docket-cache/includes/cache.php')) {
+if (!@is_file(WP_PLUGIN_DIR.'/docket-cache/includes/object-cache.d/cache-class.php')
+    || !@is_file(WP_PLUGIN_DIR.'/docket-cache/includes/object-cache.d/cache-funcs.php')
+    || !@is_file(WP_PLUGIN_DIR.'/docket-cache/includes/object-cache.d/cache-start.php')) {
     return;
 }
 
@@ -77,54 +79,7 @@ if (!class_exists('Nawawi\\DocketCache\\Plugin') || !class_exists('Nawawi\\Docke
 }
 
 /*
- * Check for object-cache-delay.txt file.
- * If exists, prevent WP Object Cache functions and classes from being defined.
- * See wp_start_object_cache() -> wp-includes/load.php.
- */
-if (@is_file(WP_CONTENT_DIR.'/object-cache-delay.txt')) {
-    // rarely condition, use function_exists to confirm function exists to avoid fatal error on certain hosting mostly using apache mod_fcgid
-    if (\function_exists('add_action')) {
-        if (time() > @filemtime(WP_CONTENT_DIR.'/object-cache-delay.txt')) {
-            if (!\function_exists('__docket_cache_halt_transient')) {
-                function __docket_cache_halt_transient($value, $option, $old_value = '')
-                {
-                    if (false !== strpos($option, '_transient_')) {
-                        return false;
-                    }
-
-                    return $value;
-                }
-
-                add_filter('pre_update_option', '__docket_cache_halt_transient', -PHP_INT_MAX, 3);
-                add_filter('pre_get_option', '__docket_cache_halt_transient', -PHP_INT_MAX, 3);
-                add_filter(
-                    'added_option',
-                    function ($option, $value) {
-                        return __docket_cache_halt_transient($value, $option);
-                    },
-                    -PHP_INT_MAX,
-                    2
-                );
-            }
-
-            add_action(
-                'shutdown',
-                function () {
-                    if (\function_exists('delete_expired_transients')) {
-                        delete_expired_transients(true);
-                    }
-                    @rename(WP_CONTENT_DIR.'/object-cache-delay.txt', WP_CONTENT_DIR.'/object-cache-after-delay.txt');
-                },
-                PHP_INT_MAX
-            );
-        }
-    }
-
-    return;
-}
-
-/*
  * Define WP Object Cache functions and classes.
  * See wp_start_object_cache() -> wp-includes/load.php.
  */
-@include_once WP_PLUGIN_DIR.'/docket-cache/includes/cache.php';
+@include_once WP_PLUGIN_DIR.'/docket-cache/includes/object-cache.d/cache-start.php';

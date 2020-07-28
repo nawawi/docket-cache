@@ -36,7 +36,7 @@ final class Canopt extends Bepart
 
     public function keys()
     {
-        return ['log', 'preload', 'advcpost', 'misc_tweaks', 'pageloader'];
+        return ['log', 'log_time', 'preload', 'advcpost', 'optermcount', 'mocache', 'misc_tweaks', 'pageloader'];
     }
 
     public function get($name)

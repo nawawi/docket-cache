@@ -82,7 +82,7 @@ $log = $this->parse_query();
             ?>
         </select>
         <br>
-        <a href="<?php echo $this->plugin->action_query('flush-log', ['idx' => 'log']); ?>" class="button button-primary button-large"><?php _e('Flush Log', 'docket-cache'); ?></a>&nbsp;
+        <a href="<?php echo $this->plugin->action_query('flush-oclog', ['idx' => 'log']); ?>" class="button button-primary button-large"><?php _e('Flush Log', 'docket-cache'); ?></a>&nbsp;
         <?php endif; ?>
 
         <?php if ($this->info->log_enable || !$log->output_empty) : ?>

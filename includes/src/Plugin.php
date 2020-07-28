@@ -64,11 +64,11 @@ final class Plugin extends Bepart
     public $screen;
 
     /**
-     * Dropin() instance.
+     * Dropino() instance.
      *
      * @var object
      */
-    public $dropin;
+    public $dropino;
 
     /**
      * View() instance.
@@ -153,11 +153,11 @@ final class Plugin extends Bepart
             return 2;
         }
 
-        if (!$this->dropin->exists()) {
+        if (!$this->dropino->exists()) {
             return 0;
         }
 
-        if ($this->dropin->validate()) {
+        if ($this->dropino->validate()) {
             return 1;
         }
 
@@ -209,7 +209,7 @@ final class Plugin extends Bepart
      */
     public function flush_cache()
     {
-        $this->dropin->delay();
+        $this->dropino->delay();
         $this->cachedir_flush($this->cache_path, false);
 
         return true;
@@ -236,15 +236,34 @@ final class Plugin extends Bepart
     }
 
     /**
+     * pushup.
+     */
+    public function wearechampion()
+    {
+        add_action(
+            'shutdown',
+            function () {
+                $active_plugins = (array) get_option('active_plugins', []);
+                if (!empty($active_plugins) && \is_array($active_plugins) && isset($active_plugins[0]) && \in_array($this->hook, $active_plugins) && $this->hook !== $active_plugins[0]) {
+                    unset($active_plugins[array_search($this->hook, $active_plugins)]);
+                    array_unshift($active_plugins, $this->hook);
+                    update_option('active_plugins', $active_plugins);
+                }
+            },
+            PHP_INT_MAX
+        );
+    }
+
+    /**
      * cleanup.
      */
     private function cleanup()
     {
-        if ($this->dropin->validate()) {
-            $this->dropin->uninstall();
+        if ($this->dropino->validate()) {
+            $this->dropino->uninstall();
         }
 
-        $this->dropin->undelay();
+        $this->dropino->undelay();
         $this->cachedir_flush($this->cache_path, true);
         $this->flush_log();
     }
@@ -271,18 +290,10 @@ final class Plugin extends Bepart
      */
     public function activate()
     {
-        if ($this->dropin->validate()) {
-            // our cache
-            $this->flush_cache();
-        } else {
-            // others dropin
-            wp_cache_flush();
-        }
-
-        // replace with our dropin
-        $this->dropin->install(true);
-
+        $this->flush_cache();
+        $this->dropino->install(true);
         $this->unregister_garbage_collector();
+        $this->wearechampion();
     }
 
     private function register_init()
@@ -297,7 +308,7 @@ final class Plugin extends Bepart
             $this->cache_path = rtim($this->cache_path, '/').'docket-cache/';
         }
 
-        $this->dropin = new Dropin($this->path);
+        $this->dropino = new Dropino($this->path);
         $this->view = new View($this);
         $this->canopt = new Canopt();
     }
@@ -335,7 +346,7 @@ final class Plugin extends Bepart
                             add_action(
                                 'shutdown',
                                 function () {
-                                    $this->dropin->install(true);
+                                    $this->dropino->install(true);
                                 },
                                 PHP_INT_MAX
                             );
@@ -351,7 +362,7 @@ final class Plugin extends Bepart
         add_action(
             'admin_footer',
             function () {
-                $output = $this->dropin->after_delay();
+                $output = $this->dropino->after_delay();
                 if (!empty($output)) {
                     echo $output;
                 }
@@ -374,17 +385,18 @@ final class Plugin extends Bepart
     public function action_token()
     {
         $keys = [
-             'docket-enable-cache',
-             'docket-disable-cache',
-             'docket-flush-cache',
-             'docket-update-dropin',
-             'docket-flush-log',
+             'docket-enable-occache',
+             'docket-disable-occache',
+             'docket-flush-occache',
+             'docket-update-dropino',
+             'docket-flush-oclog',
          ];
 
         foreach ($this->canopt->keys() as $key) {
             $keys[] = 'docket-default-'.$key;
             $keys[] = 'docket-enable-'.$key;
             $keys[] = 'docket-disable-'.$key;
+            $keys[] = 'docket-save-'.$key;
         }
 
         return $keys;
@@ -408,33 +420,6 @@ final class Plugin extends Bepart
         $query = add_query_arg($args, $this->page);
 
         return wp_nonce_url(network_admin_url($query), $key);
-    }
-
-    /**
-     * fastcgi_close.
-     */
-    public function fastcgi_close()
-    {
-        if ((\PHP_SAPI === 'fpm-fcgi')
-            && \function_exists('fastcgi_finish_request')) {
-            @session_write_close();
-            @fastcgi_finish_request();
-        }
-    }
-
-    /**
-     * ajax_response_continue.
-     */
-    public function ajax_response_continue($msg, $success = true)
-    {
-        if (!headers_sent()) {
-            header('Content-Type: application/json; charset=UTF-8');
-        }
-
-        $response = ['success' => $success];
-        $response['data'] = $msg;
-        echo wp_json_encode($response);
-        $this->fastcgi_close();
     }
 
     public function our_screen()
@@ -474,16 +459,16 @@ final class Plugin extends Bepart
                     return;
                 }
 
-                if ($this->dropin->exists()) {
-                    $url = $this->action_query('update-dropin');
+                if ($this->dropino->exists()) {
+                    $url = $this->action_query('update-dropino');
 
-                    if ($this->dropin->validate()) {
-                        if ($this->dropin->is_outdated() && !$this->dropin->install(true)) {
+                    if ($this->dropino->validate()) {
+                        if ($this->dropino->is_outdated() && !$this->dropino->install(true)) {
                             /* translators: %s: url */
                             $message = sprintf(__('<strong>Docket Cache:</strong> The object-cache.php drop-in is outdated. Please click "Re-Install" to update it now.<p style="padding:0;"><a href="%s" class="button button-primary">Re-Install</a>', 'docket-cache'), $url);
                         }
                     } else {
-                        if (!$this->dropin->install(true)) {
+                        if (!$this->dropino->install(true)) {
                             /* translators: %s: url */
                             $message = sprintf(__('<strong>Docket Cache:</strong> An unknown object-cache.php drop-in was found. Please click "Install" to use Docket Cache.<p style="margin-bottom:0;"><a href="%s" class="button button-primary">Install</a></p>', 'docket-cache'), $url);
                         }
@@ -540,16 +525,16 @@ final class Plugin extends Bepart
 
                 $type = sanitize_text_field($_POST['type']);
 
-                if ($this->dropin->validate()) {
+                if ($this->dropino->validate()) {
                     if ('preload' === $type) {
-                        $this->ajax_response_continue($this->slug.':worker: pong '.$type);
+                        $this->send_json_continue($this->slug.':worker: pong '.$type);
                         do_action('docket_preload');
                         exit;
                     }
                 }
 
                 if ('flush' === $type) {
-                    $this->ajax_response_continue($this->slug.':worker: pong '.$type);
+                    $this->send_json_continue($this->slug.':worker: pong '.$type);
                     if (\function_exists('delete_expired_transients')) {
                         delete_expired_transients(true);
                     }
@@ -597,43 +582,48 @@ final class Plugin extends Bepart
                         if (!wp_verify_nonce($_GET['_wpnonce'], $action)) {
                             return;
                         }
-                        if ('docket-flush-cache' === $action) {
-                            $message = $this->flush_cache() ? 'docket-cache-flushed' : 'docket-cache-flushed-failed';
+                        if ('docket-flush-occache' === $action) {
+                            $message = $this->flush_cache() ? 'docket-occache-flushed' : 'docket-occache-flushed-failed';
                         }
 
                         if (is_writable(WP_CONTENT_DIR)) {
                             switch ($action) {
-                                case 'docket-enable-cache':
-                                    $result = $this->dropin->install(true);
-                                    $message = $result ? 'docket-cache-enabled' : 'docket-cache-enabled-failed';
+                                case 'docket-enable-occache':
+                                    $result = $this->dropino->install(true);
+                                    $message = $result ? 'docket-occache-enabled' : 'docket-occache-enabled-failed';
                                     do_action('docket_cache_enable', $result);
                                     break;
 
-                                case 'docket-disable-cache':
-                                    $result = $this->dropin->uninstall();
-                                    $message = $result ? 'docket-cache-disabled' : 'docket-cache-disabled-failed';
+                                case 'docket-disable-occache':
+                                    $result = $this->dropino->uninstall();
+                                    $message = $result ? 'docket-occache-disabled' : 'docket-occache-disabled-failed';
                                     do_action('docket_cache_disable', $result);
                                     break;
 
-                                case 'docket-update-dropin':
-                                    $result = $this->dropin->install(true);
-                                    $message = $result ? 'docket-dropin-updated' : 'docket-dropin-updated-failed';
-                                    do_action('docket_cache_update_dropin', $result);
+                                case 'docket-update-dropino':
+                                    $result = $this->dropino->install(true);
+                                    $message = $result ? 'docket-dropino-updated' : 'docket-dropino-updated-failed';
+                                    do_action('docket_cache_update_dropino', $result);
                                     break;
 
-                                case 'docket-flush-log':
+                                case 'docket-flush-oclog':
                                     $result = $this->flush_log();
                                     $message = $result ? 'docket-log-flushed' : 'docket-log-flushed-failed';
                                     do_action('docket_cache_flush_log', $result);
                                     break;
                             }
 
-                            if (empty($message) && preg_match('@^docket-(default|enable|disable)-([a-z_]+)$@', $action, $mm)) {
+                            if (empty($message) && preg_match('@^docket-(default|enable|disable|save)-([a-z_]+)$@', $action, $mm)) {
                                 $nk = $mm[1];
                                 $nx = $mm[2];
                                 if (\in_array($nx, $this->canopt->keys())) {
-                                    $okmsg = 'default' === $nk ? 'docket-option-default' : 'docket-option-'.$nk;
-                                    $message = $this->canopt->save($nx, $nk) ? $okmsg : 'docket-option-failed';
+                                    if ('save' === $nk && isset($_GET['nv'])) {
+                                        $nv = sanitize_text_field($_GET['nv']);
+                                        $message = $this->canopt->save($nx, $nv) ? 'docket-option-save' : 'docket-option-failed';
+                                    } else {
+                                        $okmsg = 'default' === $nk ? 'docket-option-default' : 'docket-option-'.$nk;
+                                        $message = $this->canopt->save($nx, $nk) ? $okmsg : 'docket-option-failed';
+                                    }
                                 }
                             }
                         }
@@ -668,28 +658,28 @@ final class Plugin extends Bepart
                     $token = sanitize_text_field($_GET['message']);
                     $this->token = $token;
                     switch ($token) {
-                        case 'docket-cache-enabled':
+                        case 'docket-occache-enabled':
                             $message = __('Object cache enabled.', 'docket-cache');
                             break;
-                        case 'docket-cache-enabled-failed':
+                        case 'docket-occache-enabled-failed':
                             $error = __('Object cache could not be enabled.', 'docket-cache');
                             break;
-                        case 'docket-cache-disabled':
+                        case 'docket-occache-disabled':
                             $message = __('Object cache disabled.', 'docket-cache');
                             break;
-                        case 'docket-cache-disabled-failed':
+                        case 'docket-occache-disabled-failed':
                             $error = __('Object cache could not be disabled.', 'docket-cache');
                             break;
-                        case 'docket-cache-flushed':
+                        case 'docket-occache-flushed':
                             $message = __('Object cache was flushed.', 'docket-cache');
                             break;
-                        case 'docket-cache-flushed-failed':
+                        case 'docket-occache-flushed-failed':
                             $error = __('Object cache could not be flushed.', 'docket-cache');
                             break;
-                        case 'docket-dropin-updated':
+                        case 'docket-dropino-updated':
                             $message = __('Updated object cache drop-in and enabled Docket object cache.', 'docket-cache');
                             break;
-                        case 'docket-dropin-updated-failed':
+                        case 'docket-dropino-updated-failed':
                             $error = __('Docket object cache drop-in could not be updated.', 'docket-cache');
                             break;
                         case 'docket-log-flushed':
@@ -703,6 +693,9 @@ final class Plugin extends Bepart
                             break;
                         case 'docket-option-disable':
                             $message = __('Option disabled.', 'docket-cache');
+                            break;
+                        case 'docket-option-save':
+                            $message = __('Option saved.', 'docket-cache');
                             break;
                         case 'docket-option-default':
                             $message = __('Option resets to default.', 'docket-cache');
@@ -737,15 +730,15 @@ final class Plugin extends Bepart
                 switch ($this->get_status()) {
                     case 0:
                         $text = __('Enable Object Cache', 'docket-cache');
-                        $action = 'enable-cache';
+                        $action = 'enable-occache';
                         break;
                     case 1:
                         $text = __('Disable Object Cache', 'docket-cache');
-                        $action = 'disable-cache';
+                        $action = 'disable-occache';
                         break;
                     default:
                         $text = __('Install Drop-in', 'docket-cache');
-                        $action = 'update-cache';
+                        $action = 'update-dropino';
                 }
 
                 $links[] = sprintf('<a href="%s">%s</a>', $this->action_query($action), $text);
@@ -762,6 +755,21 @@ final class Plugin extends Bepart
                     wp_load_alloptions();
                     wp_count_comments(0);
 
+                    // make plugin tester happy
+                    @Crawler::fetch(get_home_url());
+                    $preload_min = [
+                        'index.php',
+                        'edit.php',
+                        'edit-comments.php',
+                        'edit-tags.php?taxonomy=category',
+                        'edit.php?post_type=page',
+                        'post-new.php?post_type=page',
+                    ];
+                    foreach ($preload_min as $path) {
+                        $url = admin_url('/'.$path);
+                        @Crawler::fetch_admin(admin_url($url));
+                    }
+
                     return;
                 }
 
@@ -775,6 +783,7 @@ final class Plugin extends Bepart
                         @Crawler::fetch(get_home_url());
 
                         $preload_admin = [
+                            'index.php',
                             'options-general.php',
                             'options-writing.php',
                             'options-reading.php',
@@ -789,13 +798,20 @@ final class Plugin extends Bepart
                             'edit.php',
                             'edit-tags.php?taxonomy=category',
                             'edit-tags.php?taxonomy=post_tag',
+                            'edit.php?post_type=page',
+                            'post-new.php?post_type=page',
                             'themes.php',
-                            'tools.php',
                             'widgets.php',
+                            'nav-menus.php',
+                            'tools.php',
+                            'import.php',
+                            'export.php',
+                            'site-health.php',
                             'update-core.php',
                         ];
 
                         $preload_network = [
+                            'index.php',
                             'update-core.php',
                             'sites.php',
                             'users.php',
@@ -812,7 +828,6 @@ final class Plugin extends Bepart
                             $preload_network = DOCKET_CACHE_PRELOAD_NETWORK;
                         }
 
-                        @Crawler::fetch_admin(admin_url('/index.php'));
                         if (!DOCKET_CACHE_WPCLI) {
                             foreach ($preload_admin as $path) {
                                 $url = admin_url('/'.$path);
@@ -825,7 +840,6 @@ final class Plugin extends Bepart
                         }
 
                         if (is_multisite()) {
-                            @Crawler::fetch_admin(network_admin_url('/index.php'));
                             if (!DOCKET_CACHE_WPCLI) {
                                 foreach ($preload_network as $path) {
                                     $url = network_admin_url('/'.$path);
@@ -846,177 +860,50 @@ final class Plugin extends Bepart
      */
     private function register_tweaks()
     {
-        // set first
-        add_action(
-            'shutdown',
-            function () {
-                $active_plugins = (array) get_option('active_plugins', []);
-                if (!empty($active_plugins) && \is_array($active_plugins) && isset($active_plugins[0]) && \in_array($this->hook, $active_plugins) && $this->hook !== $active_plugins[0]) {
-                    unset($active_plugins[array_search($this->hook, $active_plugins)]);
-                    array_unshift($active_plugins, $this->hook);
-                    update_option('active_plugins', $active_plugins);
-                }
-            },
-            PHP_INT_MAX
-        );
+        $this->wearechampion();
 
-        add_action(
-            'pre_get_posts',
-            function () {
-                remove_filter('posts_clauses', '_filter_query_attachment_filenames');
-            },
-            PHP_INT_MAX
-        );
+        if (class_exists('Nawawi\\DocketCache\\Tweaks')) {
+            $tweaks = new Tweaks($this);
+            $tweaks->vipcom();
 
-        add_filter(
-            'wp_link_query_args',
-            function ($query) {
-                $query['no_found_rows'] = true;
-
-                return $query;
-            },
-            PHP_INT_MAX
-        );
-
-        add_filter('postmeta_form_keys', '__return_false');
-
-        if (DOCKET_CACHE_MISC_TWEAKS) {
-            // wp: if only one post is found by the search results, redirect user to that post
-            add_action(
-                'template_redirect',
-                function () {
-                    if (is_search()) {
-                        global $wp_query;
-                        if (1 === (int) $wp_query->post_count && 1 === (int) $wp_query->max_num_pages) {
-                            wp_redirect(get_permalink($wp_query->posts['0']->ID));
-                            exit;
-                        }
-                    }
-                },
-                PHP_INT_MAX
-            );
-
-            // wp: hide update notifications to non-admin users
-            add_action(
-                'admin_head',
-                function () {
-                    if (!current_user_can('update_core')) {
-                        remove_action('admin_notices', 'update_nag', 3);
-                    }
-                },
-                PHP_INT_MAX
-            );
-
-            // wp: header junk
-            add_action(
-                'after_setup_theme',
-                function () {
-                    remove_action('wp_head', 'rsd_link');
-                    remove_action('wp_head', 'wp_generator');
-                    remove_action('wp_head', 'feed_links', 2);
-                    remove_action('wp_head', 'feed_links_extra', 3);
-                    remove_action('wp_head', 'index_rel_link');
-                    remove_action('wp_head', 'wlwmanifest_link');
-                    remove_action('wp_head', 'start_post_rel_link', 10, 0);
-                    remove_action('wp_head', 'parent_post_rel_link', 10, 0);
-                    remove_action('wp_head', 'adjacent_posts_rel_link', 10, 0);
-                    remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
-                    remove_action('wp_head', 'wp_shortlink_wp_head', 10, 0);
-                },
-                PHP_INT_MAX
-            );
-
-            // wp: disable pingback
-            add_action(
-                'pre_ping',
-                function (&$links) {
-                    foreach ($links as $l => $link) {
-                        if (0 === strpos($link, get_option('home'))) {
-                            unset($links[$l]);
-                        }
-                    }
-                },
-                PHP_INT_MAX
-            );
-
-            // wp: disable and remove do_pings
-            // https://wp-mix.com/wordpress-clean-up-do_pings/
-            add_action(
-                'init',
-                function () {
-                    if (isset($_GET['doing_wp_cron'])) {
-                        remove_action('do_pings', 'do_all_pings');
-                        wp_clear_scheduled_hook('do_pings');
-                    }
-                },
-                PHP_INT_MAX
-            );
-
-            // jetpack: enables object caching for the response sent by instagram when querying for instagram image html
-            // https://developer.jetpack.com/hooks/instagram_cache_oembed_api_response_body/
-            add_filter('instagram_cache_oembed_api_response_body', '__return_true');
-
-            // wp: disable xmlrpc
-            // https://www.wpbeginner.com/plugins/how-to-disable-xml-rpc-in-wordpress/
-            // https://kinsta.com/blog/xmlrpc-php/
-            add_filter('xmlrpc_enabled', '__return_false');
-            add_filter('pre_update_option_enable_xmlrpc', '__return_false');
-            add_filter('pre_option_enable_xmlrpc', '__return_zero');
-            add_action(
-                'init',
-                function () {
-                    if (isset($_SERVER['REQUEST_URI']) && '/xmlrpc.php' === $_SERVER['REQUEST_URI']) {
-                        http_response_code(403);
-                        exit('xmlrpc.php not available.');
-                    }
-                },
-                PHP_INT_MAX
-            );
-
-            if (class_exists('woocommerce')) {
-                // wc: remove counts slowing down the dashboard
-                remove_filter('wp_count_comments', ['WC_Comments', 'wp_count_comments'], 10);
-
-                // wc: remove order count from admin menu
-                add_filter('woocommerce_include_processing_order_count_in_menu', '__return_false');
-
-                // wc: remove Processing Order Count in wp-admin
-                //add_filter('woocommerce_menu_order_count', '__return_false');
-
-                // wc: action_scheduler_migration_dependencies_met
-                add_filter('action_scheduler_migration_dependencies_met', '__return_false');
-
-                // wc: disable background image regeneration
-                add_filter('woocommerce_background_image_regeneration', '__return_false');
-
-                // wc: remove marketplace suggestions
-                // https://rudrastyh.com/woocommerce/remove-marketplace-suggestions.html
-                add_filter('woocommerce_allow_marketplace_suggestions', '__return_false');
-
-                // wc: remove connect your store to WooCommerce.com admin notice
-                add_filter('woocommerce_helper_suppress_admin_notices', '__return_true');
-
-                // wc: disable the WooCommerce Admin
-                //add_filter('woocommerce_admin_disabled', '__return_true');
-
-                // wc: disable the WooCommere Marketing Hub
-                add_filter(
-                    'woocommerce_admin_features',
-                    function ($features) {
-                        $marketing = array_search('marketing', $features);
-                        unset($features[$marketing]);
-
-                        return $features;
-                    }
-                );
+            if (DOCKET_CACHE_MISC_TWEAKS) {
+                $tweaks->misc();
+                $tweaks->woocommerce();
             }
         }
 
         // wp_cache: advanced cache post
-        if ($this->dropin->exists()) {
+        if ($this->dropino->exists()) {
             if (DOCKET_CACHE_ADVCPOST && class_exists('Nawawi\\DocketCache\\AdvancedPost')) {
                 AdvancedPost::init();
             }
+
+            if (DOCKET_CACHE_MOCACHE && class_exists('Nawawi\\DocketCache\\MoCache')) {
+                add_filter(
+                    'override_load_textdomain',
+                    function ($plugin_override, $domain, $mofile) {
+                        if (!@is_file($mofile) || !@is_readable($mofile) || !isset($GLOBALS['l10n'])) {
+                            return false;
+                        }
+
+                        $l10n = $GLOBALS['l10n'];
+                        $upstream = empty($l10n[$domain]) ? null : $l10n[$domain];
+                        $mo = new MoCache($mofile, $domain, $upstream);
+                        $l10n[$domain] = $mo;
+
+                        $GLOBALS['l10n'] = $l10n;
+
+                        return true;
+                    },
+                    999,
+                    3
+                );
+            }
+        }
+
+        // optimize term count
+        if (DOCKET_CACHE_OPTERMCOUNT && class_exists('Nawawi\\DocketCache\\TermCount')) {
+            TermCount::init();
         }
     }
 
@@ -1037,7 +924,7 @@ final class Plugin extends Bepart
                 }
             }
         }
-        $this->dropin->delay_expire();
+        $this->dropino->delay_expire();
     }
 
     /**
@@ -1088,7 +975,7 @@ final class Plugin extends Bepart
         if (DOCKET_CACHE_WPCLI && !\defined('DocketCache_CLI')) {
             \define('DocketCache_CLI', true);
             $cli = new Command($this);
-            \WP_CLI::add_command('cache update', [$cli, 'update_dropin']);
+            \WP_CLI::add_command('cache update', [$cli, 'update_dropino']);
             \WP_CLI::add_command('cache enable', [$cli, 'enable']);
             \WP_CLI::add_command('cache disable', [$cli, 'disable']);
             \WP_CLI::add_command('cache status', [$cli, 'status']);

@@ -66,10 +66,13 @@ final class Constans
         self::maybe_define('DOCKET_CACHE_LOG', false);
 
         // log file
-        self::maybe_define('DOCKET_CACHE_LOG_FILE', WP_CONTENT_DIR.'/object-cache.log');
+        self::maybe_define('DOCKET_CACHE_LOG_FILE', WP_CONTENT_DIR.'/.object-cache.log');
 
         // empty file when cache flushed
         self::maybe_define('DOCKET_CACHE_LOG_FLUSH', true);
+
+        // log time format: utc, local, wp
+        self::maybe_define('DOCKET_CACHE_LOG_TIME', 'utc');
 
         // log file max size: 10MB
         self::maybe_define('DOCKET_CACHE_LOG_SIZE', 10000000);
@@ -134,7 +137,15 @@ final class Constans
 
         // misc tweaks
         self::maybe_define('DOCKET_CACHE_MISC_TWEAKS', true);
+
+        // advanced post cache
         self::maybe_define('DOCKET_CACHE_ADVCPOST', true);
+
+        // optimize term count
+        self::maybe_define('DOCKET_CACHE_OPTERMCOUNT', true);
+
+        // translation mo file cache
+        self::maybe_define('DOCKET_CACHE_MOCACHE', true);
 
         // wp-cli
         self::maybe_define('DOCKET_CACHE_WPCLI', (\defined('WP_CLI') && WP_CLI));

@@ -27,7 +27,7 @@ if (1 === $this->info->status_code && isset($this->plugin->token)) {
             $this->plugin->flush_log();
             break;
     }
-    if ((!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD) || 2 === $this->info->status_code) {
+    if (!DOCKET_CACHE_PRELOAD || 2 === $this->info->status_code) {
         $this->do_preload = false;
     }
 }

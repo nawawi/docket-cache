@@ -59,25 +59,25 @@ namespace Nawawi\DocketCache;
     </table>
 
     <p class="submit">
-        <?php if (!$this->plugin->dropin->exists()) : ?>
+        <?php if (!$this->plugin->dropino->exists()) : ?>
 
         <?php if ($this->info->cache_size > 0) : ?>
-        <a href="<?php echo $this->plugin->action_query('flush-cache'); ?>" class="button button-secondary button-large"><?php _e('Flush Cache', 'docket-cache'); ?></a>&nbsp;&nbsp;
+        <a href="<?php echo $this->plugin->action_query('flush-occache'); ?>" class="button button-secondary button-large"><?php _e('Flush Cache', 'docket-cache'); ?></a>&nbsp;&nbsp;
         <?php endif; ?>
 
         <?php if (2 !== $this->info->status_code) : ?>
-        <a href="<?php echo $this->plugin->action_query('enable-cache'); ?>" class="button button-primary button-large"><?php _e('Enable Object Cache', 'docket-cache'); ?></a>
+        <a href="<?php echo $this->plugin->action_query('enable-occache'); ?>" class="button button-primary button-large"><?php _e('Enable Object Cache', 'docket-cache'); ?></a>
         <?php endif; ?>
 
-        <?php elseif ($this->plugin->dropin->validate()) : ?>
+        <?php elseif ($this->plugin->dropino->validate()) : ?>
 
         <?php if ($this->info->cache_size > 0) : ?>
-        <a href="<?php echo $this->plugin->action_query('flush-cache'); ?>" class="button button-primary button-large"><?php _e('Flush Cache', 'docket-cache'); ?></a>&nbsp;&nbsp;
+        <a href="<?php echo $this->plugin->action_query('flush-occache'); ?>" class="button button-primary button-large"><?php _e('Flush Cache', 'docket-cache'); ?></a>&nbsp;&nbsp;
         <?php else : ?>
         <a href="<?php echo $this->tab_query('overview'); ?>" class="button button-secondary button-refresh button-large" id="refresh"><?php _e('Refresh', 'docket-cache'); ?></a>
         <?php endif; ?>
 
-        <a href="<?php echo $this->plugin->action_query('disable-cache'); ?>" class="button button-secondary button-large"><?php _e('Disable Object Cache', 'docket-cache'); ?></a>
+        <a href="<?php echo $this->plugin->action_query('disable-occache'); ?>" class="button button-secondary button-large"><?php _e('Disable Object Cache', 'docket-cache'); ?></a>
         <?php endif; ?>
     </p>
 </div>

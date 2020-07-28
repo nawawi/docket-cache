@@ -65,7 +65,7 @@ final class View
              'DOCKET_CACHE_LOG_FILE' => [
                  __('Set the log file.', 'docket-cache'),
                  /* translators: %s: value of WP_CONTENT_DIR */
-                 sprintf(__('Default: %s/object-cache.log', 'docket-cache'), $this->plugin->sanitize_rootpath(WP_CONTENT_DIR)),
+                 sprintf(__('Default: %s/.object-cache.log', 'docket-cache'), $this->plugin->sanitize_rootpath(WP_CONTENT_DIR)),
              ],
              'DOCKET_CACHE_LOG_FLUSH' => [
                  __('Set to true to empty the log file when the object cache is flushed.', 'docket-cache'),
@@ -79,8 +79,16 @@ final class View
                  __('Set to true to enable Advanced Post Cache.', 'docket-cache'),
                  __('Default: true', 'docket-cache'),
              ],
-             'DOCKET_CACHE_MISC_TWEAKS' => [
+             'DOCKET_CACHE_OPTERMCOUNT' => [
                  __('Set to true to enable miscellaneous WordPress performance tweaks.', 'docket-cache'),
+                 __('Default: true', 'docket-cache'),
+             ],
+             'DOCKET_CACHE_MOCACHE' => [
+                 __('Set to true to enable WordPress Translation Cache.', 'docket-cache'),
+                 __('Default: true', 'docket-cache'),
+             ],
+             'DOCKET_CACHE_MISC_TWEAKS' => [
+                 __('Set to true to enable optimization of WordPress Term count queries.', 'docket-cache'),
                  __('Default: true', 'docket-cache'),
              ],
              'DOCKET_CACHE_PRELOAD' => [
@@ -92,7 +100,7 @@ final class View
                  __('Default: true', 'docket-cache'),
              ],
              'DOCKET_CACHE_PAGELOADER' => [
-                 __('Set to true to enable a loading bar when the page is loading.', 'docket-cache'),
+                 __('Set to true to enable a loading bar when the admin page is loading.', 'docket-cache'),
                  __('Default: false', 'docket-cache'),
              ],
              'DOCKET_CACHE_DISABLED' => [
@@ -139,7 +147,7 @@ final class View
         $this->do_preload = false;
         $this->do_flush = false;
         $this->page('wrap');
-        $this->plugin->dropin->undelay();
+        $this->plugin->dropino->delay_expire();
     }
 
     private function tab_content()
@@ -212,6 +220,26 @@ final class View
         ] as $n => $v) {
             $action = $n.'-'.$name;
             $url = $this->plugin->action_query($action, ['idx' => 'config']);
+            $selected = $n === $default ? ' selected' : '';
+            $html .= '<option value="'.$n.'" data-action-link="'.$url.'"'.$selected.'>'.$v.'</option>';
+        }
+        $html .= '</select>';
+
+        return $html;
+    }
+
+    private function config_select_set($name, $options, $default)
+    {
+        $action = 'save-'.$name;
+        $html = '<select id="'.$name.'" class="config-select">';
+        foreach ((array) $options as $n => $v) {
+            $url = $this->plugin->action_query(
+                $action,
+                [
+                    'idx' => 'config',
+                    'nv' => $n,
+                ]
+            );
             $selected = $n === $default ? ' selected' : '';
             $html .= '<option value="'.$n.'" data-action-link="'.$url.'"'.$selected.'>'.$v.'</option>';
         }

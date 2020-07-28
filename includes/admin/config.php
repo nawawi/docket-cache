@@ -25,25 +25,54 @@ namespace Nawawi\DocketCache;
             </td>
         </tr>
         <tr>
+            <th><?php _e('Cache Log Time Format', 'docket-cache'); ?></th>
+            <td>
+                <?php
+                echo $this->config_select_set(
+                    'log_time',
+                    [
+                        'default' => __('Default', 'docket-cache'),
+                        'utc' => __('UTC', 'docket-cache'),
+                        'local' => __('Local time', 'docket-cache'),
+                        'wp' => __('Site Format', 'docket-cache'),
+                    ],
+                    DOCKET_CACHE_LOG_TIME
+                );
+                ?>
+            </td>
+        </tr>
+        <tr>
             <th><?php _e('Cache Preloading', 'docket-cache'); ?></th>
             <td>
                 <?php echo $this->config_select_bool('preload', DOCKET_CACHE_PRELOAD); ?>
             </td>
         </tr>
         <tr>
-            <th><?php _e('Advanced Post Cache', 'docket-cache'); ?></th>
+            <th><?php _e('Advanced Post Caching', 'docket-cache'); ?></th>
             <td>
                 <?php echo $this->config_select_bool('advcpost', DOCKET_CACHE_ADVCPOST); ?>
             </td>
         </tr>
         <tr>
-            <th><?php _e('Performance tweaks', 'docket-cache'); ?></th>
+            <th><?php _e('Optimize Term Count Queries', 'docket-cache'); ?></th>
+            <td>
+                <?php echo $this->config_select_bool('optermcount', DOCKET_CACHE_OPTERMCOUNT); ?>
+            </td>
+        </tr>
+        <tr>
+            <th><?php _e('WordPress Translation Caching', 'docket-cache'); ?></th>
+            <td>
+                <?php echo $this->config_select_bool('mocache', DOCKET_CACHE_MOCACHE); ?>
+            </td>
+        </tr>
+        <tr>
+            <th><?php _e('Misc Performance Tweaks', 'docket-cache'); ?></th>
             <td>
                 <?php echo $this->config_select_bool('misc_tweaks', DOCKET_CACHE_MISC_TWEAKS); ?>
             </td>
         </tr>
         <tr>
-            <th><?php _e('Page loader', 'docket-cache'); ?></th>
+            <th><?php _e('Admin Page Loader', 'docket-cache'); ?></th>
             <td>
                 <?php echo $this->config_select_bool('pageloader', DOCKET_CACHE_PAGELOADER); ?>
             </td>

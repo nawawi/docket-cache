@@ -15,6 +15,33 @@ namespace Nawawi\DocketCache;
 class Bepart extends Filesystem
 {
     /**
+     * fastcgi_close.
+     */
+    public function fastcgi_close()
+    {
+        if ((\PHP_SAPI === 'fpm-fcgi')
+            && \function_exists('fastcgi_finish_request')) {
+            @session_write_close();
+            @fastcgi_finish_request();
+        }
+    }
+
+    /**
+     * send_json_continue.
+     */
+    public function send_json_continue($msg, $success = true)
+    {
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=UTF-8');
+        }
+
+        $response = ['success' => $success];
+        $response['data'] = $msg;
+        echo wp_json_encode($response);
+        $this->fastcgi_close();
+    }
+
+    /**
      * plugin_meta.
      */
     public function plugin_meta($file)

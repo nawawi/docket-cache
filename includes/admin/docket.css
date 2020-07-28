@@ -54,7 +54,8 @@
 }
 
 #docket-cache .button-refresh {
-    background: #ffffff;
+    opacity: 0.6;
+    font-weight: bold;
 }
 
 #docket-cache .log {
@@ -128,7 +129,7 @@
 #docket-cache .form-table-selection select {
     margin-top: 6px;
     margin-bottom: 6px;
-    min-width: 80px;
+    width: 120px;
     font-family: Consolas, Monaco, monospace;
     unicode-bidi: embed;
     font-size: 12px;

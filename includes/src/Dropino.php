@@ -12,7 +12,7 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 
-final class Dropin extends Bepart
+final class Dropino extends Bepart
 {
     private $path;
 
@@ -29,8 +29,10 @@ final class Dropin extends Bepart
         $dt = [];
         $dt['src'] = $this->path.'/includes/object-cache.php';
         $dt['dst'] = WP_CONTENT_DIR.'/object-cache.php';
-        $dt['halt'] = WP_CONTENT_DIR.'/object-cache-delay.txt';
-        $dt['after'] = WP_CONTENT_DIR.'/object-cache-after-delay.txt';
+
+        // sync with includes/object-cache/cache-start.php
+        $dt['halt'] = WP_CONTENT_DIR.'/.object-cache-delay.txt';
+        $dt['after'] = WP_CONTENT_DIR.'/.object-cache-after-delay.txt';
 
         return (object) $dt;
     }
@@ -54,7 +56,7 @@ final class Dropin extends Bepart
             return $cache[$key];
         }
 
-        $cache['dropin'] = $this->plugin_meta(WP_CONTENT_DIR.'/object-cache.php');
+        $cache['dropino'] = $this->plugin_meta(WP_CONTENT_DIR.'/object-cache.php');
         $cache['plugin'] = $this->plugin_meta($this->path.'/includes/object-cache.php');
 
         return $cache[$key];
@@ -69,7 +71,7 @@ final class Dropin extends Bepart
             return false;
         }
 
-        if (0 !== strcmp($this->meta('dropin')['PluginURI'], $this->meta('plugin')['PluginURI'])) {
+        if (0 !== strcmp($this->meta('dropino')['PluginURI'], $this->meta('plugin')['PluginURI'])) {
             return false;
         }
 
@@ -81,7 +83,7 @@ final class Dropin extends Bepart
      */
     public function is_outdated()
     {
-        return version_compare($this->meta('dropin')['Version'], $this->meta('plugin')['Version'], '<') || false === strpos($this->meta('dropin')['Version'], '.');
+        return version_compare($this->meta('dropino')['Version'], $this->meta('plugin')['Version'], '<') || false === strpos($this->meta('dropino')['Version'], '.');
     }
 
     /**
