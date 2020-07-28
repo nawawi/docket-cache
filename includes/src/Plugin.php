@@ -895,7 +895,7 @@ final class Plugin extends Bepart
 
                         return true;
                     },
-                    999,
+                    PHP_INT_MAX,
                     3
                 );
             }

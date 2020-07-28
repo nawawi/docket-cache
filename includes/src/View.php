@@ -58,6 +58,10 @@ final class View
                  __('Set to true to enable the cache log.', 'docket-cache'),
                  __('Default: false', 'docket-cache'),
              ],
+             'DOCKET_CACHE_LOG_TIME' => [
+                 __('Set log time format. Available options utc, local, wp.', 'docket-cache'),
+                 __('Default: utc', 'docket-cache'),
+             ],
              'DOCKET_CACHE_LOG_SIZE' => [
                  __('Set the maximum size of a log file in bytes.', 'docket-cache'),
                  __('Default: 10000000 (10MB)', 'docket-cache'),

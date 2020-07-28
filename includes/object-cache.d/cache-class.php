@@ -644,15 +644,7 @@ class WP_Object_Cache
             $caller = 'wp-cli';
         }
 
-        switch ($tag) {
-            case 'miss':
-                $tag = $tag.' ';
-                break;
-            case 'hit':
-                $tag = $tag.'  ';
-                break;
-        }
-
+        $tag = str_pad($tag,5);
         return $this->filesystem->log($tag, $id, $data, $caller);
     }
 
@@ -670,7 +662,7 @@ class WP_Object_Cache
             return true;
         }
 
-        $this->docket_log('error', 'internalresc-'.$this->item_hash(__FUNCTION__), 'Object cache could not be flushed');
+        $this->docket_log('err', 'internalresc-'.$this->item_hash(__FUNCTION__), 'Object cache could not be flushed');
 
         return false;
     }
@@ -679,7 +671,7 @@ class WP_Object_Cache
     {
         $file = $this->get_file_path($key, $group);
         $this->filesystem->unlink($file, false);
-        $this->docket_log('remove', $this->get_item_hash($file), $group.':'.$key);
+        $this->docket_log('del', $this->get_item_hash($file), $group.':'.$key);
     }
 
     private function docket_remove_group($group)
@@ -691,7 +683,7 @@ class WP_Object_Cache
                 $fx = $object->getPathName();
                 if ($match === substr($fn, 0, \strlen($match))) {
                     $this->filesystem->unlink($fx, false);
-                    $this->docket_log('remove', $this->get_item_hash($fx), $group.':*');
+                    $this->docket_log('del', $this->get_item_hash($fx), $group.':*');
                     unset($this->cache[$group]);
                 }
             }
@@ -710,7 +702,7 @@ class WP_Object_Cache
         if (!isset($data['timeout'])) {
             $data['timeout'] = $this->maybe_expire(0);
         } elseif ($data['timeout'] > 0 && time() >= $data['timeout']) {
-            $this->docket_log('expired', $this->get_item_hash($file), $group.':'.$key);
+            $this->docket_log('exp', $this->get_item_hash($file), $group.':'.$key);
             $this->filesystem->unlink($file, false);
 
             unset($this->cache[$group][$key]);
@@ -729,14 +721,14 @@ class WP_Object_Cache
 
         $data = $this->filesystem->export_var($arr, $error);
         if (false === $data) {
-            $this->docket_log('error', $fname, 'Failed to export var: '.$error);
+            $this->docket_log('err', $fname, 'Failed to export var: '.$error);
 
             return false;
         }
 
         $len = \strlen($data);
         if ($len >= $this->cache_maxsize) {
-            $this->docket_log('error', $fname, 'Data too large: '.$len.'/'.$this->cache_maxsize);
+            $this->docket_log('err', $fname, 'Data too large: '.$len.'/'.$this->cache_maxsize);
 
             return false;
         }
@@ -744,7 +736,7 @@ class WP_Object_Cache
         $code = $this->code_stub($data);
         $stat = $this->filesystem->dump($file, $code);
         if (-1 === $stat) {
-            $this->docket_log('error', $fname, 'Failed to write');
+            $this->docket_log('err', $fname, 'Failed to write');
 
             return false;
         }
