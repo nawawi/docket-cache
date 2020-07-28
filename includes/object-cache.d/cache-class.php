@@ -644,7 +644,8 @@ class WP_Object_Cache
             $caller = 'wp-cli';
         }
 
-        $tag = str_pad($tag,5);
+        $tag = str_pad($tag, 5);
+
         return $this->filesystem->log($tag, $id, $data, $caller);
     }
 

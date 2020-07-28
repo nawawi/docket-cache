@@ -41,7 +41,7 @@ class ComposerStaticInit71169967e8f502f7da209e4236957996
         'Nawawi\\DocketCache\\Command' => __DIR__ . '/../../..' . '/includes/src/Command.php',
         'Nawawi\\DocketCache\\Constans' => __DIR__ . '/../../..' . '/includes/src/Constans.php',
         'Nawawi\\DocketCache\\Crawler' => __DIR__ . '/../../..' . '/includes/src/Crawler.php',
-        'Nawawi\\DocketCache\\Dropinoc' => __DIR__ . '/../../..' . '/includes/src/Dropino.php',
+        'Nawawi\\DocketCache\\Dropino' => __DIR__ . '/../../..' . '/includes/src/Dropino.php',
         'Nawawi\\DocketCache\\Filesystem' => __DIR__ . '/../../..' . '/includes/src/Filesystem.php',
         'Nawawi\\DocketCache\\MoCache' => __DIR__ . '/../../..' . '/includes/src/MoCache.php',
         'Nawawi\\DocketCache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',

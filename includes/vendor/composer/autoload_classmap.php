@@ -12,7 +12,7 @@ return array(
     'Nawawi\\DocketCache\\Command' => $baseDir . '/includes/src/Command.php',
     'Nawawi\\DocketCache\\Constans' => $baseDir . '/includes/src/Constans.php',
     'Nawawi\\DocketCache\\Crawler' => $baseDir . '/includes/src/Crawler.php',
-    'Nawawi\\DocketCache\\Dropinoc' => $baseDir . '/includes/src/Dropino.php',
+    'Nawawi\\DocketCache\\Dropino' => $baseDir . '/includes/src/Dropino.php',
     'Nawawi\\DocketCache\\Filesystem' => $baseDir . '/includes/src/Filesystem.php',
     'Nawawi\\DocketCache\\MoCache' => $baseDir . '/includes/src/MoCache.php',
     'Nawawi\\DocketCache\\Plugin' => $baseDir . '/includes/src/Plugin.php',

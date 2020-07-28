@@ -347,6 +347,14 @@ final class Plugin extends Bepart
                                 'shutdown',
                                 function () {
                                     $this->dropino->install(true);
+
+                                    // previous file format
+                                    foreach (['object-cache-delay.txt', 'object-cache-after-delay.txt', 'object-cache.log'] as $f) {
+                                        $fx = WP_CONTENT_DIR.'/'.$f;
+                                        if (@is_file($fx)) {
+                                            @unlink($fx);
+                                        }
+                                    }
                                 },
                                 PHP_INT_MAX
                             );
