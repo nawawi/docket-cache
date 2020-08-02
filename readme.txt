@@ -23,7 +23,7 @@ An inside look:
 https://youtu.be/385zLPZLLb8
 
 == Why use this plugin? ==
-When it comes to reliable persistent Object Cache in WordPress, [Redis](https://redis.io/) or [Memcached](https://memcached.org/) comes on top. However, those solutions are rarely available at low cost or shared hosting servers.
+When it comes to reliable persistent Object Cache in WordPress, [Redis](https://redis.io/) or [Memcached](https://memcached.org/) comes on top. However, those solutions require knowledge of server and rarely available at low cost or shared hosting servers.
 
 The only solution is to store the object caches into files. With WordPress, exporting the PHP objects are not easy, most plugin that implements file-based solution will serialize and unserialize the object to store and retrieve the data.
 
@@ -60,6 +60,13 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPCache for
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.08.03 =
+
+This is an improved version based on previous releases.
+
+- Added WordPres Translation Caching
+- Added Optimization for Term Count Queries
+
 = 20.07.27 =
 
 This is an improved version based on previous releases.
@@ -74,14 +81,8 @@ This is an improved version based on previous releases.
 - Added basic configuration interface.
 - improved cache read/write.
 
-= 20.07.20 =
 
-This is an improved version based on previous releases.
-
-- Cache performance, replace file_exists with is_file.
-
-
-Changelog limit to 3 releases. Kindly refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) for previous Changelog.
+Kindly refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) for previous Changelog.
 
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
