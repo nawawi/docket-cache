@@ -8,11 +8,6 @@
  * @see    https://github.com/nawawi/docket-cache
  */
 
-/**
- * Based on:
- *  https://github.com/Automattic/lightweight-term-count-update.
- */
-
 namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;

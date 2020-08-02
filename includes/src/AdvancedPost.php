@@ -8,11 +8,6 @@
  * @see    https://github.com/nawawi/docket-cache
  */
 
-/**
- * Based on:
- *  https://github.com/Automattic/vip-go-mu-plugins-built/blob/master/advanced-post-cache/advanced-post-cache.php.
- */
-
 namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
@@ -180,7 +175,7 @@ class AdvancedPost
                     )
                 );
 
-                if (empty($months)) {
+                if (empty($months) || empty((array) $months)) {
                     return;
                 }
 
@@ -200,10 +195,10 @@ class AdvancedPost
             return;
         }
 
-        $this->cache_incr = wp_cache_get('cache_incrementors', $this->prefix);
+        $this->cache_incr = wp_cache_get('cache_incr', $this->prefix);
         if (!is_numeric($this->cache_incr)) {
             $now = time();
-            wp_cache_set('cache_incrementors', $now, $this->prefix);
+            wp_cache_set('cache_incr', $now, $this->prefix);
             $this->cache_incr = $now;
         }
         $this->cache_group = $this->group_prefix.$this->cache_incr;
@@ -223,9 +218,9 @@ class AdvancedPost
             return;
         }
 
-        $this->cache_incr = wp_cache_incr('cache_incrementors', 1, $this->prefix);
+        $this->cache_incr = wp_cache_incr('cache_incr', 1, $this->prefix);
         if (10 < \strlen($this->cache_incr)) {
-            wp_cache_set('cache_incrementors', 0, $this->prefix);
+            wp_cache_set('cache_incr', 0, $this->prefix);
             $this->cache_incr = 0;
         }
         $this->cache_group = $this->group_prefix.$this->cache_incr;

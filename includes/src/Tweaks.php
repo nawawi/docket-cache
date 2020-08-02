@@ -145,6 +145,10 @@ final class Tweaks
 
     public function woocommerce()
     {
+        if (\defined('DOCKET_CACHE_TWEAKS_WOO_DISABLE') && DOCKET_CACHE_TWEAKS_WOO_DISABLE) {
+            return;
+        }
+
         if (!class_exists('woocommerce')) {
             return;
         }

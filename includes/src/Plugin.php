@@ -347,14 +347,6 @@ final class Plugin extends Bepart
                                 'shutdown',
                                 function () {
                                     $this->dropino->install(true);
-
-                                    // previous file format
-                                    foreach (['object-cache-delay.txt', 'object-cache-after-delay.txt', 'object-cache.log'] as $f) {
-                                        $fx = WP_CONTENT_DIR.'/'.$f;
-                                        if (@is_file($fx)) {
-                                            @unlink($fx);
-                                        }
-                                    }
                                 },
                                 PHP_INT_MAX
                             );
@@ -476,10 +468,8 @@ final class Plugin extends Bepart
                             $message = sprintf(__('<strong>Docket Cache:</strong> The object-cache.php drop-in is outdated. Please click "Re-Install" to update it now.<p style="padding:0;"><a href="%s" class="button button-primary">Re-Install</a>', 'docket-cache'), $url);
                         }
                     } else {
-                        if (!$this->dropino->install(true)) {
-                            /* translators: %s: url */
-                            $message = sprintf(__('<strong>Docket Cache:</strong> An unknown object-cache.php drop-in was found. Please click "Install" to use Docket Cache.<p style="margin-bottom:0;"><a href="%s" class="button button-primary">Install</a></p>', 'docket-cache'), $url);
-                        }
+                        /* translators: %s: url */
+                        $message = sprintf(__('<strong>Docket Cache:</strong> An unknown object-cache.php drop-in was found. Please click "Install" to use Docket Cache.<p style="margin-bottom:0;"><a href="%s" class="button button-primary">Install</a></p>', 'docket-cache'), $url);
                     }
                 }
 
@@ -536,7 +526,7 @@ final class Plugin extends Bepart
                 if ($this->dropino->validate()) {
                     if ('preload' === $type) {
                         $this->send_json_continue($this->slug.':worker: pong '.$type);
-                        do_action('docket_preload');
+                        do_action('docket-cache/preload');
                         exit;
                     }
                 }
@@ -599,25 +589,25 @@ final class Plugin extends Bepart
                                 case 'docket-enable-occache':
                                     $result = $this->dropino->install(true);
                                     $message = $result ? 'docket-occache-enabled' : 'docket-occache-enabled-failed';
-                                    do_action('docket_cache_enable', $result);
+                                    do_action('docket-cache/object-cache-enable', $result);
                                     break;
 
                                 case 'docket-disable-occache':
                                     $result = $this->dropino->uninstall();
                                     $message = $result ? 'docket-occache-disabled' : 'docket-occache-disabled-failed';
-                                    do_action('docket_cache_disable', $result);
+                                    do_action('docket-cache/object-cache-disable', $result);
                                     break;
 
                                 case 'docket-update-dropino':
                                     $result = $this->dropino->install(true);
                                     $message = $result ? 'docket-dropino-updated' : 'docket-dropino-updated-failed';
-                                    do_action('docket_cache_update_dropino', $result);
+                                    do_action('docket-cache/object-cache-install', $result);
                                     break;
 
                                 case 'docket-flush-oclog':
                                     $result = $this->flush_log();
                                     $message = $result ? 'docket-log-flushed' : 'docket-log-flushed-failed';
-                                    do_action('docket_cache_flush_log', $result);
+                                    do_action('docket-cache/flush-log', $result);
                                     break;
                             }
 
@@ -756,7 +746,18 @@ final class Plugin extends Bepart
         );
 
         add_action(
-            'docket_preload',
+            'docket-cache/save-option',
+            function ($name, $value) {
+                if ('log' === $name) {
+                    $this->flush_log();
+                }
+            },
+            -1,
+            2
+        );
+
+        add_action(
+            'docket-cache/preload',
             function () {
                 if (!DOCKET_CACHE_PRELOAD) {
                     // preload minima
@@ -776,6 +777,7 @@ final class Plugin extends Bepart
                     foreach ($preload_min as $path) {
                         $url = admin_url('/'.$path);
                         @Crawler::fetch_admin(admin_url($url));
+                        usleep(500000);
                     }
 
                     return;
@@ -839,20 +841,15 @@ final class Plugin extends Bepart
                         if (!DOCKET_CACHE_WPCLI) {
                             foreach ($preload_admin as $path) {
                                 $url = admin_url('/'.$path);
-                                if (!DOCKET_CACHE_WPCLI) {
-                                    @Crawler::fetch_admin($url);
-                                }
-
-                                usleep(7500);
+                                @Crawler::fetch_admin($url);
+                                usleep(500000);
                             }
-                        }
 
-                        if (is_multisite()) {
-                            if (!DOCKET_CACHE_WPCLI) {
+                            if (is_multisite()) {
                                 foreach ($preload_network as $path) {
                                     $url = network_admin_url('/'.$path);
                                     @Crawler::fetch_admin($url);
-                                    usleep(7500);
+                                    usleep(500000);
                                 }
                             }
                         }

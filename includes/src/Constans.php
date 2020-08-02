@@ -120,11 +120,8 @@ final class Constans
         // cache ignored keys
         self::maybe_define('DOCKET_CACHE_IGNORED_KEYS', []);
 
-        // this will handle conditionally to cache specifix group in ignored groups.
-        // cache will delete base on hook: save_post, edit_post, update_post, wp_login, profile_update, insert_user_meta
-        // value: false|array
-        // array: group => [keys]
-        // array: group => false
+        // @private
+        // this option private for right now
         self::maybe_define(
             'DOCKET_CACHE_FILTERED_GROUPS',
             [
@@ -145,7 +142,7 @@ final class Constans
         self::maybe_define('DOCKET_CACHE_OPTERMCOUNT', true);
 
         // translation mo file cache
-        self::maybe_define('DOCKET_CACHE_MOCACHE', true);
+        self::maybe_define('DOCKET_CACHE_MOCACHE', false);
 
         // wp-cli
         self::maybe_define('DOCKET_CACHE_WPCLI', (\defined('WP_CLI') && WP_CLI));

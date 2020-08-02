@@ -18,10 +18,12 @@ final class View
     private $info;
     private $do_preload;
     private $do_flush;
+    private $log_enable;
 
     public function __construct(Plugin $plugin)
     {
         $this->plugin = $plugin;
+        $this->log_enable = DOCKET_CACHE_LOG;
     }
 
     private function constants_desc()
@@ -166,7 +168,16 @@ final class View
 
     private function is_index()
     {
-        return !empty($_GET['idx']) ? sanitize_text_field($_GET['idx']) : 'overview';
+        $idx = !empty($_GET['idx']) ? sanitize_text_field($_GET['idx']) : 'overview';
+        switch ($idx) {
+            case 'log':
+                if (!$this->log_enable) {
+                    $idx = 'config';
+                }
+                break;
+        }
+
+        return $idx;
     }
 
     private function tab_current($index)
@@ -187,10 +198,36 @@ final class View
     {
         $html = '<nav class="nav-tab-wrapper">';
         $html .= '<a href="'.$this->tab_query('overview').'" class="nav-tab'.$this->tab_active('overview').'">'.__('Overview', 'docket-cache').'</a>';
-        $html .= '<a href="'.$this->tab_query('log').'" class="nav-tab'.$this->tab_active('log').'">'.__('Cache Log', 'docket-cache').'</a>';
+        if ($this->log_enable) {
+            $html .= '<a href="'.$this->tab_query('log').'" class="nav-tab'.$this->tab_active('log').'">'.__('Cache Log', 'docket-cache').'</a>';
+        }
         $html .= '<a href="'.$this->tab_query('config').'" class="nav-tab'.$this->tab_active('config').'">'.__('Configure', 'docket-cache').'</a>';
         $html .= '</nav>';
         echo $html;
+    }
+
+    private function maybe_change_timestamp($data)
+    {
+        if (DOCKET_CACHE_LOG_TIME) {
+            if (preg_match('@^\[([0-9A-Z\.\:\-\+ ]+)\]\s+@', $data, $mm)) {
+                $tm = strtotime($mm[1]);
+                $timestamp = '';
+                switch (DOCKET_CACHE_LOG_TIME) {
+                    case 'local':
+                        $timestamp = wp_date('Y-m-d H:i:s T', $tm);
+                        break;
+                    case 'wp':
+                        $timestamp = wp_date(get_option('date_format'), $tm).' '.wp_date(get_option('time_format'), $tm);
+                        break;
+                }
+
+                if (!empty($timestamp)) {
+                    $data = str_replace('['.$mm[1].']', '['.$timestamp.']', $data);
+                }
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -206,7 +243,7 @@ final class View
                 if (empty($line)) {
                     continue;
                 }
-                $output[] = $line;
+                $output[] = $this->maybe_change_timestamp($line);
             }
         }
 

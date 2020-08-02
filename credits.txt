@@ -1,0 +1,8 @@
+1) Lightweight Term Count Update
+   https://github.com/Automattic/lightweight-term-count-update.
+
+2) Advanced Post Cache
+   https://github.com/Automattic/vip-go-mu-plugins-built/blob/master/advanced-post-cache/advanced-post-cache.php.
+
+3) Software Testing Isometric Banner Functional Test
+   Designed by upklyak / Freepik -- http://www.freepik.com

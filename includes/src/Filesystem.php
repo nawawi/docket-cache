@@ -207,7 +207,8 @@ class Filesystem
             'shutdown',
             function () use ($tmpfile) {
                 @unlink($tmpfile);
-            }
+            },
+            PHP_INT_MAX
         );
 
         // alias
@@ -229,6 +230,9 @@ class Filesystem
 
                 return true;
             }
+
+            // failed to replace
+            $ok = false;
         }
 
         // maybe -1, true, false
@@ -251,6 +255,11 @@ class Filesystem
         $this->put($file, $code);
     }
 
+    public function is_php($file)
+    {
+        return '.php' === substr($file, -4);
+    }
+
     public function opcache_flush($file)
     {
         static $done = [];
@@ -259,7 +268,7 @@ class Filesystem
             return true;
         }
 
-        if (\function_exists('opcache_invalidate') && '.php' === substr($file, -4) && @is_file($file)) {
+        if (\function_exists('opcache_invalidate') && $this->is_php($file) && @is_file($file)) {
             $done[$file] = $file;
 
             return @opcache_invalidate($file, true);
@@ -276,7 +285,7 @@ class Filesystem
             return true;
         }
 
-        if (\function_exists('opcache_compile_file') && '.php' === substr($file, -4) && @is_file($file)) {
+        if (\function_exists('opcache_compile_file') && $this->is_php($file) && @is_file($file)) {
             $done[$file] = $file;
 
             return @opcache_compile_file($file);
@@ -303,7 +312,7 @@ class Filesystem
 
         if (!$cleanup && $cnt > 0) {
             if (DOCKET_CACHE_WPCLI) {
-                do_action('docket_preload');
+                do_action('docket-cache/preload');
             }
         }
 
@@ -368,16 +377,6 @@ class Filesystem
         $meta = [];
         $date_format = 'Y-m-d H:i:s T';
         $timestamp = date($date_format);
-        if (DOCKET_CACHE_LOG_TIME) {
-            switch (DOCKET_CACHE_LOG_TIME) {
-                case 'local':
-                    $timestamp = date_i18n($date_format);
-                    break;
-                case 'wp':
-                    $timestamp = date_i18n(get_option('date_format')).' '.date_i18n(get_option('time_format'));
-                    break;
-            }
-        }
         $meta['timestamp'] = $timestamp;
 
         if (!empty($caller)) {

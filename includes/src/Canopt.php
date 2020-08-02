@@ -80,6 +80,11 @@ final class Canopt extends Bepart
         $code .= "defined('ABSPATH') || exit;".PHP_EOL;
         $code .= 'return '.$this->export_var($config).';';
 
-        return $this->dump($this->file, $code);
+        $ret = $this->dump($this->file, $code);
+        if (true === $ret) {
+            do_action('docket-cache/save-option', $name, $value);
+        }
+
+        return $ret;
     }
 }

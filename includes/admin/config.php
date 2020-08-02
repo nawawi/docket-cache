@@ -25,7 +25,7 @@ namespace Nawawi\DocketCache;
             </td>
         </tr>
         <tr>
-            <th><?php _e('Cache Log Time Format', 'docket-cache'); ?></th>
+            <th class="border"><?php _e('Cache Log Time Format', 'docket-cache'); ?></th>
             <td>
                 <?php
                 echo $this->config_select_set(
@@ -39,12 +39,6 @@ namespace Nawawi\DocketCache;
                     DOCKET_CACHE_LOG_TIME
                 );
                 ?>
-            </td>
-        </tr>
-        <tr>
-            <th><?php _e('Cache Preloading', 'docket-cache'); ?></th>
-            <td>
-                <?php echo $this->config_select_bool('preload', DOCKET_CACHE_PRELOAD); ?>
             </td>
         </tr>
         <tr>
@@ -69,6 +63,12 @@ namespace Nawawi\DocketCache;
             <th><?php _e('Misc Performance Tweaks', 'docket-cache'); ?></th>
             <td>
                 <?php echo $this->config_select_bool('misc_tweaks', DOCKET_CACHE_MISC_TWEAKS); ?>
+            </td>
+        </tr>
+        <tr>
+            <th class="border"><?php _e('Cache Preloading', 'docket-cache'); ?></th>
+            <td>
+                <?php echo $this->config_select_bool('preload', DOCKET_CACHE_PRELOAD); ?>
             </td>
         </tr>
         <tr>

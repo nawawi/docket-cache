@@ -186,7 +186,7 @@ class Command extends WP_CLI_Command
         if (!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD) {
             $this->halt_error(__('Cache preloading not enabled.', 'docket-cache'));
         }
-        do_action('docket_preload');
+        do_action('docket-cache/preload');
         $this->halt_status(__('Preloading will happen shortly.', 'docket-cache'));
     }
 
