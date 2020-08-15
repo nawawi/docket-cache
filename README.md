@@ -1,13 +1,13 @@
 
 # ![Docket Cache](./.wordpress.org/icon-128x128.png) Docket Cache
 
-A file-based persistent WordPress Object Cache stored as a plain PHP code.
+A file-based persistent object cache stored as a plain PHP code. Accelerates caching with OPcache backend.
   
 ## Description
 
 The Docket cache is a file-based persistent WordPress Object Cache that is stored as a plain PHP code. Intends to provide an alternative option for those who can't use Redis or Memcached server.
 
-Rather than using [serialize](https://www.php.net/manual/en/function.serialize.php) and [unserialize](https://www.php.net/manual/en/function.unserialize.php) a PHP object to store into flat files, this plugin stores data by converting the object into plain PHP code which results in faster data retrieval and better performance with PHP OPCache enabled.
+Rather than using [serialize](https://www.php.net/manual/en/function.serialize.php) and [unserialize](https://www.php.net/manual/en/function.unserialize.php) a PHP object to store into flat files, this plugin stores data by converting the object into plain PHP code which results in faster data retrieval and better performance with Zend OPcache enabled.
 
 Kindly refer to the WordPress documentation on [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
 
@@ -20,7 +20,7 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 
 ## Installation
 
-To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPCache for best performance.
+To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
 
 Please see the [installation wiki](https://github.com/nawawi/docket-cache/wiki/Installation) page for details.
 
