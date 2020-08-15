@@ -42,9 +42,11 @@ To use the WP-CLI commands, please see the [WP-CLI wiki](https://github.com/nawa
 
 ![Cache Log](./.wordpress.org/screenshot-2.png) Cache Log.
 
-![Configuration Options](./.wordpress.org/screenshot-3.png) Configuration Options.
+![Configuration](./.wordpress.org/screenshot-3.png) Configuration.
 
-![Cache File](./.wordpress.org/screenshot-4.png) Cache File.
+![Select log to view](./.wordpress.org/screenshot-4.png) Select log to view.
+
+![Cache view](./.wordpress.org/screenshot-5.png) Cache view.
 
 ## How Versions Work
 
