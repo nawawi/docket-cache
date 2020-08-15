@@ -41,6 +41,7 @@ To use the WP-CLI commands, please see the [WP-CLI wiki](https://github.com/nawa
 == Requirement ==
 
 To use Docket Cache require minimum:
+
 - PHP 7.2.5
 - WordPress 5.4
 - Zend OPcache
