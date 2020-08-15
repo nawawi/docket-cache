@@ -25,6 +25,7 @@ if (1 === $this->info->status_code && isset($this->plugin->token)) {
             break;
         case 'docket-log-flushed':
             $this->plugin->flush_log();
+            $this->do_preload = true;
             break;
     }
     if (!DOCKET_CACHE_PRELOAD || 2 === $this->info->status_code) {
@@ -43,7 +44,7 @@ if ($this->do_preload) {
 }
 ?>
 <div class="wrap" id="docket-cache">
-    <h1 class="title"><?php _e('Docket Cache', 'docket-cache'); ?><span id="docket-cache-spinner" class="spinner is-active"></span></h1>
+    <h1 class="screen-reader-text"><?php _e('Docket Cache', 'docket-cache'); ?></h1>
     <?php $this->tab_nav(); ?>
 
     <div class="tab-content">

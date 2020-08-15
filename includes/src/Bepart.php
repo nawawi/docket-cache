@@ -95,4 +95,88 @@ class Bepart extends Filesystem
 
         return $code;
     }
+
+    public function safe_wpdb()
+    {
+        if (!isset($GLOBALS['wpdb']) || !$GLOBALS['wpdb']->ready) {
+            return false;
+        }
+
+        return $GLOBALS['wpdb'];
+    }
+
+    /**
+     * get_proxy_ip.
+     */
+    public function get_proxy_ip()
+    {
+        $ip = wp_cache_set('proxy-ip', 'docketcache-data');
+        if (false !== $ip) {
+            return $ip;
+        }
+
+        if (!empty($_SERVER['HTTP_HOST'])) {
+            $ip = gethostbyname($_SERVER['HTTP_HOST']);
+        } elseif (!empty($_SERVER['SERVER_ADDR'])) {
+            $ip = $_SERVER['SERVER_ADDR'];
+        }
+
+        if (!empty($ip)) {
+            wp_cache_set('proxy-ip', $ip, 'docketcache-data', 3600);
+        }
+
+        return $ip;
+    }
+
+    /**
+     * is_cloudflare.
+     */
+    public function is_cloudflare()
+    {
+        if (!empty($_SERVER['HTTP_CF_RAY'])) {
+            $rip = $this->get_proxy_ip();
+
+            return $rip.' [Ray ID: '.$_SERVER['HTTP_CF_RAY'].']';
+        }
+
+        return false;
+    }
+
+    /**
+     * is_behind_proxy.
+     */
+    public function is_behind_proxy()
+    {
+        if (!empty($_SERVER['HTTP_CF_RAY'])) {
+            return true;
+        }
+
+        $sipr = (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : null);
+        $sipl = (!empty($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : null);
+
+        if (null !== $sipr && null !== $sipl) {
+            $ipr = explode(',', $sipr);
+            $ipr = end($ipr);
+
+            $ipl = $sipl;
+
+            return  $ipr == $ipl ? true : false;
+        }
+
+        return false;
+    }
+
+    /**
+     * get_server_software.
+     */
+    public function get_server_software()
+    {
+        if (!empty($_SERVER['SERVER_SOFTWARE'])) {
+            $data = explode(' ', $_SERVER['SERVER_SOFTWARE']);
+
+            return str_replace('/', ' / ', $data[0]);
+        }
+
+        return 'Unknown';
+    }
 }

@@ -19,122 +19,64 @@ final class View
     private $do_preload;
     private $do_flush;
     private $log_enable;
+    private $log_max_size;
+    private $cache_max_size;
 
     public function __construct(Plugin $plugin)
     {
         $this->plugin = $plugin;
         $this->log_enable = DOCKET_CACHE_LOG;
+        $this->log_max_size = $this->plugin->normalize_size(DOCKET_CACHE_LOG_SIZE);
+        $this->cache_max_size = $this->plugin->normalize_size(DOCKET_CACHE_MAXSIZE);
     }
 
-    private function constants_desc()
-    {
-        return [
-             'DOCKET_CACHE_MAXTTL' => [
-                 __('Maximum cache time-to-live in seconds, if expiry key 0', 'docket-cache'),
-                 __('Default: 0', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_SIZE' => [
-                 __('Set the maximum size of cache in bytes.', 'docket-cache'),
-                 __('Default: 3000000 (3MB).', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_PATH' => [
-                 __('Set the cache directory.', 'docket-cache'),
-                 /* translators: %s: value of WP_CONTENT_DIR */
-                 sprintf(__('Default: %s/cache/docket-cache', 'docket-cache'), $this->plugin->sanitize_rootpath(WP_CONTENT_DIR)),
-             ],
-             'DOCKET_CACHE_FLUSH_DELETE' => [
-                 __('By default Docket Cache only empty the cache file. Set to true to delete the cache file.', 'docket-cache'),
-                 __('Default: false', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_GLOBAL_GROUPS' => [
-                 __('Lists of cache groups that share cache with other sites in a Multisite setup.', 'docket-cache'),
-                 /* translators: %s: url */
-                 sprintf(__('Default: <a href="%s" rel="noopener" target="blank">See details</a>', 'docket-cache'), 'https://github.com/nawawi/docket-cache#configuration-options'),
-             ],
-             'DOCKET_CACHE_IGNORED_GROUPS' => [
-                 __('List of cache groups that should not be cached.', 'docket-cache'),
-                 /* translators: %s: url */
-                 sprintf(__('Default: <a href="%s" rel="noopener" target="blank">See details</a>', 'docket-cache'), 'https://github.com/nawawi/docket-cache#configuration-options'),
-             ],
-             'DOCKET_CACHE_LOG' => [
-                 __('Set to true to enable the cache log.', 'docket-cache'),
-                 __('Default: false', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_LOG_TIME' => [
-                 __('Set log time format. Available options utc, local, wp.', 'docket-cache'),
-                 __('Default: utc', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_LOG_SIZE' => [
-                 __('Set the maximum size of a log file in bytes.', 'docket-cache'),
-                 __('Default: 10000000 (10MB)', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_LOG_FILE' => [
-                 __('Set the log file.', 'docket-cache'),
-                 /* translators: %s: value of WP_CONTENT_DIR */
-                 sprintf(__('Default: %s/.object-cache.log', 'docket-cache'), $this->plugin->sanitize_rootpath(WP_CONTENT_DIR)),
-             ],
-             'DOCKET_CACHE_LOG_FLUSH' => [
-                 __('Set to true to empty the log file when the object cache is flushed.', 'docket-cache'),
-                 __('Default: true', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_GC' => [
-                 __('The Docket Cache Garbage collector is scheduled to run every 30 minutes to clean empty files that are more than 2 minutes old. Set to false to disable the garbage collector.', 'docket-cache'),
-                 __('Default: true', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_ADVCPOST' => [
-                 __('Set to true to enable Advanced Post Cache.', 'docket-cache'),
-                 __('Default: true', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_OPTERMCOUNT' => [
-                 __('Set to true to enable miscellaneous WordPress performance tweaks.', 'docket-cache'),
-                 __('Default: true', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_MOCACHE' => [
-                 __('Set to true to enable WordPress Translation Cache.', 'docket-cache'),
-                 __('Default: true', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_MISC_TWEAKS' => [
-                 __('Set to true to enable optimization of WordPress Term count queries.', 'docket-cache'),
-                 __('Default: true', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_PRELOAD' => [
-                 __('Set to true to enable cache preloading.', 'docket-cache'),
-                 __('Default: false', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_COMMENT' => [
-                 __('Set to true to enable the HTML footer comment that promote this plugin.', 'docket-cache'),
-                 __('Default: true', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_PAGELOADER' => [
-                 __('Set to true to enable a loading bar when the admin page is loading.', 'docket-cache'),
-                 __('Default: false', 'docket-cache'),
-             ],
-             'DOCKET_CACHE_DISABLED' => [
-                 __('Set to true to bypass caching object at runtime. No object cache at this time.', 'docket-cache'),
-                 __('Default: false', 'docket-cache'),
-             ],
-         ];
-    }
-
-    private function parse_query()
+    private function parse_log_query()
     {
         $ret = (object) [];
         $ret->default_order = 'last';
         $ret->default_sort = 'desc';
         $ret->default_line = 100;
+        $ret->output = '';
+        $ret->output_empty = true;
+        $ret->log_size = 0;
+        $ret->row_size = 15;
 
-        if (!empty($_GET['srt'])) {
-            $srt = explode('-', $_GET['srt']);
-            if (3 >= \count($srt)) {
-                $ret->default_order = $srt[0];
-                $ret->default_sort = $srt[1];
-                $ret->default_line = (int) $srt[2];
+        if ($this->has_vcache()) {
+            $cache_path = $this->plugin->cache_path;
+            $vache = $this->idx_vcache();
+            $file = $cache_path.$vache.'.php';
+            if ($this->plugin->filesize($file) > 0) {
+                $data = $this->plugin->cache_get($file);
+                if (false !== $data) {
+                    $ret->output = $this->plugin->export_var($data);
+                    $ret->output_empty = empty($ret->output);
+                    $ret->log_size = $this->plugin->normalize_size(\strlen(serialize($data)));
+                    $ret->output_size = $ret->log_size;
+                    if ($ret->output_size > 15) {
+                        $ret->row_size = 25;
+                    }
+                }
+                unset($data);
             }
-        }
+        } else {
+            if (!empty($_GET['srt'])) {
+                $srt = explode('-', sanitize_text_field($_GET['srt']));
+                if (3 >= \count($srt)) {
+                    $ret->default_order = $srt[0];
+                    $ret->default_sort = $srt[1];
+                    $ret->default_line = (int) $srt[2];
+                }
+            }
 
-        $ret->output = $this->read_log($ret->default_line, 'last' === $ret->default_order ? true : false);
-        $ret->output_empty = empty($ret->output);
-        $ret->output_size = !$ret->output_empty ? \count($ret->output) : 0;
+            $ret->output = $this->read_log($ret->default_line, 'last' === $ret->default_order ? true : false);
+            $ret->output_empty = empty($ret->output);
+            $ret->output_size = !$ret->output_empty ? \count($ret->output) : 0;
+            $ret->log_size = $this->plugin->get_logsize();
+            if ($ret->output_size < 15) {
+                $ret->row_size = $ret->output_size;
+            }
+            $ret->output = implode("\n", 'desc' === $ret->default_sort ? array_reverse($ret->output, true) : $ret->output);
+        }
 
         return $ret;
     }
@@ -154,6 +96,11 @@ final class View
         $this->do_flush = false;
         $this->page('wrap');
         $this->plugin->dropino->delay_expire();
+    }
+
+    private function tab_title($title, $add_loader = true, $css = '')
+    {
+        echo '<h2 class="title'.(!empty($css) ? ' '.$css : '').'">'.$title.($add_loader ? '<span id="docket-cache-spinner" class="spinner is-active"></span>' : '').'</h2>';
     }
 
     private function tab_content()
@@ -206,33 +153,53 @@ final class View
         echo $html;
     }
 
+    private function change_timestamp($time)
+    {
+        $timestamp = '';
+        if ('utc' !== DOCKET_CACHE_LOG_TIME) {
+            switch (DOCKET_CACHE_LOG_TIME) {
+                case 'local':
+                    $timestamp = wp_date('Y-m-d H:i:s T', $time);
+                    break;
+                case 'wp':
+                    $timestamp = wp_date(get_option('date_format'), $time).' '.wp_date(get_option('time_format'), $time);
+                    break;
+            }
+        }
+
+        return $timestamp;
+    }
+
     private function maybe_change_timestamp($data)
     {
-        if (DOCKET_CACHE_LOG_TIME) {
-            if (preg_match('@^\[([0-9A-Z\.\:\-\+ ]+)\]\s+@', $data, $mm)) {
-                $tm = strtotime($mm[1]);
-                $timestamp = '';
-                switch (DOCKET_CACHE_LOG_TIME) {
-                    case 'local':
-                        $timestamp = wp_date('Y-m-d H:i:s T', $tm);
-                        break;
-                    case 'wp':
-                        $timestamp = wp_date(get_option('date_format'), $tm).' '.wp_date(get_option('time_format'), $tm);
-                        break;
-                }
+        if (preg_match('@^\[([0-9A-Z\.\:\-\+ ]+)\]\s+@', $data, $mm)) {
+            $tm = strtotime($mm[1]);
+            $timestamp = $this->change_timestamp($tm);
 
-                if (!empty($timestamp)) {
-                    $data = str_replace('['.$mm[1].']', '['.$timestamp.']', $data);
-                }
+            if (!empty($timestamp)) {
+                $data = str_replace('['.$mm[1].']', '['.$timestamp.']', $data);
             }
         }
 
         return $data;
     }
 
-    /**
-     * read_log.
-     */
+    private function parse_log($data)
+    {
+        if (preg_match('@^\[([^\]]+)\]\s+([a-zA-Z]+):\s+"([^"]+)"\s+"([^"]+)"\s+"([^"]+)"@', $data, $mm)) {
+            $tm = strtotime($mm[1]);
+            $timestamp = $this->change_timestamp($tm);
+
+            if (!empty($timestamp)) {
+                $mm[1] = $timestamp;
+            }
+
+            return $mm;
+        }
+
+        return $data;
+    }
+
     private function read_log($limit = 100, $do_last = true)
     {
         $limit = (int) $limit;
@@ -287,5 +254,15 @@ final class View
         $html .= '</select>';
 
         return $html;
+    }
+
+    private function has_vcache()
+    {
+        return !empty($_GET['vcache']);
+    }
+
+    private function idx_vcache()
+    {
+        return $this->has_vcache() ? sanitize_text_field($_GET['vcache']) : '';
     }
 }

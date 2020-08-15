@@ -260,18 +260,55 @@ class Filesystem
         return '.php' === substr($file, -4);
     }
 
-    public function opcache_flush($file)
+    public function is_opcache_enable()
     {
+        return @ini_get('opcache.enable') && \function_exists('opcache_reset');
+    }
+
+    public function opcache_is_cached($file)
+    {
+        if (!$this->is_opcache_enable()) {
+            return false;
+        }
+
         static $done = [];
 
         if (isset($done[$file])) {
-            return true;
+            return $done[$file];
+        }
+
+        if (\function_exists('opcache_is_script_cached')) {
+            $done[$file] = @opcache_is_script_cached($file);
+
+            return $done[$file];
+        }
+
+        return false;
+    }
+
+    public function opcache_flush($file)
+    {
+        if (!$this->is_opcache_enable()) {
+            return false;
+        }
+
+        static $done = [];
+
+        if (isset($done[$file])) {
+            return $done[$file];
+        }
+
+        // wp 5.5
+        if (\function_exists('wp_opcache_invalidate')) {
+            $done[$file] = @wp_opcache_invalidate($file, true);
+
+            return $done[$file];
         }
 
         if (\function_exists('opcache_invalidate') && $this->is_php($file) && @is_file($file)) {
-            $done[$file] = $file;
+            $done[$file] = @opcache_invalidate($file, true);
 
-            return @opcache_invalidate($file, true);
+            return $done[$file];
         }
 
         return false;
@@ -279,19 +316,56 @@ class Filesystem
 
     public function opcache_compile($file)
     {
+        if (!$this->is_opcache_enable()) {
+            return false;
+        }
+
         static $done = [];
 
         if (isset($done[$file])) {
-            return true;
+            return $done[$file];
         }
 
         if (\function_exists('opcache_compile_file') && $this->is_php($file) && @is_file($file)) {
-            $done[$file] = $file;
+            $done[$file] = @opcache_compile_file($file);
 
-            return @opcache_compile_file($file);
+            return $done[$file];
         }
 
         return false;
+    }
+
+    public function opcache_reset($dir)
+    {
+        if (!$this->is_opcache_enable()) {
+            return false;
+        }
+
+        @opcache_reset();
+        $dir = realpath($dir);
+        if (false !== $dir && is_dir($dir) && is_writable($dir) && $this->is_docketcachedir($dir)) {
+            foreach ($this->scanfiles($dir) as $object) {
+                $fx = $object->getPathName();
+                if (!$object->isFile() || 'file' !== $object->getType() || !$this->is_php($fx)) {
+                    continue;
+                }
+
+                $this->opcache_flush($fx);
+            }
+        }
+
+        // always true
+        return true;
+    }
+
+    public function define_cache_path($cache_path)
+    {
+        $cache_path = !empty($cache_path) && is_dir($cache_path) && '/' !== $cache_path ? rtrim($cache_path, '/\\').'/' : WP_CONTENT_DIR.'/cache/docket-cache/';
+        if (!$this->is_docketcachedir($cache_path)) {
+            $cache_path = rtim($cache_path, '/').'docket-cache/';
+        }
+
+        return $cache_path;
     }
 
     public function cachedir_flush($dir, $cleanup = false)
@@ -299,15 +373,20 @@ class Filesystem
         clearstatcache();
         $cnt = 0;
         $dir = realpath($dir);
-        if (false !== $dir && is_dir($dir) && is_writable($dir) && $this->is_docketcachedir($dir)) {
-            foreach ($this->scanfiles($dir) as $object) {
-                $this->unlink($object->getPathName(), $cleanup ? true : false);
-                ++$cnt;
-            }
+        if (false === $dir || !@is_dir($dir) || !@is_writable($dir) || !$this->is_docketcachedir($dir)) {
+            return false;
+        }
 
-            if ($cleanup) {
-                $this->unlink($dir.'/index.php', true);
+        foreach ($this->scanfiles($dir) as $object) {
+            if (!$object->isFile() || 'file' !== $object->getType()) {
+                continue;
             }
+            $this->unlink($object->getPathName(), $cleanup ? true : false);
+            ++$cnt;
+        }
+
+        if ($cleanup) {
+            $this->unlink($dir.'/index.php', true);
         }
 
         if (!$cleanup && $cnt > 0) {
@@ -322,16 +401,51 @@ class Filesystem
     /**
      * cache_size.
      */
-    public function cache_size($dir)
+    public function cache_size($dir, $is_stats = false, $force = false)
     {
-        $bytestotal = 0;
-        if ($this->is_docketcachedir($dir)) {
-            foreach ($this->scanfiles($dir) as $object) {
-                $bytestotal += $object->getSize();
+        if (!$force) {
+            $cache_stats = wp_cache_get('cache_stats', 'docketcache-data');
+            if (!empty($cache_stats) && \is_array($cache_stats)) {
+                return $is_stats ? (object) $cache_stats : $cache_stats->size;
             }
         }
 
-        return $bytestotal;
+        $bytestotal = 0;
+        $fsizetotal = 0;
+        $filestotal = 0;
+        if ($this->is_docketcachedir($dir)) {
+            foreach ($this->scanfiles($dir) as $object) {
+                if (!$object->isFile() || 'file' !== $object->getType()) {
+                    continue;
+                }
+
+                $fx = $object->getPathName();
+                $fs = $object->getSize();
+
+                if (0 === $fs) {
+                    @unlink($fx);
+                    continue;
+                }
+
+                $data = $this->cache_get($object->getPathName());
+                if (false !== $data) {
+                    $bytestotal += \strlen(serialize($data));
+                    ++$filestotal;
+                }
+                unset($data);
+                $fsizetotal += $fs;
+            }
+        }
+
+        $cache_stats = [
+            'size' => $bytestotal,
+            'filesize' => $fsizetotal,
+            'files' => $filestotal,
+        ];
+
+        wp_cache_set('cache_stats', $cache_stats, 'docketcache-data', 10);
+
+        return $is_stats ? (object) $cache_stats : $bytestotal;
     }
 
     public function cache_get($file)
@@ -365,13 +479,9 @@ class Filesystem
         $do_flush = false;
         $file = DOCKET_CACHE_LOG_FILE;
         if (@is_file($file)) {
-            if (DOCKET_CACHE_LOG_FLUSH && 'flush' === strtolower($id) || $this->filesize($file) >= (int) DOCKET_CACHE_LOG_SIZE) {
+            if (DOCKET_CACHE_LOG_FLUSH && 'flush' === $tag || $this->filesize($file) >= (int) DOCKET_CACHE_LOG_SIZE) {
                 $do_flush = true;
             }
-        }
-
-        if (false !== strpos($caller, '?page=docket-cache')) {
-            $caller = @preg_replace('@\?page=docket-cache.*@', '?page=docket-cache', $caller);
         }
 
         $meta = [];

@@ -22,7 +22,7 @@ class Command extends WP_CLI_Command
 {
     private $plugin;
 
-    public function __construct($plugin)
+    public function __construct(Plugin $plugin)
     {
         $this->plugin = $plugin;
     }
@@ -71,8 +71,7 @@ class Command extends WP_CLI_Command
         $info = (object) $this->plugin->get_info();
         $halt = $info->status_code ? 0 : 1;
 
-        WP_CLI::line("Object Cache\t: ".$this->status_color($info->status_code, $info->status_text));
-        WP_CLI::line("OPCache\t\t: ".$this->status_color($info->opcache_code, $info->opcache_text));
+        WP_CLI::line("Cache Status\t: ".$this->status_color($info->status_code, $info->status_text));
         WP_CLI::line("Cache Path\t: ".$info->cache_path);
         WP_CLI::line("Cache Size\t: ".$info->cache_size);
         WP_CLI::halt($halt);
@@ -140,9 +139,9 @@ class Command extends WP_CLI_Command
      *
      * ## EXAMPLES
      *
-     *  wp cache update-dropino
+     *  wp cache update
      *
-     * @subcommand update-dropino
+     * @subcommand update
      */
     public function update_dropino()
     {
@@ -155,39 +154,21 @@ class Command extends WP_CLI_Command
     /**
      * Flushes the object cache.
      *
-     * Directly execute 'wp cache flush' if drop-in file exists.
+     * For WordPress.
      *
      * ## EXAMPLES
      *
-     *  wp docket-cache flush
+     *  wp cache flush
+     *
+     * @subcommand flush
      */
-    public function flush()
+    public function flush_cache()
     {
-        if (!$this->plugin->dropino->exists()) {
-            $this->halt_error(__('No object cache drop-in found.', 'docket-cache'));
+        if (false === $this->plugin->flush_cache()) {
+            $this->halt_error(__('Object cache could not be flushed.', 'docket-cache'));
         }
 
-        WP_CLI::runcommand('cache flush');
-    }
-
-    /**
-     * Run cache preload.
-     *
-     * Default behavior is to overwrite any existing object cache drop-in.
-     *
-     * ## EXAMPLES
-     *
-     *  wp cache preload
-     *
-     * @subcommand preload
-     */
-    public function run_preload()
-    {
-        if (!\defined('DOCKET_CACHE_PRELOAD') || !DOCKET_CACHE_PRELOAD) {
-            $this->halt_error(__('Cache preloading not enabled.', 'docket-cache'));
-        }
-        do_action('docket-cache/preload');
-        $this->halt_status(__('Preloading will happen shortly.', 'docket-cache'));
+        $this->halt_success(__('The cache was flushed.', 'docket-cache'));
     }
 
     /**
@@ -200,7 +181,7 @@ class Command extends WP_CLI_Command
      *
      * ## EXAMPLES
      *
-     *     wp cache type
+     *  wp cache type
      */
     public function type()
     {

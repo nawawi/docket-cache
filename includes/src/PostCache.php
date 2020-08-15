@@ -12,12 +12,10 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 
-class AdvancedPost
+class PostCache
 {
     public $prefix;
     public $group_prefix;
-    public $do_flush_cache;
-    public $need_to_flush_cache;
     public $cache_incr;
     public $cache_group;
     public $cache_key;
@@ -33,9 +31,6 @@ class AdvancedPost
     {
         $this->prefix = 'docketcache-post';
         $this->group_prefix = $this->prefix.'-';
-
-        $this->do_flush_cache = true;
-        $this->need_to_flush_cache = true;
 
         /* Per cache-clear data */
         $this->cache_incr = 0;
@@ -74,20 +69,6 @@ class AdvancedPost
         add_action('clean_term_cache', [$this, 'flush_cache']);
         add_action('clean_post_cache', [$this, 'flush_cache']);
 
-        add_action(
-            'wp_updating_comment_count',
-            function () {
-                $this->do_flush_cache = true;
-            }
-        );
-
-        add_action(
-            'wp_update_comment_count',
-            function () {
-                $this->do_flush_cache = false;
-            }
-        );
-
         add_filter('instagram_cache_oembed_api_response_body', '__return_true');
 
         add_filter(
@@ -120,11 +101,11 @@ class AdvancedPost
                     return $counts;
                 }
 
-                $cache_key = "comments-{$post_id}";
-                $stats_object = wp_cache_get($cache_key);
+                $cache_key = 'comments-0';
+                $stats_object = wp_cache_get($cache_key, $this->prefix);
 
                 if (false === $stats_object) {
-                    $stats = get_comment_count($post_id);
+                    $stats = get_comment_count(0);
                     $stats['moderated'] = $stats['awaiting_moderation'];
                     unset($stats['awaiting_moderation']);
                     $stats_object = (object) $stats;
@@ -137,6 +118,15 @@ class AdvancedPost
             10,
             2
         );
+
+        foreach (['unapproved_to_approved', 'approved_to_unapproved', 'spam_to_approved', 'approved_to_spam'] as $fx) {
+            add_action(
+                'comment_'.$fx,
+                function () {
+                    wp_cache_delete('comments-0', $this->prefix);
+                }
+            );
+        }
 
         add_filter(
             'media_library_months_with_files',
@@ -206,10 +196,6 @@ class AdvancedPost
 
     public function flush_cache()
     {
-        if (!$this->do_flush_cache) {
-            return;
-        }
-
         if (is_admin() && isset($_POST['wp-preview']) && 'dopreview' === $_POST['wp-preview']) {
             return;
         }
@@ -224,14 +210,13 @@ class AdvancedPost
             $this->cache_incr = 0;
         }
         $this->cache_group = $this->group_prefix.$this->cache_incr;
-        $this->need_to_flush_cache = false;
     }
 
     public function posts_request($sql, $query)
     {
         global $wpdb;
 
-        if (apply_filters('docketcache_post_skip_type', false, $query->get('post_type'))) {
+        if (apply_filters('docket-cache/postcache-skip-type', false, $query->get('post_type'))) {
             return $sql;
         }
 
@@ -282,7 +267,7 @@ class AdvancedPost
 
     public function posts_results($posts, $query)
     {
-        if (apply_filters('docketcache_post_skip_type', false, $query->get('post_type'))) {
+        if (apply_filters('docket-cache/postcache-skip-type', false, $query->get('post_type'))) {
             return $posts;
         }
 
@@ -313,14 +298,13 @@ class AdvancedPost
         }
 
         \call_user_func($this->cache_func, $this->cache_key, $post_ids, $this->cache_group);
-        $this->need_to_flush_cache = true;
 
         return array_map('get_post', $posts);
     }
 
     public function post_limits_request($limits, $query)
     {
-        if (apply_filters('docketcache_post_skip_type', false, $query->get('post_type'))) {
+        if (apply_filters('docket-cache/postcache-skip-type', false, $query->get('post_type'))) {
             return $limits;
         }
 
@@ -335,7 +319,7 @@ class AdvancedPost
 
     public function found_posts_query($sql, $query)
     {
-        if (apply_filters('docketcache_post_skip_type', false, $query->get('post_type'))) {
+        if (apply_filters('docket-cache/postcache-skip-type', false, $query->get('post_type'))) {
             return $sql;
         }
 
@@ -348,7 +332,7 @@ class AdvancedPost
 
     public function found_posts($found_posts, $query)
     {
-        if (apply_filters('docketcache_post_skip_type', false, $query->get('post_type'))) {
+        if (apply_filters('docket-cache/postcache-skip-type', false, $query->get('post_type'))) {
             return $found_posts;
         }
 
@@ -358,7 +342,6 @@ class AdvancedPost
 
         $cache_key = $this->cache_key.'-found';
         \call_user_func($this->cache_func, $cache_key, (int) $found_posts, $this->cache_group);
-        $this->need_to_flush_cache = true;
 
         return $found_posts;
     }

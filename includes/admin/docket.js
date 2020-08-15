@@ -87,8 +87,8 @@
                         );
                 };
 
-                $selector.find( 'p.submit' )
-                    .find( 'a.button' )
+                var $psubmit = $selector.find( 'p.submit' );
+                $psubmit.find( 'a.button' )
                     .on(
                         'click',
                         function() {
@@ -96,8 +96,7 @@
                         }
                     );
 
-                $selector.find( 'p.submit' )
-                    .find( 'select' )
+                $psubmit.find( 'select' )
                     .on(
                         'change',
                         function() {
@@ -118,6 +117,81 @@
                         }
                     );
 
+                var highlight_row = function( selector, lineNum ) {
+                    var val = selector.value;
+                    var arr = val.split( "\n" );
+
+                    var startPos = 0,
+                        endPos = val.length;
+                    for ( var x = 0; x < arr.length; x++ ) {
+                        if ( x == lineNum ) {
+                            break;
+                        }
+                        startPos += ( arr[ x ].length + 1 );
+
+                    }
+
+                    var endPos = arr[ lineNum ].length + startPos;
+
+                    if ( typeof( selector.selectionStart ) != "undefined" ) {
+                        selector.focus();
+                        selector.selectionStart = startPos;
+                        selector.selectionEnd = endPos;
+                        return true;
+                    }
+
+                    if ( document.selection && document.selection.createRange ) {
+                        selector.focus();
+                        selector.select();
+                        var range = document.selection.createRange();
+                        range.collapse( true );
+                        range.moveEnd( "character", endPos );
+                        range.moveStart( "character", startPos );
+                        range.select();
+                        return true;
+                    }
+
+                    return false;
+                };
+
+                var view_row = function( row ) {
+                    var mm = row.match( /\:\s+\"([^"]+)\"\s+/ );
+                    if ( mm && mm[ 1 ] ) {
+                        var idx = mm[ 1 ];
+                        var $bt = $selector.find( 'a.button-vcache' );
+                        var url = $bt.attr( 'href' );
+
+                        $bt.removeClass( 'hide' );
+
+                        url = url.replace( /\&vcache=.*/, '' );
+                        url = url + '&vcache=' + idx;
+                        $bt.attr( 'href', url );
+                        $selector.find( 'span.vcache' )
+                            .removeClass( 'hide' )
+                            .html( idx );
+                    }
+                };
+                $selector.find( '.log' )
+                    .find( 'textarea#log' )
+                    .on(
+                        "click",
+                        function( e ) {
+                            var $self = $( this );
+                            var sp = $self
+                                .scrollTop()
+                            var lh = $self
+                                .css( "line-height" );
+                            lh = parseInt( lh.substring( 0, lh.length - 2 ) );
+
+                            var line = Math.floor( ( e.offsetY + sp ) / lh );
+                            var arr = $self
+                                .val()
+                                .split( "\n" );
+                            var row = arr[ line ];
+                            view_row( row );
+                            highlight_row( this, line );
+                        }
+                    );
             }
         );
 } )( jQuery );

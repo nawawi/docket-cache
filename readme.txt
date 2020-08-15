@@ -1,15 +1,15 @@
-=== Docket Cache ===
-Contributors: nawawijamili,rutflare
-Tags: cache, database, opcache, optimizing, object cache, performance, redis, memcached, keydb, speed
+=== Docket Cache - Object Cache Accelerator ===
+Contributors: nawawijamili
+Tags: object cache, opcache, fastcgi, cache, database, optimization, performance, redis, memcached, speed, multisite, server load, docket
 Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
-Tested up to: 5.4.2
+Tested up to: 5.5
 Requires PHP: 7.2.5
 Stable tag: trunk
 License: MIT
 License URI: ./license.txt
 
-A file-based persistent WordPress Object Cache stored as a plain PHP code.
+A file-based persistent object cache stored as a plain PHP code. Accelerates caching with OPCache backend.
 
 == Description ==
 The Docket cache is a file-based persistent WordPress Object Cache that is stored as a plain PHP code. Intends to provide an alternative option for those who can't use Redis or Memcached server.
@@ -18,7 +18,7 @@ Rather than using [serialize](https://www.php.net/manual/en/function.serialize.p
 
 Kindly refer to the WordPress documentation on [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
 
-An inside look:
+Quick Demo:
 
 https://youtu.be/385zLPZLLb8
 
@@ -55,6 +55,30 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and PHP OPCache for
 2. Cache Log.
 3. Configuration Options.
 4. Cache File.
+
+== Frequently Asked Questions ==
+= What is Object Caching in WordPress? =
+Object caching is a process that stores database query results in order to quickly bring them back up next time they are needed.
+
+The cached object will be served promptly from the cache rather than sending multiple requests to a database. This is more efficient and reduces massive unnecessary loads on your server.
+
+In simple terms, object caching allows objects that are used often to be copied and stored at a closer location for quicker use.
+
+= What is Docket Cache in Object Caching? =
+By default, the object cache in WordPress is non-persistent. This means that data stored in the cache reside in memory only and only for the duration of the request. Cached data will not be stored persistently across page loads. To make it persistent, the object cache must be stored on a local disk.
+
+Docket Cache is not just stored the object cache, it converts the object cache into plain PHP code. This solution is faster since WordPress can use the cache directly without running other operation.
+
+= What is OPCache in Docket Cache? =
+OPcache is a caching engine built into PHP, improves performance by storing precompiled script bytecode in shared memory, thereby removing the need for PHP to load and parse scripts on each request.
+
+Docket Cache converts the object cache into plain PHP code. When read and write cache, it will use OPCache directly which results in faster data retrieval and better performance.
+
+= What’s the difference with the other object cache plugin? =
+Docket Cache is an Object Cache Accelerator. It does some optimization of caching like cache post queries, comments counting, WordPress translation and more before storing the object caches.
+
+= Can I pair using it with other cache plugin? =
+Yes and No. You can pair using it with page caching plugin, but not with the object cache plugin.
 
 == Upgrade Notice ==
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.

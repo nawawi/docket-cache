@@ -14,12 +14,58 @@ namespace Nawawi\DocketCache;
 
 final class Constans
 {
-    public static function is_defined_array($name)
+    private static $inst;
+
+    public function __construct()
+    {
+        $this->register_default();
+    }
+
+    public static function init()
+    {
+        if (!isset(self::$inst)) {
+            self::$inst = new self();
+        }
+
+        return self::$inst;
+    }
+
+    public function is_false($name)
+    {
+        return !\defined($name) || !\constant($name);
+    }
+
+    public function is_true($name)
+    {
+        return \defined($name) && \constant($name);
+    }
+
+    public function is_array($name)
     {
         return \defined($name) && \is_array($name) && !empty($name);
     }
 
-    public static function maybe_define($name, $value, $user_config = true)
+    public function is_int($name)
+    {
+        return \defined($name) && \is_int($name);
+    }
+
+    public function is($name, $value)
+    {
+        return \defined($name) && $value === \constant($name);
+    }
+
+    public function value($name)
+    {
+        $value = '';
+        if (\defined($name)) {
+            $value = \constant($name);
+        }
+
+        return $value;
+    }
+
+    public function maybe_define($name, $value, $user_config = true)
     {
         if (!\defined($name)) {
             if ($user_config && class_exists('Nawawi\\DocketCache\\Canopt')) {
@@ -44,47 +90,53 @@ final class Constans
         return false;
     }
 
-    public static function init()
+    public function register_default()
     {
         // compat
-        self::maybe_define('WP_CONTENT_DIR', ABSPATH.'wp-content', false);
-        self::maybe_define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins', false);
+        $this->maybe_define('WP_CONTENT_DIR', ABSPATH.'wp-content', false);
+        $this->maybe_define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins', false);
 
         // data dir
-        self::maybe_define('DOCKET_CACHE_DATA_PATH', WP_CONTENT_DIR.'/docket-cache-data/', false);
+        $this->maybe_define('DOCKET_CACHE_DATA_PATH', WP_CONTENT_DIR.'/docket-cache-data/', false);
 
         // cache dir
-        self::maybe_define('DOCKET_CACHE_PATH', WP_CONTENT_DIR.'/cache/docket-cache/', false);
+        $this->maybe_define('DOCKET_CACHE_PATH', WP_CONTENT_DIR.'/cache/docket-cache/', false);
 
-        // cache file max size: 3MB, min 1MB
-        self::maybe_define('DOCKET_CACHE_MAXSIZE', 3000000);
+        // cache file max size: 3MB, 1MB = 1048576 bytes (binary) = 1000000 bytes (decimal)
+        $this->maybe_define('DOCKET_CACHE_MAXSIZE', 3145728);
 
         // cache maxttl
-        self::maybe_define('DOCKET_CACHE_MAXTTL', 0);
+        $this->maybe_define('DOCKET_CACHE_MAXTTL', 0);
 
         // log on/off
-        self::maybe_define('DOCKET_CACHE_LOG', false);
+        $this->maybe_define('DOCKET_CACHE_LOG', false);
 
         // log file
-        self::maybe_define('DOCKET_CACHE_LOG_FILE', WP_CONTENT_DIR.'/.object-cache.log');
+        $this->maybe_define('DOCKET_CACHE_LOG_FILE', WP_CONTENT_DIR.'/.object-cache.log');
 
         // empty file when cache flushed
-        self::maybe_define('DOCKET_CACHE_LOG_FLUSH', true);
+        $this->maybe_define('DOCKET_CACHE_LOG_FLUSH', true);
 
         // log time format: utc, local, wp
-        self::maybe_define('DOCKET_CACHE_LOG_TIME', 'utc');
+        $this->maybe_define('DOCKET_CACHE_LOG_TIME', 'utc');
 
-        // log file max size: 10MB
-        self::maybe_define('DOCKET_CACHE_LOG_SIZE', 10000000);
+        // log file max size: 10MB, 1MB = 1048576 bytes (binary) = 1000000 bytes (decimal)
+        $this->maybe_define('DOCKET_CACHE_LOG_SIZE', 10485760);
 
         // truncate or delete cache file
-        self::maybe_define('DOCKET_CACHE_FLUSH_DELETE', false);
+        $this->maybe_define('DOCKET_CACHE_FLUSH_DELETE', false);
 
         // garbage collector
-        self::maybe_define('DOCKET_CACHE_GC', true);
+        $this->maybe_define('DOCKET_CACHE_GC', true);
+
+        // optimize db
+        $this->maybe_define('DOCKET_CACHE_CRONOPTMZDB', 'never');
+
+        // option autoload
+        $this->maybe_define('DOCKET_CACHE_WPOPTALOAD', false);
 
         // global cache group
-        self::maybe_define(
+        $this->maybe_define(
             'DOCKET_CACHE_GLOBAL_GROUPS',
             [
                 'blog-details',
@@ -108,7 +160,7 @@ final class Constans
         );
 
         // cache ignored groups
-        self::maybe_define(
+        $this->maybe_define(
             'DOCKET_CACHE_IGNORED_GROUPS',
             [
                 'themes',
@@ -118,11 +170,11 @@ final class Constans
         );
 
         // cache ignored keys
-        self::maybe_define('DOCKET_CACHE_IGNORED_KEYS', []);
+        $this->maybe_define('DOCKET_CACHE_IGNORED_KEYS', []);
 
         // @private
         // this option private for right now
-        self::maybe_define(
+        $this->maybe_define(
             'DOCKET_CACHE_FILTERED_GROUPS',
             [
                 'counts' => [
@@ -133,33 +185,46 @@ final class Constans
         );
 
         // misc tweaks
-        self::maybe_define('DOCKET_CACHE_MISC_TWEAKS', true);
+        $this->maybe_define('DOCKET_CACHE_MISC_TWEAKS', true);
+
+        // woocommerce tweaks
+        $this->maybe_define('DOCKET_CACHE_WOOTWEAKS', true);
+
+        // post missed schedule
+        $this->maybe_define('DOCKET_CACHE_POSTMISSEDSCHEDULE', true);
 
         // advanced post cache
-        self::maybe_define('DOCKET_CACHE_ADVCPOST', true);
+        $this->maybe_define('DOCKET_CACHE_ADVCPOST', true);
 
         // optimize term count
-        self::maybe_define('DOCKET_CACHE_OPTERMCOUNT', true);
+        $this->maybe_define('DOCKET_CACHE_OPTERMCOUNT', true);
 
         // translation mo file cache
-        self::maybe_define('DOCKET_CACHE_MOCACHE', false);
+        $this->maybe_define('DOCKET_CACHE_MOCACHE', false);
 
         // wp-cli
-        self::maybe_define('DOCKET_CACHE_WPCLI', (\defined('WP_CLI') && WP_CLI));
+        $this->maybe_define('DOCKET_CACHE_WPCLI', (\defined('WP_CLI') && WP_CLI));
 
         // banner
-        self::maybe_define('DOCKET_CACHE_COMMENT', true);
+        $this->maybe_define('DOCKET_CACHE_SIGNATURE', true);
 
         // preload
-        self::maybe_define('DOCKET_CACHE_PRELOAD', false);
+        $this->maybe_define('DOCKET_CACHE_PRELOAD', false);
+
+        // precache
+        $this->maybe_define('DOCKET_CACHE_PRECACHE', true);
 
         // page loader
-        self::maybe_define('DOCKET_CACHE_PAGELOADER', true);
+        $this->maybe_define('DOCKET_CACHE_PAGELOADER', true);
+
+        // docket connect
+        $this->maybe_define('DOCKET_CACHE_CONNECTSAAS', false);
 
         // backwards-compatible
-        self::maybe_define('DOCKET_CACHE_DEBUG', DOCKET_CACHE_LOG);
-        self::maybe_define('DOCKET_CACHE_DEBUG_FILE', DOCKET_CACHE_LOG_FILE);
-        self::maybe_define('DOCKET_CACHE_DEBUG_FLUSH', DOCKET_CACHE_LOG_FLUSH);
-        self::maybe_define('DOCKET_CACHE_DEBUG_SIZE', DOCKET_CACHE_LOG_SIZE);
+        $this->maybe_define('DOCKET_CACHE_COMMENT', DOCKET_CACHE_SIGNATURE);
+        $this->maybe_define('DOCKET_CACHE_DEBUG', DOCKET_CACHE_LOG);
+        $this->maybe_define('DOCKET_CACHE_DEBUG_FILE', DOCKET_CACHE_LOG_FILE);
+        $this->maybe_define('DOCKET_CACHE_DEBUG_FLUSH', DOCKET_CACHE_LOG_FLUSH);
+        $this->maybe_define('DOCKET_CACHE_DEBUG_SIZE', DOCKET_CACHE_LOG_SIZE);
     }
 }

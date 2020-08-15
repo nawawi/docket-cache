@@ -22,7 +22,7 @@ final class TermCount
     public function __construct()
     {
         if (!(\defined('DOING_CRON') && DOING_CRON) && !(\defined('WP_CLI') && WP_CLI) && !(\defined('WP_IMPORTING') && WP_IMPORTING)) {
-            add_action('init', [$this, 'attach']);
+            add_action('plugin_loaded', [$this, 'attach']);
         }
     }
 
@@ -197,7 +197,7 @@ final class TermCount
         if (!($screen instanceof \WP_Screen)) {
             return false;
         }
-        if ('edit-$taxonomy' === $screen->id) {
+        if ('edit-'.$taxonomy === $screen->id) {
             wp_update_term_count_now([$tt_id], $taxonomy);
         }
 

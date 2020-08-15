@@ -14,14 +14,14 @@ namespace Nawawi\DocketCache;
 
 final class Tweaks
 {
-    private $hook;
+    private $plugin;
 
     public function __construct(Plugin $plugin)
     {
-        $this->hook = $plugin->hook;
+        $this->plugin = $plugin;
     }
 
-    public function vipcom()
+    public function wpquery()
     {
         // vipcom: prevent core from doing filename lookups for media search.
         // https://core.trac.wordpress.org/ticket/39358
@@ -111,7 +111,7 @@ final class Tweaks
         // wp: disable and remove do_pings
         // https://wp-mix.com/wordpress-clean-up-do_pings/
         add_action(
-            'init',
+            'plugins_loaded',
             function () {
                 if (isset($_GET['doing_wp_cron'])) {
                     remove_action('do_pings', 'do_all_pings');
@@ -128,27 +128,45 @@ final class Tweaks
         // wp: disable xmlrpc
         // https://www.wpbeginner.com/plugins/how-to-disable-xml-rpc-in-wordpress/
         // https://kinsta.com/blog/xmlrpc-php/
-        add_filter('xmlrpc_enabled', '__return_false');
-        add_filter('pre_update_option_enable_xmlrpc', '__return_false');
-        add_filter('pre_option_enable_xmlrpc', '__return_zero');
-        add_action(
-            'init',
-            function () {
-                if (isset($_SERVER['REQUEST_URI']) && '/xmlrpc.php' === $_SERVER['REQUEST_URI']) {
-                    http_response_code(403);
-                    exit('xmlrpc.php not available.');
-                }
-            },
-            PHP_INT_MAX
-        );
+        if ($this->plugin->constans->is_false('DOCKET_CACHE_TWEAKS_XMLRPC_DISABLED')) {
+            add_filter('xmlrpc_enabled', '__return_false');
+            add_filter('pre_update_option_enable_xmlrpc', '__return_false');
+            add_filter('pre_option_enable_xmlrpc', '__return_zero');
+            add_action(
+                'plugins_loaded',
+                function () {
+                    if (isset($_SERVER['REQUEST_URI']) && '/xmlrpc.php' === $_SERVER['REQUEST_URI']) {
+                        http_response_code(403);
+                        exit('xmlrpc.php not available.');
+                    }
+                },
+                PHP_INT_MAX
+            );
+        }
+
+        if ($this->plugin->constans->is_false('DOCKET_CACHE_TWEAKS_WPCOOKIE_DISABLED')) {
+            // wp: comment cookie lifetime, default to 30000000 second = 12 months
+            add_filter(
+                'comment_cookie_lifetime',
+                function () {
+                    return 12 * HOUR_IN_SECONDS;
+                },
+                -PHP_INT_MAX
+            );
+
+            // wp: protected post, expire when browser close
+            add_filter(
+                'post_password_expires',
+                function () {
+                    return 0;
+                },
+                -PHP_INT_MAX
+            );
+        }
     }
 
     public function woocommerce()
     {
-        if (\defined('DOCKET_CACHE_TWEAKS_WOO_DISABLE') && DOCKET_CACHE_TWEAKS_WOO_DISABLE) {
-            return;
-        }
-
         if (!class_exists('woocommerce')) {
             return;
         }
@@ -188,4 +206,82 @@ final class Tweaks
             }
         );
     }
+
+    public function security_header()
+    {
+        if (isset($_SERVER['DOCKET_CACHE_SERVER'])) {
+            return;
+        }
+
+        add_action(
+            'send_headers',
+            function () {
+                if (is_ssl()) {
+                    header('Strict-Transport-Security: max-age=63072000; includeSubDomains');
+                }
+
+                header('X-Frame-Options: SAMEORIGIN');
+                header('Referrer-Policy: strict-origin-when-cross-origin');
+                header('Feature-Policy: payment \'self\'; sync-xhr \'self\' '.get_home_url());
+                header('X-Content-Type-Options: nosniff');
+                header('X-XSS-Protection: 1; mode=block');
+                header('Content-Security-Policy: report-uri /csp-report-parser;');
+                header('X-Permitted-Cross-Domain-Policies: master-only');
+            },
+            PHP_INT_MAX
+        );
+    }
+
+    public function post_missed_schedule()
+    {
+        $wpdb = $this->plugin->safe_wpdb();
+        if (!$wpdb) {
+            return false;
+        }
+
+        $limit = wp_count_posts()->future;
+        if ($limit < 1) {
+            return false;
+        }
+
+        $limit = $limit > 100 ? 100 : $limit;
+
+        $now = gmdate('Y-m-d H:i:59');
+        $args = [
+            'public' => true,
+            'exclude_from_search' => false,
+            '_builtin' => false,
+        ];
+
+        $post_types = get_post_types($args, 'names', 'and');
+        if (!empty($post_types) && \is_array($post_types)) {
+            $types = implode("','", $post_types);
+            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page','%s') AND post_status='future' AND post_date_gmt < '%s' ORDER BY ID ASC LIMIT %d", $types, $now, $limit);
+        } else {
+            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page') AND post_status='future' AND post_date_gmt < '%s' ORDER BY ID ASC LIMIT %d", $now, $limit);
+        }
+
+        $suppress = $wpdb->suppress_errors(true);
+        $results = $wpdb->get_results($query, ARRAY_A);
+        $wpdb->suppress_errors($suppress);
+
+        if (!empty($results)) {
+            while ($row = @array_shift($results)) {
+                $id = $row['ID'];
+                wp_publish_post($id);
+            }
+        }
+
+        return true;
+    }
+
+    /*public function wpoptions_size() {
+        $wpdb = $this->plugni->safe_wpdb();
+        if ( !$wpdb ) {
+            return false;
+        }
+
+        $query = $wpdb->prepare("SELECT LENGTH(option_value), option_name FROM `{$wpdb->options}` WHERE autoload='yes' ORDER BY length(option_value) DESC");
+
+    }*/
 }

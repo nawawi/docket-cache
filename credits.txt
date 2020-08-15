@@ -1,8 +1,16 @@
-1) Lightweight Term Count Update
+The portion of following projects has been used in Docket Cache. Thank you for all the great works!.
+
+1) Symfony VarExporter Component
+   https://github.com/symfony/var-exporter
+
+2) MonoDB
+   https://github.com/nawawi/MonoDB
+
+3) Lightweight Term Count Update
    https://github.com/Automattic/lightweight-term-count-update.
 
-2) Advanced Post Cache
+4) Advanced Post Cache
    https://github.com/Automattic/vip-go-mu-plugins-built/blob/master/advanced-post-cache/advanced-post-cache.php.
 
-3) Software Testing Isometric Banner Functional Test
+5) Software Testing Isometric Banner Functional Test
    Designed by upklyak / Freepik -- http://www.freepik.com

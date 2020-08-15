@@ -36,7 +36,22 @@ final class Canopt extends Bepart
 
     public function keys()
     {
-        return ['log', 'log_time', 'preload', 'advcpost', 'optermcount', 'mocache', 'misc_tweaks', 'pageloader'];
+        return [
+             'log',
+             'log_time',
+             'preload',
+             'advcpost',
+             'optermcount',
+             'precache',
+             'mocache',
+             'misc_tweaks',
+             'postmissedschedule',
+             'wootweaks',
+             'pageloader',
+             'wpoptaload',
+             'cronoptmzdb',
+             'connectsaas',
+         ];
     }
 
     public function get($name)
@@ -81,9 +96,7 @@ final class Canopt extends Bepart
         $code .= 'return '.$this->export_var($config).';';
 
         $ret = $this->dump($this->file, $code);
-        if (true === $ret) {
-            do_action('docket-cache/save-option', $name, $value);
-        }
+        do_action('docket-cache/save-option', $name, $value, $ret);
 
         return $ret;
     }

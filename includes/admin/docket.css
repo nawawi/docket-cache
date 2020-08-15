@@ -6,11 +6,28 @@
  *
  * @see    https://github.com/nawawi/docket-cache
  */
-#docket-cache .form-table,
-#docket-cache .form-table tbody,
-#docket-cache .form-table td,
-#docket-cache .form-table th,
-#docket-cache .form-table tr {
+
+body {
+    background-color: #f5f5f5;
+}
+
+#docket-cache {
+    margin-top: 20px;
+}
+
+#docket-cache .hide {
+    display: none !important;
+}
+
+#docket-cache .text-capitalize {
+    text-transform: capitalize !important;
+}
+
+#docket-cache table,
+#docket-cache tbody,
+#docket-cache td,
+#docket-cache th,
+#docket-cache tr {
     margin: 0;
     padding: 0;
     border: 0;
@@ -36,9 +53,22 @@
 
 #docket-cache .overview .form-table td,
 #docket-cache .log .form-table td {
-    font-family: Consolas, Monaco, monospace;
+    font-family: monospace, Consolas, Monaco;
     unicode-bidi: embed;
     font-size: 13px;
+}
+
+#docket-cache .overview .form-table th {
+    min-width: 250px;
+}
+
+#docket-cache .overview a.btxo {
+    text-decoration: none;
+    color: #444444;
+}
+
+#docket-cache .overview a.btxo:hover {
+    text-decoration: underline;
 }
 
 #docket-cache .form-table th,
@@ -58,6 +88,11 @@
     font-weight: bold;
 }
 
+#docket-cache .bt-fx {
+    min-width: 100px;
+    margin-bottom: 4px;
+}
+
 #docket-cache .log {
     width: 100%;
 }
@@ -67,7 +102,12 @@
     margin-bottom: 10px;
 }
 
-#docket-cache textarea {
+#docket-cache .log span.vcache {
+    display: inline-block;
+    margin-top: 5px;
+}
+
+#docket-cache .log textarea {
     width: 100%;
     font-size: 100%;
     font: courier;
@@ -79,45 +119,20 @@
     background-color: white;
 }
 
-#docket-cache .config p {
-    font-size: 14px;
+#docket-cache .log a.logf {
+    text-decoration: none;
+    color: #444444;
 }
 
-#docket-cache .config .form-table th,
-#docket-cache .config .form-table td {
-    vertical-align: top;
+#docket-cache .log a.logf:hover {
+    text-decoration: underline;
 }
 
-#docket-cache .config .form-table th {
-    min-width: 300px;
-    padding-top: 12px;
-}
-
-#docket-cache .config .form-table td {
-    padding-top: 4px;
-}
-
-#docket-cache .config .form-table small {
-    display: inline-block;
-    margin-top: 10px;
-    font-size: 13px;
-}
-
-#docket-cache .config .form-table code {
-    font-size: 12px;
-}
-
-#docket-cache .config .form-table th.const {
+#docket-cache .log .dashicons {
     font-weight: normal;
 }
 
-#docket-cache .config .table-scroll {
-    display: block;
-    width: 100%;
-    height: 280px;
-    overflow: auto;
-}
-
+/* config */
 
 #docket-cache .form-table-selection td,
 #docket-cache .form-table-selection th {
@@ -126,14 +141,29 @@
     vertical-align: middle !important;
 }
 
+#docket-cache .form-table-selection th {
+    min-width: 300px;
+}
+
 #docket-cache .form-table-selection select {
     margin-top: 6px;
     margin-bottom: 6px;
-    width: 120px;
-    font-family: Consolas, Monaco, monospace;
+    width: 150px;
+    font-family: monospace, Consolas, Monaco;
     unicode-bidi: embed;
     font-size: 12px;
 }
+
+#docket-cache .config .inside * {
+    font-size: 13px !important;
+}
+
+#docket-cache .config .inside div {
+    padding: 0 6px 0 6px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* /config */
 
 #docket-cache h2.title {
     padding: 0;
@@ -184,12 +214,16 @@
     border-bottom: none !important;
 }
 
-#docket-cache .border {
+#docket-cache .border-b {
     border-bottom: 1px solid #ddd !important;
 }
 
 #docket-cache .log p.submit {
     margin-top: 12px;
+}
+
+#docket-cache .log textarea {
+    cursor: pointer;
 }
 
 #docket-cache textarea:focus,
@@ -204,15 +238,90 @@
     margin-right: 4px;
 }
 
+/* flex */
+#docket-cache .flex-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+#docket-cache .flex-container div.row-left {
+    width: 100%;
+    margin-right: 40px;
+}
+
+#docket-cache .flex-container div.row-right {
+    width: 450px;
+}
+
+#docket-cache .flex-container .postbox {
+    border-color: #ddd;
+}
+
+#docket-cache .flex-container .postbox .inside {
+    padding: 0 12px 0 12px;
+}
+
+#docket-cache .flex-container .postbox .inside .bt-cx {
+    margin-top: 10px;
+}
+
+#docket-cache .dashicons {
+    font-size: 18px;
+    margin-top: -1px;
+}
+
+#docket-cache .connector-table {
+    width: 100%;
+}
+
+#docket-cache .connector-table td,
+#docket-cache .connector-table th {
+    padding: 6px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+#docket-cache .connector-table th {
+    font-weight: 600;
+    width: 40%;
+}
+
+#docket-cache .connector-table input.api {
+    width: 100%;
+}
+
+#docket-cache .connector-table input.btapi {
+    width: 100%;
+}
+
+#docket-cache .connector-table a {
+    text-decoration: none;
+    margin-right: 6px;
+}
+
+#docket-cache .connector-table a:hover {
+    text-decoration: underline;
+}
+
+/* /flex */
+
+/* desktop */
 @media only screen and (min-width: 700px) {
     #docket-cache .nav-tab {
         min-width: 100px;
         text-align: center;
     }
+
+    #docket-cache p.submit .button {
+        margin-right: 6px;
+    }
 }
 
+/* small */
 @media only screen and (max-width: 600px) {
-    #docket-cache .config .form-table th {
+    #docket-cache p.submit .button {
         width: 100%;
     }
 
@@ -223,9 +332,57 @@
     #docket-cache .form-table td {
         padding-top: 0;
     }
+
+    #docket-cache .border-b {
+        border-bottom: none !important;
+    }
+
+    #docket-cache .table-scroll thead {
+        display: none;
+    }
+
+    #docket-cache .form-table-selection th,
+    #docket-cache .form-table-selection td {
+        width: 100% !important;
+        display: block;
+        float: left;
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    #docket-cache .form-table-selection td:nth-of-type(1) {
+        border: none !important;
+    }
+
+    #docket-cache .form-table-selection select {
+        width: 100%;
+    }
+
+    #docket-cache .flex-container {
+        flex-direction: column;
+    }
+
+    #docket-cache .flex-container div.row-left,
+    #docket-cache .flex-container div.row-right {
+        width: 100%;
+        margin: 0;
+    }
+
+    #docket-cache .connector-table th,
+    #docket-cache .connector-table td {
+        width: 100%;
+        display: block;
+        float: left;
+        padding-right: 0;
+        padding-left: 0;
+    }
 }
 
 #wpfooter #footer-left,
 #wpfooter #footer-upgrade {
-    font-size: 12px !important;
+    font-size: 11px !important;
+}
+
+.update-nag {
+    display: none;
 }

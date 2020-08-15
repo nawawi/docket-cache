@@ -35,16 +35,18 @@ class ComposerStaticInit71169967e8f502f7da209e4236957996
     );
 
     public static $classMap = array (
-        'Nawawi\\DocketCache\\AdvancedPost' => __DIR__ . '/../../..' . '/includes/src/AdvancedPost.php',
         'Nawawi\\DocketCache\\Bepart' => __DIR__ . '/../../..' . '/includes/src/Bepart.php',
         'Nawawi\\DocketCache\\Canopt' => __DIR__ . '/../../..' . '/includes/src/Canopt.php',
         'Nawawi\\DocketCache\\Command' => __DIR__ . '/../../..' . '/includes/src/Command.php',
         'Nawawi\\DocketCache\\Constans' => __DIR__ . '/../../..' . '/includes/src/Constans.php',
         'Nawawi\\DocketCache\\Crawler' => __DIR__ . '/../../..' . '/includes/src/Crawler.php',
         'Nawawi\\DocketCache\\Dropino' => __DIR__ . '/../../..' . '/includes/src/Dropino.php',
+        'Nawawi\\DocketCache\\Event' => __DIR__ . '/../../..' . '/includes/src/Event.php',
         'Nawawi\\DocketCache\\Filesystem' => __DIR__ . '/../../..' . '/includes/src/Filesystem.php',
         'Nawawi\\DocketCache\\MoCache' => __DIR__ . '/../../..' . '/includes/src/MoCache.php',
+        'Nawawi\\DocketCache\\PageCache' => __DIR__ . '/../../..' . '/includes/src/PageCache.php',
         'Nawawi\\DocketCache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',
+        'Nawawi\\DocketCache\\PostCache' => __DIR__ . '/../../..' . '/includes/src/PostCache.php',
         'Nawawi\\DocketCache\\PrivateRepo' => __DIR__ . '/../../..' . '/includes/src/PrivateRepo.php',
         'Nawawi\\DocketCache\\TermCount' => __DIR__ . '/../../..' . '/includes/src/TermCount.php',
         'Nawawi\\DocketCache\\Tweaks' => __DIR__ . '/../../..' . '/includes/src/Tweaks.php',

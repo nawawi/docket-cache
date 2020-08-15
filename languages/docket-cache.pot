@@ -2,27 +2,27 @@
 # This file is distributed under the same license as the Docket Cache plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 20.08.03\n"
+"Project-Id-Version: Docket Cache 20.08.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-08-02T18:52:31+00:00\n"
+"POT-Creation-Date: 2020-08-15T18:26:29+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
 
 #. Plugin Name of the plugin
-#: includes/admin/wrap.php:46
-#: includes/src/Plugin.php:444
-#: includes/src/Plugin.php:445
+#: includes/admin/wrap.php:47
+#: includes/src/Plugin.php:594
+#: includes/src/Plugin.php:595
 msgid "Docket Cache"
 msgstr ""
 
 #. Description of the plugin
-msgid "A file-based persistent WordPress Object Cache stored as a plain PHP code."
+msgid "A file-based persistent object cache stored as a plain PHP code. Accelerates caching with OPCache backend."
 msgstr ""
 
 #. Author of the plugin
@@ -33,473 +33,459 @@ msgstr ""
 msgid "https://profiles.wordpress.org/nawawijamili"
 msgstr ""
 
-#: includes/admin/config.php:16
+#: includes/admin/config.php:18
 msgid "Configuration"
 msgstr ""
 
-#: includes/admin/config.php:18
-msgid "Options"
-msgstr ""
-
 #: includes/admin/config.php:19
-msgid "This option allows you to quickly change basic configuration, overwrites by constants if defined."
+msgid "The following option allows to quickly change basic configuration, overwrites by constants if defined."
 msgstr ""
 
 #: includes/admin/config.php:22
-#: includes/src/View.php:202
+#: includes/admin/log.php:19
+#: includes/src/View.php:149
 msgid "Cache Log"
 msgstr ""
 
-#: includes/admin/config.php:28
+#: includes/admin/config.php:29
 msgid "Cache Log Time Format"
 msgstr ""
 
-#: includes/admin/config.php:34
-#: includes/src/View.php:258
+#: includes/admin/config.php:35
+#: includes/admin/config.php:77
+#: includes/src/View.php:225
 msgid "Default"
 msgstr ""
 
-#: includes/admin/config.php:35
+#: includes/admin/config.php:36
 msgid "UTC"
 msgstr ""
 
-#: includes/admin/config.php:36
+#: includes/admin/config.php:37
 msgid "Local time"
 msgstr ""
 
-#: includes/admin/config.php:37
+#: includes/admin/config.php:38
 msgid "Site Format"
 msgstr ""
 
-#: includes/admin/config.php:45
+#: includes/admin/config.php:47
 msgid "Advanced Post Caching"
 msgstr ""
 
-#: includes/admin/config.php:51
-msgid "Optimize Term Count Queries"
+#: includes/admin/config.php:53
+msgid "Object Cache Precaching"
 msgstr ""
 
-#: includes/admin/config.php:57
+#: includes/admin/config.php:59
 msgid "WordPress Translation Caching"
 msgstr ""
 
-#: includes/admin/config.php:63
+#: includes/admin/config.php:65
+msgid "Optimize Term Count Queries"
+msgstr ""
+
+#: includes/admin/config.php:71
+msgid "Optimize Database Tables"
+msgstr ""
+
+#: includes/admin/config.php:78
+msgid "Daily"
+msgstr ""
+
+#: includes/admin/config.php:79
+msgid "Weekly"
+msgstr ""
+
+#: includes/admin/config.php:80
+msgid "Monthly"
+msgstr ""
+
+#: includes/admin/config.php:81
+msgid "Never"
+msgstr ""
+
+#: includes/admin/config.php:89
+msgid "Suspend WP Options Autoload"
+msgstr ""
+
+#: includes/admin/config.php:95
+msgid "Post Missed Schedule Tweaks"
+msgstr ""
+
+#: includes/admin/config.php:101
 msgid "Misc Performance Tweaks"
 msgstr ""
 
-#: includes/admin/config.php:69
-msgid "Cache Preloading"
+#: includes/admin/config.php:107
+msgid "Misc WooCommerce Tweaks"
 msgstr ""
 
-#: includes/admin/config.php:75
+#: includes/admin/config.php:113
+msgid "Admin Page Cache Preloading"
+msgstr ""
+
+#: includes/admin/config.php:119
 msgid "Admin Page Loader"
 msgstr ""
 
-#: includes/admin/config.php:83
-msgid "Constants"
-msgstr ""
-
-#. translators: %s: link to wp-config.php
-#: includes/admin/config.php:87
-msgid "The following PHP constants can be defined in your %s file, in order to change the default behavior."
+#: includes/admin/connect.php:15
+msgid "Docket Connect"
 msgstr ""
 
 #: includes/admin/log.php:19
-msgid "Cache Log "
+msgid "Cache View"
 msgstr ""
 
-#: includes/admin/log.php:23
-msgid "Status"
+#: includes/admin/log.php:24
+msgid "Log File"
 msgstr ""
 
-#: includes/admin/log.php:27
-msgid "File"
+#: includes/admin/log.php:29
+msgid "Cache Index"
 msgstr ""
 
-#: includes/admin/log.php:32
-msgid "Data"
+#: includes/admin/log.php:35
+msgid "Data Not available"
 msgstr ""
 
-#: includes/admin/log.php:33
-msgid "Not available"
+#: includes/admin/log.php:39
+msgid "Log Size"
 msgstr ""
 
-#: includes/admin/log.php:37
-msgid "Size"
+#: includes/admin/log.php:49
+msgid "Close"
 msgstr ""
 
-#: includes/admin/log.php:53
+#: includes/admin/log.php:60
+msgid "Flush"
+msgstr ""
+
+#: includes/admin/log.php:62
+msgid "View"
+msgstr ""
+
+#: includes/admin/log.php:75
 msgid "FIRST"
 msgstr ""
 
-#: includes/admin/log.php:54
+#: includes/admin/log.php:76
 msgid "LAST"
 msgstr ""
 
-#: includes/admin/log.php:72
+#: includes/admin/log.php:94
 msgid "ASCENDING"
 msgstr ""
 
-#: includes/admin/log.php:73
+#: includes/admin/log.php:95
 msgid "DESCENDING"
 msgstr ""
 
-#: includes/admin/log.php:85
+#: includes/admin/log.php:107
 msgid "Flush Log"
 msgstr ""
 
-#: includes/admin/log.php:89
-#: includes/admin/overview.php:77
+#: includes/admin/log.php:111
+#: includes/admin/log.php:115
+#: includes/admin/overview.php:121
 msgid "Refresh"
 msgstr ""
 
-#: includes/admin/overview.php:16
-#: includes/src/View.php:200
-msgid "Overview"
-msgstr ""
-
-#: includes/admin/overview.php:20
-msgid "Object Cache"
-msgstr ""
-
 #: includes/admin/overview.php:25
-msgid "OPCache"
-msgstr ""
-
-#: includes/admin/overview.php:30
-msgid "PHP Memory Limit"
+msgid "Web Proxy"
 msgstr ""
 
 #: includes/admin/overview.php:35
-msgid "WP Memory Limit"
+#: includes/src/View.php:147
+msgid "Overview"
 msgstr ""
 
-#: includes/admin/overview.php:40
-msgid "Drop-in Installable"
+#: includes/admin/overview.php:38
+msgid "Web Server"
 msgstr ""
 
-#: includes/admin/overview.php:45
-msgid "Cache Writable"
-msgstr ""
-
-#: includes/admin/overview.php:50
-msgid "Cache Path"
+#: includes/admin/overview.php:43
+msgid "PHP SAPI"
 msgstr ""
 
 #: includes/admin/overview.php:55
-msgid "Total Cache Size"
+msgid "Object Cache"
 msgstr ""
 
-#: includes/admin/overview.php:65
-#: includes/admin/overview.php:75
-msgid "Flush Cache"
+#: includes/admin/overview.php:60
+msgid "Zend OPcache"
 msgstr ""
 
 #: includes/admin/overview.php:69
-#: includes/src/Plugin.php:730
+msgid "PHP Memory Limit"
+msgstr ""
+
+#: includes/admin/overview.php:74
+msgid "WP Frontend Memory Limit"
+msgstr ""
+
+#: includes/admin/overview.php:79
+msgid "WP Backend Memory Limit"
+msgstr ""
+
+#: includes/admin/overview.php:84
+msgid "Drop-in Installable"
+msgstr ""
+
+#: includes/admin/overview.php:89
+msgid "Drop-in Path"
+msgstr ""
+
+#: includes/admin/overview.php:94
+msgid "Cache Writable"
+msgstr ""
+
+#: includes/admin/overview.php:99
+msgid "Cache Path"
+msgstr ""
+
+#: includes/admin/overview.php:109
+#: includes/admin/overview.php:119
+msgid "Flush Cache"
+msgstr ""
+
+#: includes/admin/overview.php:113
+#: includes/src/Plugin.php:904
 msgid "Enable Object Cache"
 msgstr ""
 
-#: includes/admin/overview.php:80
-#: includes/src/Plugin.php:734
+#: includes/admin/overview.php:124
+#: includes/src/Plugin.php:908
 msgid "Disable Object Cache"
 msgstr ""
 
-#: includes/src/Command.php:95
+#: includes/admin/resource.php:15
+msgid "Resources"
+msgstr ""
+
+#: includes/admin/resource.php:20
+msgid "The Docket Cache keeps the admin interface clean and simple as possible, predefined configuration and works out-of-the-box."
+msgstr ""
+
+#: includes/admin/resource.php:24
+msgid "CONSTANTS"
+msgstr ""
+
+#. translators: %s: <a href="https://github.com/nawawi/docket-cache/wiki/Constants" rel="noopener" target="new">Configuration Wiki</a>
+#: includes/admin/resource.php:27
+msgid "This plugin uses constants variable as main configuration methods. To adjust the plugin behavior, please refer to %s page for details."
+msgstr ""
+
+#. translators: %s: <a href="https://github.com/nawawi/docket-cache/wiki/WP-CLI" rel="noopener" target="new">WP-CLI Wiki</a>
+#: includes/admin/resource.php:34
+msgid "You can manage this plugin through command line, please refer to %s page for available commands."
+msgstr ""
+
+#: includes/admin/resource.php:39
+msgid "If Docket Cache beneficial to your website performance, it’s more than thank you if you can leave a review about your experience."
+msgstr ""
+
+#: includes/admin/resource.php:40
+msgid "Write your review."
+msgstr ""
+
+#: includes/src/Command.php:94
 msgid "Docket object cache already enabled."
 msgstr ""
 
-#: includes/src/Command.php:99
+#: includes/src/Command.php:98
 msgid "An unknown object cache drop-in was found. To use Docket object cache, run: wp cache update."
 msgstr ""
 
-#: includes/src/Command.php:103
-#: includes/src/Plugin.php:660
+#: includes/src/Command.php:102
+#: includes/src/Plugin.php:822
 msgid "Object cache enabled."
 msgstr ""
 
-#: includes/src/Command.php:106
-#: includes/src/Plugin.php:663
+#: includes/src/Command.php:105
+#: includes/src/Plugin.php:825
 msgid "Object cache could not be enabled."
 msgstr ""
 
-#: includes/src/Command.php:122
-#: includes/src/Command.php:167
+#: includes/src/Command.php:121
 msgid "No object cache drop-in found."
 msgstr ""
 
-#: includes/src/Command.php:126
+#: includes/src/Command.php:125
 msgid "An unknown object cache drop-in was found. To use Docket run: wp cache update."
 msgstr ""
 
-#: includes/src/Command.php:130
-#: includes/src/Plugin.php:666
+#: includes/src/Command.php:129
+#: includes/src/Plugin.php:828
 msgid "Object cache disabled."
 msgstr ""
 
-#: includes/src/Command.php:133
-#: includes/src/Plugin.php:669
+#: includes/src/Command.php:132
+#: includes/src/Plugin.php:831
 msgid "Object cache could not be disabled."
 msgstr ""
 
-#: includes/src/Command.php:150
-#: includes/src/Plugin.php:678
+#: includes/src/Command.php:149
+#: includes/src/Plugin.php:840
 msgid "Updated object cache drop-in and enabled Docket object cache."
 msgstr ""
 
-#: includes/src/Command.php:152
+#: includes/src/Command.php:151
 msgid "Object cache drop-in could not be updated."
 msgstr ""
 
-#: includes/src/Command.php:187
-msgid "Cache preloading not enabled."
+#: includes/src/Command.php:168
+#: includes/src/Plugin.php:837
+msgid "Object cache could not be flushed."
 msgstr ""
 
-#: includes/src/Command.php:190
-msgid "Preloading will happen shortly."
+#: includes/src/Command.php:171
+msgid "The cache was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:112
+#: includes/src/Event.php:35
+msgid "Every 30 minutes"
+msgstr ""
+
+#: includes/src/Event.php:39
+msgid "Once Monthly"
+msgstr ""
+
+#: includes/src/Plugin.php:119
 msgid "Disabled"
 msgstr ""
 
-#: includes/src/Plugin.php:113
+#: includes/src/Plugin.php:120
 msgid "Enabled"
 msgstr ""
 
-#: includes/src/Plugin.php:114
+#: includes/src/Plugin.php:121
 msgid "Not Available"
 msgstr ""
 
-#: includes/src/Plugin.php:115
+#: includes/src/Plugin.php:122
 msgid "Unknown"
 msgstr ""
 
-#: includes/src/Plugin.php:127
-#: includes/src/Plugin.php:128
+#. translators: %1$s = size, %2$s number of file
+#: includes/src/Plugin.php:134
+#: includes/src/Plugin.php:149
+msgid "%1$s of %2$s file"
+msgid_plural "%1$s of %2$s files"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/src/Plugin.php:139
+msgid "Disabled at runtime."
+msgstr ""
+
+#: includes/src/Plugin.php:165
+#: includes/src/Plugin.php:167
 msgid "Yes"
 msgstr ""
 
-#: includes/src/Plugin.php:127
-#: includes/src/Plugin.php:128
+#: includes/src/Plugin.php:165
+#: includes/src/Plugin.php:167
 msgid "No"
 msgstr ""
 
+#: includes/src/Plugin.php:253
+msgid "Byte"
+msgstr ""
+
 #. translators: %s: url
-#: includes/src/Plugin.php:468
+#: includes/src/Plugin.php:618
 msgid "<strong>Docket Cache:</strong> The object-cache.php drop-in is outdated. Please click \"Re-Install\" to update it now.<p style=\"padding:0;\"><a href=\"%s\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:472
+#: includes/src/Plugin.php:622
 msgid "<strong>Docket Cache:</strong> An unknown object-cache.php drop-in was found. Please click \"Install\" to use Docket Cache.<p style=\"margin-bottom:0;\"><a href=\"%s\" class=\"button button-primary\">Install</a></p>"
 msgstr ""
 
-#: includes/src/Plugin.php:477
+#: includes/src/Plugin.php:627
 msgid "The object-cache.php drop-in has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: version
-#: includes/src/Plugin.php:552
-#: includes/src/Plugin.php:565
+#: includes/src/Plugin.php:703
+#: includes/src/Plugin.php:717
 msgid "Version %s"
 msgstr ""
 
 #. translators: %s: php version
-#: includes/src/Plugin.php:652
+#: includes/src/Plugin.php:814
 msgid "This plugin requires PHP %s or greater."
 msgstr ""
 
-#: includes/src/Plugin.php:672
+#: includes/src/Plugin.php:834
 msgid "Object cache was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:675
-msgid "Object cache could not be flushed."
-msgstr ""
-
-#: includes/src/Plugin.php:681
+#: includes/src/Plugin.php:843
 msgid "Docket object cache drop-in could not be updated."
 msgstr ""
 
-#: includes/src/Plugin.php:684
+#: includes/src/Plugin.php:846
 msgid "Cache log was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:687
+#: includes/src/Plugin.php:849
 msgid "Cache log could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:690
+#: includes/src/Plugin.php:852
+msgid "Cache file was flushed."
+msgstr ""
+
+#: includes/src/Plugin.php:855
+msgid "Cache file could not be flushed."
+msgstr ""
+
+#: includes/src/Plugin.php:858
+msgid "OPcache was flushed."
+msgstr ""
+
+#: includes/src/Plugin.php:861
+msgid "OPcache could not be flushed."
+msgstr ""
+
+#: includes/src/Plugin.php:864
 msgid "Option enabled."
 msgstr ""
 
-#: includes/src/Plugin.php:693
+#: includes/src/Plugin.php:867
 msgid "Option disabled."
 msgstr ""
 
-#: includes/src/Plugin.php:696
+#: includes/src/Plugin.php:870
 msgid "Option saved."
 msgstr ""
 
-#: includes/src/Plugin.php:699
+#: includes/src/Plugin.php:873
 msgid "Option resets to default."
 msgstr ""
 
-#: includes/src/Plugin.php:702
+#: includes/src/Plugin.php:876
 msgid "Failed to change options."
 msgstr ""
 
-#: includes/src/Plugin.php:724
+#: includes/src/Plugin.php:898
 msgid "Settings"
 msgstr ""
 
-#: includes/src/Plugin.php:738
+#: includes/src/Plugin.php:912
 msgid "Install Drop-in"
 msgstr ""
 
-#: includes/src/Plugin.php:953
-msgid "Docket Cache Garbage Collector Run Every 30 minutes"
-msgstr ""
-
-#: includes/src/View.php:33
-msgid "Maximum cache time-to-live in seconds, if expiry key 0"
-msgstr ""
-
-#: includes/src/View.php:34
-msgid "Default: 0"
-msgstr ""
-
-#: includes/src/View.php:37
-msgid "Set the maximum size of cache in bytes."
-msgstr ""
-
-#: includes/src/View.php:38
-msgid "Default: 3000000 (3MB)."
-msgstr ""
-
-#: includes/src/View.php:41
-msgid "Set the cache directory."
-msgstr ""
-
-#. translators: %s: value of WP_CONTENT_DIR
-#: includes/src/View.php:43
-msgid "Default: %s/cache/docket-cache"
-msgstr ""
-
-#: includes/src/View.php:46
-msgid "By default Docket Cache only empty the cache file. Set to true to delete the cache file."
-msgstr ""
-
-#: includes/src/View.php:47
-#: includes/src/View.php:61
-#: includes/src/View.php:102
-#: includes/src/View.php:110
-#: includes/src/View.php:114
-msgid "Default: false"
-msgstr ""
-
-#: includes/src/View.php:50
-msgid "Lists of cache groups that share cache with other sites in a Multisite setup."
-msgstr ""
-
-#. translators: %s: url
-#: includes/src/View.php:52
-#: includes/src/View.php:57
-msgid "Default: <a href=\"%s\" rel=\"noopener\" target=\"blank\">See details</a>"
-msgstr ""
-
-#: includes/src/View.php:55
-msgid "List of cache groups that should not be cached."
-msgstr ""
-
-#: includes/src/View.php:60
-msgid "Set to true to enable the cache log."
-msgstr ""
-
-#: includes/src/View.php:64
-msgid "Set log time format. Available options utc, local, wp."
-msgstr ""
-
-#: includes/src/View.php:65
-msgid "Default: utc"
-msgstr ""
-
-#: includes/src/View.php:68
-msgid "Set the maximum size of a log file in bytes."
-msgstr ""
-
-#: includes/src/View.php:69
-msgid "Default: 10000000 (10MB)"
-msgstr ""
-
-#: includes/src/View.php:72
-msgid "Set the log file."
-msgstr ""
-
-#. translators: %s: value of WP_CONTENT_DIR
-#: includes/src/View.php:74
-msgid "Default: %s/.object-cache.log"
-msgstr ""
-
-#: includes/src/View.php:77
-msgid "Set to true to empty the log file when the object cache is flushed."
-msgstr ""
-
-#: includes/src/View.php:78
-#: includes/src/View.php:82
-#: includes/src/View.php:86
-#: includes/src/View.php:90
-#: includes/src/View.php:94
-#: includes/src/View.php:98
-#: includes/src/View.php:106
-msgid "Default: true"
-msgstr ""
-
-#: includes/src/View.php:81
-msgid "The Docket Cache Garbage collector is scheduled to run every 30 minutes to clean empty files that are more than 2 minutes old. Set to false to disable the garbage collector."
-msgstr ""
-
-#: includes/src/View.php:85
-msgid "Set to true to enable Advanced Post Cache."
-msgstr ""
-
-#: includes/src/View.php:89
-msgid "Set to true to enable miscellaneous WordPress performance tweaks."
-msgstr ""
-
-#: includes/src/View.php:93
-msgid "Set to true to enable WordPress Translation Cache."
-msgstr ""
-
-#: includes/src/View.php:97
-msgid "Set to true to enable optimization of WordPress Term count queries."
-msgstr ""
-
-#: includes/src/View.php:101
-msgid "Set to true to enable cache preloading."
-msgstr ""
-
-#: includes/src/View.php:105
-msgid "Set to true to enable the HTML footer comment that promote this plugin."
-msgstr ""
-
-#: includes/src/View.php:109
-msgid "Set to true to enable a loading bar when the admin page is loading."
-msgstr ""
-
-#: includes/src/View.php:113
-msgid "Set to true to bypass caching object at runtime. No object cache at this time."
-msgstr ""
-
-#: includes/src/View.php:204
+#: includes/src/View.php:151
 msgid "Configure"
 msgstr ""
 
-#: includes/src/View.php:259
+#: includes/src/View.php:226
 msgid "Enable"
 msgstr ""
 
-#: includes/src/View.php:260
+#: includes/src/View.php:227
 msgid "Disable"
 msgstr ""
