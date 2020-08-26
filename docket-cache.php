@@ -31,4 +31,4 @@ namespace Nawawi\DocketCache;
 
 \define('DOCKET_CACHE_FILE', __FILE__);
 require __DIR__.'/includes/load.php';
-( new Plugin(__FILE__) )->attach();
+( new Plugin() )->attach();

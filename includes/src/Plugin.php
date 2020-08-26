@@ -1009,9 +1009,13 @@ final class Plugin extends Bepart
                         break;
                     case 'cronbot':
                         $action = 'enable' === $value ? true : false;
-                        add_action('shutdown', function() use($action) {
-                            apply_filters('docket-cache/cronbot-active', $action);
-                        }, PHP_INT_MAX);
+                        add_action(
+                            'shutdown',
+                            function () use ($action) {
+                                apply_filters('docket-cache/cronbot-active', $action);
+                            },
+                            PHP_INT_MAX
+                        );
                         break;
                 }
             },
