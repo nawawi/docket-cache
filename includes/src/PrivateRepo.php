@@ -191,7 +191,7 @@ final class PrivateRepo
                 }
 
                 if ('plugin' === $options['type'] && !empty($options['plugins']) && \is_array($options['plugins']) && isset($options['plugins'][$this->hook])) {
-                    do_action($this->slug.'_upgrader_process_complete');
+                    do_action($this->slug.'/upgrader_process_complete');
                 }
             },
             -PHP_INT_MAX,

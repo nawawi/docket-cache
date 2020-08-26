@@ -27,6 +27,18 @@ class Bepart extends Filesystem
     }
 
     /**
+     * close_exit.
+     */
+    public function close_exit($msg = '')
+    {
+        if (!empty($msg)) {
+            echo $msg;
+        }
+        $this->fastcgi_close();
+        exit;
+    }
+
+    /**
      * send_json_continue.
      */
     public function send_json_continue($msg, $success = true)
@@ -75,6 +87,9 @@ class Bepart extends Filesystem
         return $cache[$file];
     }
 
+    /**
+     * code_worker.
+     */
     public function code_worker($types = '')
     {
         $types = (array) $types;
@@ -110,7 +125,7 @@ class Bepart extends Filesystem
      */
     public function get_proxy_ip()
     {
-        $ip = wp_cache_set('proxy-ip', 'docketcache-data');
+        $ip = wp_cache_get('proxy-ip', 'docketcache-data');
         if (false !== $ip) {
             return $ip;
         }
@@ -178,5 +193,60 @@ class Bepart extends Filesystem
         }
 
         return 'Unknown';
+    }
+
+    /**
+     * get_user_agent.
+     */
+    public function get_user_agent()
+    {
+        return !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'Unknown';
+    }
+
+    /**
+     * base64_encode_url.
+     */
+    public function base64_encode_url($string)
+    {
+        return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($string));
+    }
+
+    /**
+     * base64_decode_url.
+     */
+    public function base64_decode_url($string)
+    {
+        return base64_decode(str_replace(['-', '_'], ['+', '/'], $string));
+    }
+
+    /**
+     * nw_encrypt.
+     */
+    public function nw_encrypt($string, $epad = '!!$$surya16!!')
+    {
+        $mykey = '!!$'.$epad.'!!';
+        $pad = base64_decode($mykey);
+        $encrypted = '';
+        for ($i = 0; $i < \strlen($string); ++$i) {
+            $encrypted .= @\chr(@\ord($string[$i]) ^ @\ord($pad[$i]));
+        }
+
+        return $this->base64_encode_url($encrypted);
+    }
+
+    /**
+     * nw_decrypt.
+     */
+    public function nw_decrypt($string, $epad = '!!$$surya16!!')
+    {
+        $mykey = '!!$'.$epad.'!!';
+        $pad = base64_decode($mykey);
+        $encrypted = $this->base64_decode_url($string);
+        $decrypted = '';
+        for ($i = 0; $i < \strlen($encrypted); ++$i) {
+            $decrypted .= @\chr(@\ord($encrypted[$i]) ^ @\ord($pad[$i]));
+        }
+
+        return $decrypted;
     }
 }

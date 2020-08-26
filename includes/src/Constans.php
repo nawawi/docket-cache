@@ -111,6 +111,9 @@ final class Constans
         // log on/off
         $this->maybe_define('DOCKET_CACHE_LOG', false);
 
+        // log on/off
+        $this->maybe_define('DOCKET_CACHE_LOG_ALL', (\defined('WP_DEBUG') ? WP_DEBUG : false));
+
         // log file
         $this->maybe_define('DOCKET_CACHE_LOG_FILE', WP_CONTENT_DIR.'/.object-cache.log');
 
@@ -191,7 +194,7 @@ final class Constans
         $this->maybe_define('DOCKET_CACHE_WOOTWEAKS', true);
 
         // post missed schedule
-        $this->maybe_define('DOCKET_CACHE_POSTMISSEDSCHEDULE', true);
+        $this->maybe_define('DOCKET_CACHE_POSTMISSEDSCHEDULE', false);
 
         // advanced post cache
         $this->maybe_define('DOCKET_CACHE_ADVCPOST', true);
@@ -217,14 +220,10 @@ final class Constans
         // page loader
         $this->maybe_define('DOCKET_CACHE_PAGELOADER', true);
 
-        // docket connect
-        $this->maybe_define('DOCKET_CACHE_CONNECTSAAS', false);
+        // docket cronbot
+        $this->maybe_define('DOCKET_CACHE_CRONBOT', false);
 
         // backwards-compatible
         $this->maybe_define('DOCKET_CACHE_COMMENT', DOCKET_CACHE_SIGNATURE);
-        $this->maybe_define('DOCKET_CACHE_DEBUG', DOCKET_CACHE_LOG);
-        $this->maybe_define('DOCKET_CACHE_DEBUG_FILE', DOCKET_CACHE_LOG_FILE);
-        $this->maybe_define('DOCKET_CACHE_DEBUG_FLUSH', DOCKET_CACHE_LOG_FLUSH);
-        $this->maybe_define('DOCKET_CACHE_DEBUG_SIZE', DOCKET_CACHE_LOG_SIZE);
     }
 }

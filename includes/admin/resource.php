@@ -20,6 +20,22 @@ namespace Nawawi\DocketCache;
                 <?php esc_html_e('The Docket Cache keeps the admin interface clean and simple as possible, predefined configuration and works out-of-the-box.', 'docket-cache'); ?>
             </p>
             <hr>
+            <?php if ($this->tab_current('overview')) : ?>
+            <p>
+                <strong><?php esc_html_e('DROPIN', 'docket-cache'); ?></strong><br class="break">
+                <?php esc_html_e('The Docket Cache relied on an object cache operation. Disabling the Object Cache will affect availability of other functions.', 'docket-cache'); ?><br>
+            </p>
+            <hr>
+            <p>
+                <strong><?php esc_html_e('CONFIGURATION', 'docket-cache'); ?></strong><br class="break">
+                <?php esc_html_e('The configuration panel allows to quickly change basic configuration without using constants.', 'docket-cache'); ?><br>
+            </p>
+            <hr>
+            <p>
+                <strong><?php esc_html_e('CACHE LOG', 'docket-cache'); ?></strong><br class="break">
+                <?php esc_html_e('The cache log panel provides information about the cache activities, disabled by default. Activate at the configuration panel.', 'docket-cache'); ?><br>
+            </p>
+            <?php elseif ($this->tab_current('config')) : ?>
             <p>
                 <strong><?php esc_html_e('CONSTANTS', 'docket-cache'); ?></strong><br class="break">
                 <?php
@@ -36,9 +52,15 @@ namespace Nawawi\DocketCache;
             </p>
             <hr>
             <p>
+                <strong><?php esc_html_e('CRONBOT', 'docket-cache'); ?></strong><br class="break">
+                <?php esc_html_e('The Cronbot is an external scheduler that pings your website every hour in order to keep WordPress Cron running active.', 'docket-cache'); ?><br>
+            </p>
+            <hr>
+            <p>
                 <?php esc_html_e('If Docket Cache beneficial to your website performance, it’s more than thank you if you can leave a review about your experience.', 'docket-cache'); ?><br>
                 <a href="https://wordpress.org/support/plugin/docket-cache/reviews/" rel="noopener" target="new"><?php esc_html_e('Write your review.', 'docket-cache'); ?></a>
             </p>
+            <?php endif; ?>
         </div>
 
 

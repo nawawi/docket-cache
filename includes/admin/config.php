@@ -19,6 +19,12 @@ namespace Nawawi\DocketCache;
             <p class="desc"><?php esc_html_e('The following option allows to quickly change basic configuration, overwrites by constants if defined.', 'docket-cache'); ?></p>
             <table class="form-table form-table-selection">
                 <tr>
+                    <th class="border-b"><?php esc_html_e('Cron Bot Service', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('cronbot', DOCKET_CACHE_CRONBOT); ?>
+                    </td>
+                </tr>
+                <tr>
                     <th<?php echo !DOCKET_CACHE_LOG ? ' class="border-b"' : ''; ?>><?php esc_html_e('Cache Log', 'docket-cache'); ?></th>
                         <td>
                             <?php echo $this->config_select_bool('log', DOCKET_CACHE_LOG); ?>

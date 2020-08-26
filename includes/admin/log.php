@@ -17,12 +17,22 @@ $log = $this->parse_log_query();
 
 <div class="section<?php echo !$log->output_empty ? ' log' : ''; ?>">
     <?php $this->tab_title(!$this->has_vcache() ? esc_html__('Cache Log', 'docket-cache') : esc_html__('Cache View', 'docket-cache')); ?>
-
+    <p class="desc">
+        <?php if (!$this->has_vcache()) : ?>
+        <?php esc_html_e('The cache log intended to provide information how the cache works. For performance and security concerns, deactivate if no longer needed.', 'docket-cache'); ?>
+        <?php endif; ?>
+    </p>
     <table class="form-table">
         <?php if (!$this->has_vcache()) : ?>
         <tr>
             <th><?php esc_html_e('Log File', 'docket-cache'); ?></th>
-            <td><span class="dashicons dashicons-external"></span><a class="logf" href="<?php echo content_url(basename($this->info->log_file)); ?>" rel="noopener" target="new"><?php echo $this->info->log_file; ?></a></td>
+            <td>
+                <?php if ($log->output_empty) : ?>
+                <?php echo $this->info->log_file; ?>
+                <?php else : ?>
+                <a class="btxo" title="<?php esc_html_e('Download', 'docket-cache'); ?>" href="<?php echo $this->tab_query('log', ['dl' => '0'.time()]); ?>" rel="noopener" target="new"><?php echo $this->info->log_file; ?><span class="dashicons dashicons-external"></span></a>
+                <?php endif; ?>
+            </td>
         </tr>
         <?php else : ?>
         <tr>

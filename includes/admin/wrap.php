@@ -14,21 +14,21 @@ namespace Nawawi\DocketCache;
 
 if (1 === $this->info->status_code && isset($this->plugin->token)) {
     switch ($this->plugin->token) {
-        case 'docket-cache-flushed':
+        case 'docket-occache-flushed':
             $this->plugin->flush_cache();
             $this->do_preload = true;
             $this->do_flush = true;
             break;
-        case 'docket-cache-enabled':
+        case 'docket-occache-enabled':
             $this->do_preload = true;
             $this->do_flush = true;
             break;
         case 'docket-log-flushed':
             $this->plugin->flush_log();
-            $this->do_preload = true;
+            $this->do_fetch = true;
             break;
     }
-    if (!DOCKET_CACHE_PRELOAD || 2 === $this->info->status_code) {
+    if ($this->plugin->constans->is_false('DOCKET_CACHE_PRELOAD') || 2 === $this->info->status_code) {
         $this->do_preload = false;
     }
 }
@@ -41,6 +41,8 @@ if ($this->do_preload) {
     echo $this->plugin->code_worker(['flush', 'preload']);
 } elseif ($this->do_flush) {
     echo $this->plugin->code_worker('flush');
+} elseif ($this->do_fetch) {
+    echo $this->plugin->code_worker('fetch');
 }
 ?>
 <div class="wrap" id="docket-cache">

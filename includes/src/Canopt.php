@@ -14,8 +14,8 @@ namespace Nawawi\DocketCache;
 
 final class Canopt extends Bepart
 {
-    private $file;
-    private $path;
+    public $file;
+    public $path;
 
     private static $inst;
 
@@ -50,16 +50,56 @@ final class Canopt extends Bepart
              'pageloader',
              'wpoptaload',
              'cronoptmzdb',
-             'connectsaas',
+             'cronbot',
          ];
+    }
+
+    private function read_config($file = '')
+    {
+        $file = empty($file) ? $this->file : $file;
+        $config = [];
+        if (@is_file($file) && is_readable($file)) {
+            $config = @include $file;
+        }
+
+        return $config;
+    }
+
+    private function put_config($config, $file = '')
+    {
+        $file = empty($file) ? $this->file : $file;
+        if (empty($config) || !\is_array($config)) {
+            @unlink($file);
+
+            return false;
+        }
+
+        $data = $this->export_var($config);
+        $code = $this->code_stub($data);
+
+        return $this->dump($file, $code);
+    }
+
+    private function cleanup($config)
+    {
+        if (!empty($config) && \is_array($config)) {
+            $keys = $this->keys();
+            foreach ($config as $name => $value) {
+                $nx = str_replace('DOCKET_CACHE_', '', $name);
+                $nx = strtolower($nx);
+
+                if (!\in_array($nx, $keys)) {
+                    unset($config[$name]);
+                }
+            }
+        }
+
+        return $config;
     }
 
     public function get($name)
     {
-        $config = [];
-        if (@is_file($this->file) && is_readable($this->file)) {
-            $config = @include $this->file;
-        }
+        $config = $this->read_config();
 
         if (!empty($config) && !empty($config[$name])) {
             return $config[$name];
@@ -76,10 +116,8 @@ final class Canopt extends Bepart
 
         $this->placeholder($this->path);
 
-        $config = [];
-        if (@is_file($this->file)) {
-            $config = @include $this->file;
-        }
+        $config = $this->read_config();
+        $config = $this->cleanup($config);
 
         if (\in_array($name, $this->keys())) {
             $nx = 'DOCKET_CACHE_'.strtoupper($name);
@@ -91,13 +129,23 @@ final class Canopt extends Bepart
             }
         }
 
-        $code = '<?php ';
-        $code .= "defined('ABSPATH') || exit;".PHP_EOL;
-        $code .= 'return '.$this->export_var($config).';';
-
-        $ret = $this->dump($this->file, $code);
+        $ret = $this->put_config($config);
         do_action('docket-cache/save-option', $name, $value, $ret);
 
         return $ret;
+    }
+
+    public function save_part($data, $file = 'part')
+    {
+        $file = $this->path.'/'.$file.'.php';
+
+        return $this->put_config($data, $file);
+    }
+
+    public function get_part($file = 'part')
+    {
+        $file = $this->path.'/'.$file.'.php';
+
+        return $this->read_config($file);
     }
 }

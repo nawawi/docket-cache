@@ -168,6 +168,8 @@ class Command extends WP_CLI_Command
             $this->halt_error(__('Object cache could not be flushed.', 'docket-cache'));
         }
 
+        $this->plugin->dropino->undelay();
+        do_action('docket-cache/preload');
         $this->halt_success(__('The cache was flushed.', 'docket-cache'));
     }
 

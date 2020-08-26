@@ -23,6 +23,19 @@ body {
     text-transform: capitalize !important;
 }
 
+#docket-cache .dashicons {
+    font-weight: normal;
+}
+
+#docket-cache a.btxo {
+    text-decoration: none;
+    color: #444444;
+}
+
+#docket-cache a.btxo:hover {
+    color: orangered;
+}
+
 #docket-cache table,
 #docket-cache tbody,
 #docket-cache td,
@@ -52,23 +65,22 @@ body {
 }
 
 #docket-cache .overview .form-table td,
-#docket-cache .log .form-table td {
+#docket-cache .log .form-table td,
+#docket-cache .cronbot .form-table td {
     font-family: monospace, Consolas, Monaco;
     unicode-bidi: embed;
     font-size: 13px;
 }
 
-#docket-cache .overview .form-table th {
+#docket-cache .overview .form-table th,
+#docket-cache .cronbot .form-table th {
     min-width: 250px;
 }
 
-#docket-cache .overview a.btxo {
-    text-decoration: none;
-    color: #444444;
-}
-
-#docket-cache .overview a.btxo:hover {
-    text-decoration: underline;
+#docket-cache .overview .opcache-flush {
+    margin-left: 2px;
+    margin-top: 1px;
+    font-size: 16px;
 }
 
 #docket-cache .form-table th,
@@ -119,19 +131,6 @@ body {
     background-color: white;
 }
 
-#docket-cache .log a.logf {
-    text-decoration: none;
-    color: #444444;
-}
-
-#docket-cache .log a.logf:hover {
-    text-decoration: underline;
-}
-
-#docket-cache .log .dashicons {
-    font-weight: normal;
-}
-
 /* config */
 
 #docket-cache .form-table-selection td,
@@ -152,15 +151,6 @@ body {
     font-family: monospace, Consolas, Monaco;
     unicode-bidi: embed;
     font-size: 12px;
-}
-
-#docket-cache .config .inside * {
-    font-size: 13px !important;
-}
-
-#docket-cache .config .inside div {
-    padding: 0 6px 0 6px;
-    font-family: Arial, Helvetica, sans-serif;
 }
 
 /* /config */
@@ -267,6 +257,15 @@ body {
     margin-top: 10px;
 }
 
+#docket-cache .flex-container .postbox .inside * {
+    font-size: 13px !important;
+}
+
+#docket-cache .flex-container .postbox .inside div {
+    padding: 0 6px 0 6px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 #docket-cache .dashicons {
     font-size: 18px;
     margin-top: -1px;
@@ -314,6 +313,10 @@ body {
         text-align: center;
     }
 
+    #docket-cache .nav-select {
+        display: none;
+    }
+
     #docket-cache p.submit .button {
         margin-right: 6px;
     }
@@ -321,8 +324,32 @@ body {
 
 /* small */
 @media only screen and (max-width: 600px) {
-    #docket-cache p.submit .button {
+    #docket-cache .nav-tab {
+        display: none;
+    }
+
+    #docket-cache .nav-tab-wrapper {
+        margin: 0;
+        padding: 0;
+    }
+
+    #docket-cache .nav-select {
+        display: block;
         width: 100%;
+    }
+
+    #docket-cache .log p.submit {
+        white-space: nowrap;
+    }
+
+    #docket-cache .log p.submit select {
+        width: 32%;
+    }
+
+    #docket-cache p.submit .button {
+        display: block;
+        width: 100%;
+        margin-bottom: 6px;
     }
 
     #docket-cache .form-table th {
@@ -335,10 +362,6 @@ body {
 
     #docket-cache .border-b {
         border-bottom: none !important;
-    }
-
-    #docket-cache .table-scroll thead {
-        display: none;
     }
 
     #docket-cache .form-table-selection th,

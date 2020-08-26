@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: trunk
+Stable tag: 20.08.04
 License: MIT
 License URI: ./license.txt
 
@@ -25,10 +25,26 @@ The only solution is to store the object caches into files. With WordPress, expo
 
 The Docket Cache is better because it converts the object cache into plain PHP code. This solution is faster since WordPress can use the cache directly without running other operation.
 
-== Development ==
-- [Report issues](https://github.com/nawawi/docket-cache/issues)
-- [Send Pull requests](https://github.com/nawawi/docket-cache/pulls)
-- [Changelog](https://github.com/nawawi/docket-cache/releases)
+== Features ==
+
+- Object caching + OPcache
+- Advanced Post Caching
+- Object Cache Precaching
+- WordPress Translation Caching
+- Term Count Queries Optimization
+- Post, Page, Comment Count Optimization
+- Database Tables Optimization
+- WP Options Autoload suspension
+- Post Missed Schedule Tweaks
+- Cache Log
+
+== Requirement ==
+
+To use Docket Cache requires minimum:
+
+- PHP 7.2.5
+- WordPress 5.4
+- Zend OPcache
 
 == Configuration Options ==
 
@@ -38,13 +54,10 @@ To adjust the configuration, please see the [configuration wiki](https://github.
 
 To use the WP-CLI commands, please see the [WP-CLI wiki](https://github.com/nawawi/docket-cache/wiki/WP-CLI) page for available commands.
 
-== Requirement ==
-
-To use Docket Cache require minimum:
-
-- PHP 7.2.5
-- WordPress 5.4
-- Zend OPcache
+== Development ==
+- [Report issues](https://github.com/nawawi/docket-cache/issues)
+- [Send Pull requests](https://github.com/nawawi/docket-cache/pulls)
+- [Changelog](https://github.com/nawawi/docket-cache/releases)
 
 == Installation ==
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
@@ -130,3 +143,6 @@ Kindly refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) f
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 
+== Credits ==
+
+* Isometric graphic by upklyak/freepik.com

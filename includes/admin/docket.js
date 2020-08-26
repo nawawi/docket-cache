@@ -117,6 +117,19 @@
                         }
                     );
 
+                $selector.find( '.nav-tab-wrapper' )
+                    .find( 'select.nav-select' )
+                    .on(
+                        'change',
+                        function() {
+                            var $self = $( this );
+                            var link = $self.children( 'option:selected' )
+                                .attr( 'data-action-link' );
+                            window.location.replace( link );
+                            return false;
+                        }
+                    );
+
                 var highlight_row = function( selector, lineNum ) {
                     var val = selector.value;
                     var arr = val.split( "\n" );

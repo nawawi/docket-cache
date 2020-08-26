@@ -11,7 +11,6 @@
 namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
-$is_saasconnect = false; //$this->plugin->constans->is_true('DOCKET_CACHE_CONNECTSAAS');
 
 $has_proxy = false;
 $proxy_title = '';
@@ -28,11 +27,10 @@ if ($this->plugin->is_behind_proxy()) {
 }
 ?>
 <div class="section overview">
-    <?php if ($is_saasconnect) : ?>
     <div class="flex-container">
         <div class="row-left">
-            <?php endif; ?>
             <?php $this->tab_title(esc_html__('Overview', 'docket-cache')); ?>
+            <p class="desc"><?php esc_html_e('The overview panel provides information about the plugin activity status.', 'docket-cache'); ?></p>
             <table class="form-table">
                 <tr>
                     <th><?php esc_html_e('Web Server', 'docket-cache'); ?></th>
@@ -53,15 +51,15 @@ if ($this->plugin->is_behind_proxy()) {
 
                 <tr>
                     <th><?php esc_html_e('Object Cache', 'docket-cache'); ?></th>
-                    <td><?php echo 1 === $this->info->status_code && !empty($this->info->status_text_stats) ? $this->info->status_text_stats : $this->info->status_text; ?></td>
+                    <td><?php echo 1 === $this->info->status_code && !empty($this->info->status_text_stats) ? '<a class="btxo" title="'.esc_html__('Flush Cache', 'docket-cache').'" href="'.$this->plugin->action_query('flush-occache').'">'.$this->info->status_text_stats.'<span class="dashicons dashicons-update-alt opcache-flush"></span></a>' : $this->info->status_text; ?></td>
                 </tr>
 
                 <tr>
                     <th class="border-b"><?php esc_html_e('Zend OPcache', 'docket-cache'); ?></th>
                     <td>
                         <?php
-                        echo 1 === $this->info->opcache_code ? '<a href="'.$this->plugin->action_query('flush-opcache').'" class="btxo">'.$this->info->opcache_text_stats.'</a>' : $this->info->opcache_text;
-                    ?>
+                        echo 1 === $this->info->opcache_code ? '<a class="btxo" title="'.esc_html__('Flush OPcache', 'docket-cache').'" href="'.$this->plugin->action_query('flush-opcache').'">'.$this->info->opcache_text_stats.'<span class="dashicons dashicons-update-alt opcache-flush"></span></a>' : $this->info->opcache_text;
+                        ?>
                     </td>
                 </tr>
 
@@ -81,12 +79,12 @@ if ($this->plugin->is_behind_proxy()) {
                 </tr>
 
                 <tr>
-                    <th><?php esc_html_e('Drop-in Installable', 'docket-cache'); ?></th>
+                    <th><?php esc_html_e('Drop-in Writable', 'docket-cache'); ?></th>
                     <td><?php echo $this->info->write_dropin; ?></td>
                 </tr>
 
                 <tr>
-                    <th class="border-b"><?php esc_html_e('Drop-in Path', 'docket-cache'); ?></th>
+                    <th class="border-b"><?php esc_html_e('Drop-in File', 'docket-cache'); ?></th>
                     <td><?php echo $this->info->dropin_path; ?></td>
                 </tr>
 
@@ -98,6 +96,16 @@ if ($this->plugin->is_behind_proxy()) {
                 <tr>
                     <th><?php esc_html_e('Cache Path', 'docket-cache'); ?></th>
                     <td><?php echo $this->info->cache_path; ?></td>
+                </tr>
+
+                <tr>
+                    <th><?php esc_html_e('Config Writable', 'docket-cache'); ?></th>
+                    <td><?php echo $this->info->write_config; ?></td>
+                </tr>
+
+                <tr>
+                    <th><?php esc_html_e('Config Path', 'docket-cache'); ?></th>
+                    <td><?php echo $this->info->config_path; ?></td>
                 </tr>
 
             </table>
@@ -125,10 +133,8 @@ if ($this->plugin->is_behind_proxy()) {
                 <?php endif; ?>
             </p>
         </div>
-        <?php if ($is_saasconnect) : ?>
         <div class="row-right">
-            <?php $this->page('connect'); ?>
+            <?php $this->page('resource'); ?>
         </div>
     </div>
-    <?php endif; ?>
 </div>

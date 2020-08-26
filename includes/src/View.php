@@ -18,16 +18,19 @@ final class View
     private $info;
     private $do_preload;
     private $do_flush;
+    private $do_fetch;
     private $log_enable;
     private $log_max_size;
     private $cache_max_size;
+    private $cronbot_enable;
 
     public function __construct(Plugin $plugin)
     {
         $this->plugin = $plugin;
-        $this->log_enable = DOCKET_CACHE_LOG;
+        $this->log_enable = $this->plugin->constans->is_true('DOCKET_CACHE_LOG');
         $this->log_max_size = $this->plugin->normalize_size(DOCKET_CACHE_LOG_SIZE);
         $this->cache_max_size = $this->plugin->normalize_size(DOCKET_CACHE_MAXSIZE);
+        $this->cronbot_enable = $this->plugin->constans->is_true('DOCKET_CACHE_CRONBOT');
     }
 
     private function parse_log_query()
@@ -81,6 +84,48 @@ final class View
         return $ret;
     }
 
+    private function cronbot_status()
+    {
+        $data = $this->plugin->canopt->get_part('cronbot');
+        if (!empty($data) && \is_array($data)) {
+            return $data;
+        }
+
+        return false;
+    }
+
+    private function cronbot_pings()
+    {
+        $data = $this->plugin->canopt->get_part('pings');
+        if (!empty($data) && \is_array($data)) {
+            return $data;
+        }
+
+        return false;
+    }
+
+    private function is_cronbot_connected()
+    {
+        $data = $this->cronbot_status();
+
+        return !empty($data) && !empty($data['connected']);
+    }
+
+    private function ping_next()
+    {
+        $data = $this->cronbot_pings();
+        if (!empty($data) && \is_array($data) && !empty($data['timestamp'])) {
+            $timestamp = strtotime($data['timestamp']);
+
+            return [
+                'last' => date('d-m-Y H:i:s T', $timestamp),
+                'next' => date('d-m-Y H:i:s T', strtotime('+1 hour', $timestamp)),
+            ];
+        }
+
+        return false;
+    }
+
     private function page($index)
     {
         $this->info = (object) $this->plugin->get_info();
@@ -94,6 +139,7 @@ final class View
     {
         $this->do_preload = false;
         $this->do_flush = false;
+        $this->do_fetch = false;
         $this->page('wrap');
         $this->plugin->dropino->delay_expire();
     }
@@ -108,9 +154,16 @@ final class View
         $this->page($this->is_index());
     }
 
-    private function tab_query($index)
+    private function tab_query($index, $args_extra = [])
     {
-        return network_admin_url(add_query_arg('idx', $index, $this->plugin->page));
+        $args = array_merge(
+            [
+                'idx' => $index,
+            ],
+            $args_extra
+        );
+
+        return network_admin_url(add_query_arg($args, $this->plugin->page));
     }
 
     private function is_index()
@@ -143,13 +196,38 @@ final class View
 
     private function tab_nav()
     {
-        $html = '<nav class="nav-tab-wrapper">';
-        $html .= '<a href="'.$this->tab_query('overview').'" class="nav-tab'.$this->tab_active('overview').'">'.__('Overview', 'docket-cache').'</a>';
-        if ($this->log_enable) {
-            $html .= '<a href="'.$this->tab_query('log').'" class="nav-tab'.$this->tab_active('log').'">'.__('Cache Log', 'docket-cache').'</a>';
+        $lists = [
+             'overview' => esc_html__('Overview', 'docket-cache'),
+             'log' => esc_html__('Cache Log', 'docket-cache'),
+             'cronbot' => esc_html__('Cronbot', 'docket-cache'),
+             'config' => esc_html__('Configuration', 'docket-cache'),
+         ];
+
+        if (!$this->log_enable) {
+            unset($lists['log']);
         }
-        $html .= '<a href="'.$this->tab_query('config').'" class="nav-tab'.$this->tab_active('config').'">'.__('Configure', 'docket-cache').'</a>';
+
+        if (!$this->cronbot_enable) {
+            unset($lists['cronbot']);
+        }
+
+        $option = '';
+        $html = '<nav class="nav-tab-wrapper">';
+        foreach ($lists as $id => $text) {
+            $link = $this->tab_query($id);
+            $active = $this->tab_active($id);
+            $html .= '<a href="'.$link.'" class="nav-tab'.$active.'">'.$text.'</a>';
+
+            $selected = $this->tab_current($id) ? ' selected' : '';
+            $option .= '<option value="'.$id.'" data-action-link="'.$link.'"'.$selected.'>'.$text.'</option>';
+        }
+
+        $html .= '<select class="nav-select">';
+        $html .= $option;
+        $html .= '</select>';
+
         $html .= '</nav>';
+
         echo $html;
     }
 

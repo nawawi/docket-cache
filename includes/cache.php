@@ -903,7 +903,7 @@ class WP_Object_Cache
             $keys = array_unique($keys);
             foreach ($keys as $key) {
                 $this->delete($key, $group);
-                $this->docket_log('flush', 'internalresc-'.$this->item_hash(__FUNCTION__), $group.':'.$key);
+                $this->docket_log('flush', 'internalproc-'.$this->item_hash(__FUNCTION__), $group.':'.$key);
             }
         }
 
@@ -947,6 +947,10 @@ class WP_Object_Cache
 
     private function item_hash($str, $length = 12)
     {
+        if (!$this->is_valid_key($str)) {
+            $str = serialize($str);
+        }
+
         return substr(md5($str), 0, $length);
     }
 
@@ -960,25 +964,22 @@ class WP_Object_Cache
         return $this->cache_path.$this->cache_index($key, $group).'.php';
     }
 
-    private function code_stub($data = '')
-    {
-        $code = '<?php ';
-        $code .= "defined('ABSPATH') || exit;".PHP_EOL;
-        if (!empty($data)) {
-            $code .= 'return '.$data.';'.PHP_EOL;
-        }
-
-        return $code;
-    }
-
     private function docket_log($tag, $id, $data)
     {
         if ($this->constans->is_false('DOCKET_CACHE_LOG')) {
             return false;
         }
 
-        if ($this->constans->is_false('WP_DEBUG')) {
+        if ($this->skip_stats($data)) {
+            return false;
+        }
+
+        if ($this->constans->is_false('DOCKET_CACHE_LOG_ALL')) {
             if (!\in_array($tag, ['hit', 'miss'])) {
+                return false;
+            }
+
+            if (@preg_match('@^user(s|email|logins|_meta)\:.*@', $data)) {
                 return false;
             }
         }
@@ -996,6 +997,15 @@ class WP_Object_Cache
 
         $tag = str_pad($tag, 5);
 
+        static $duplicate = [];
+
+        $buff = $this->item_hash($tag.$id.$data.$caller);
+        if (isset($duplicate[$buff])) {
+            return false;
+        }
+
+        $duplicate[$buff] = 1;
+
         return $this->filesystem->log($tag, $id, $data, $caller);
     }
 
@@ -1004,11 +1014,11 @@ class WP_Object_Cache
         $dir = $this->cache_path;
         $cnt = $this->filesystem->cachedir_flush($dir);
         if (false === $cnt) {
-            $this->docket_log('err', 'internalresc-'.$this->item_hash(__FUNCTION__), 'Object cache could not be flushed');
+            $this->docket_log('err', 'internalproc-'.$this->item_hash(__FUNCTION__), 'Object cache could not be flushed');
         }
 
         if ($cnt > 0) {
-            $this->docket_log('flush', 'internalresc-'.$this->item_hash(__FUNCTION__), 'files:'.$cnt);
+            $this->docket_log('flush', 'internalproc-'.$this->item_hash(__FUNCTION__), 'files:'.$cnt);
 
             if ($this->constans->is_true('DOCKET_CACHE_WPCLI')) {
                 do_action('docket-cache/preload');
@@ -1045,6 +1055,11 @@ class WP_Object_Cache
         }
     }
 
+    private function skip_stats($group)
+    {
+        return $this->constans->is_false('DOCKET_CACHE_LOG_ALL') && $this->filesystem->internal_group($group);
+    }
+
     private function docket_get($key, $group, $is_raw = false)
     {
         $file = $this->get_file_path($key, $group);
@@ -1052,8 +1067,11 @@ class WP_Object_Cache
 
         $data = $this->filesystem->cache_get($file);
         if (false === $data) {
-            ++$this->cache_misses;
-            $this->docket_log('miss', $index, $group.':'.$key);
+            if (!$this->skip_stats($group)) {
+                ++$this->cache_misses;
+
+                $this->docket_log('miss', $index, $group.':'.$key);
+            }
 
             return false;
         }
@@ -1066,13 +1084,17 @@ class WP_Object_Cache
 
             unset($this->cache[$group][$key]);
 
-            ++$this->cache_misses;
+            if (!$this->skip_stats($group)) {
+                ++$this->cache_misses;
+            }
 
             return false;
         }
 
-        ++$this->cache_hits;
-        $this->docket_log('hit', $index, $group.':'.$key);
+        if (!$this->skip_stats($group)) {
+            ++$this->cache_hits;
+            $this->docket_log('hit', $index, $group.':'.$key);
+        }
 
         clearstatcache();
 
@@ -1097,7 +1119,7 @@ class WP_Object_Cache
             return false;
         }
 
-        $code = $this->code_stub($data);
+        $code = $this->filesystem->code_stub($data);
         $stat = $this->filesystem->dump($file, $code);
         if (-1 === $stat) {
             $this->docket_log('err', $fname, 'Failed to write');
@@ -1115,12 +1137,12 @@ class WP_Object_Cache
         }
 
         if (!@is_file($this->cache_path.'index.php')) {
-            @$this->filesystem->put($this->cache_path.'index.php', $this->code_stub(time()));
+            @$this->filesystem->put($this->cache_path.'index.php', $this->filesystem->code_stub(time()));
         }
 
         // if transient and without expiry, set to 12 hours in our cache
         if (\in_array($group, ['site-transient', 'transient']) && 0 === $expire) {
-            $expire = 12 * HOUR_IN_SECONDS;
+            $expire = 43200; // 12h
         }
 
         $file = $this->get_file_path($key, $group);
@@ -1175,32 +1197,40 @@ class WP_Object_Cache
         $req_key = json_encode($_SERVER['REQUEST_URI']);
         $req_key = $this->item_hash($req_key);
 
-        $this->get_precache($req_key);
+        $this->precache_get($req_key);
 
         add_action(
             'shutdown',
             function () use ($req_key) {
-                $this->add_precache($req_key);
+                $this->precache_set($req_key);
             },
             PHP_INT_MAX
         );
     }
 
-    private function get_precache($hash)
+    private function precache_get($hash)
     {
+        static $cached = [];
         $group = 'docketcache-precache';
         $keys = $this->get($hash, $group);
 
         if (!empty($keys) && \is_array($keys)) {
             foreach ($keys as $cache_group => $arr) {
                 foreach ($arr as $cache_key) {
-                    $this->get($cache_key, $cache_group);
+                    // reduce our load
+                    if (isset($cached[$cache_key.$cache_group])) {
+                        continue;
+                    }
+
+                    if (false !== $this->get($cache_key, $cache_group)) {
+                        $cached[$cache_key.$cache_group] = 1;
+                    }
                 }
             }
         }
     }
 
-    private function add_precache($hash)
+    private function precache_set($hash)
     {
         if (empty($this->precache) || !\is_array($this->precache)) {
             return;
@@ -1224,6 +1254,10 @@ class WP_Object_Cache
                     unset($cache_hash[$h]);
                     ++$x;
                 }
+
+                if ($x > 0) {
+                    $this->set('index', $cache_hash, $group, 86400);
+                }
             }
         }
 
@@ -1241,10 +1275,10 @@ class WP_Object_Cache
         }
 
         if (!empty($data)) {
-            $this->add($hash, $data, $group);
+            $this->set($hash, $data, $group, 86400); // 24h
 
             $cache_hash[$hash] = 1;
-            $this->set('index', $cache_hash, $group);
+            $this->set('index', $cache_hash, $group, 86400);
         }
     }
 

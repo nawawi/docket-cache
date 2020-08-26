@@ -122,9 +122,19 @@ class Filesystem
                 $data = var_export($data, 1);
                 $data = str_replace('stdClass::__set_state', '(object)', $data);
             } else {
+                $this->log('err', 'internalproc-internalfunc', 'export_var: '.$error);
+
                 return false;
             }
         }
+
+        // alias: shorter name
+        // map it in includes/compat.php
+        $data = str_replace(
+            '\Nawawi\Symfony\Component\VarExporter\Internal\\',
+            '\Nawawi\DocketCache\Exporter\\',
+            $data
+        );
 
         return $data;
     }
@@ -211,13 +221,6 @@ class Filesystem
             PHP_INT_MAX
         );
 
-        // alias
-        $data = str_replace(
-            '\Nawawi\Symfony\Component\VarExporter\Internal\\',
-            '\Nawawi\DocketCache\Exporter\\',
-            $data
-        );
-
         $this->opcache_flush($file);
 
         $ok = $this->put($tmpfile, $data);
@@ -292,23 +295,13 @@ class Filesystem
             return false;
         }
 
-        static $done = [];
-
-        if (isset($done[$file])) {
-            return $done[$file];
-        }
-
         // wp 5.5
         if (\function_exists('wp_opcache_invalidate')) {
-            $done[$file] = @wp_opcache_invalidate($file, true);
-
-            return $done[$file];
+            return @wp_opcache_invalidate($file, true);
         }
 
         if (\function_exists('opcache_invalidate') && $this->is_php($file) && @is_file($file)) {
-            $done[$file] = @opcache_invalidate($file, true);
-
-            return $done[$file];
+            return @opcache_invalidate($file, true);
         }
 
         return false;
@@ -341,7 +334,10 @@ class Filesystem
             return false;
         }
 
-        @opcache_reset();
+        if (!@opcache_reset()) {
+            return false;
+        }
+
         $dir = realpath($dir);
         if (false !== $dir && is_dir($dir) && is_writable($dir) && $this->is_docketcachedir($dir)) {
             foreach ($this->scanfiles($dir) as $object) {
@@ -350,6 +346,14 @@ class Filesystem
                     continue;
                 }
 
+                $this->opcache_flush($fx);
+            }
+        }
+
+        $opcache_status = opcache_get_status();
+        if (!empty($opcache_status) && \is_array($opcache_status) && !empty($opcache_status['scripts'])) {
+            foreach ($opcache_status['scripts'] as $key => $data) {
+                $fx = $data['full_path'];
                 $this->opcache_flush($fx);
             }
         }
@@ -410,6 +414,7 @@ class Filesystem
             }
         }
 
+        $is_debug = \defined('DOCKET_CACHE_LOG_ALL') && DOCKET_CACHE_LOG_ALL ? true : false;
         $bytestotal = 0;
         $fsizetotal = 0;
         $filestotal = 0;
@@ -427,13 +432,22 @@ class Filesystem
                     continue;
                 }
 
+                $skip = false;
                 $data = $this->cache_get($object->getPathName());
                 if (false !== $data) {
+                    if (!$is_debug && !empty($data['group']) && $this->internal_group($data['group'])) {
+                        $skip = true;
+                        continue;
+                    }
+
                     $bytestotal += \strlen(serialize($data));
                     ++$filestotal;
                 }
                 unset($data);
-                $fsizetotal += $fs;
+
+                if (!$skip) {
+                    $fsizetotal += $fs;
+                }
             }
         }
 
@@ -462,7 +476,18 @@ class Filesystem
 
         // include when we can read, try to avoid fatal error.
         if (flock($handle, LOCK_SH)) {
-            $data = @include $file;
+            try {
+                $data = @include $file;
+            } catch (\Exception $e) {
+                $error = $e->getMessage();
+                if (preg_match('@Class.*not found@', $error)) {
+                    @unlink($file);
+                }
+
+                $this->log('err', 'internalproc-internalfunc', 'cache_get: '.$error);
+                $data = false;
+            }
+
             @flock($handle, LOCK_UN);
         }
         @fclose($handle);
@@ -472,6 +497,17 @@ class Filesystem
         }
 
         return $data;
+    }
+
+    public function code_stub($data = '')
+    {
+        $code = '<?php ';
+        $code .= "defined('ABSPATH') || exit;".PHP_EOL;
+        if (!empty($data)) {
+            $code .= 'return '.$data.';'.PHP_EOL;
+        }
+
+        return $code;
     }
 
     public function log($tag, $id, $data, $caller = '')
@@ -500,5 +536,19 @@ class Filesystem
         }
 
         return @$this->put($file, $log.PHP_EOL, $do_flush ? 'cb' : 'ab');
+    }
+
+    public function internal_group($group)
+    {
+        return 'docketcache' === substr($group, 0, 11);
+    }
+
+    public function get_home_path()
+    {
+        if (!\function_exists('get_home_path')) {
+            require_once ABSPATH.'wp-admin/includes/file.php';
+        }
+
+        return get_home_path();
     }
 }

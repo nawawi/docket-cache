@@ -207,31 +207,6 @@ final class Tweaks
         );
     }
 
-    public function security_header()
-    {
-        if (isset($_SERVER['DOCKET_CACHE_SERVER'])) {
-            return;
-        }
-
-        add_action(
-            'send_headers',
-            function () {
-                if (is_ssl()) {
-                    header('Strict-Transport-Security: max-age=63072000; includeSubDomains');
-                }
-
-                header('X-Frame-Options: SAMEORIGIN');
-                header('Referrer-Policy: strict-origin-when-cross-origin');
-                header('Feature-Policy: payment \'self\'; sync-xhr \'self\' '.get_home_url());
-                header('X-Content-Type-Options: nosniff');
-                header('X-XSS-Protection: 1; mode=block');
-                header('Content-Security-Policy: report-uri /csp-report-parser;');
-                header('X-Permitted-Cross-Domain-Policies: master-only');
-            },
-            PHP_INT_MAX
-        );
-    }
-
     public function post_missed_schedule()
     {
         $wpdb = $this->plugin->safe_wpdb();
@@ -239,12 +214,15 @@ final class Tweaks
             return false;
         }
 
-        $limit = wp_count_posts()->future;
-        if ($limit < 1) {
+        // check
+        $query = "SELECT ID FROM `{$wpdb->posts}` WHERE post_status='future' ORDER BY ID ASC LIMIT 1";
+        $check = $wpdb->query($query);
+
+        if ($check < 1) {
             return false;
         }
 
-        $limit = $limit > 100 ? 100 : $limit;
+        $limit = 1000;
 
         $now = gmdate('Y-m-d H:i:59');
         $args = [
@@ -256,9 +234,9 @@ final class Tweaks
         $post_types = get_post_types($args, 'names', 'and');
         if (!empty($post_types) && \is_array($post_types)) {
             $types = implode("','", $post_types);
-            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page','%s') AND post_status='future' AND post_date_gmt < '%s' ORDER BY ID ASC LIMIT %d", $types, $now, $limit);
+            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page','%s') AND post_status='future' AND post_date_gmt < %s ORDER BY ID ASC LIMIT %d", $types, $now, $limit);
         } else {
-            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page') AND post_status='future' AND post_date_gmt < '%s' ORDER BY ID ASC LIMIT %d", $now, $limit);
+            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page') AND post_status='future' AND post_date_gmt < %s ORDER BY ID ASC LIMIT %d", $now, $limit);
         }
 
         $suppress = $wpdb->suppress_errors(true);

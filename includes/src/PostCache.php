@@ -25,10 +25,11 @@ class PostCache
     public $found_posts;
     public $cache_func;
 
-    private static $inst;
+    private $plugin;
 
-    public function __construct()
+    public function __construct(Plugin $plugin)
     {
+        $this->plugin = $plugin;
         $this->prefix = 'docketcache-post';
         $this->group_prefix = $this->prefix.'-';
 
@@ -46,15 +47,6 @@ class PostCache
 
         $this->setup_for_blog();
         $this->setup_hooks();
-    }
-
-    public static function init()
-    {
-        if (!isset(self::$inst)) {
-            self::$inst = new self();
-        }
-
-        return self::$inst;
     }
 
     private function setup_hooks()
@@ -136,10 +128,14 @@ class PostCache
                 $months = wp_cache_get('media_library_months_with_files', $cache_group);
 
                 if (false === $months) {
-                    global $wpdb;
+                    $wpdb = $this->plugin->safe_wpdb();
+                    if (!$wpdb) {
+                        return $months;
+                    }
+
                     $months = $wpdb->get_results(
                         $wpdb->prepare(
-                            'SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month FROM '.$wpdb->posts.' WHERE post_type = %s ORDER BY post_date DESC',
+                            "SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month FROM `{$wpdb->posts}` WHERE post_type = %s ORDER BY post_date DESC",
                             'attachment'
                         )
                     );
@@ -157,20 +153,28 @@ class PostCache
                     return;
                 }
 
-                global $wpdb;
+                $wpdb = $this->plugin->safe_wpdb();
+                if (!$wpdb) {
+                    return;
+                }
+
                 $months = $wpdb->get_results(
                     $wpdb->prepare(
-                        'SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month FROM '.$wpdb->posts.' WHERE post_type = %s ORDER BY post_date DESC LIMIT 1',
+                        "SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month FROM `{$wpdb->posts}` WHERE post_type = %s ORDER BY post_date DESC LIMIT 1",
                         'attachment'
-                    )
+                    ),
+                    ARRAY_A
                 );
 
-                if (empty($months) || empty((array) $months)) {
+                if (empty($months) || !\is_array($value)) {
                     return;
                 }
 
                 $cache_group = $this->prefix.'-media';
-                $months = array_shift(array_values($months));
+                $months = array_values($months);
+                $months = array_shift($months);
+
+                $months = (object) $months;
 
                 if (!$months->year == get_the_time('Y', $post_id) && !$months->month == get_the_time('m', $post_id)) {
                     wp_cache_delete('media_library_months_with_files', $cache_group);
@@ -214,7 +218,10 @@ class PostCache
 
     public function posts_request($sql, $query)
     {
-        global $wpdb;
+        $wpdb = $this->plugin->safe_wpdb();
+        if (!$wpdb) {
+            return $sql;
+        }
 
         if (apply_filters('docket-cache/postcache-skip-type', false, $query->get('post_type'))) {
             return $sql;
@@ -256,7 +263,7 @@ class PostCache
             $uncached_post_ids = array_diff($this->all_post_ids, $this->cached_post_ids);
 
             if ($uncached_post_ids) {
-                return "SELECT * FROM $wpdb->posts WHERE ID IN(".implode(',', array_map('absint', $uncached_post_ids)).')';
+                return "SELECT * FROM `{$wpdb->posts}` WHERE ID IN(".implode(',', array_map('absint', $uncached_post_ids)).')';
             }
 
             return '';

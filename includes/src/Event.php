@@ -123,19 +123,31 @@ class Event
             clearstatcache();
             foreach ($this->plugin->scanfiles($this->plugin->cache_path) as $object) {
                 $fx = $object->getPathName();
+
                 if (!$object->isFile() || 'file' !== $object->getType()) {
                     @unlink($fx);
                     continue;
                 }
+
                 $fn = $object->getFileName();
                 $fs = $object->getSize();
                 $fm = time() + 120;
+
                 if ($fm >= filemtime($fx) && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
                     $this->plugin->unlink($fx, true);
-                } else {
-                    if (!$this->plugin->opcache_is_cached($fx)) {
-                        $this->plugin->opcache_compile($fx);
-                    }
+                    continue;
+                }
+
+                $data = $this->plugin->cache_get($fx);
+                if (false !== $data && !empty($data['timeout']) && $fm >= (int) $data['timeout']) {
+                    $this->plugin->unlink($fx, false);
+                    unset($data);
+                    continue;
+                }
+                unset($data);
+
+                if (!$this->plugin->opcache_is_cached($fx)) {
+                    $this->plugin->opcache_compile($fx);
                 }
             }
         }
@@ -151,6 +163,9 @@ class Event
         if (!$wpdb) {
             return false;
         }
+
+        // delete expired transient in db
+        delete_expired_transients(true);
 
         $dbname = $wpdb->dbname;
         $tables = $wpdb->get_results('SHOW TABLES FROM '.$dbname, ARRAY_A);
