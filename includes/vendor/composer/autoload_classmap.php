@@ -14,6 +14,7 @@ return array(
     'Nawawi\\DocketCache\\CronAgent' => $baseDir . '/includes/src/CronAgent.php',
     'Nawawi\\DocketCache\\Dropino' => $baseDir . '/includes/src/Dropino.php',
     'Nawawi\\DocketCache\\Event' => $baseDir . '/includes/src/Event.php',
+    'Nawawi\\DocketCache\\EventList' => $baseDir . '/includes/src/EventList.php',
     'Nawawi\\DocketCache\\Filesystem' => $baseDir . '/includes/src/Filesystem.php',
     'Nawawi\\DocketCache\\MoCache' => $baseDir . '/includes/src/MoCache.php',
     'Nawawi\\DocketCache\\Plugin' => $baseDir . '/includes/src/Plugin.php',

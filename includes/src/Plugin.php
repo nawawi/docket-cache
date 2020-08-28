@@ -579,6 +579,7 @@ final class Plugin extends Bepart
              'docket-flush-opcache',
              'docket-connect-cronbot',
              'docket-disconnect-cronbot',
+             'docket-runevent-cronbot',
          ];
 
         foreach ($this->canopt->keys() as $key) {
@@ -828,6 +829,12 @@ final class Plugin extends Bepart
                                 $message = $result ? 'docket-cronbot-disconnect' : 'docket-cronbot-disconnect-failed';
                                 do_action('docket-cache/disconnect-cronbot', $result);
                                 break;
+                            case 'docket-runevent-cronbot':
+                                $result = apply_filters('docket-cache/cronbot-runevent', false);
+                                $message = $result ? 'docket-cronbot-runevent' : 'docket-cronbot-runevent-failed';
+                                do_action('docket-cache/runevent-cronbot', $result);
+                                @Crawler::fetch_admin(admin_url('/'));
+                                break;
                         }
 
                         if (empty($message) && preg_match('@^docket-(default|enable|disable|save)-([a-z_]+)$@', $action, $mm)) {
@@ -921,13 +928,19 @@ final class Plugin extends Bepart
                             $message = esc_html__('Cronbot connected.', 'docket-cache');
                             break;
                         case 'docket-cronbot-connect-failed':
-                            $message = esc_html__('Cronbot failed to connect.', 'docket-cache');
+                            $error = esc_html__('Cronbot failed to connect.', 'docket-cache');
                             break;
                         case 'docket-cronbot-disconnect':
                             $message = esc_html__('Cronbot disconnected.', 'docket-cache');
                             break;
                         case 'docket-cronbot-disconnect-failed':
-                            $message = esc_html__('Cronbot failed to disconnect.', 'docket-cache');
+                            $error = esc_html__('Cronbot failed to disconnect.', 'docket-cache');
+                            break;
+                        case 'docket-cronbot-runevent':
+                            $message = esc_html__('Cron run successful.', 'docket-cache');
+                            break;
+                        case 'docket-cronbot-runevent-failed':
+                            $error = esc_html__('Failed to run cron.', 'docket-cache');
                             break;
                         case 'docket-option-enable':
                             $message = esc_html__('Option enabled.', 'docket-cache');

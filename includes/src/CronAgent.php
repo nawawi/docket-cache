@@ -50,6 +50,24 @@ class CronAgent
             },
             PHP_INT_MAX
         );
+
+        add_filter(
+            'docket-cache/cronbot-runevent',
+            function ($status) {
+                $results = $this->run_wpcron();
+
+                if (is_wp_error($results)) {
+                    return false;
+                }
+
+                if (200 !== wp_remote_retrieve_response_code($results)) {
+                    return false;
+                }
+
+                return true;
+            },
+            -PHP_INT_MAX
+        );
     }
 
     private function send_action($action)
@@ -85,7 +103,7 @@ class CronAgent
         ];
 
         if (is_wp_error($results)) {
-            $output['error'] = $result->get_error_message();
+            $output['error'] = $results->get_error_message();
             $this->plugin->canopt->save_part($output, 'cronbot');
 
             return false;
@@ -127,28 +145,8 @@ class CronAgent
         $this->plugin->close_exit(json_encode($response, JSON_UNESCAPED_SLASHES));
     }
 
-    private function receive_ping()
+    private function run_wpcron()
     {
-        if (headers_sent() || empty($_SERVER['REQUEST_URI']) || '/docketcache-cron.php' !== substr($_SERVER['REQUEST_URI'], 0, 21)) {
-            return;
-        }
-
-        if (!@preg_match('@compatible;\s+cronbot/[0-9\.]+;\s+docket\-cache/[0-9\.]+;\s+@', $this->plugin->get_user_agent())) {
-            return;
-        }
-
-        $response = [
-            'timestamp' => date('Y-m-d H:i:s T'),
-            'timezone' => wp_timezone_string(),
-            'site' => site_url(),
-            'status' => 1,
-        ];
-
-        if ($this->plugin->constans->is_false('DOCKET_CACHE_CRONBOT')) {
-            $response['status'] = 0;
-            $this->close_ping($response);
-        }
-
         $do_fetch = false;
 
         if ($this->plugin->constans->is_true('DISABLE_WP_CRON')
@@ -189,6 +187,33 @@ class CronAgent
             $cron_request['args']['blocking'] = true;
             $results = Crawler::post($cron_request['url'], $cron_request['args']);
         }
+
+        return $results;
+    }
+
+    private function receive_ping()
+    {
+        if (headers_sent() || empty($_SERVER['REQUEST_URI']) || '/docketcache-cron.php' !== substr($_SERVER['REQUEST_URI'], 0, 21)) {
+            return;
+        }
+
+        if (!@preg_match('@compatible;\s+cronbot/[0-9\.]+;\s+docket\-cache/[0-9\.]+;\s+@', $this->plugin->get_user_agent())) {
+            return;
+        }
+
+        $response = [
+            'timestamp' => date('Y-m-d H:i:s T'),
+            'timezone' => wp_timezone_string(),
+            'site' => site_url(),
+            'status' => 1,
+        ];
+
+        if ($this->plugin->constans->is_false('DOCKET_CACHE_CRONBOT')) {
+            $response['status'] = 0;
+            $this->close_ping($response);
+        }
+
+        $results = $this->run_wpcron();
 
         if (is_wp_error($results)) {
             $response['wpcron_return'] = 0;

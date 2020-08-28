@@ -43,6 +43,7 @@ class ComposerStaticInit71169967e8f502f7da209e4236957996
         'Nawawi\\DocketCache\\CronAgent' => __DIR__ . '/../../..' . '/includes/src/CronAgent.php',
         'Nawawi\\DocketCache\\Dropino' => __DIR__ . '/../../..' . '/includes/src/Dropino.php',
         'Nawawi\\DocketCache\\Event' => __DIR__ . '/../../..' . '/includes/src/Event.php',
+        'Nawawi\\DocketCache\\EventList' => __DIR__ . '/../../..' . '/includes/src/EventList.php',
         'Nawawi\\DocketCache\\Filesystem' => __DIR__ . '/../../..' . '/includes/src/Filesystem.php',
         'Nawawi\\DocketCache\\MoCache' => __DIR__ . '/../../..' . '/includes/src/MoCache.php',
         'Nawawi\\DocketCache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',

@@ -33,6 +33,11 @@ final class View
         $this->cronbot_enable = $this->plugin->constans->is_true('DOCKET_CACHE_CRONBOT');
     }
 
+    public function utc_to_local($gmt_timestamp)
+    {
+        return get_date_from_gmt(date('Y-m-d H:i:s', $gmt_timestamp), 'U');
+    }
+
     private function parse_log_query()
     {
         $ret = (object) [];
@@ -118,8 +123,8 @@ final class View
             $timestamp = strtotime($data['timestamp']);
 
             return [
-                'last' => date('d-m-Y H:i:s T', $timestamp),
-                'next' => date('d-m-Y H:i:s T', strtotime('+1 hour', $timestamp)),
+                'last' => wp_date('Y-m-d H:i:s', $timestamp),
+                'next' => wp_date('Y-m-d H:i:s', strtotime('+1 hour', $timestamp)),
             ];
         }
 

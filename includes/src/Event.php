@@ -27,6 +27,22 @@ class Event
     public function register()
     {
         add_filter(
+            'heartbeat_send',
+            function ($response, $screen_id) {
+                if (is_admin() && is_user_logged_in() && current_user_can('manage_options')) {
+                    $timestmp = get_transient('docketcache/event');
+                    if (!empty($timestmp) && \is_int($timestmp) && time() > $timestmp) {
+                        apply_filters('docket-cache/cronbot-runevent', false);
+                    }
+
+                    set_transient('docketcache/event', strtotime('+30 minutes'), DAY_IN_SECONDS);
+                }
+            },
+            9,
+            2
+        );
+
+        add_filter(
             'cron_schedules',
             function ($schedules) {
                 $schedules = [
@@ -129,6 +145,10 @@ class Event
                     continue;
                 }
 
+                if (!$this->plugin->is_php($fx)) {
+                    continue;
+                }
+
                 $fn = $object->getFileName();
                 $fs = $object->getSize();
                 $fm = time() + 120;
@@ -145,10 +165,6 @@ class Event
                     continue;
                 }
                 unset($data);
-
-                if (!$this->plugin->opcache_is_cached($fx)) {
-                    $this->plugin->opcache_compile($fx);
-                }
             }
         }
         $this->plugin->dropino->delay_expire();

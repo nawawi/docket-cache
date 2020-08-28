@@ -20,6 +20,10 @@ if (!empty($ping_data)) {
     $ping_next = $ping_data['next'];
     $ping_last = $ping_data['last'];
 }
+$event_list = new EventList();
+$event_list->prepare_items();
+$utc_offset = '('.$event_list->get_utc_offset().')';
+$total_page = $event_list->get_pagination_arg('total_pages');
 ?>
 <div class="section cronbot">
     <?php $this->tab_title(esc_html__('Cronbot', 'docket-cache')); ?>
@@ -31,21 +35,44 @@ if (!empty($ping_data)) {
 
         <tr>
             <th><?php esc_html_e('Last Received Ping', 'docket-cache'); ?></th>
-            <td><?php echo $ping_last; ?></td>
+            <td><?php echo $ping_last.' '.$utc_offset; ?></td>
         </tr>
-
+        <?php if ( $is_connected ): ?>
         <tr>
             <th><?php esc_html_e('Next Expecting Ping', 'docket-cache'); ?></th>
-            <td><?php echo $ping_next; ?></td>
+            <td><?php echo $ping_next.' '.$utc_offset; ?></td>
         </tr>
-
+        <?php endif; ?>
     </table>
 
     <p class="submit">
         <?php if ($is_connected) : ?>
         <a href="<?php echo $this->plugin->action_query('disconnect-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary button-large"><?php esc_html_e('Disconnect', 'docket-cache'); ?></a>
+        <a href="<?php echo $this->plugin->action_query('connect-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary button-large"><?php esc_html_e('Ping Test', 'docket-cache'); ?></a>
         <?php else : ?>
         <a href="<?php echo $this->plugin->action_query('connect-cronbot', ['idx' => 'cronbot']); ?>" class="button button-primary button-large"><?php esc_html_e('Connect', 'docket-cache'); ?></a>
         <?php endif; ?>
     </p>
+
+    <?php $this->tab_title(esc_html__('Cron Events', 'docket-cache'), false); ?>
+    <div class="eventlist">
+
+        <div class="box-left">
+            <a href="<?php echo $this->plugin->action_query('runevent-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary"><?php esc_html_e('Run WP-CRON', 'docket-cache'); ?></a>
+        </div>
+
+        <?php if ($total_page > 1 || !empty($_GET['s'])) : ?>
+        <div class="box-right">
+            <form id="events-filter" method="get" action="<?php echo $this->plugin->page; ?>">
+                <input type="hidden" name="page" value="docket-cache">
+                <input type="hidden" name="idx" value="cronbot">
+                <?php $event_list->search_box(__('Filter Hook Names', 'docket-cache'), 'eventlist-event'); ?>
+            </form>
+        </div>
+        <?php endif; ?>
+        <div class="table-responsive">
+            <?php $event_list->display(); ?>
+        </div>
+    </div>
+
 </div>
