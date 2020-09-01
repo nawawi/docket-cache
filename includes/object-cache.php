@@ -17,7 +17,7 @@
 /*
  * Check if doing action.
  */
-if (isset($_GET['_wpnonce'], $_GET['action'], $_GET['page']) && !empty($_GET['page']) && 'docket-cache' === $_GET['page']) {
+if (isset($_GET['_wpnonce'], $_GET['action'], $_GET['page']) && !empty($_GET['page']) && 'docket-cache' === $_GET['page'] && false === strpos($_GET['action'], 'cronbot')) {
     return;
 }
 
