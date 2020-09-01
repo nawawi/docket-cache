@@ -14,8 +14,7 @@ namespace Nawawi\DocketCache;
 
 class CronAgent
 {
-    //private $backend = 'https://cronbot.docketcache.com';
-    private $backend = 'http://cronbot.docketcache.local';
+    private $backend = 'https://cronbot.docketcache.com';
     private $plugin;
 
     public function __construct(Plugin $plugin)
