@@ -206,7 +206,7 @@ class CronAgent
 
     private function receive_ping()
     {
-        if (headers_sent() || empty($_POST['ping']) || empty($_GET['docketcache_ping']) || empty($_SERVER['REQUEST_URI']) || '/?docketcache_ping=' !== substr($_SERVER['REQUEST_URI'], 0, 19)) {
+        if (headers_sent() || empty($_POST['ping']) || empty($_GET['docketcache_ping']) || empty($_SERVER['REQUEST_URI']) || false === strpos($_SERVER['REQUEST_URI'], '/?docketcache_ping=') ) {
             return;
         }
 

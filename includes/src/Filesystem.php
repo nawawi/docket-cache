@@ -408,7 +408,7 @@ class Filesystem
     public function cache_size($dir, $is_stats = false, $force = false)
     {
         if (!$force) {
-            $cache_stats = get_transient('docketcache/cachestats');
+            $cache_stats = wp_cache_get('cache_stats', 'docketcache-data');
             if (!empty($cache_stats) && \is_array($cache_stats)) {
                 return $is_stats ? (object) $cache_stats : $cache_stats->size;
             }
@@ -457,7 +457,7 @@ class Filesystem
             'files' => $filestotal,
         ];
 
-        set_transient('docketcache/cachestats', $cache_stats, 10);
+        wp_cache_set('cache_stats', $cache_stats, 'docketcache-data', 10);
 
         return $is_stats ? (object) $cache_stats : $bytestotal;
     }

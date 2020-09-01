@@ -104,6 +104,18 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.08.05 =
+
+New features and fix releases.
+
+- Added Cronbot Service
+- Fixed precache overmissed
+- Fixed for security reason, exclude *user* group from cache log if WP_DEBUG false
+- Fixed cache_read() -> Registry::getClassReflector -> fatal error class not found
+- Fixed PostCache::setup_hooks() -> array_shift error byreference
+- Fixed get_proxy_ip() -> return bool instead of IP string
+- Fixed ajax worker -> cache preload, cache flush, log flush
+
 = 20.08.04 =
 
 New features and fix releases.
