@@ -105,16 +105,30 @@ class CronAgent
         if (is_wp_error($results)) {
             $output['error'] = $results->get_error_message();
             $this->plugin->canopt->save_part($output, 'cronbot');
+            set_transient('docketcache/cronboterror', $output['error'], 10);
 
             return false;
         }
 
-        $output['response'] = wp_remote_retrieve_response_message($results);
+        $output['response'] = wp_remote_retrieve_body($results);
+        if (!empty($output['response'])) {
+            $output['response'] = json_decode($output['response'], true);
+            if (JSON_ERROR_NONE === json_last_error()) {
+                if (!empty($output['response']['error'])) {
+                    $output['error'] = $output['response']['error'];
+                    $this->plugin->canopt->save_part($output, 'cronbot');
+                    set_transient('docketcache/cronboterror', $output['error'], 10);
+
+                    return false;
+                }
+            }
+        }
 
         $code = (int) wp_remote_retrieve_response_code($results);
         if ($code > 400) {
             $output['error'] = $code;
             $this->plugin->canopt->save_part($output, 'cronbot');
+            set_transient('docketcache/cronboterror', $output['error'], 10);
 
             return false;
         }
@@ -193,7 +207,11 @@ class CronAgent
 
     private function receive_ping()
     {
-        if (headers_sent() || empty($_SERVER['REQUEST_URI']) || '/docketcache-cron.php' !== substr($_SERVER['REQUEST_URI'], 0, 21)) {
+        if (headers_sent() || empty($_POST['ping']) || empty($_GET['docketcache_ping']) || empty($_SERVER['REQUEST_URI']) || '/?docketcache_ping=' !== substr($_SERVER['REQUEST_URI'], 0, 19)) {
+            return;
+        }
+
+        if ($_POST['ping'] !== md5($_GET['docketcache_ping'])) {
             return;
         }
 
