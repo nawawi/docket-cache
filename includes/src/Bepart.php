@@ -121,6 +121,35 @@ class Bepart extends Filesystem
     }
 
     /**
+     * get_user_ip.
+     */
+    public function get_user_ip()
+    {
+        foreach ([
+            'HTTP_CF_CONNECTING_IP',
+            'HTTP_CLIENT_IP',
+            'HTTP_X_FORWARDED_FOR',
+            'HTTP_X_FORWARDED',
+            'HTTP_X_CLUSTER_CLIENT_IP',
+            'HTTP_X_REAL_IP',
+            'HTTP_FORWARDED_FOR',
+            'HTTP_FORWARDED',
+            'REMOTE_ADDR',
+        ] as $key) {
+            if (!empty($_SERVER[$key])) {
+                $ip = explode(',', $_SERVER[$key]);
+                $ip = end($ip);
+
+                if (false !== filter_var($ip, FILTER_VALIDATE_IP)) {
+                    return $ip;
+                }
+            }
+        }
+
+        return '0.0.0.0';
+    }
+
+    /**
      * get_proxy_ip.
      */
     public function get_proxy_ip()
