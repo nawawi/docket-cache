@@ -37,6 +37,7 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 - WP Options Autoload suspension
 - Post Missed Schedule Tweaks
 - Cache Log
+- Cronbot Service
 - Multisite support
 
 == Requirement ==
