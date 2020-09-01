@@ -27,22 +27,6 @@ class Event
     public function register()
     {
         add_filter(
-            'heartbeat_send',
-            function ($response, $screen_id) {
-                if (is_admin() && is_user_logged_in() && current_user_can('manage_options')) {
-                    $timestmp = get_transient('docketcache/event');
-                    if (!empty($timestmp) && \is_int($timestmp) && time() > $timestmp) {
-                        apply_filters('docket-cache/cronbot-runevent', false);
-                    }
-
-                    set_transient('docketcache/event', strtotime('+30 minutes'), DAY_IN_SECONDS);
-                }
-            },
-            9,
-            2
-        );
-
-        add_filter(
             'cron_schedules',
             function ($schedules) {
                 $schedules = [
