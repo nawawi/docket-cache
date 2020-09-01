@@ -60,10 +60,6 @@ namespace Nawawi\DocketCache;
                 <?php esc_html_e('If Docket Cache beneficial to your website performance, it’s more than thank you if you can leave a review about your experience.', 'docket-cache'); ?><br>
                 <a href="https://wordpress.org/support/plugin/docket-cache/reviews/" rel="noopener" target="new"><?php esc_html_e('Write your review.', 'docket-cache'); ?></a>
             </p>
-            <p>
-                <?php esc_html_e('The Docket Cache is an Open Source Software under MIT license. It depends on your generosity to sponsor the development cost to keep it up-to-date.', 'docket-cache'); ?><br>
-                <a href="https://wordpress.org/support/plugin/docket-cache/reviews/" rel="noopener" target="new"><?php esc_html_e('Write your review.', 'docket-cache'); ?></a>
-            </p>
             <?php endif; ?>
         </div>
 

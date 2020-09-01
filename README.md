@@ -1,12 +1,11 @@
-
 # ![Docket Cache](./.wordpress.org/icon-128x128.png) Docket Cache
 [![WP compatibility](https://plugintests.com/plugins/wporg/docket-cache/wp-badge.svg)](https://plugintests.com/plugins/wporg/docket-cache/latest) [![PHP compatibility](https://plugintests.com/plugins/wporg/docket-cache/php-badge.svg)](https://plugintests.com/plugins/wporg/docket-cache/latest)
 
-A file-based persistent object cache stored as a plain PHP code. Accelerates caching with OPcache backend.
+A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
 
 ## Description
 
-The Docket cache is a file-based persistent WordPress Object Cache that is stored as a plain PHP code. Intends to provide an alternative option for those who can't use Redis or Memcached server.
+The Docket cache is a persistent WordPress Object Cache that is stored as a plain PHP code. Intends to provide an alternative option for those who can't use Redis or Memcached server.
 
 Rather than using [serialize](https://www.php.net/manual/en/function.serialize.php) and [unserialize](https://www.php.net/manual/en/function.unserialize.php) a PHP object to store into flat files, this plugin stores data by converting the object into plain PHP code which results in faster data retrieval and better performance with Zend OPcache enabled.
 
@@ -53,9 +52,9 @@ To use the WP-CLI commands, please see the [WP-CLI wiki](https://github.com/nawa
 
 Versions are as follows: Year.Month.Day
 
-* Year: Two digits year of release.
-* Month: Two digits month of release.
-* Day: Two digits day of release.
+* Year: Two digits representation of a year.
+* Month: Two digits representation of a month.
+* Day: Two digits representation of a day.
 
 
 ## Contributions

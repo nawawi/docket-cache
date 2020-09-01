@@ -9,13 +9,13 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-08-28T20:36:26+00:00\n"
+"POT-Creation-Date: 2020-09-01T01:26:01+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
 
 #. Plugin Name of the plugin
-#: includes/admin/wrap.php:53
+#: includes/admin/wrap.php:49
 #: includes/src/Plugin.php:634
 #: includes/src/Plugin.php:635
 msgid "Docket Cache"
@@ -134,7 +134,7 @@ msgstr ""
 msgid "Admin Page Loader"
 msgstr ""
 
-#: includes/admin/cronbot.php:16
+#: includes/admin/cronbot.php:20
 #: includes/src/Plugin.php:121
 msgid "Not Available"
 msgstr ""
@@ -169,7 +169,7 @@ msgid "Disconnect"
 msgstr ""
 
 #: includes/admin/cronbot.php:51
-msgid "Ping Test"
+msgid "Test ping"
 msgstr ""
 
 #: includes/admin/cronbot.php:53
@@ -330,12 +330,12 @@ msgid "Config Path"
 msgstr ""
 
 #: includes/admin/overview.php:121
-#: includes/src/Plugin.php:985
+#: includes/src/Plugin.php:988
 msgid "Enable Object Cache"
 msgstr ""
 
 #: includes/admin/overview.php:132
-#: includes/src/Plugin.php:989
+#: includes/src/Plugin.php:992
 msgid "Disable Object Cache"
 msgstr ""
 
@@ -398,12 +398,7 @@ msgid "If Docket Cache beneficial to your website performance, it’s more than 
 msgstr ""
 
 #: includes/admin/resource.php:61
-#: includes/admin/resource.php:65
 msgid "Write your review."
-msgstr ""
-
-#: includes/admin/resource.php:64
-msgid "The Docket Cache is an Open Source Software under MIT license. It depends on your generosity to sponsor the development cost to keep it up-to-date."
 msgstr ""
 
 #: includes/src/Command.php:94
@@ -415,12 +410,12 @@ msgid "An unknown object cache drop-in was found. To use Docket object cache, ru
 msgstr ""
 
 #: includes/src/Command.php:102
-#: includes/src/Plugin.php:884
+#: includes/src/Plugin.php:885
 msgid "Object cache enabled."
 msgstr ""
 
 #: includes/src/Command.php:105
-#: includes/src/Plugin.php:887
+#: includes/src/Plugin.php:888
 msgid "Object cache could not be enabled."
 msgstr ""
 
@@ -433,17 +428,17 @@ msgid "An unknown object cache drop-in was found. To use Docket run: wp cache up
 msgstr ""
 
 #: includes/src/Command.php:129
-#: includes/src/Plugin.php:890
+#: includes/src/Plugin.php:891
 msgid "Object cache disabled."
 msgstr ""
 
 #: includes/src/Command.php:132
-#: includes/src/Plugin.php:893
+#: includes/src/Plugin.php:894
 msgid "Object cache could not be disabled."
 msgstr ""
 
 #: includes/src/Command.php:149
-#: includes/src/Plugin.php:902
+#: includes/src/Plugin.php:903
 msgid "Updated object cache drop-in and enabled Docket object cache."
 msgstr ""
 
@@ -452,7 +447,7 @@ msgid "Object cache drop-in could not be updated."
 msgstr ""
 
 #: includes/src/Command.php:168
-#: includes/src/Plugin.php:899
+#: includes/src/Plugin.php:900
 msgid "Object cache could not be flushed."
 msgstr ""
 
@@ -460,11 +455,11 @@ msgstr ""
 msgid "The cache was flushed."
 msgstr ""
 
-#: includes/src/Event.php:51
+#: includes/src/Event.php:35
 msgid "Every 30 minutes"
 msgstr ""
 
-#: includes/src/Event.php:55
+#: includes/src/Event.php:39
 msgid "Once Monthly"
 msgstr ""
 
@@ -621,91 +616,92 @@ msgid "Version %s"
 msgstr ""
 
 #. translators: %s: php version
-#: includes/src/Plugin.php:876
+#: includes/src/Plugin.php:877
 msgid "This plugin requires PHP %s or greater."
 msgstr ""
 
-#: includes/src/Plugin.php:896
+#: includes/src/Plugin.php:897
 msgid "Object cache was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:905
+#: includes/src/Plugin.php:906
 msgid "Docket object cache drop-in could not be updated."
 msgstr ""
 
-#: includes/src/Plugin.php:908
+#: includes/src/Plugin.php:909
 msgid "Cache log was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:911
+#: includes/src/Plugin.php:912
 msgid "Cache log could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:914
+#: includes/src/Plugin.php:915
 msgid "Cache file was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:917
+#: includes/src/Plugin.php:918
 msgid "Cache file could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:920
+#: includes/src/Plugin.php:921
 msgid "OPcache was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:924
+#: includes/src/Plugin.php:925
 msgid "OPcache could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:927
+#: includes/src/Plugin.php:928
 msgid "Cronbot connected."
 msgstr ""
 
-#: includes/src/Plugin.php:930
-msgid "Cronbot failed to connect."
-msgstr ""
-
+#. translators: %s = error message
 #: includes/src/Plugin.php:933
-msgid "Cronbot disconnected."
+msgid "Cronbot failed to connect: %s"
 msgstr ""
 
 #: includes/src/Plugin.php:936
-msgid "Cronbot failed to disconnect."
+msgid "Cronbot disconnected."
 msgstr ""
 
 #: includes/src/Plugin.php:939
-msgid "Cron run successful."
+msgid "Cronbot failed to disconnect."
 msgstr ""
 
 #: includes/src/Plugin.php:942
-msgid "Failed to run cron."
+msgid "Cron run successful."
 msgstr ""
 
 #: includes/src/Plugin.php:945
-msgid "Option enabled."
+msgid "Failed to run cron."
 msgstr ""
 
 #: includes/src/Plugin.php:948
-msgid "Option disabled."
+msgid "Option enabled."
 msgstr ""
 
 #: includes/src/Plugin.php:951
-msgid "Option saved."
+msgid "Option disabled."
 msgstr ""
 
 #: includes/src/Plugin.php:954
-msgid "Option resets to default."
+msgid "Option saved."
 msgstr ""
 
 #: includes/src/Plugin.php:957
+msgid "Option resets to default."
+msgstr ""
+
+#: includes/src/Plugin.php:960
 msgid "Failed to change options."
 msgstr ""
 
-#: includes/src/Plugin.php:979
+#: includes/src/Plugin.php:982
 msgid "Settings"
 msgstr ""
 
-#: includes/src/Plugin.php:993
+#: includes/src/Plugin.php:996
 msgid "Install Drop-in"
 msgstr ""
 

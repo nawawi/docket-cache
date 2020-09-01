@@ -9,10 +9,10 @@ Stable tag: 20.08.04
 License: MIT
 License URI: ./license.txt
 
-A file-based persistent object cache stored as a plain PHP code. Accelerates caching with OPcache backend.
+A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
 
 == Description ==
-The Docket cache is a file-based persistent WordPress Object Cache that is stored as a plain PHP code. Intends to provide an alternative option for those who can't use Redis or Memcached server.
+The Docket cache is a persistent WordPress Object Cache that is stored as a plain PHP code. Intends to provide an alternative option for those who can't use Redis or Memcached server.
 
 Rather than using [serialize](https://www.php.net/manual/en/function.serialize.php) and [unserialize](https://www.php.net/manual/en/function.unserialize.php) a PHP object to store into flat files, this plugin stores data by converting the object into plain PHP code which results in faster data retrieval and better performance with Zend OPcache enabled.
 
@@ -37,6 +37,7 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 - WP Options Autoload suspension
 - Post Missed Schedule Tweaks
 - Cache Log
+- Multisite support
 
 == Requirement ==
 
