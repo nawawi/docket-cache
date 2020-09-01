@@ -928,7 +928,9 @@ final class Plugin extends Bepart
                             $message = esc_html__('Cronbot connected.', 'docket-cache');
                             break;
                         case 'docket-cronbot-connect-failed':
-                            $error = esc_html__('Cronbot failed to connect.', 'docket-cache');
+                            $errmsg = get_transient('docketcache/cronboterror');
+                            /* translators: %s = error message */
+                            $error = sprintf(esc_html__('Cronbot failed to connect: %s', 'docket-cache'), $errmsg);
                             break;
                         case 'docket-cronbot-disconnect':
                             $message = esc_html__('Cronbot disconnected.', 'docket-cache');
@@ -1025,7 +1027,9 @@ final class Plugin extends Bepart
                         add_action(
                             'shutdown',
                             function () use ($action) {
-                                apply_filters('docket-cache/cronbot-active', $action);
+                                if (!$action) {
+                                    apply_filters('docket-cache/cronbot-active', $action);
+                                }
                             },
                             PHP_INT_MAX
                         );
