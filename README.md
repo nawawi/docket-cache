@@ -22,13 +22,13 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
 
-Please see the [installation](https://docs.docketcache.com/installation) documentation for details.
+Please refer to [Installation](https://docs.docketcache.com/installation) documentation for details.
 
 ## Configuration Options
 
 The Docket Cache uses constants variable as main configuration methods.
 
-To adjust the plugin behavior, please refer to [configuration](https://docs.docketcache.com/configuration) documentation for details.
+To adjust the plugin behavior, please refer to [Configuration](https://docs.docketcache.com/configuration) documentation for details.
 
 
 ## WP-CLI Commands

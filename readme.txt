@@ -40,7 +40,7 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 - Cronbot Service
 - Multisite support
 
-== Requirement ==
+== Requirements ==
 
 To use Docket Cache requires minimum:
 
@@ -50,11 +50,11 @@ To use Docket Cache requires minimum:
 
 == Configuration Options ==
 
-To adjust the configuration, please see the [configuration wiki](https://github.com/nawawi/docket-cache/wiki/Constants) page for details.
+To adjust the configuration, please refer to [Configuration](https://docs.docketcache.com/configuration) documentation for details.
 
 == WP-CLI Commands ==
 
-To use the WP-CLI commands, please see the [WP-CLI wiki](https://github.com/nawawi/docket-cache/wiki/WP-CLI) page for available commands.
+To use the WP-CLI commands, please refer to [WP-CLI](https://docs.docketcache.com/wp-cli) documentation for available commands
 
 == Development ==
 - [Report issues](https://github.com/nawawi/docket-cache/issues)
