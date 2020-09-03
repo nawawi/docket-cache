@@ -22,20 +22,20 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
 
-Please see the [installation wiki](https://github.com/nawawi/docket-cache/wiki/Installation) page for details.
+Please see the [installation](https://docs.docketcache.com/installation) documentation for details.
 
 ## Configuration Options
 
 The Docket Cache uses constants variable as main configuration methods.
 
-To adjust the plugin behavior, please see the [configuration wiki](https://github.com/nawawi/docket-cache/wiki/Constants) page for details.
+To adjust the plugin behavior, please refer to [configuration](https://docs.docketcache.com/configuration) documentation for details.
 
 
 ## WP-CLI Commands
 
 You can manage this plugin through command line when activated.
 
-To use the WP-CLI commands, please see the [WP-CLI wiki](https://github.com/nawawi/docket-cache/wiki/WP-CLI) page for available commands.
+To use the WP-CLI commands, please refer to [WP-CLI](https://docs.docketcache.com/wp-cli) documentation for available commands.
 
 ## Screenshots
 ![Overview](./.wordpress.org/screenshot-1.png) Plugin Overview.
@@ -73,4 +73,4 @@ Anyone can contribute to Docket Cache. Please do so by posting issues when you'v
 
 ## License
 
-Docket cache is open-sourced software licensed under the [MIT license](https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt).
+Docket cache is an Open Source Software under the [MIT license](https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt).
