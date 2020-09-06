@@ -68,14 +68,11 @@ namespace Nawawi\DocketCache;
             </p>
             <hr>
             <p>
-                <strong><?php esc_html_e('OPEN SOURCE', 'docket-cache'); ?></strong><br class="break">
+                <strong><?php esc_html_e('SPONSOR', 'docket-cache'); ?></strong><br class="break">
                 <?php esc_html_e('Docket Cache is an open source project under MIT license. Free to use, free to modify and free to distribute as long copyright retained. To maintain its condition of being free, it requires your support.', 'docket-cache'); ?>
                 <a href="https://www.paypal.com/paypalme/ghostbirdme/5usd" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Sponsor This Project', 'docket-cache'); ?></a>
             </p>
             <?php endif; ?>
         </div>
-
-
     </div>
-
 </div>
