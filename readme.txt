@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.08.05
+Stable tag: 20.08.06
 License: MIT
 License URI: ./license.txt
 

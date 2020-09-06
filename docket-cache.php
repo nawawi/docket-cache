@@ -15,7 +15,7 @@
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * GitHub Plugin URI:   https://github.com/nawawi/docket-cache
  * Author:              Nawawi Jamili
- * Author URI:          https://profiles.wordpress.org/nawawijamili
+ * Author URI:          https://github.com/nawawi
  * Requires at least:   5.4
  * Requires PHP:        7.2.5
  * Network:             true
