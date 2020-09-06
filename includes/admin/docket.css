@@ -255,6 +255,8 @@ body {
 
 #docket-cache .flex-container .postbox .inside .bt-cx {
     margin-top: 10px;
+    margin-bottom: 10px;
+    display: table;
 }
 
 #docket-cache .flex-container .postbox .inside * {
@@ -264,6 +266,14 @@ body {
 #docket-cache .flex-container .postbox .inside div {
     padding: 0 6px 0 6px;
     font-family: Arial, Helvetica, sans-serif;
+}
+
+#docket-cache .flex-container div.row-right a:not(.button) {
+    text-decoration: none;
+}
+
+#docket-cache .flex-container div.row-right a:hover:not(.button) {
+    text-decoration: underline;
 }
 
 #docket-cache .dashicons {
@@ -307,7 +317,7 @@ body {
 /* /flex */
 
 /* desktop */
-@media only screen and (min-width: 700px) {
+@media only screen and (min-width: 782px) {
     #docket-cache .nav-tab {
         min-width: 100px;
         text-align: center;
@@ -323,7 +333,7 @@ body {
 }
 
 /* small */
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width:782px) {
     #docket-cache .nav-tab {
         display: none;
     }
@@ -398,6 +408,11 @@ body {
         float: left;
         padding-right: 0;
         padding-left: 0;
+    }
+
+    #docket-cache .flex-container .postbox .inside .bt-cx {
+        display: block;
+        width: 100%;
     }
 }
 
@@ -487,7 +502,7 @@ body {
     text-align: center;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 782px) {
 
     #docket-cache .eventlist .box-left,
     #docket-cache .eventlist .box-right {

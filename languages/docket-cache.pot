@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-09-01T01:26:01+00:00\n"
+"POT-Creation-Date: 2020-09-06T14:05:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -22,7 +22,7 @@ msgid "Docket Cache"
 msgstr ""
 
 #. Description of the plugin
-msgid "A file-based persistent object cache stored as a plain PHP code. Accelerates caching with OPCache backend."
+msgid "A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend."
 msgstr ""
 
 #. Author of the plugin
@@ -343,62 +343,83 @@ msgstr ""
 msgid "Resources"
 msgstr ""
 
-#: includes/admin/resource.php:20
-msgid "The Docket Cache keeps the admin interface clean and simple as possible, predefined configuration and works out-of-the-box."
+#: includes/admin/resource.php:21
+msgid "ADMIN INTERFACE"
 msgstr ""
 
-#: includes/admin/resource.php:25
-msgid "DROPIN"
+#: includes/admin/resource.php:22
+msgid "The Docket Cache keeps the admin interface clean, responsive and simple as possible, predefined configuration and works out-of-the-box."
 msgstr ""
 
 #: includes/admin/resource.php:26
+msgid "DROPIN"
+msgstr ""
+
+#: includes/admin/resource.php:27
 msgid "The Docket Cache relies on an object cache operation. Disabling the Object Cache will affect availability of other functions."
 msgstr ""
 
-#: includes/admin/resource.php:30
+#: includes/admin/resource.php:31
 msgid "CONFIGURATION"
 msgstr ""
 
-#: includes/admin/resource.php:31
+#: includes/admin/resource.php:32
 msgid "The configuration panel allows to quickly change basic configuration without using constants."
 msgstr ""
 
-#: includes/admin/resource.php:35
+#: includes/admin/resource.php:36
 msgid "CACHE LOG"
 msgstr ""
 
-#: includes/admin/resource.php:36
+#: includes/admin/resource.php:37
 msgid "The cache log panel provides information about the cache activities, disabled by default. Activate at the configuration panel."
 msgstr ""
 
-#: includes/admin/resource.php:40
+#: includes/admin/resource.php:41
 msgid "CONSTANTS"
 msgstr ""
 
 #. translators: %s: <a href="https://github.com/nawawi/docket-cache/wiki/Constants" rel="noopener" target="new">Configuration Wiki</a>
-#: includes/admin/resource.php:43
-msgid "This plugin uses constants variable as main configuration methods. To adjust the plugin behavior, please refer to %s page for details."
+#: includes/admin/resource.php:44
+msgid "This plugin uses constants variable as main configuration methods. To adjust the plugin behavior, please refer to %s documentation for details."
 msgstr ""
 
 #. translators: %s: <a href="https://github.com/nawawi/docket-cache/wiki/WP-CLI" rel="noopener" target="new">WP-CLI Wiki</a>
-#: includes/admin/resource.php:50
-msgid "You can manage this plugin through command line, please refer to %s page for available commands."
+#: includes/admin/resource.php:52
+msgid "You can manage this plugin through command line, please refer to %s documentation for available commands."
 msgstr ""
 
-#: includes/admin/resource.php:55
+#: includes/admin/resource.php:57
 msgid "CRONBOT"
 msgstr ""
 
-#: includes/admin/resource.php:56
-msgid "The Cronbot is an external scheduler that pings your website every hour in order to keep WordPress Cron running active."
+#. translators: %s: external scheduler
+#: includes/admin/resource.php:60
+msgid "The Cronbot is an %s that pings your website every hour in order to keep WordPress Cron running active. Only site Timezone and URL are involved when enabling this service."
 msgstr ""
 
-#: includes/admin/resource.php:60
+#: includes/admin/resource.php:65
+msgid "FEEDBACK"
+msgstr ""
+
+#: includes/admin/resource.php:66
 msgid "If Docket Cache beneficial to your website performance, it’s more than thank you if you can leave a review about your experience."
 msgstr ""
 
-#: includes/admin/resource.php:61
-msgid "Write your review."
+#: includes/admin/resource.php:67
+msgid "Write your review"
+msgstr ""
+
+#: includes/admin/resource.php:71
+msgid "SPONSOR"
+msgstr ""
+
+#: includes/admin/resource.php:72
+msgid "Docket Cache is an open source project under MIT license. Free to use, free to modify and free to distribute as long copyright retained. To maintain its condition of being free, it requires your generosity."
+msgstr ""
+
+#: includes/admin/resource.php:73
+msgid "Sponsor this project"
 msgstr ""
 
 #: includes/src/Command.php:94

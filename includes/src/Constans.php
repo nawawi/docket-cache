@@ -111,7 +111,7 @@ final class Constans
         // log on/off
         $this->maybe_define('DOCKET_CACHE_LOG', false);
 
-        // log on/off
+        // private: log on/off
         $this->maybe_define('DOCKET_CACHE_LOG_ALL', (\defined('WP_DEBUG') ? WP_DEBUG : false));
 
         // log file
@@ -172,6 +172,7 @@ final class Constans
             ]
         );
 
+        // @private
         // cache ignored keys
         $this->maybe_define('DOCKET_CACHE_IGNORED_KEYS', []);
 
@@ -205,6 +206,7 @@ final class Constans
         // translation mo file cache
         $this->maybe_define('DOCKET_CACHE_MOCACHE', false);
 
+        // @private
         // wp-cli
         $this->maybe_define('DOCKET_CACHE_WPCLI', (\defined('WP_CLI') && WP_CLI));
 

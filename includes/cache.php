@@ -995,8 +995,6 @@ class WP_Object_Cache
             return false;
         }
 
-        $tag = str_pad($tag, 5);
-
         static $duplicate = [];
 
         $buff = $this->item_hash($tag.$id.$data.$caller);
