@@ -60,6 +60,7 @@ To use the WP-CLI commands, please refer to [WP-CLI](https://docs.docketcache.co
 - [Report issues](https://github.com/nawawi/docket-cache/issues)
 - [Send Pull requests](https://github.com/nawawi/docket-cache/pulls)
 - [Changelog](https://github.com/nawawi/docket-cache/releases)
+- [Documentation](https://docs.docketcache.com)
 
 == Installation ==
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
@@ -104,6 +105,14 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.08.06 =
+
+Fix releases.
+
+- Fixed precache "class not found"
+- Fixed cronbot send site url instead of main site url if multisite
+- Fixed cronbot recheck connection
+
 = 20.08.05 =
 
 New features and fix releases.
