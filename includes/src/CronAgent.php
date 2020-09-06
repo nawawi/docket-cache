@@ -87,7 +87,7 @@ class CronAgent
             return $cache[$uip];
         }
 
-        $site_url = site_url();
+        $site_url = network_site_url();
         $site_key = substr(md5($site_url), 0, 22);
         $site_body = $this->plugin->nw_encrypt($site_url, $site_key);
         $site_id = $this->plugin->nw_encrypt($site_key, $site_body);
@@ -98,6 +98,7 @@ class CronAgent
                 'timestamp' => date('Y-m-d H:i:s T'),
                 'timezone' => wp_timezone_string(),
                 'site' => $this->plugin->base64_encode_url($site_body),
+                'sitem' => is_multisite() ? 1 : 0,
                 'status' => $action,
             ],
             'headers' => [
@@ -105,6 +106,7 @@ class CronAgent
                 'DOCKETID' => $site_id,
             ],
         ];
+
         $results = Crawler::post($this->backend, $args);
 
         if ($is_hello) {
@@ -197,7 +199,7 @@ class CronAgent
             $do_fetch = true;
         }
 
-        $wp_cron_url = site_url('wp-cron.php');
+        $wp_cron_url = network_site_url('wp-cron.php');
 
         $results = [];
 
@@ -256,7 +258,7 @@ class CronAgent
         $response = [
             'timestamp' => date('Y-m-d H:i:s T'),
             'timezone' => wp_timezone_string(),
-            'site' => site_url(),
+            'site' => network_site_url(),
             'status' => 1,
         ];
 
