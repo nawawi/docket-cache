@@ -20,6 +20,10 @@ class CronAgent
     public function __construct(Plugin $plugin)
     {
         $this->plugin = $plugin;
+
+        if ($this->plugin->constans->is_true('DOCKET_CACHE_DEV')) {
+            $this->backend = 'http://cronbot.docketcache.local';
+        }
     }
 
     public function register()
@@ -69,15 +73,27 @@ class CronAgent
         );
     }
 
-    private function send_action($action)
+    private function is_ping_request()
     {
+        return !empty($_POST['ping']) && !empty($_GET['docketcache_ping']) && !empty($_SERVER['REQUEST_URI']) && false !== strpos($_SERVER['REQUEST_URI'], '/?docketcache_ping=');
+    }
+
+    private function send_action($action, $is_hello = false)
+    {
+        $uip = $this->plugin->get_user_ip();
+
+        static $cache = [];
+        if (isset($cache[$uip])) {
+            return $cache[$uip];
+        }
+
         $site_url = site_url();
         $site_key = substr(md5($site_url), 0, 22);
         $site_body = $this->plugin->nw_encrypt($site_url, $site_key);
         $site_id = $this->plugin->nw_encrypt($site_key, $site_body);
 
         $args = [
-            'blocking' => true,
+            'blocking' => $is_hello ? false : true,
             'body' => [
                 'timestamp' => date('Y-m-d H:i:s T'),
                 'timezone' => wp_timezone_string(),
@@ -90,6 +106,10 @@ class CronAgent
             ],
         ];
         $results = Crawler::post($this->backend, $args);
+
+        if ($is_hello) {
+            return true;
+        }
 
         $output = [
             'created' => date('Y-m-d H:i:s T'),
@@ -106,6 +126,8 @@ class CronAgent
             $this->plugin->canopt->save_part($output, 'cronbot');
             set_transient('docketcache/cronboterror', $output['error'], 10);
 
+            $cache[$uip] = false;
+
             return false;
         }
 
@@ -118,6 +140,8 @@ class CronAgent
                     $this->plugin->canopt->save_part($output, 'cronbot');
                     set_transient('docketcache/cronboterror', $output['error'], 10);
 
+                    $cache[$uip] = false;
+
                     return false;
                 }
             }
@@ -129,11 +153,15 @@ class CronAgent
             $this->plugin->canopt->save_part($output, 'cronbot');
             set_transient('docketcache/cronboterror', $output['error'], 10);
 
+            $cache[$uip] = false;
+
             return false;
         }
 
         $output['connected'] = 'off' === $action ? false : true;
         $this->plugin->canopt->save_part($output, 'cronbot');
+
+        $cache[$uip] = true;
 
         return true;
     }
@@ -164,8 +192,8 @@ class CronAgent
 
         if ($this->plugin->constans->is_true('DISABLE_WP_CRON')
               || $this->plugin->constans->is_true('ALTERNATE_WP_CRON')
-              || class_exists('\\HM\\Cavalcade\\Plugin\\Job')
-              || class_exists('\\Automattic\\WP\\Cron_Control')) {
+              || class_exists('\\HM\\Cavalcade\\Plugin\\Job', false)
+              || class_exists('\\Automattic\\WP\\Cron_Control', false)) {
             $do_fetch = true;
         }
 
@@ -206,7 +234,7 @@ class CronAgent
 
     private function receive_ping()
     {
-        if (headers_sent() || empty($_POST['ping']) || empty($_GET['docketcache_ping']) || empty($_SERVER['REQUEST_URI']) || false === strpos($_SERVER['REQUEST_URI'], '/?docketcache_ping=') ) {
+        if (headers_sent() || !$this->is_ping_request()) {
             return;
         }
 
@@ -218,6 +246,13 @@ class CronAgent
             return;
         }
 
+        $uip = $this->plugin->get_user_ip();
+
+        static $cache = [];
+        if (!empty($cache[$uip])) {
+            return $cache[$uip];
+        }
+
         $response = [
             'timestamp' => date('Y-m-d H:i:s T'),
             'timezone' => wp_timezone_string(),
@@ -227,6 +262,7 @@ class CronAgent
 
         if ($this->plugin->constans->is_false('DOCKET_CACHE_CRONBOT')) {
             $response['status'] = 0;
+            $cache[$uip] = $response;
             $this->close_ping($response);
         }
 
@@ -241,18 +277,44 @@ class CronAgent
             $response['wpcron_code'] = $code;
         }
 
-        $this->close_ping($response);
+        $cache[$uip] = $response;
+        $this->close_ping($cache[$uip]);
     }
 
     private function check_connection()
     {
+        if ($this->is_ping_request()) {
+            return;
+        }
+
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            $paths = [
+                '/wp-admin/plugins.php',
+                '/wp-admin/update-core.php',
+                '/wp-admin/network/plugins.php',
+                '/wp-admin/network/update-core.php',
+                '/wp-admin/network/upgrade.php',
+            ];
+            foreach ($paths as $path) {
+                if (false !== strpos($_SERVER['REQUEST_URI'], $path)) {
+                    return;
+                }
+            }
+        }
+
+        static $is_done = false;
+        if ($is_done) {
+            return;
+        }
+
         $crondata = $this->plugin->canopt->get_part('cronbot');
         if (!empty($crondata) && \is_array($crondata) && !empty($crondata['connected'])) {
             $pingdata = $this->plugin->canopt->get_part('pings');
             if (!empty($pingdata) && \is_array($pingdata) && !empty($pingdata['timestamp'])) {
                 $timestamp = strtotime('+90 minutes', strtotime($pingdata['timestamp']));
-                if (time() > $timestamp) {
-                    $this->send_action('on');
+                if ($timestamp > 0 && time() > $timestamp) {
+                    $is_done = true;
+                    $this->send_action('on', true);
                 }
             }
         }
