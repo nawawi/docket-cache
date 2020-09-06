@@ -457,7 +457,7 @@ class Filesystem
             'files' => $filestotal,
         ];
 
-        wp_cache_set('cache_stats', $cache_stats, 'docketcache-data', 10);
+        wp_cache_set('cache_stats', $cache_stats, 'docketcache-data', 30);
 
         return $is_stats ? (object) $cache_stats : $bytestotal;
     }
@@ -501,9 +501,35 @@ class Filesystem
 
     public function code_stub($data = '')
     {
+        $ucode = '';
+        if (!empty($data) && false !== strpos($data, 'Registry::p(')) {
+            if (@preg_match_all('@Registry::p\(\'([a-zA-Z_]+)\'\)@', $data, $mm)) {
+                if (!empty($mm) && isset($mm[1]) && \is_array($mm[1])) {
+                    $cls = $mm[1];
+                    foreach ($cls as $clsname) {
+                        if ('stdClass' !== $clsname) {
+                            if (\defined('WP_DEBUG') && WP_DEBUG) {
+                                $reflector = new \ReflectionClass($clsname);
+                                $clsfname = $reflector->getFileName();
+                                if (false !== $clsfname) {
+                                    $ucode .= '/* f: '.str_replace(ABSPATH, '', $clsfname).' */'.PHP_EOL;
+                                }
+                            }
+                            $ucode .= "if ( !@class_exists('".$clsname."', false) ) { return false; }".PHP_EOL;
+                        }
+                    }
+                    unset($cls, $clsname);
+                }
+                unset($mm);
+            }
+        }
+
         $code = '<?php ';
-        $code .= "defined('ABSPATH') || exit;".PHP_EOL;
+        $code .= "if ( !\defined('ABSPATH') ) { return false; }".PHP_EOL;
         if (!empty($data)) {
+            if (!empty($ucode)) {
+                $code .= $ucode;
+            }
             $code .= 'return '.$data.';'.PHP_EOL;
         }
 
@@ -532,6 +558,10 @@ class Filesystem
         if (\is_array($data)) {
             $log = $this->export_var(array_merge($meta, $data));
         } else {
+            $rtag = trim($tag);
+            if (!\in_array($rtag, ['hit', 'miss', 'err', 'exp'])) {
+                $tag = str_pad($rtag, 5);
+            }
             $log = '['.$meta['timestamp'].'] '.$tag.': "'.$id.'" "'.trim($data).'" "'.$caller.'"';
         }
 
