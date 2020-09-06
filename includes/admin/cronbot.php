@@ -30,7 +30,7 @@ if (!empty($ping_data)) {
     <table class="form-table">
         <tr>
             <th><?php esc_html_e('Service Status', 'docket-cache'); ?></th>
-            <td><?php echo $is_connected ? esc_html__('Connected', 'docket-cache') : esc_html__('Not Connected', 'docket-cache'); ?></td>
+            <td class="<?php echo $is_connected ? 'text-green' : 'text-red'; ?>"><?php echo $is_connected ? esc_html__('Connected', 'docket-cache') : esc_html__('Not Connected', 'docket-cache'); ?></td>
         </tr>
 
         <tr>

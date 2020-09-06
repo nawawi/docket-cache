@@ -19,12 +19,23 @@ body {
     display: none !important;
 }
 
+#docket-cache .text-green {
+    color: green;
+}
+
+#docket-cache .text-red {
+    color: red;
+}
+
 #docket-cache .text-capitalize {
     text-transform: capitalize !important;
 }
 
 #docket-cache .dashicons {
     font-weight: normal;
+    font-size: 20px;
+    margin-top: -2px;
+    margin-right: 4px;
 }
 
 #docket-cache a.btxo {
@@ -274,11 +285,6 @@ body {
 
 #docket-cache .flex-container div.row-right a:hover:not(.button) {
     text-decoration: underline;
-}
-
-#docket-cache .dashicons {
-    font-size: 18px;
-    margin-top: -1px;
 }
 
 #docket-cache .connector-table {
