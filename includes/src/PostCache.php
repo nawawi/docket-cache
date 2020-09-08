@@ -166,7 +166,7 @@ class PostCache
                     ARRAY_A
                 );
 
-                if (empty($months) || !\is_array($value)) {
+                if (empty($months) || !\is_array($months)) {
                     return;
                 }
 
