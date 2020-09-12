@@ -375,20 +375,6 @@ class WP_Object_Cache
     private $filtered_groups = false;
 
     /**
-     * Filesystem() instance.
-     *
-     * @var object
-     */
-    private $filesystem;
-
-    /**
-     * Constans() instance.
-     *
-     * @var object
-     */
-    private $constans;
-
-    /**
      * Show signature.
      *
      * @var bool
@@ -409,7 +395,7 @@ class WP_Object_Cache
     {
         $this->multisite = is_multisite();
         $this->blog_prefix = $this->switch_to_blog(get_current_blog_id());
-        $this->docket_init();
+        $this->dc_init();
     }
 
     /**
@@ -440,7 +426,7 @@ class WP_Object_Cache
             return false;
         }
 
-        $id = $this->define_key($key, $group);
+        $id = $this->dc_key($key, $group);
         if ($this->_exists($id, $group)) {
             return false;
         }
@@ -480,7 +466,7 @@ class WP_Object_Cache
             return false;
         }
 
-        $key = $this->define_key($key, $group);
+        $key = $this->dc_key($key, $group);
 
         if (!$this->_exists($key, $group)) {
             return false;
@@ -498,7 +484,7 @@ class WP_Object_Cache
             $this->cache[$group][$key] = 0;
         }
 
-        $this->docket_update($key, $this->cache[$group][$key], $group);
+        $this->dc_update($key, $this->cache[$group][$key], $group);
 
         return $this->cache[$group][$key];
     }
@@ -524,7 +510,7 @@ class WP_Object_Cache
             return false;
         }
 
-        $key = $this->define_key($key, $group);
+        $key = $this->dc_key($key, $group);
 
         if (!$this->_exists($key, $group)) {
             return false;
@@ -532,7 +518,7 @@ class WP_Object_Cache
 
         unset($this->cache[$group][$key]);
         unset($this->precache[$group][$key]);
-        $this->docket_remove($key, $group);
+        $this->dc_remove($key, $group);
 
         return true;
     }
@@ -547,7 +533,7 @@ class WP_Object_Cache
         $this->cache = [];
         $this->precache = [];
 
-        return $this->docket_flush();
+        return $this->dc_flush();
     }
 
     /**
@@ -578,7 +564,7 @@ class WP_Object_Cache
             return false;
         }
 
-        $key = $this->define_key($key, $group);
+        $key = $this->dc_key($key, $group);
 
         if ($this->_exists($key, $group)) {
             $found = true;
@@ -608,8 +594,10 @@ class WP_Object_Cache
     public function get_multiple($keys, $group = 'default', $force = false)
     {
         $values = [];
-        foreach ($keys as $key) {
-            $values[$key] = $this->get($key, $group, $force);
+        if (!empty($keys) && \is_array($keys)) {
+            foreach ($keys as $key) {
+                $values[$key] = $this->get($key, $group, $force);
+            }
         }
 
         return $values;
@@ -634,7 +622,7 @@ class WP_Object_Cache
             return false;
         }
 
-        $key = $this->define_key($key, $group);
+        $key = $this->dc_key($key, $group);
 
         if (!$this->_exists($key, $group)) {
             return false;
@@ -652,7 +640,7 @@ class WP_Object_Cache
             $this->cache[$group][$key] = 0;
         }
 
-        $this->docket_update($key, $this->cache[$group][$key], $group);
+        $this->dc_update($key, $this->cache[$group][$key], $group);
 
         return $this->cache[$group][$key];
     }
@@ -679,7 +667,7 @@ class WP_Object_Cache
             return false;
         }
 
-        $id = $this->define_key($key, $group);
+        $id = $this->dc_key($key, $group);
 
         if (!$this->_exists($id, $group)) {
             return false;
@@ -713,7 +701,7 @@ class WP_Object_Cache
             return false;
         }
 
-        $key = $this->define_key($key, $group);
+        $key = $this->dc_key($key, $group);
 
         if (\is_object($data)) {
             $data = clone $data;
@@ -723,7 +711,7 @@ class WP_Object_Cache
 
         if (!$this->is_non_persistent_groups($group) && !$this->is_non_persistent_keys($key) || $this->is_filtered_groups($group, $key)) {
             $expire = $this->maybe_expire($expire);
-            $this->docket_save($key, $this->cache[$group][$key], $group, $expire);
+            $this->dc_save($key, $this->cache[$group][$key], $group, $expire);
         }
 
         return true;
@@ -792,7 +780,7 @@ class WP_Object_Cache
 
         $is_exists = !empty($this->cache) && isset($this->cache[$group]) && (isset($this->cache[$group][$key]) || \array_key_exists($key, $this->cache[$group]));
         if (!$is_exists) {
-            $data = $this->docket_get($key, $group, false);
+            $data = $this->dc_get($key, $group, false);
             if (false !== $data) {
                 $is_exists = true;
                 $this->cache[$group][$key] = $data;
@@ -858,15 +846,6 @@ class WP_Object_Cache
         return \function_exists('is_user_logged_in') && !is_user_logged_in();
     }
 
-    private function define_key($key, $group)
-    {
-        if ($this->multisite && !\array_key_exists($group, $this->global_groups)) {
-            $key = $this->blog_prefix.$key;
-        }
-
-        return $key;
-    }
-
     private function is_filtered_groups($group, $key)
     {
         if (!\is_array($this->filtered_groups) || !isset($this->filtered_groups[$group])) {
@@ -903,7 +882,7 @@ class WP_Object_Cache
             $keys = array_unique($keys);
             foreach ($keys as $key) {
                 $this->delete($key, $group);
-                $this->docket_log('flush', 'internalproc-'.$this->item_hash(__FUNCTION__), $group.':'.$key);
+                $this->dc_log('flush', 'internalproc-'.$this->item_hash(__FUNCTION__), $group.':'.$key);
             }
         }
 
@@ -915,24 +894,9 @@ class WP_Object_Cache
         return @preg_replace('@^\d+:@', '', $key, 1);
     }
 
-    private function sanitize_second($time)
-    {
-        $time = (int) $time;
-        if ($time < 0) {
-            $time = 0;
-        } else {
-            $max = ceil(log10($time));
-            if ($max > 10 || 'NaN' === $max) {
-                $time = 0;
-            }
-        }
-
-        return $time;
-    }
-
     private function maybe_expire($expire = 0)
     {
-        $expire = $this->sanitize_second($expire);
+        $expire = $this->fs()->sanitize_second($expire);
         if (0 !== $this->cache_maxttl && 0 === $expire) {
             $expire = $this->cache_maxttl;
         }
@@ -954,19 +918,50 @@ class WP_Object_Cache
         return substr(md5($str), 0, $length);
     }
 
-    private function cache_index($key, $group)
-    {
-        return $this->item_hash($group).'-'.$this->item_hash($key);
-    }
-
     private function get_file_path($key, $group)
     {
-        return $this->cache_path.$this->cache_index($key, $group).'.php';
+        $index = $this->item_hash($group).'-'.$this->item_hash($key);
+
+        return $this->cache_path.$index.'.php';
     }
 
-    private function docket_log($tag, $id, $data)
+    private function skip_stats($group)
     {
-        if ($this->constans->is_false('DOCKET_CACHE_LOG')) {
+        return $this->cf()->is_false('DOCKET_CACHE_LOG_ALL') && $this->fs()->internal_group($group);
+    }
+
+    private function fs()
+    {
+        static $inst;
+        if (!\is_object($inst)) {
+            $inst = new Nawawi\DocketCache\Filesystem();
+        }
+
+        return $inst;
+    }
+
+    private function cf()
+    {
+        static $inst;
+        if (!\is_object($inst)) {
+            $inst = new Nawawi\DocketCache\Constans();
+        }
+
+        return $inst;
+    }
+
+    private function dc_key($key, $group)
+    {
+        if ($this->multisite && !\array_key_exists($group, $this->global_groups)) {
+            $key = $this->blog_prefix.$key;
+        }
+
+        return $key;
+    }
+
+    private function dc_log($tag, $id, $data)
+    {
+        if ($this->cf()->is_false('DOCKET_CACHE_LOG')) {
             return false;
         }
 
@@ -974,7 +969,7 @@ class WP_Object_Cache
             return false;
         }
 
-        if ($this->constans->is_false('DOCKET_CACHE_LOG_ALL')) {
+        if ($this->cf()->is_false('DOCKET_CACHE_LOG_ALL')) {
             if (!\in_array($tag, ['hit', 'miss'])) {
                 return false;
             }
@@ -987,7 +982,7 @@ class WP_Object_Cache
         $caller = '';
         if (!empty($_SERVER['REQUEST_URI'])) {
             $caller = $_SERVER['REQUEST_URI'];
-        } elseif ($this->constans->is_true('DOCKET_CACHE_WPCLI')) {
+        } elseif ($this->cf()->is_true('DOCKET_CACHE_WPCLI')) {
             $caller = 'wp-cli';
         }
 
@@ -1004,40 +999,36 @@ class WP_Object_Cache
 
         $duplicate[$buff] = 1;
 
-        return $this->filesystem->log($tag, $id, $data, $caller);
+        return $this->fs()->log($tag, $id, $data, $caller);
     }
 
-    private function docket_flush()
+    private function dc_flush()
     {
         $dir = $this->cache_path;
-        $cnt = $this->filesystem->cachedir_flush($dir);
+        $cnt = $this->fs()->cachedir_flush($dir);
         if (false === $cnt) {
-            $this->docket_log('err', 'internalproc-'.$this->item_hash(__FUNCTION__), 'Object cache could not be flushed');
+            $this->dc_log('err', 'internalproc-'.$this->item_hash(__FUNCTION__), 'Object cache could not be flushed');
         }
 
         if ($cnt > 0) {
-            $this->docket_log('flush', 'internalproc-'.$this->item_hash(__FUNCTION__), 'files:'.$cnt);
-
-            if ($this->constans->is_true('DOCKET_CACHE_WPCLI')) {
-                do_action('docket-cache/preload');
-            }
+            $this->dc_log('flush', 'internalproc-'.$this->item_hash(__FUNCTION__), 'files:'.$cnt);
         }
 
         return true;
     }
 
-    private function docket_remove($key, $group)
+    private function dc_remove($key, $group)
     {
         $file = $this->get_file_path($key, $group);
-        $this->filesystem->unlink($file, false);
-        $this->docket_log('del', $this->get_item_hash($file), $group.':'.$key);
+        $this->fs()->unlink($file, false);
+        $this->dc_log('del', $this->get_item_hash($file), $group.':'.$key);
     }
 
-    private function docket_remove_group($group)
+    private function dc_remove_group($group)
     {
         $match = $this->item_hash($group).'-';
-        if ($this->filesystem->is_docketcachedir($this->cache_path)) {
-            foreach ($this->filesystem->scanfiles($this->cache_path) as $object) {
+        if ($this->fs()->is_docketcachedir($this->cache_path)) {
+            foreach ($this->fs()->scanfiles($this->cache_path) as $object) {
                 $fx = $object->getPathName();
                 if (!$object->isFile() || 'file' !== $object->getType()) {
                     continue;
@@ -1045,30 +1036,25 @@ class WP_Object_Cache
 
                 $fn = $object->getFileName();
                 if ($match === substr($fn, 0, \strlen($match))) {
-                    $this->filesystem->unlink($fx, false);
-                    $this->docket_log('del', $this->get_item_hash($fx), $group.':*');
+                    $this->fs()->unlink($fx, false);
+                    $this->dc_log('del', $this->get_item_hash($fx), $group.':*');
                     unset($this->cache[$group]);
                 }
             }
         }
     }
 
-    private function skip_stats($group)
-    {
-        return $this->constans->is_false('DOCKET_CACHE_LOG_ALL') && $this->filesystem->internal_group($group);
-    }
-
-    private function docket_get($key, $group, $is_raw = false)
+    private function dc_get($key, $group, $is_raw = false)
     {
         $file = $this->get_file_path($key, $group);
         $index = $this->get_item_hash($file);
 
-        $data = $this->filesystem->cache_get($file);
+        $data = $this->fs()->cache_get($file);
         if (false === $data) {
             if (!$this->skip_stats($group)) {
                 ++$this->cache_misses;
 
-                $this->docket_log('miss', $index, $group.':'.$key);
+                $this->dc_log('miss', $index, $group.':'.$key);
             }
 
             return false;
@@ -1077,8 +1063,8 @@ class WP_Object_Cache
         if (!isset($data['timeout'])) {
             $data['timeout'] = $this->maybe_expire(0);
         } elseif ($data['timeout'] > 0 && time() >= $data['timeout']) {
-            $this->docket_log('exp', $this->get_item_hash($file), $group.':'.$key);
-            $this->filesystem->unlink($file, false);
+            $this->dc_log('exp', $this->get_item_hash($file), $group.':'.$key);
+            $this->fs()->unlink($file, false);
 
             unset($this->cache[$group][$key]);
 
@@ -1091,36 +1077,36 @@ class WP_Object_Cache
 
         if (!$this->skip_stats($group)) {
             ++$this->cache_hits;
-            $this->docket_log('hit', $index, $group.':'.$key);
+            $this->dc_log('hit', $index, $group.':'.$key);
         }
 
         clearstatcache();
 
-        return  $is_raw ? $data : $data['data'];
+        return $is_raw ? $data : $data['data'];
     }
 
-    private function docket_code($file, $arr)
+    private function dc_code($file, $arr)
     {
         $fname = $this->get_item_hash($file);
 
-        $data = $this->filesystem->export_var($arr, $error);
+        $data = $this->fs()->export_var($arr, $error);
         if (false === $data) {
-            $this->docket_log('err', $fname, 'Failed to export var: '.$error);
+            $this->dc_log('err', $fname, 'Failed to export var: '.$error);
 
             return false;
         }
 
         $len = \strlen($data);
         if ($len >= $this->cache_maxsize) {
-            $this->docket_log('err', $fname, 'Data too large: '.$len.'/'.$this->cache_maxsize);
+            $this->dc_log('err', $fname, 'Data too large: '.$len.'/'.$this->cache_maxsize);
 
             return false;
         }
 
-        $code = $this->filesystem->code_stub($data);
-        $stat = $this->filesystem->dump($file, $code);
+        $code = $this->fs()->code_stub($data);
+        $stat = $this->fs()->dump($file, $code);
         if (-1 === $stat) {
-            $this->docket_log('err', $fname, 'Failed to write');
+            $this->dc_log('err', $fname, 'Failed to write');
 
             return false;
         }
@@ -1128,19 +1114,19 @@ class WP_Object_Cache
         return $stat;
     }
 
-    private function docket_save($key, $data, $group = 'default', $expire = 0)
+    private function dc_save($key, $data, $group = 'default', $expire = 0)
     {
         if (!@wp_mkdir_p($this->cache_path)) {
             return false;
         }
 
         if (!@is_file($this->cache_path.'index.php')) {
-            @$this->filesystem->put($this->cache_path.'index.php', $this->filesystem->code_stub(time()));
+            @$this->fs()->put($this->cache_path.'index.php', $this->fs()->code_stub(time()));
         }
 
         // if transient and without expiry, set to 12 hours in our cache
         if (\in_array($group, ['site-transient', 'transient']) && 0 === $expire) {
-            $expire = 43200; // 12h
+            $expire = 'update_plugins' === $key ? 21600 : 43200; // 21600 = 6h, 43200 = 12h
         }
 
         $file = $this->get_file_path($key, $group);
@@ -1161,16 +1147,16 @@ class WP_Object_Cache
             'data' => $data,
         ];
 
-        if (true === $this->docket_code($file, $meta)) {
+        if (true === $this->dc_code($file, $meta)) {
             return true;
         }
 
         return false;
     }
 
-    private function docket_update($key, $data, $group)
+    private function dc_update($key, $data, $group)
     {
-        $meta = $this->docket_get($key, $group, true);
+        $meta = $this->dc_get($key, $group, true);
         if (false === $meta || !\is_array($meta) || !isset($meta['data'])) {
             return false;
         }
@@ -1179,34 +1165,14 @@ class WP_Object_Cache
         $meta['timeout'] = $this->maybe_expire($meta['timeout']);
         $meta['data'] = $data;
 
-        if (true === $this->docket_code($file, $meta)) {
+        if (true === $this->dc_code($file, $meta)) {
             return true;
         }
 
         return false;
     }
 
-    private function docket_precache()
-    {
-        if (empty($_SERVER['REQUEST_URI']) || $this->constans->is_true('DOCKET_CACHE_WPCLI')) {
-            return;
-        }
-
-        $req_key = json_encode($_SERVER['REQUEST_URI']);
-        $req_key = $this->item_hash($req_key);
-
-        $this->precache_get($req_key);
-
-        add_action(
-            'shutdown',
-            function () use ($req_key) {
-                $this->precache_set($req_key);
-            },
-            PHP_INT_MAX
-        );
-    }
-
-    private function precache_get($hash)
+    private function dc_precache_get($hash)
     {
         static $cached = [];
         $group = 'docketcache-precache';
@@ -1228,7 +1194,7 @@ class WP_Object_Cache
         }
     }
 
-    private function precache_set($hash)
+    private function dc_precache_set($hash)
     {
         if (empty($this->precache) || !\is_array($this->precache)) {
             return;
@@ -1280,36 +1246,55 @@ class WP_Object_Cache
         }
     }
 
-    private function docket_init()
+    private function dc_precache()
     {
-        $this->constans = new Nawawi\DocketCache\Constans();
-        $this->filesystem = new Nawawi\DocketCache\Filesystem();
+        if (empty($_SERVER['REQUEST_URI']) || $this->cf()->is_true('DOCKET_CACHE_WPCLI')) {
+            return;
+        }
 
-        if ($this->constans->is_int('DOCKET_CACHE_MAXSIZE') && DOCKET_CACHE_MAXSIZE > 1000000) {
+        // remove query
+        $req_uri = @preg_replace('@\?.*@', '', $_SERVER['REQUEST_URI']);
+        $req_key = json_encode($req_uri);
+        $req_key = $this->item_hash($req_key);
+
+        $this->dc_precache_get($req_key);
+
+        add_action(
+            'shutdown',
+            function () use ($req_key) {
+                $this->dc_precache_set($req_key);
+            },
+            PHP_INT_MAX
+        );
+    }
+
+    private function dc_init()
+    {
+        if ($this->cf()->is_int('DOCKET_CACHE_MAXSIZE') && DOCKET_CACHE_MAXSIZE > 1000000) {
             $this->cache_maxsize = DOCKET_CACHE_MAXSIZE;
         }
 
-        if ($this->constans->is_int('DOCKET_CACHE_MAXTTL')) {
-            $this->cache_maxttl = $this->sanitize_second(DOCKET_CACHE_MAXTTL);
+        if ($this->cf()->is_int('DOCKET_CACHE_MAXTTL')) {
+            $this->cache_maxttl = $this->fs()->sanitize_second(DOCKET_CACHE_MAXTTL);
         }
 
-        if ($this->constans->is_array('DOCKET_CACHE_GLOBAL_GROUPS')) {
+        if ($this->cf()->is_array('DOCKET_CACHE_GLOBAL_GROUPS')) {
             $this->add_global_groups(DOCKET_CACHE_GLOBAL_GROUPS);
         }
 
-        if ($this->constans->is_array('DOCKET_CACHE_IGNORED_GROUPS')) {
+        if ($this->cf()->is_array('DOCKET_CACHE_IGNORED_GROUPS')) {
             $this->non_persistent_groups = DOCKET_CACHE_IGNORED_GROUPS;
         }
 
-        if ($this->constans->is_array('DOCKET_CACHE_IGNORED_KEYS')) {
+        if ($this->cf()->is_array('DOCKET_CACHE_IGNORED_KEYS')) {
             $this->non_persistent_keys = DOCKET_CACHE_IGNORED_KEYS;
         }
 
-        if ($this->constans->is_array('DOCKET_CACHE_FILTERED_GROUPS')) {
+        if ($this->cf()->is_array('DOCKET_CACHE_FILTERED_GROUPS')) {
             $this->filtered_groups = DOCKET_CACHE_FILTERED_GROUPS;
         }
 
-        $this->cache_path = $this->filesystem->define_cache_path($this->constans->value('DOCKET_CACHE_PATH'));
+        $this->cache_path = $this->fs()->define_cache_path($this->cf()->value('DOCKET_CACHE_PATH'));
 
         foreach (['added', 'updated', 'deleted'] as $prefix) {
             add_action(
@@ -1379,7 +1364,7 @@ class WP_Object_Cache
             add_action(
                 'save_post',
                 function ($post_id, $post, $update) {
-                    $this->flush_filtered_groups('save_post', \func_get_args());
+                    $this->flush_filtered_groups('save_post', [$post_id, $post, $update]);
                 },
                 -PHP_INT_MAX,
                 3
@@ -1388,7 +1373,7 @@ class WP_Object_Cache
             add_action(
                 'edit_post',
                 function ($post_id, $post) {
-                    $this->flush_filtered_groups('edit_post', \func_get_args());
+                    $this->flush_filtered_groups('edit_post', [$post_id, $post]);
                 },
                 -PHP_INT_MAX,
                 2
@@ -1397,7 +1382,7 @@ class WP_Object_Cache
             add_action(
                 'delete_post',
                 function ($post_id) {
-                    $this->flush_filtered_groups('delete_post', \func_get_args());
+                    $this->flush_filtered_groups('delete_post', [$post_id]);
                 },
                 -PHP_INT_MAX
             );
@@ -1405,7 +1390,7 @@ class WP_Object_Cache
 
         // html comment
         $this->add_signature = false;
-        if ($this->constans->is_true('DOCKET_CACHE_SIGNATURE')) {
+        if ($this->cf()->is_true('DOCKET_CACHE_SIGNATURE')) {
             add_action(
                 'wp_head',
                 function () {
@@ -1427,8 +1412,8 @@ class WP_Object_Cache
             );
         }
 
-        if ($this->constans->is_true('DOCKET_CACHE_PRECACHE')) {
-            $this->docket_precache();
+        if ($this->cf()->is_true('DOCKET_CACHE_PRECACHE')) {
+            $this->dc_precache();
         }
     }
 }
