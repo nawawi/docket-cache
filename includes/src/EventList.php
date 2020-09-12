@@ -9,24 +9,21 @@
  */
 
 /*
- * original code from:
- *		plugins/wp-crontrol/src/event-list-table.php
- *		plugins/wp-crontrol/src/event.php
+ * Based on:
+ *  plugins/wp-crontrol/src/event-list-table.php
+ *	plugins/wp-crontrol/src/event.php
  */
 
 namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 
-if (!class_exists('WP_List_Table', false)) {
+if (!class_exists('\\WP_List_Table', false)) {
     require_once ABSPATH.'wp-admin/includes/class-wp-list-table.php';
 }
 
 class EventList extends \WP_List_Table
 {
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         parent::__construct(
@@ -70,6 +67,10 @@ class EventList extends \WP_List_Table
 
         foreach ($crons as $time => $cron) {
             foreach ($cron as $hook => $dings) {
+                if (!has_action($hook)) {
+                    wp_clear_scheduled_hook($hook);
+                    continue;
+                }
                 foreach ($dings as $sig => $data) {
                     $events[$hook.'-'.$sig.'-'.$time] = (object) [
                         'hook' => $hook,

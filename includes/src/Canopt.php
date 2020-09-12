@@ -54,11 +54,16 @@ final class Canopt extends Bepart
          ];
     }
 
-    private function read_config($file = '')
+    private function read_config($file = '', $force = false)
     {
         $file = empty($file) ? $this->file : $file;
         $config = [];
         if (@is_file($file) && is_readable($file)) {
+            // fresh
+            if ($force) {
+                $this->opcache_flush($file);
+            }
+
             $config = @include $file;
         }
 
@@ -142,10 +147,10 @@ final class Canopt extends Bepart
         return $this->put_config($data, $file);
     }
 
-    public function get_part($file = 'part')
+    public function get_part($file = 'part', $force = false)
     {
         $file = $this->path.'/'.$file.'.php';
 
-        return $this->read_config($file);
+        return $this->read_config($file, $force);
     }
 }

@@ -48,7 +48,7 @@ class Event
             'plugin_loaded',
             function () {
                 // gc
-                if ($this->plugin->constans->is_true('DOCKET_CACHE_GC')) {
+                if ($this->plugin->constans()->is_true('DOCKET_CACHE_GC')) {
                     add_action('docket_cache_gc', [$this, 'garbage_collector']);
 
                     if (!wp_next_scheduled('docket_cache_gc')) {
@@ -61,7 +61,7 @@ class Event
                 }
 
                 // optimize db
-                $cronoptmzdb = $this->plugin->constans->value('DOCKET_CACHE_CRONOPTMZDB');
+                $cronoptmzdb = $this->plugin->constans()->value('DOCKET_CACHE_CRONOPTMZDB');
                 if (!empty($cronoptmzdb) && 'never' !== $cronoptmzdb) {
                     add_action('docket_cache_optimizedb', [$this, 'optimizedb']);
 
@@ -94,6 +94,23 @@ class Event
                 }
             }
         );
+
+        add_filter(
+            'heartbeat_send',
+            function ($response, $screen_id) {
+                if (is_admin() && is_user_logged_in() && current_user_can('manage_options')) {
+                    $locked = get_transient('docketcache/tickproc');
+                    if (!empty($locked) && time() > (int) $locked) {
+                        do_action('docket-cache/countcachesize');
+                    }
+                    set_transient('docketcache/tickproc', time() + 60);
+                }
+
+                return $response;
+            },
+            PHP_INT_MAX,
+            2
+        );
     }
 
     /**
@@ -111,7 +128,10 @@ class Event
      */
     public function monitor()
     {
-        $this->plugin->suspend_wp_options_autoload();
+        $this->clear_unknown_cron();
+        $this->delete_expired_transients_db();
+        do_action('docket-cache/suspend_wp_options_autoload');
+        do_action('docket-cache/countcachesize');
     }
 
     /**
@@ -124,12 +144,7 @@ class Event
             foreach ($this->plugin->scanfiles($this->plugin->cache_path) as $object) {
                 $fx = $object->getPathName();
 
-                if (!$object->isFile() || 'file' !== $object->getType()) {
-                    @unlink($fx);
-                    continue;
-                }
-
-                if (!$this->plugin->is_php($fx)) {
+                if (!$object->isFile() || 'file' !== $object->getType() || !$this->plugin->is_php($fx)) {
                     continue;
                 }
 
@@ -151,7 +166,7 @@ class Event
                 unset($data);
             }
         }
-        $this->plugin->dropino->delay_expire();
+        $this->plugin->dropino()->delay_expire();
     }
 
     /**
@@ -164,20 +179,62 @@ class Event
             return false;
         }
 
-        // delete expired transient in db
-        delete_expired_transients(true);
+        $suppress = $wpdb->suppress_errors(true);
+        $this->delete_expired_transients_db();
 
         $dbname = $wpdb->dbname;
         $tables = $wpdb->get_results('SHOW TABLES FROM '.$dbname, ARRAY_A);
         if (!empty($tables) && \is_array($tables)) {
-            $suppress = $wpdb->suppress_errors(true);
             foreach ($tables as $table) {
                 $tbl = $table['Tables_in_'.$dbname];
-                $wpdb->query("OPTIMIZE TABLE `{$tbl}`");
+                $wpdb->query('OPTIMIZE TABLE `'.$tbl.'`');
             }
-            $wpdb->suppress_errors($suppress);
         }
 
+        $wpdb->suppress_errors($suppress);
+
         return true;
+    }
+
+    /**
+     * delete_expired_transients_db.
+     */
+    public function delete_expired_transients_db()
+    {
+        if (!wp_using_ext_object_cache()) {
+            return false;
+        }
+
+        $wpdb = $this->plugin->safe_wpdb();
+        if (!$wpdb) {
+            return false;
+        }
+
+        // delete expired transient in db
+        // https://developer.wordpress.org/reference/functions/delete_expired_transients/
+        delete_expired_transients(true);
+
+        return true;
+    }
+
+    /**
+     * clear_unknown_cron.
+     */
+    public function clear_unknown_cron()
+    {
+        if (!\function_exists('_get_cron_array')) {
+            return;
+        }
+        $crons = _get_cron_array();
+        if (!empty($crons) && \is_array($crons)) {
+            foreach ($crons as $time => $cron) {
+                foreach ($cron as $hook => $dings) {
+                    if (!has_action($hook)) {
+                        wp_clear_scheduled_hook($hook);
+                    }
+                }
+            }
+        }
+        unset($crons);
     }
 }

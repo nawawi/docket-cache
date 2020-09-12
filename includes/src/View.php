@@ -27,10 +27,10 @@ final class View
     public function __construct(Plugin $plugin)
     {
         $this->plugin = $plugin;
-        $this->log_enable = $this->plugin->constans->is_true('DOCKET_CACHE_LOG');
+        $this->log_enable = $this->plugin->constans()->is_true('DOCKET_CACHE_LOG');
         $this->log_max_size = $this->plugin->normalize_size(DOCKET_CACHE_LOG_SIZE);
         $this->cache_max_size = $this->plugin->normalize_size(DOCKET_CACHE_MAXSIZE);
-        $this->cronbot_enable = $this->plugin->constans->is_true('DOCKET_CACHE_CRONBOT');
+        $this->cronbot_enable = $this->plugin->constans()->is_true('DOCKET_CACHE_CRONBOT');
     }
 
     public function utc_to_local($gmt_timestamp)
@@ -91,7 +91,7 @@ final class View
 
     private function cronbot_status()
     {
-        $data = $this->plugin->canopt->get_part('cronbot');
+        $data = $this->plugin->canopt()->get_part('cronbot');
         if (!empty($data) && \is_array($data)) {
             return $data;
         }
@@ -101,7 +101,7 @@ final class View
 
     private function cronbot_pings()
     {
-        $data = $this->plugin->canopt->get_part('pings');
+        $data = $this->plugin->canopt()->get_part('pings');
         if (!empty($data) && \is_array($data)) {
             return $data;
         }
@@ -146,7 +146,7 @@ final class View
         $this->do_flush = false;
         $this->do_fetch = false;
         $this->page('wrap');
-        $this->plugin->dropino->delay_expire();
+        $this->plugin->dropino()->delay_expire();
     }
 
     private function tab_title($title, $add_loader = true, $css = '')
@@ -347,5 +347,15 @@ final class View
     private function idx_vcache()
     {
         return $this->has_vcache() ? sanitize_text_field($_GET['vcache']) : '';
+    }
+
+    private function is_dropin_exists()
+    {
+        return $this->plugin->dropino()->exists();
+    }
+
+    private function is_dropin_validate()
+    {
+        return $this->plugin->dropino()->validate();
     }
 }

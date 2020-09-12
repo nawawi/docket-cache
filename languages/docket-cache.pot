@@ -9,15 +9,15 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-09-06T17:13:09+00:00\n"
+"POT-Creation-Date: 2020-09-12T19:53:45+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
 
 #. Plugin Name of the plugin
 #: includes/admin/wrap.php:49
-#: includes/src/Plugin.php:634
-#: includes/src/Plugin.php:635
+#: includes/src/Plugin.php:631
+#: includes/src/Plugin.php:632
 msgid "Docket Cache"
 msgstr ""
 
@@ -135,7 +135,7 @@ msgid "Admin Page Loader"
 msgstr ""
 
 #: includes/admin/cronbot.php:20
-#: includes/src/Plugin.php:121
+#: includes/src/Plugin.php:123
 msgid "Not Available"
 msgstr ""
 
@@ -330,12 +330,12 @@ msgid "Config Path"
 msgstr ""
 
 #: includes/admin/overview.php:121
-#: includes/src/Plugin.php:988
+#: includes/src/Plugin.php:989
 msgid "Enable Object Cache"
 msgstr ""
 
 #: includes/admin/overview.php:132
-#: includes/src/Plugin.php:992
+#: includes/src/Plugin.php:993
 msgid "Disable Object Cache"
 msgstr ""
 
@@ -427,12 +427,12 @@ msgid "An unknown object cache drop-in was found. To use Docket object cache, ru
 msgstr ""
 
 #: includes/src/Command.php:102
-#: includes/src/Plugin.php:885
+#: includes/src/Plugin.php:883
 msgid "Object cache enabled."
 msgstr ""
 
 #: includes/src/Command.php:105
-#: includes/src/Plugin.php:888
+#: includes/src/Plugin.php:886
 msgid "Object cache could not be enabled."
 msgstr ""
 
@@ -445,17 +445,17 @@ msgid "An unknown object cache drop-in was found. To use Docket run: wp cache up
 msgstr ""
 
 #: includes/src/Command.php:129
-#: includes/src/Plugin.php:891
+#: includes/src/Plugin.php:889
 msgid "Object cache disabled."
 msgstr ""
 
 #: includes/src/Command.php:132
-#: includes/src/Plugin.php:894
+#: includes/src/Plugin.php:892
 msgid "Object cache could not be disabled."
 msgstr ""
 
 #: includes/src/Command.php:149
-#: includes/src/Plugin.php:903
+#: includes/src/Plugin.php:901
 msgid "Updated object cache drop-in and enabled Docket object cache."
 msgstr ""
 
@@ -464,11 +464,11 @@ msgid "Object cache drop-in could not be updated."
 msgstr ""
 
 #: includes/src/Command.php:168
-#: includes/src/Plugin.php:900
+#: includes/src/Plugin.php:898
 msgid "Object cache could not be flushed."
 msgstr ""
 
-#: includes/src/Command.php:173
+#: includes/src/Command.php:172
 msgid "The cache was flushed."
 msgstr ""
 
@@ -481,244 +481,244 @@ msgid "Once Monthly"
 msgstr ""
 
 #. translators: %s: Schedule name
-#: includes/src/EventList.php:237
+#: includes/src/EventList.php:238
 msgid "Unknown (%s)"
 msgstr ""
 
 #. translators: 1: The number of years in an interval of time.
-#: includes/src/EventList.php:247
+#: includes/src/EventList.php:248
 msgid "%s year"
 msgid_plural "%s years"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: The number of months in an interval of time.
-#: includes/src/EventList.php:249
+#: includes/src/EventList.php:250
 msgid "%s month"
 msgid_plural "%s months"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: The number of weeks in an interval of time.
-#: includes/src/EventList.php:251
+#: includes/src/EventList.php:252
 msgid "%s week"
 msgid_plural "%s weeks"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: The number of days in an interval of time.
-#: includes/src/EventList.php:253
+#: includes/src/EventList.php:254
 msgid "%s day"
 msgid_plural "%s days"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: The number of hours in an interval of time.
-#: includes/src/EventList.php:255
+#: includes/src/EventList.php:256
 msgid "%s hour"
 msgid_plural "%s hours"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: The number of minutes in an interval of time.
-#: includes/src/EventList.php:257
+#: includes/src/EventList.php:258
 msgid "%s minute"
 msgid_plural "%s minutes"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: The number of seconds in an interval of time.
-#: includes/src/EventList.php:259
+#: includes/src/EventList.php:260
 msgid "%s second"
 msgid_plural "%s seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/src/EventList.php:263
+#: includes/src/EventList.php:264
 msgid "now"
 msgstr ""
 
 #. translators: %s: UTC offset
-#: includes/src/EventList.php:353
+#: includes/src/EventList.php:354
 msgid "Next Schedule (%s)"
 msgstr ""
 
-#: includes/src/EventList.php:356
+#: includes/src/EventList.php:357
 msgid "Hook"
 msgstr ""
 
-#: includes/src/EventList.php:357
+#: includes/src/EventList.php:358
 msgid "Arguments"
 msgstr ""
 
-#: includes/src/EventList.php:359
+#: includes/src/EventList.php:360
 msgid "Action"
 msgstr ""
 
-#: includes/src/EventList.php:360
+#: includes/src/EventList.php:361
 msgid "Recurrence"
 msgstr ""
 
-#: includes/src/EventList.php:409
+#: includes/src/EventList.php:410
 msgid "None"
 msgstr ""
 
 #. translators: %s: Time period, for example "8 minutes"
-#: includes/src/EventList.php:429
+#: includes/src/EventList.php:430
 msgid "%s ago"
 msgstr ""
 
-#: includes/src/EventList.php:459
+#: includes/src/EventList.php:460
 msgid "Non-repeating"
 msgstr ""
 
-#: includes/src/EventList.php:464
+#: includes/src/EventList.php:465
 msgid "There are currently no scheduled cron events."
 msgstr ""
 
-#: includes/src/Plugin.php:119
+#: includes/src/Plugin.php:121
 msgid "Disabled"
 msgstr ""
 
-#: includes/src/Plugin.php:120
+#: includes/src/Plugin.php:122
 msgid "Enabled"
 msgstr ""
 
-#: includes/src/Plugin.php:122
+#: includes/src/Plugin.php:124
 msgid "Unknown"
 msgstr ""
 
-#: includes/src/Plugin.php:126
+#: includes/src/Plugin.php:128
 msgid "No"
 msgstr ""
 
-#: includes/src/Plugin.php:127
+#: includes/src/Plugin.php:129
 msgid "Yes"
 msgstr ""
 
 #. translators: %1$s = size, %2$s number of file
-#: includes/src/Plugin.php:139
-#: includes/src/Plugin.php:155
+#: includes/src/Plugin.php:141
+#: includes/src/Plugin.php:157
 msgid "%1$s of %2$s file"
 msgid_plural "%1$s of %2$s files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/src/Plugin.php:144
+#: includes/src/Plugin.php:146
 msgid "Disabled at runtime."
 msgstr ""
 
-#: includes/src/Plugin.php:266
+#: includes/src/Plugin.php:268
 msgid "Byte"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:658
+#: includes/src/Plugin.php:655
 msgid "<strong>Docket Cache:</strong> The object-cache.php drop-in is outdated. Please click \"Re-Install\" to update it now.<p style=\"padding:0;\"><a href=\"%s\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:662
+#: includes/src/Plugin.php:659
 msgid "<strong>Docket Cache:</strong> An unknown object-cache.php drop-in was found. Please click \"Install\" to use Docket Cache.<p style=\"margin-bottom:0;\"><a href=\"%s\" class=\"button button-primary\">Install</a></p>"
 msgstr ""
 
-#: includes/src/Plugin.php:667
+#: includes/src/Plugin.php:664
 msgid "The object-cache.php drop-in has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: version
-#: includes/src/Plugin.php:750
-#: includes/src/Plugin.php:764
+#: includes/src/Plugin.php:748
+#: includes/src/Plugin.php:762
 msgid "Version %s"
 msgstr ""
 
 #. translators: %s: php version
-#: includes/src/Plugin.php:877
+#: includes/src/Plugin.php:875
 msgid "This plugin requires PHP %s or greater."
 msgstr ""
 
-#: includes/src/Plugin.php:897
+#: includes/src/Plugin.php:895
 msgid "Object cache was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:906
+#: includes/src/Plugin.php:904
 msgid "Docket object cache drop-in could not be updated."
 msgstr ""
 
-#: includes/src/Plugin.php:909
+#: includes/src/Plugin.php:907
 msgid "Cache log was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:912
+#: includes/src/Plugin.php:910
 msgid "Cache log could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:915
+#: includes/src/Plugin.php:913
 msgid "Cache file was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:918
+#: includes/src/Plugin.php:916
 msgid "Cache file could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:921
+#: includes/src/Plugin.php:919
 msgid "OPcache was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:925
+#: includes/src/Plugin.php:923
 msgid "OPcache could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:928
+#: includes/src/Plugin.php:926
 msgid "Cronbot connected."
 msgstr ""
 
 #. translators: %s = error message
 #: includes/src/Plugin.php:933
-msgid "Cronbot failed to connect: %s"
+msgid "Cronbot failed to connect%s"
 msgstr ""
 
-#: includes/src/Plugin.php:936
+#: includes/src/Plugin.php:937
 msgid "Cronbot disconnected."
 msgstr ""
 
-#: includes/src/Plugin.php:939
+#: includes/src/Plugin.php:940
 msgid "Cronbot failed to disconnect."
 msgstr ""
 
-#: includes/src/Plugin.php:942
+#: includes/src/Plugin.php:943
 msgid "Cron run successful."
 msgstr ""
 
-#: includes/src/Plugin.php:945
+#: includes/src/Plugin.php:946
 msgid "Failed to run cron."
 msgstr ""
 
-#: includes/src/Plugin.php:948
+#: includes/src/Plugin.php:949
 msgid "Option enabled."
 msgstr ""
 
-#: includes/src/Plugin.php:951
+#: includes/src/Plugin.php:952
 msgid "Option disabled."
 msgstr ""
 
-#: includes/src/Plugin.php:954
+#: includes/src/Plugin.php:955
 msgid "Option saved."
 msgstr ""
 
-#: includes/src/Plugin.php:957
+#: includes/src/Plugin.php:958
 msgid "Option resets to default."
 msgstr ""
 
-#: includes/src/Plugin.php:960
+#: includes/src/Plugin.php:961
 msgid "Failed to change options."
 msgstr ""
 
-#: includes/src/Plugin.php:982
+#: includes/src/Plugin.php:983
 msgid "Settings"
 msgstr ""
 
-#: includes/src/Plugin.php:996
+#: includes/src/Plugin.php:997
 msgid "Install Drop-in"
 msgstr ""
 

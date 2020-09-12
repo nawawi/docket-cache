@@ -128,7 +128,7 @@ final class Tweaks
         // wp: disable xmlrpc
         // https://www.wpbeginner.com/plugins/how-to-disable-xml-rpc-in-wordpress/
         // https://kinsta.com/blog/xmlrpc-php/
-        if ($this->plugin->constans->is_false('DOCKET_CACHE_TWEAKS_XMLRPC_DISABLED')) {
+        if ($this->plugin->constans()->is_false('DOCKET_CACHE_TWEAKS_XMLRPC_DISABLED')) {
             add_filter('xmlrpc_enabled', '__return_false');
             add_filter('pre_update_option_enable_xmlrpc', '__return_false');
             add_filter('pre_option_enable_xmlrpc', '__return_zero');
@@ -144,7 +144,7 @@ final class Tweaks
             );
         }
 
-        if ($this->plugin->constans->is_false('DOCKET_CACHE_TWEAKS_WPCOOKIE_DISABLED')) {
+        if ($this->plugin->constans()->is_false('DOCKET_CACHE_TWEAKS_WPCOOKIE_DISABLED')) {
             // wp: comment cookie lifetime, default to 30000000 second = 12 months
             add_filter(
                 'comment_cookie_lifetime',

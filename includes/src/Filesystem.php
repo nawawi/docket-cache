@@ -393,12 +393,6 @@ class Filesystem
             $this->unlink($dir.'/index.php', true);
         }
 
-        if (!$cleanup && $cnt > 0) {
-            if (DOCKET_CACHE_WPCLI) {
-                do_action('docket-cache/preload');
-            }
-        }
-
         return $cnt;
     }
 
@@ -409,7 +403,17 @@ class Filesystem
     {
         if (!$force) {
             $cache_stats = wp_cache_get('cache_stats', 'docketcache-data');
-            if (!empty($cache_stats) && \is_array($cache_stats)) {
+            if (empty($cache_stats) || !\is_array($cache_stats)) {
+                $cache_stats = [
+                    'timeout' => 0,
+                    'size' => 0,
+                    'filesize' => 0,
+                    'files' => 0,
+                ];
+                wp_cache_set('cache_stats', $cache_stats, 'docketcache-data', DAY_IN_SECONDS);
+            }
+
+            if (!empty($cache_stat['timeout']) && (int) $cache_stat['timeout'] > time()) {
                 return $is_stats ? (object) $cache_stats : $cache_stats->size;
             }
         }
@@ -418,25 +422,25 @@ class Filesystem
         $bytestotal = 0;
         $fsizetotal = 0;
         $filestotal = 0;
+
         if ($this->is_docketcachedir($dir)) {
             foreach ($this->scanfiles($dir) as $object) {
-                if (!$object->isFile() || 'file' !== $object->getType()) {
+                $fx = $object->getPathName();
+
+                if (!$object->isFile() || 'file' !== $object->getType() || !$this->is_php($fx)) {
                     continue;
                 }
 
-                $fx = $object->getPathName();
                 $fs = $object->getSize();
 
                 if (0 === $fs) {
-                    @unlink($fx);
+                    $this->unlink($fx, true);
                     continue;
                 }
 
-                $skip = false;
                 $data = $this->cache_get($object->getPathName());
                 if (false !== $data) {
                     if (!$is_debug && !empty($data['group']) && $this->internal_group($data['group'])) {
-                        $skip = true;
                         continue;
                     }
 
@@ -445,19 +449,19 @@ class Filesystem
                 }
                 unset($data);
 
-                if (!$skip) {
-                    $fsizetotal += $fs;
-                }
+                $fsizetotal += $fs;
             }
         }
 
+        $exp = 5 * MINUTE_IN_SECONDS;
         $cache_stats = [
+            'timeout' => $exp,
             'size' => $bytestotal,
             'filesize' => $fsizetotal,
             'files' => $filestotal,
         ];
 
-        wp_cache_set('cache_stats', $cache_stats, 'docketcache-data', 30);
+        wp_cache_set('cache_stats', $cache_stats, 'docketcache-data', DAY_IN_SECONDS);
 
         return $is_stats ? (object) $cache_stats : $bytestotal;
     }
@@ -573,12 +577,18 @@ class Filesystem
         return 'docketcache' === substr($group, 0, 11);
     }
 
-    public function get_home_path()
+    public function sanitize_second($time)
     {
-        if (!\function_exists('get_home_path')) {
-            require_once ABSPATH.'wp-admin/includes/file.php';
+        $time = (int) $time;
+        if ($time < 0) {
+            $time = 0;
+        } else {
+            $max = ceil(log10($time));
+            if ($max > 10 || 'NaN' === $max) {
+                $time = 0;
+            }
         }
 
-        return get_home_path();
+        return $time;
     }
 }

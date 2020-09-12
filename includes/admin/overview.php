@@ -111,7 +111,7 @@ if ($this->plugin->is_behind_proxy()) {
             </table>
 
             <p class="submit">
-                <?php if (!$this->plugin->dropino->exists()) : ?>
+                <?php if (!$this->is_dropin_exists()) : ?>
 
                 <?php if ($this->info->cache_size > 0) : ?>
                 <a href="<?php echo $this->plugin->action_query('flush-occache'); ?>" class="button button-secondary button-large"><?php esc_html_e('Flush Cache', 'docket-cache'); ?></a>
@@ -121,7 +121,7 @@ if ($this->plugin->is_behind_proxy()) {
                 <a href="<?php echo $this->plugin->action_query('enable-occache'); ?>" class="button button-primary button-large"><?php esc_html_e('Enable Object Cache', 'docket-cache'); ?></a>
                 <?php endif; ?>
 
-                <?php elseif ($this->plugin->dropino->validate()) : ?>
+                <?php elseif ($this->is_dropin_validate()) : ?>
 
                 <?php if ($this->info->cache_size > 0) : ?>
                 <a href="<?php echo $this->plugin->action_query('flush-occache'); ?>" class="button button-primary button-large"><?php esc_html_e('Flush Cache', 'docket-cache'); ?></a>

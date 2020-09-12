@@ -28,7 +28,7 @@ if (1 === $this->info->status_code && isset($this->plugin->token)) {
             $this->do_fetch = true;
             break;
     }
-    if ($this->plugin->constans->is_false('DOCKET_CACHE_PRELOAD') || 2 === $this->info->status_code) {
+    if ($this->plugin->constans()->is_false('DOCKET_CACHE_PRELOAD') || 2 === $this->info->status_code) {
         $this->do_preload = false;
     }
 }
