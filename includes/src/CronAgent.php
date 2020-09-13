@@ -272,11 +272,7 @@ class CronAgent
             $this->close_ping($response);
         }
 
-        $locked = get_transient('docketcache/recping');
-        if (false === $locked) {
-            set_transient('docketcache/recping', 0);
-        }
-
+        $locked = wp_cache_get('receive_ping', 'docketcache-cron');
         if (!empty($locked) && (int) $locked > time()) {
             $response['msg'] = 'already received. try again in few minutes';
             $this->close_ping($response);
@@ -295,7 +291,7 @@ class CronAgent
             $response['wpcron_code'] = $code;
         }
 
-        set_transient('docketcache/recping', time() + 30);
+        wp_cache_set('receive_ping', time() + 30, 'docketcache-cron');
 
         $cache[$uip] = $response;
         $this->close_ping($cache[$uip]);
@@ -311,13 +307,7 @@ class CronAgent
             return;
         }
 
-        $locked = get_transient('docketcache/checkconn');
-        if (false === $locked) {
-            set_transient('docketcache/checkconn', 0);
-
-            return;
-        }
-
+        $locked = wp_cache_get('check_connection', 'docketcache-cron');
         if (!empty($locked) && (int) $locked > time()) {
             return;
         }
@@ -335,7 +325,7 @@ class CronAgent
             if (\is_array($pingdata) && !empty($pingdata['timestamp'])) {
                 $timestamp = strtotime('+90 minutes', strtotime($pingdata['timestamp']));
                 if ($timestamp > 0 && time() > $timestamp) {
-                    set_transient('docketcache/checkconn', time() + 30);
+                    wp_cache_set('check_connection', time() + 30, 'docketcache-cron');
                     $this->send_action('on', true);
                 }
             }

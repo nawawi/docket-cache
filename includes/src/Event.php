@@ -99,11 +99,11 @@ class Event
             'heartbeat_send',
             function ($response, $screen_id) {
                 if (is_admin() && is_user_logged_in() && current_user_can('manage_options')) {
-                    $locked = get_transient('docketcache/tickproc');
+                    $locked = wp_cache_get('heartbeat_tick', 'docketcache-event');
                     if (!empty($locked) && time() > (int) $locked) {
                         do_action('docket-cache/countcachesize');
                     }
-                    set_transient('docketcache/tickproc', time() + 60);
+                    wp_cache_set('heartbeat_tick', time() + 90, 'docketcache-event');
                 }
 
                 return $response;
