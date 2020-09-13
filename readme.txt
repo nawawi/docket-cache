@@ -105,9 +105,18 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.08.07 =
+
+Fix release.
+
+- Fixed precaching, ignore query to avoid junk query string
+- Fixed cronbot, add locking to avoid multiple send in short period
+- Fixed cronbot, remove site url trailing slash
+- Fixed cache stats overview
+
 = 20.08.06 =
 
-Fix releases.
+Fix release.
 
 - Fixed precache "class not found"
 - Fixed cronbot send site url instead of main site url if multisite
@@ -115,7 +124,7 @@ Fix releases.
 
 = 20.08.05 =
 
-New features and fix releases.
+New features and fix release.
 
 - Added Cronbot Service
 - Fixed precache overmissed
@@ -127,7 +136,7 @@ New features and fix releases.
 
 = 20.08.04 =
 
-New features and fix releases.
+New features and fix release.
 
 - Added Object Cache Precaching
 - Added Optimize Database Tables

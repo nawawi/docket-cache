@@ -27,8 +27,10 @@ if ($this->plugin->is_behind_proxy()) {
 }
 ?>
 <div class="section overview">
+<?php if ( $this->pageconfig_enable ): ?>
     <div class="flex-container">
         <div class="row-left">
+<?php endif;?>
             <?php $this->tab_title(esc_html__('Overview', 'docket-cache')); ?>
             <p class="desc"><?php esc_html_e('The overview panel provides information about the plugin activity status.', 'docket-cache'); ?></p>
             <table class="form-table">
@@ -132,9 +134,11 @@ if ($this->plugin->is_behind_proxy()) {
                 <a href="<?php echo $this->plugin->action_query('disable-occache'); ?>" class="button button-secondary button-large"><?php esc_html_e('Disable Object Cache', 'docket-cache'); ?></a>
                 <?php endif; ?>
             </p>
+<?php if ( $this->pageconfig_enable ): ?>
         </div>
         <div class="row-right">
             <?php $this->page('resource'); ?>
         </div>
     </div>
+<?php endif;?>
 </div>

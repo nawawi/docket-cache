@@ -225,6 +225,9 @@ final class Constans
         // docket cronbot
         $this->maybe_define('DOCKET_CACHE_CRONBOT', false);
 
+        // config page
+        $this->maybe_define('DOCKET_CACHE_PAGECONFIG', true);
+
         // backwards-compatible
         $this->maybe_define('DOCKET_CACHE_COMMENT', DOCKET_CACHE_SIGNATURE);
     }

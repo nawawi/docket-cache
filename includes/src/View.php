@@ -23,6 +23,7 @@ final class View
     private $log_max_size;
     private $cache_max_size;
     private $cronbot_enable;
+    private $pageconfig_enable;
 
     public function __construct(Plugin $plugin)
     {
@@ -31,6 +32,7 @@ final class View
         $this->log_max_size = $this->plugin->normalize_size(DOCKET_CACHE_LOG_SIZE);
         $this->cache_max_size = $this->plugin->normalize_size(DOCKET_CACHE_MAXSIZE);
         $this->cronbot_enable = $this->plugin->constans()->is_true('DOCKET_CACHE_CRONBOT');
+        $this->pageconfig_enable = $this->plugin->constans()->is_true('DOCKET_CACHE_PAGECONFIG');
     }
 
     public function utc_to_local($gmt_timestamp)
@@ -176,7 +178,7 @@ final class View
         $idx = !empty($_GET['idx']) ? sanitize_text_field($_GET['idx']) : 'overview';
         switch ($idx) {
             case 'log':
-                if (!$this->log_enable) {
+                if (!$this->log_enable && $this->pageconfig_enable) {
                     $idx = 'config';
                 }
                 break;
@@ -216,6 +218,10 @@ final class View
             unset($lists['cronbot']);
         }
 
+        if (!$this->pageconfig_enable) {
+            unset($lists['config']);
+        }
+
         $option = '';
         $html = '<nav class="nav-tab-wrapper">';
         foreach ($lists as $id => $text) {
@@ -239,8 +245,9 @@ final class View
     private function change_timestamp($time)
     {
         $timestamp = '';
-        if ('utc' !== DOCKET_CACHE_LOG_TIME) {
-            switch (DOCKET_CACHE_LOG_TIME) {
+        $val = $this->plugin->constans()->value('DOCKET_CACHE_LOG_TIME');
+        if ('utc' !== $val) {
+            switch ($val) {
                 case 'local':
                     $timestamp = wp_date('Y-m-d H:i:s T', $time);
                     break;

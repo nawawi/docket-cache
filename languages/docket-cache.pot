@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-09-13T10:33:05+00:00\n"
+"POT-Creation-Date: 2020-09-13T11:00:54+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -34,7 +34,7 @@ msgid "https://github.com/nawawi"
 msgstr ""
 
 #: includes/admin/config.php:18
-#: includes/src/View.php:208
+#: includes/src/View.php:210
 msgid "Configuration"
 msgstr ""
 
@@ -48,7 +48,7 @@ msgstr ""
 
 #: includes/admin/config.php:28
 #: includes/admin/log.php:19
-#: includes/src/View.php:206
+#: includes/src/View.php:208
 msgid "Cache Log"
 msgstr ""
 
@@ -58,7 +58,7 @@ msgstr ""
 
 #: includes/admin/config.php:41
 #: includes/admin/config.php:83
-#: includes/src/View.php:308
+#: includes/src/View.php:315
 msgid "Default"
 msgstr ""
 
@@ -140,7 +140,7 @@ msgid "Not Available"
 msgstr ""
 
 #: includes/admin/cronbot.php:29
-#: includes/src/View.php:207
+#: includes/src/View.php:209
 msgid "Cronbot"
 msgstr ""
 
@@ -259,7 +259,7 @@ msgid "Web Proxy"
 msgstr ""
 
 #: includes/admin/overview.php:32
-#: includes/src/View.php:205
+#: includes/src/View.php:207
 msgid "Overview"
 msgstr ""
 
@@ -360,7 +360,7 @@ msgid "CONFIGURATION"
 msgstr ""
 
 #: includes/admin/resource.php:32
-msgid "The configuration panel allows to quickly change basic configuration without using constants."
+msgid "The configuration page allows to quickly change basic configuration without using constants."
 msgstr ""
 
 #: includes/admin/resource.php:36
@@ -368,7 +368,7 @@ msgid "CACHE LOG"
 msgstr ""
 
 #: includes/admin/resource.php:37
-msgid "The cache log panel provides information about the cache activities, disabled by default. Activate at the configuration panel."
+msgid "The cache log page provides information about the cache activities, disabled by default. Activate at the configuration page."
 msgstr ""
 
 #: includes/admin/resource.php:41
@@ -722,10 +722,10 @@ msgstr ""
 msgid "Install Drop-in"
 msgstr ""
 
-#: includes/src/View.php:309
+#: includes/src/View.php:316
 msgid "Enable"
 msgstr ""
 
-#: includes/src/View.php:310
+#: includes/src/View.php:317
 msgid "Disable"
 msgstr ""

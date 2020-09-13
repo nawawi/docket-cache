@@ -29,12 +29,12 @@ namespace Nawawi\DocketCache;
             <hr>
             <p>
                 <strong><?php esc_html_e('CONFIGURATION', 'docket-cache'); ?></strong><br class="break">
-                <?php esc_html_e('The configuration panel allows to quickly change basic configuration without using constants.', 'docket-cache'); ?><br>
+                <?php esc_html_e('The configuration page allows to quickly change basic configuration without using constants.', 'docket-cache'); ?><br>
             </p>
             <hr>
             <p>
                 <strong><?php esc_html_e('CACHE LOG', 'docket-cache'); ?></strong><br class="break">
-                <?php esc_html_e('The cache log panel provides information about the cache activities, disabled by default. Activate at the configuration panel.', 'docket-cache'); ?><br>
+                <?php esc_html_e('The cache log page provides information about the cache activities, disabled by default. Activate at the configuration page.', 'docket-cache'); ?><br>
             </p>
             <?php elseif ($this->tab_current('config')) : ?>
             <p>
