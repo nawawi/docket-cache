@@ -77,7 +77,8 @@ class CronAgent
         return !empty($_POST['ping']) && !empty($_GET['docketcache_ping']) && !empty($_SERVER['REQUEST_URI']) && false !== strpos($_SERVER['REQUEST_URI'], '/?docketcache_ping=');
     }
 
-    private function site_url() {
+    private function site_url()
+    {
         return rtrim(network_site_url(), '\\/');
     }
 
