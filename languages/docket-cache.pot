@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-09-13T11:00:54+00:00\n"
+"POT-Creation-Date: 2020-09-13T11:09:16+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -250,7 +250,7 @@ msgstr ""
 
 #: includes/admin/log.php:121
 #: includes/admin/log.php:125
-#: includes/admin/overview.php:129
+#: includes/admin/overview.php:131
 msgid "Refresh"
 msgstr ""
 
@@ -258,83 +258,83 @@ msgstr ""
 msgid "Web Proxy"
 msgstr ""
 
-#: includes/admin/overview.php:32
+#: includes/admin/overview.php:34
 #: includes/src/View.php:207
 msgid "Overview"
 msgstr ""
 
-#: includes/admin/overview.php:33
+#: includes/admin/overview.php:35
 msgid "The overview panel provides information about the plugin activity status."
 msgstr ""
 
-#: includes/admin/overview.php:36
+#: includes/admin/overview.php:38
 msgid "Web Server"
 msgstr ""
 
-#: includes/admin/overview.php:41
+#: includes/admin/overview.php:43
 msgid "PHP SAPI"
 msgstr ""
 
-#: includes/admin/overview.php:53
+#: includes/admin/overview.php:55
 msgid "Object Cache"
 msgstr ""
 
-#: includes/admin/overview.php:54
-#: includes/admin/overview.php:117
-#: includes/admin/overview.php:127
+#: includes/admin/overview.php:56
+#: includes/admin/overview.php:119
+#: includes/admin/overview.php:129
 msgid "Flush Cache"
 msgstr ""
 
-#: includes/admin/overview.php:58
+#: includes/admin/overview.php:60
 msgid "Zend OPcache"
 msgstr ""
 
-#: includes/admin/overview.php:61
+#: includes/admin/overview.php:63
 msgid "Flush OPcache"
 msgstr ""
 
-#: includes/admin/overview.php:67
+#: includes/admin/overview.php:69
 msgid "PHP Memory Limit"
 msgstr ""
 
-#: includes/admin/overview.php:72
+#: includes/admin/overview.php:74
 msgid "WP Frontend Memory Limit"
 msgstr ""
 
-#: includes/admin/overview.php:77
+#: includes/admin/overview.php:79
 msgid "WP Backend Memory Limit"
 msgstr ""
 
-#: includes/admin/overview.php:82
+#: includes/admin/overview.php:84
 msgid "Drop-in Writable"
 msgstr ""
 
-#: includes/admin/overview.php:87
+#: includes/admin/overview.php:89
 msgid "Drop-in File"
 msgstr ""
 
-#: includes/admin/overview.php:92
+#: includes/admin/overview.php:94
 msgid "Cache Writable"
 msgstr ""
 
-#: includes/admin/overview.php:97
+#: includes/admin/overview.php:99
 msgid "Cache Path"
 msgstr ""
 
-#: includes/admin/overview.php:102
+#: includes/admin/overview.php:104
 msgid "Config Writable"
 msgstr ""
 
-#: includes/admin/overview.php:107
+#: includes/admin/overview.php:109
 msgid "Config Path"
 msgstr ""
 
-#: includes/admin/overview.php:121
+#: includes/admin/overview.php:123
 #: includes/src/Plugin.php:989
 msgid "Enable Object Cache"
 msgstr ""
 
-#: includes/admin/overview.php:132
+#: includes/admin/overview.php:134
 #: includes/src/Plugin.php:993
 msgid "Disable Object Cache"
 msgstr ""
