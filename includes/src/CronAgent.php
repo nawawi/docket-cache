@@ -68,13 +68,17 @@ class CronAgent
 
                 return true;
             },
-            -PHP_INT_MAX
+            PHP_INT_MAX
         );
     }
 
     private function is_ping_request()
     {
         return !empty($_POST['ping']) && !empty($_GET['docketcache_ping']) && !empty($_SERVER['REQUEST_URI']) && false !== strpos($_SERVER['REQUEST_URI'], '/?docketcache_ping=');
+    }
+
+    private function site_url() {
+        return rtrim(network_site_url(), '\\/');
     }
 
     private function send_action($action, $is_hello = false)
@@ -86,7 +90,7 @@ class CronAgent
             return $cache[$uip];
         }
 
-        $site_url = network_site_url();
+        $site_url = $this->site_url();
         $site_key = substr(md5($site_url), 0, 22);
         $site_body = $this->plugin->nw_encrypt($site_url, $site_key);
         $site_id = $this->plugin->nw_encrypt($site_key, $site_body);
@@ -219,7 +223,7 @@ class CronAgent
                     'url' => $url,
                     'key' => $doing_wp_cron,
                     'args' => [
-                        'timeout' => 3,
+                        'timeout' => 10,
                         'blocking' => true,
                         'sslverify' => apply_filters('https_local_ssl_verify', false),
                     ],
@@ -257,7 +261,7 @@ class CronAgent
         $response = [
             'timestamp' => date('Y-m-d H:i:s T'),
             'timezone' => wp_timezone_string(),
-            'site' => network_site_url(),
+            'site' => $this->site_url(),
             'status' => 1,
         ];
 
@@ -269,7 +273,7 @@ class CronAgent
 
         $locked = get_transient('docketcache/recping');
         if (false === $locked) {
-            set_transient('docketcache/recping', time() - 60);
+            set_transient('docketcache/recping', 0);
         }
 
         if (!empty($locked) && (int) $locked > time()) {
@@ -308,7 +312,7 @@ class CronAgent
 
         $locked = get_transient('docketcache/checkconn');
         if (false === $locked) {
-            set_transient('docketcache/checkconn', time());
+            set_transient('docketcache/checkconn', 0);
 
             return;
         }
