@@ -114,7 +114,6 @@ class Event
         $this->clear_unknown_cron();
         $this->delete_expired_transients_db();
         do_action('docket-cache/suspend_wp_options_autoload');
-        do_action('docket-cache/countcachesize');
     }
 
     /**

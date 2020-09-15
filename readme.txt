@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.08.07
+Stable tag: 20.08.08
 License: MIT
 License URI: ./license.txt
 
@@ -110,7 +110,7 @@ Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docke
 This is a hotfix release.
 
 - Fixed cache stats, do collecting data in background to avoid lagging.
-- Fixed cronbot, execute cron process directly without wp-cron.php, to avoid http connection error.
+- Fixed cronbot, execute cron process directly without wp-cron.php, to avoid http connection error. 
 - Added cache stats options, Enable/disable object cache stats at Overview page. 
 
 = 20.08.07 =
