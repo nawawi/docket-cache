@@ -127,6 +127,12 @@ namespace Nawawi\DocketCache;
                         <?php echo $this->config_select_bool('pageloader', DOCKET_CACHE_PAGELOADER); ?>
                     </td>
                 </tr>
+                <tr>
+                    <th><?php esc_html_e('Cache Stats', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('stats', DOCKET_CACHE_STATS); ?>
+                    </td>
+                </tr>
             </table>
         </div>
         <div class="row-right">

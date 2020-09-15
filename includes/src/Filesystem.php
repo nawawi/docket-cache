@@ -413,9 +413,7 @@ class Filesystem
                 wp_cache_set('cache_stats', $cache_stats, 'docketcache-data', DAY_IN_SECONDS);
             }
 
-            if (!empty($cache_stat['timeout']) && (int) $cache_stat['timeout'] > time()) {
-                return $is_stats ? (object) $cache_stats : $cache_stats->size;
-            }
+            return $is_stats ? (object) $cache_stats : $cache_stats->size;
         }
 
         $is_debug = \defined('DOCKET_CACHE_LOG_ALL') && DOCKET_CACHE_LOG_ALL ? true : false;

@@ -1203,10 +1203,10 @@ class WP_Object_Cache
         $group = 'docketcache-precache';
         $data = [];
 
-        // limit precache list to 2000
+        // limit precache list to 1000
         $cache_hash = $this->get('index', $group);
         if (!empty($cache_hash) && \is_array($cache_hash)) {
-            if (\count($cache_hash) >= 2000) {
+            if (\count($cache_hash) >= 1000) {
                 // flush first 500
                 $x = 0;
                 foreach ($cache_hash as $h) {

@@ -228,6 +228,9 @@ final class Constans
         // config page
         $this->maybe_define('DOCKET_CACHE_PAGECONFIG', true);
 
+        // cache stats
+        $this->maybe_define('DOCKET_CACHE_STATS', true);
+
         // backwards-compatible
         $this->maybe_define('DOCKET_CACHE_COMMENT', DOCKET_CACHE_SIGNATURE);
     }

@@ -73,7 +73,9 @@ class Command extends WP_CLI_Command
 
         WP_CLI::line("Cache Status\t: ".$this->status_color($info->status_code, $info->status_text));
         WP_CLI::line("Cache Path\t: ".$info->cache_path);
-        WP_CLI::line("Cache Size\t: ".$info->cache_size);
+        if ($this->plugin->constans()->is_true('DOCKET_CACHE_STATS')) {
+            WP_CLI::line("Cache Size\t: ".$info->cache_size);
+        }
         WP_CLI::halt($halt);
     }
 

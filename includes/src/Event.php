@@ -94,23 +94,6 @@ class Event
                 }
             }
         );
-
-        add_filter(
-            'heartbeat_send',
-            function ($response, $screen_id) {
-                if (is_admin() && is_user_logged_in() && current_user_can('manage_options')) {
-                    $locked = wp_cache_get('heartbeat_tick', 'docketcache-event');
-                    if (!empty($locked) && time() > (int) $locked) {
-                        do_action('docket-cache/countcachesize');
-                    }
-                    wp_cache_set('heartbeat_tick', time() + 90, 'docketcache-event');
-                }
-
-                return $response;
-            },
-            PHP_INT_MAX,
-            2
-        );
     }
 
     /**
@@ -222,6 +205,10 @@ class Event
      */
     public function clear_unknown_cron()
     {
+        if (!wp_using_ext_object_cache()) {
+            return;
+        }
+
         if (!\function_exists('_get_cron_array')) {
             return;
         }

@@ -129,8 +129,23 @@ final class Plugin extends Bepart
              1 => esc_html__('Yes', 'docket-cache'),
          ];
 
+        $cache_stats = (object) [
+             'timeout' => 0,
+             'size' => 0,
+             'filesize' => 0,
+             'files' => 0,
+         ];
+
+        $force_stats = false;
+        if ($this->constans()->is_true('DOCKET_CACHE_WPCLI')) {
+            $force_stats = true;
+        }
+
+        if ($this->constans()->is_true('DOCKET_CACHE_STATS')) {
+            $cache_stats = $this->cache_size($this->cache_path, true, $force_stats);
+        }
+
         $status = $this->get_status();
-        $cache_stats = $this->cache_size($this->cache_path, true);
         $status_text_stats = '';
         $status_text = '';
 
@@ -722,6 +737,12 @@ final class Plugin extends Bepart
                     if ('fetch' === $type) {
                         $this->send_json_continue($this->slug.':worker: pong '.$type);
                         @Crawler::fetch_home();
+                        exit;
+                    }
+
+                    if ('countcachesize' === $type) {
+                        $this->send_json_continue($this->slug.':worker: pong '.$type);
+                        do_action('docket-cache/countcachesize');
                         exit;
                     }
                 }

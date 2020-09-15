@@ -51,6 +51,7 @@ final class Canopt extends Bepart
              'wpoptaload',
              'cronoptmzdb',
              'cronbot',
+             'stats',
          ];
     }
 

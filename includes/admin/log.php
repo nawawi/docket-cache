@@ -25,7 +25,7 @@ $log = $this->parse_log_query();
     <table class="form-table">
         <?php if (!$this->has_vcache()) : ?>
         <tr>
-            <th><?php esc_html_e('Log File', 'docket-cache'); ?></th>
+            <th class="border-b"><?php esc_html_e('Log File', 'docket-cache'); ?></th>
             <td>
                 <?php if ($log->output_empty) : ?>
                 <?php echo $this->info->log_file; ?>

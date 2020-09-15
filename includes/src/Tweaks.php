@@ -252,14 +252,4 @@ final class Tweaks
 
         return true;
     }
-
-    /*public function wpoptions_size() {
-        $wpdb = $this->plugni->safe_wpdb();
-        if ( !$wpdb ) {
-            return false;
-        }
-
-        $query = $wpdb->prepare("SELECT LENGTH(option_value), option_name FROM `{$wpdb->options}` WHERE autoload='yes' ORDER BY length(option_value) DESC");
-
-    }*/
 }

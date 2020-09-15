@@ -28,7 +28,7 @@ class CronAgent
     public function register()
     {
         add_action(
-            'plugin_loaded',
+            'init',
             function () {
                 $this->receive_ping();
             },
@@ -57,16 +57,11 @@ class CronAgent
             'docket-cache/cronbot-runevent',
             function ($status) {
                 $results = $this->run_wpcron();
-
-                if (is_wp_error($results)) {
-                    return false;
+                if (!empty($results) && \is_array($results) && !empty($results['wpcron_return'])) {
+                    return true;
                 }
 
-                if (200 !== wp_remote_retrieve_response_code($results)) {
-                    return false;
-                }
-
-                return true;
+                return false;
             },
             PHP_INT_MAX
         );
@@ -79,7 +74,9 @@ class CronAgent
 
     private function site_url()
     {
-        return rtrim(network_site_url(), '\\/');
+        $scheme = $this->plugin->is_ssl() ? 'https' : null;
+
+        return rtrim(network_site_url('', $scheme), '\\/');
     }
 
     private function send_action($action, $is_hello = false)
@@ -106,7 +103,7 @@ class CronAgent
                 'status' => $action,
             ],
             'headers' => [
-                'REFERER' => $site_url,
+                'REFERER' => site_url(), // current site
                 'DOCKETID' => $site_id,
             ],
         ];
@@ -192,48 +189,101 @@ class CronAgent
         $this->plugin->close_exit(json_encode($response, JSON_UNESCAPED_SLASHES));
     }
 
-    private function run_wpcron()
+    private function get_wpcron_lock()
     {
-        $do_fetch = false;
-
-        if ($this->plugin->constans()->is_true('DISABLE_WP_CRON')
-              || $this->plugin->constans()->is_true('ALTERNATE_WP_CRON')
-              || class_exists('\\HM\\Cavalcade\\Plugin\\Job', false)
-              || class_exists('\\Automattic\\WP\\Cron_Control', false)) {
-            $do_fetch = true;
-        }
-
-        $wp_cron_url = network_site_url('wp-cron.php');
-
-        $results = [];
-
-        if ($do_fetch) {
-            $results = Crawler::fetch(
-                $wp_cron_url,
-                [
-                    'blocking' => true,
-                    'timeout' => 10,
-                ]
-            );
+        $value = 0;
+        if (wp_using_ext_object_cache()) {
+            $value = wp_cache_get('doing_cron', 'transient', true);
         } else {
-            $doing_wp_cron = sprintf('%.22F', microtime(true));
-            $url = add_query_arg('doing_wp_cron', $doing_wp_cron, $wp_cron_url);
-            $cron_request = apply_filters(
-                'cron_request',
-                [
-                    'url' => $url,
-                    'key' => $doing_wp_cron,
-                    'args' => [
-                        'timeout' => 10,
-                        'blocking' => true,
-                        'sslverify' => apply_filters('https_local_ssl_verify', false),
-                    ],
-                ]
-            );
-
-            $cron_request['args']['blocking'] = true;
-            $results = Crawler::post($cron_request['url'], $cron_request['args']);
+            $wpdb = $this->plugin->safe_wpdb();
+            if ($wpdb) {
+                $row = $wpdb->get_row($wpdb->prepare('SELECT option_value FROM `'.$wpdb->options.'` WHERE option_name = %s LIMIT 1', '_transient_doing_cron'));
+                if (\is_object($row)) {
+                    $value = $row->option_value;
+                }
+            }
         }
+
+        return $value;
+    }
+
+    private function run_wpcron($run_now = false)
+    {
+        $results = [
+            'wpcron_return' => 0,
+            'wpcron_msg' => '',
+        ];
+
+        if (false !== strpos($_SERVER['REQUEST_URI'], '/wp-cron.php') || isset($_GET['doing_wp_cron']) || $this->plugin->constans()->is_true('DOING_CRON')) {
+            $results['wpcron_return'] = 1;
+            $results['wpcron_msg'] = 'another process currently run';
+
+            return $results;
+        }
+
+        $crons = $run_now ? _get_cron_array() : wp_get_ready_cron_jobs();
+        if (empty($crons)) {
+            $results['wpcron_return'] = 1;
+            $results['wpcron_msg'] = 'no scheduled event ready to run';
+
+            return $results;
+        }
+
+        $gmt_time = microtime(true);
+        $doing_cron_transient = get_transient('doing_cron');
+
+        if ($doing_cron_transient && ($doing_cron_transient + 60 > $gmt_time)) {
+            $results['wpcron_return'] = 1;
+            $results['wpcron_msg'] = 'process locked';
+
+            return $results;
+        }
+
+        $doing_wp_cron = sprintf('%.22F', microtime(true));
+        $doing_cron_transient = $doing_wp_cron;
+        set_transient('doing_cron', $doing_wp_cron);
+
+        if ($doing_cron_transient !== $doing_wp_cron) {
+            $results['wpcron_return'] = 1;
+            $results['wpcron_msg'] = 'process locked';
+
+            return $results;
+        }
+
+        $run_ok = 0;
+        foreach ($crons as $timestamp => $cronhooks) {
+            if (!$run_now && $timestamp > $gmt_time) {
+                break;
+            }
+
+            foreach ($cronhooks as $hook => $keys) {
+                foreach ($keys as $k => $v) {
+                    $schedule = $v['schedule'];
+
+                    if ($schedule) {
+                        wp_reschedule_event($timestamp, $schedule, $hook, $v['args']);
+                    }
+
+                    wp_unschedule_event($timestamp, $hook, $v['args']);
+                    do_action_ref_array($hook, $v['args']);
+
+                    if ($this->get_wpcron_lock() !== $doing_wp_cron) {
+                        $results['wpcron_return'] = 0;
+                        $results['wpcron_msg'] = 'process timeout';
+
+                        return $results;
+                    }
+                }
+                ++$run_ok;
+            }
+        }
+
+        if ($this->get_wpcron_lock() === $doing_wp_cron) {
+            delete_transient('doing_cron');
+        }
+
+        $results['wpcron_return'] = 1;
+        $results['wpcron_msg'] = 'number of events: '.$run_ok;
 
         return $results;
     }
@@ -281,15 +331,7 @@ class CronAgent
         }
 
         $results = $this->run_wpcron();
-
-        if (is_wp_error($results)) {
-            $response['wpcron_return'] = 0;
-            $response['wpcron_error'] = $results->get_error_message();
-        } else {
-            $code = wp_remote_retrieve_response_code($results);
-            $response['wpcron_return'] = 200 === $code ? 1 : 0;
-            $response['wpcron_code'] = $code;
-        }
+        $response = array_merge($response, $results);
 
         wp_cache_set('receive_ping', time() + 30, 'docketcache-cron');
 

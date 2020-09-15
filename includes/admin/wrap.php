@@ -43,6 +43,8 @@ if ($this->do_preload) {
     echo $this->plugin->code_worker('flush');
 } elseif ($this->do_fetch) {
     echo $this->plugin->code_worker('fetch');
+} elseif ($this->plugin->constans()->is_true('DOCKET_CACHE_STATS')) {
+    echo $this->plugin->code_worker('countcachesize');
 }
 ?>
 <div class="wrap" id="docket-cache">
