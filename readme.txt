@@ -105,6 +105,14 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.08.08 =
+
+This is a hotfix release.
+
+- Fixed cache stats, do collecting data in background to avoid lagging.
+- Fixed cronbot, execute cron process directly without wp-cron.php, to avoid http connection error.
+- Added cache stats options, Enable/disable object cache stats at Overview page. 
+
 = 20.08.07 =
 
 Fix release.
@@ -154,20 +162,6 @@ This is an improved version based on previous releases.
 
 - Added WordPres Translation Caching
 - Added Optimization for Term Count Queries
-
-= 20.07.27 =
-
-This is an improved version based on previous releases.
-
-- Added delete expired transients before replace dropin
-- Fixed rarely condition, check wp function if exists before use at drop-in file to avoid fatal error, mostly if using apache mod_fcgid
-
-= 20.07.24 =
-
-This is an improved version based on previous releases.
-
-- Added basic configuration interface
-- improved cache read/write
 
 
 Kindly refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) for previous Changelog.
