@@ -36,16 +36,6 @@ if (1 === $this->info->status_code && isset($this->plugin->token)) {
 if (is_multisite() && is_network_admin()) {
     settings_errors('general');
 }
-
-if ($this->do_preload) {
-    echo $this->plugin->code_worker(['flush', 'preload']);
-} elseif ($this->do_flush) {
-    echo $this->plugin->code_worker('flush');
-} elseif ($this->do_fetch) {
-    echo $this->plugin->code_worker('fetch');
-} elseif ($this->plugin->constans()->is_true('DOCKET_CACHE_STATS')) {
-    echo $this->plugin->code_worker('countcachesize');
-}
 ?>
 <div class="wrap" id="docket-cache">
     <h1 class="screen-reader-text"><?php _e('Docket Cache', 'docket-cache'); ?></h1>
@@ -58,3 +48,11 @@ if ($this->do_preload) {
     </div>
 </div>
 <div id="docket-cache-overlay"></div>
+<?php
+if ($this->do_preload) :
+    echo $this->plugin->code_worker(['flush', 'preload']);
+elseif ($this->do_flush) :
+    echo $this->plugin->code_worker('flush');
+elseif ($this->do_fetch) :
+    echo $this->plugin->code_worker('fetch');
+endif;

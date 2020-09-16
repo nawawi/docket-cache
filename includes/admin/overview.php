@@ -14,17 +14,17 @@ namespace Nawawi\DocketCache;
 
 $has_proxy = false;
 $proxy_title = '';
-if ($this->plugin->is_behind_proxy()) {
+if ($this->plugin->is_behind_proxy()) :
     $has_proxy = true;
     $cf = $this->plugin->is_cloudflare();
-    if (false !== $cf) {
+    if (false !== $cf) :
         $proxy_title = 'Cloudflare';
         $proxy_text = esc_html($cf);
-    } else {
+    else :
         $proxy_title = esc_html__('Web Proxy', 'docket-cache');
         $proxy_text = $this->plugin->get_proxy_ip();
-    }
-}
+    endif;
+endif;
 ?>
 <div class="section overview">
     <?php if ($this->pageconfig_enable) : ?>
@@ -142,3 +142,7 @@ if ($this->plugin->is_behind_proxy()) {
     </div>
     <?php endif; ?>
 </div>
+<?php
+if ($this->plugin->constans()->is_true('DOCKET_CACHE_STATS')) :
+    echo $this->plugin->code_worker('countcachesize');
+endif;

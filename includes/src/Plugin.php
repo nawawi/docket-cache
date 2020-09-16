@@ -1065,22 +1065,7 @@ final class Plugin extends Bepart
         add_action(
             'docket-cache/preload',
             function () {
-                if (!wp_using_ext_object_cache() || $this->constans()->is_true('DOCKET_CACHE_WPCLI')) {
-                    return;
-                }
-
-                if ($this->constans()->is_false('DOCKET_CACHE_PRELOAD')) {
-                    add_action(
-                        'shutdown',
-                        function () {
-                            wp_load_alloptions();
-                            wp_count_comments(0);
-
-                            @Crawler::fetch_home();
-                        },
-                        PHP_INT_MAX
-                    );
-
+                if ($this->constans()->is_false('DOCKET_CACHE_PRELOAD') || $this->constans()->is_true('DOCKET_CACHE_WPCLI')) {
                     return;
                 }
 
@@ -1161,7 +1146,12 @@ final class Plugin extends Bepart
         add_action(
             'docket-cache/countcachesize',
             function () {
-                $this->cache_size($this->cache_path, false, true);
+                $locked = wp_cache_get('doing_countcachesize', 'docketcache', true);
+                if (empty($locked)) {
+                    wp_cache_set('doing_countcachesize', 1, 'docketcache', 120);
+                    $this->cache_size($this->cache_path, 0, true);
+                }
+                wp_cache_set('doing_countcachesize', 0, 'docketcache', 0);
             },
             PHP_INT_MAX
         );
@@ -1169,7 +1159,12 @@ final class Plugin extends Bepart
         add_action(
             'docket-cache/suspend_wp_options_autoload',
             function () {
-                $this->suspend_wp_options_autoload(null);
+                $locked = wp_cache_get('doing_suspend_wp_options_autoload', 'docketcache', true);
+                if (empty($locked)) {
+                    wp_cache_set('doing_suspend_wp_options_autoload', 1, 'docketcache', 120);
+                    $this->suspend_wp_options_autoload(null);
+                }
+                wp_cache_set('doing_suspend_wp_options_autoload', 0, 'docketcache', 0);
             },
             PHP_INT_MAX
         );

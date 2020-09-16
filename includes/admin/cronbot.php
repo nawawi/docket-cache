@@ -20,10 +20,10 @@ $is_connected = $this->is_cronbot_connected();
 $ping_last = esc_html__('Not Available', 'docket-cache');
 $ping_next = $ping_last;
 $ping_data = $this->ping_next();
-if (!empty($ping_data)) {
+if (!empty($ping_data)) :
     $ping_next = $ping_data['next'].' '.$utc_offset;
     $ping_last = $ping_data['last'].' '.$utc_offset;
-}
+endif;
 ?>
 <div class="section cronbot">
     <?php $this->tab_title(esc_html__('Cronbot', 'docket-cache')); ?>

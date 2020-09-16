@@ -40,21 +40,6 @@ final class Constans
         return \defined($name) && \constant($name);
     }
 
-    public function is_array($name)
-    {
-        return \defined($name) && \is_array($name) && !empty($name);
-    }
-
-    public function is_int($name)
-    {
-        return \defined($name) && \is_int($name);
-    }
-
-    public function is($name, $value)
-    {
-        return \defined($name) && $value === \constant($name);
-    }
-
     public function value($name)
     {
         $value = '';
@@ -63,6 +48,25 @@ final class Constans
         }
 
         return $value;
+    }
+
+    public function is_array($name)
+    {
+        $value = $this->value($name);
+
+        return !empty($value) && \is_array($value);
+    }
+
+    public function is_int($name)
+    {
+        $value = $this->value($name);
+
+        return !empty($value) && \is_int($value);
+    }
+
+    public function is($name, $value)
+    {
+        return \defined($name) && $value === \constant($name);
     }
 
     public function maybe_define($name, $value, $user_config = true)
@@ -105,8 +109,8 @@ final class Constans
         // cache file max size: 3MB, 1MB = 1048576 bytes (binary) = 1000000 bytes (decimal)
         $this->maybe_define('DOCKET_CACHE_MAXSIZE', 3145728);
 
-        // cache maxttl: 28 days = 28 x 86400
-        $this->maybe_define('DOCKET_CACHE_MAXTTL', 2419200);
+        // cache maxttl: 4 days = 28 x 86400
+        $this->maybe_define('DOCKET_CACHE_MAXTTL', 345600);
 
         // log on/off
         $this->maybe_define('DOCKET_CACHE_LOG', false);
