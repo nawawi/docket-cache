@@ -11,7 +11,7 @@
 /**
  * @wordpress-plugin
  * Plugin Name:         Docket Cache
- * Version:             20.08.08
+ * Version:             20.08.09
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * GitHub Plugin URI:   https://github.com/nawawi/docket-cache
  * Author:              Nawawi Jamili
