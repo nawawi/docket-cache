@@ -461,6 +461,8 @@ final class Plugin extends Bepart
         $this->suspend_wp_options_autoload(null);
 
         $this->dropino()->install(true);
+        $this->dropino()->set_activate();
+
         $this->unregister_cronjob();
         $this->wearechampion();
     }
@@ -1065,7 +1067,33 @@ final class Plugin extends Bepart
         add_action(
             'docket-cache/preload',
             function () {
-                if ($this->constans()->is_false('DOCKET_CACHE_PRELOAD') || $this->constans()->is_true('DOCKET_CACHE_WPCLI')) {
+                if ($this->constans()->is_true('DOCKET_CACHE_WPCLI')) {
+                    return;
+                }
+
+                // warmup: see after_delay
+                if ($this->constans()->is_false('DOCKET_CACHE_PRELOAD')) {
+                    if ($this->dropino()->is_activate()) {
+                        add_action(
+                            'shutdown',
+                            function () {
+                                @Crawler::warmup();
+                            },
+                            PHP_INT_MAX
+                        );
+
+                        return;
+                    }
+                    add_action(
+                        'shutdown',
+                        function () {
+                            wp_load_alloptions();
+                            wp_count_comments(0);
+                            @Crawler::fetch_home();
+                        },
+                        PHP_INT_MAX
+                    );
+
                     return;
                 }
 

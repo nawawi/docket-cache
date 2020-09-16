@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.08.09
+Stable tag: 20.08.10
 License: MIT
 License URI: ./license.txt
 
@@ -105,6 +105,12 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.08.10 =
+
+This is a hotfix release. Please do "Flush Cache" after/before installing this update. Thanks.
+
+- Fixed cache file, maxttl should by default set as 0
+
 = 20.08.09 =
 
 This is a hotfix release. Please do "Flush Cache" after/before installing this update. Thanks.

@@ -109,8 +109,8 @@ final class Constans
         // cache file max size: 3MB, 1MB = 1048576 bytes (binary) = 1000000 bytes (decimal)
         $this->maybe_define('DOCKET_CACHE_MAXSIZE', 3145728);
 
-        // cache maxttl: 4 days = 28 x 86400
-        $this->maybe_define('DOCKET_CACHE_MAXTTL', 345600);
+        // cache maxttl: 0
+        $this->maybe_define('DOCKET_CACHE_MAXTTL', 0);
 
         // log on/off
         $this->maybe_define('DOCKET_CACHE_LOG', false);
