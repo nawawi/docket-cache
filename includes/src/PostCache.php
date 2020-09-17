@@ -58,6 +58,7 @@ class PostCache
         add_filter('found_posts_query', [&$this, 'found_posts_query'], 10, 2);
         add_filter('found_posts', [&$this, 'found_posts'], 10, 2);
 
+        // https://developer.wordpress.org/reference/functions/clean_term_cache/
         add_action('clean_term_cache', [$this, 'flush_cache']);
         add_action('clean_post_cache', [$this, 'flush_cache']);
 

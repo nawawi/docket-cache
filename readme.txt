@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.08.10
+Stable tag: 20.08.11
 License: MIT
 License URI: ./license.txt
 
@@ -105,11 +105,26 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.08.11 =
+
+This is an enhanced version based on previous fix releases.
+
+- Fixed Object cache stats, counting using ajax worker and only run on the overview page.
+- Fixed Precaching, completely ignore query string and limit to 1000 urls.
+- Fixed Caching, maxttl always set to 0 to avoid unexpected behavior from others plugin.
+- Fixed Cronbot, bepart::is_ssl() check if site behind cloudflare/proxy.
+- Added Transient, Set the expiry time to 12 hours if expiration not set.
+- Added Garbage collector, scheduled to every 5 minutes instead of 30 minutes. Enable cronbot service if your site wp-cron not running active.
+- Added Object cache stats, enable/disable at configuration page.
+- Added DOCKET_CACHE_MAXFILES constant, attempting to reduce cache file if bigger than default 5000 files. Only numbers between 200 and 200000 are accepted.
+
+Please do "Flush Cache" after/before installing this update. Thanks.
+
 = 20.08.10 =
 
 This is a hotfix release. Please do "Flush Cache" after/before installing this update. Thanks.
 
-- Fixed cache file, maxttl should by default set as 0
+- Fixed cache file grow quickly if enable advanced post cache, maxttl should always set to 0.
 
 = 20.08.09 =
 

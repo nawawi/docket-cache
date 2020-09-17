@@ -14,7 +14,7 @@ namespace Nawawi\DocketCache;
 
 final class Crawler
 {
-    private static $version = '20.08.10';
+    private static $version = '20.08.11';
     public static $send_cookie = false;
 
     private static function default_args($param = [])
@@ -87,35 +87,5 @@ final class Crawler
         $args = self::default_args($param);
 
         return wp_remote_post($url, $args);
-    }
-
-    public static function warmup()
-    {
-        @self::fetch_home();
-        if (is_user_logged_in() && current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options')) {
-            $param['timeout'] = 3;
-            self::$send_cookie = true;
-
-            $preload_warm = [
-                'index.php',
-                'edit.php',
-                'post-new.php',
-                'upload.php',
-                'options-writing.php',
-                'post-new.php?post_type=page',
-                'edit-tags.php?taxonomy=category',
-                'edit-comments.php',
-                'options-discussion.php',
-                'media-new.php',
-            ];
-            foreach ($preload_warm as $path) {
-                $url = admin_url('/'.$path);
-                @self::fetch($url, $param);
-                usleep(750);
-            }
-        }
-        // put last
-        wp_load_alloptions();
-        wp_count_comments(0);
     }
 }

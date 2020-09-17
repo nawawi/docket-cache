@@ -96,7 +96,12 @@ endif;
                 </tr>
 
                 <tr>
-                    <th><?php esc_html_e('Cache Path', 'docket-cache'); ?></th>
+                    <th><?php esc_html_e('Cache Max Files', 'docket-cache'); ?></th>
+                    <td><?php echo $this->info->cache_maxfile; ?></td>
+                </tr>
+
+                <tr>
+                    <th class="border-b"><?php esc_html_e('Cache Path', 'docket-cache'); ?></th>
                     <td><?php echo $this->info->cache_path; ?></td>
                 </tr>
 

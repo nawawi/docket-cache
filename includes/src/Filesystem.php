@@ -422,10 +422,19 @@ class Filesystem
         $filestotal = 0;
 
         if ($this->is_docketcachedir($dir)) {
+            // hardmax
+            $maxfile = 300000;
+            $cnt = 0;
+
             foreach ($this->scanfiles($dir) as $object) {
                 $fx = $object->getPathName();
 
                 if (!$object->isFile() || 'file' !== $object->getType() || !$this->is_php($fx)) {
+                    continue;
+                }
+
+                if ($cnt >= $maxfile) {
+                    $this->unlink($fx, true);
                     continue;
                 }
 
@@ -448,6 +457,8 @@ class Filesystem
                 unset($data);
 
                 $fsizetotal += $fs;
+
+                ++$cnt;
             }
         }
 

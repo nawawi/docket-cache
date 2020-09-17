@@ -341,7 +341,11 @@ class CronAgent
 
     private function check_connection()
     {
-        if (wp_is_maintenance_mode() || $this->is_ping_request()) {
+        if (\function_exists('wp_is_maintenance_mode') && wp_is_maintenance_mode()) {
+            return;
+        }
+
+        if ($this->is_ping_request()) {
             return;
         }
 

@@ -189,6 +189,7 @@ final class Plugin extends Bepart
              'cache_size' => $this->normalize_size($cache_stats->size),
              'cache_path_real' => $this->cache_path,
              'cache_path' => $this->sanitize_rootpath($this->cache_path),
+             'cache_maxfile' => $this->get_cache_maxfile(),
              'log_file_real' => $this->constans()->value('DOCKET_CACHE_LOG_FILE'),
              'log_file' => $this->sanitize_rootpath($this->constans()->value('DOCKET_CACHE_LOG_FILE')),
              'log_enable' => $this->constans()->is_true('DOCKET_CACHE_LOG') ? 1 : 0,
@@ -270,6 +271,24 @@ final class Plugin extends Bepart
         }
 
         return (object) $arr;
+    }
+
+    public function get_cache_maxfile()
+    {
+        $max_files = $this->constans()->value('DOCKET_CACHE_MAXFILE');
+        if (empty($max_files) || !\is_int($max_files)) {
+            $max_files = 5000;
+        }
+
+        if ($max_files < 200) {
+            $max_files = 5000;
+        }
+
+        if ($max_files > 200000) {
+            $max_files = 200000;
+        }
+
+        return $max_files;
     }
 
     /**
@@ -459,10 +478,7 @@ final class Plugin extends Bepart
     {
         $this->flush_cache();
         $this->suspend_wp_options_autoload(null);
-
         $this->dropino()->install(true);
-        $this->dropino()->set_activate();
-
         $this->unregister_cronjob();
         $this->wearechampion();
     }
@@ -1073,17 +1089,6 @@ final class Plugin extends Bepart
 
                 // warmup: see after_delay
                 if ($this->constans()->is_false('DOCKET_CACHE_PRELOAD')) {
-                    if ($this->dropino()->is_activate()) {
-                        add_action(
-                            'shutdown',
-                            function () {
-                                @Crawler::warmup();
-                            },
-                            PHP_INT_MAX
-                        );
-
-                        return;
-                    }
                     add_action(
                         'shutdown',
                         function () {

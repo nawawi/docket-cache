@@ -32,7 +32,11 @@ class Event
                 $schedules = [
                     'halfhour' => [
                         'interval' => 30 * MINUTE_IN_SECONDS,
-                        'display' => esc_html__('Every 30 minutes', 'docket-cache'),
+                        'display' => esc_html__('Every 30 Minutes', 'docket-cache'),
+                    ],
+                    'docket_cache_gc_schedule' => [
+                        'interval' => 5 * MINUTE_IN_SECONDS,
+                        'display' => esc_html__('Every 5 Minutes', 'docket-cache'),
                     ],
                     'monthly' => [
                         'interval' => MONTH_IN_SECONDS,
@@ -49,10 +53,16 @@ class Event
             function () {
                 // gc
                 if ($this->plugin->constans()->is_true('DOCKET_CACHE_GC')) {
+                    // reset from 30 to 5
+                    $check = wp_get_scheduled_event('docket_cache_gc');
+                    if (\is_object($check) && 'halfhour' === $check->schedule) {
+                        wp_clear_scheduled_hook('docket_cache_gc');
+                    }
+
                     add_action('docket_cache_gc', [$this, 'garbage_collector']);
 
                     if (!wp_next_scheduled('docket_cache_gc')) {
-                        wp_schedule_event(time(), 'halfhour', 'docket_cache_gc');
+                        wp_schedule_event(time(), 'docket_cache_gc_schedule', 'docket_cache_gc');
                     }
                 } else {
                     if (wp_get_schedule('docket_cache_gc')) {
@@ -121,12 +131,22 @@ class Event
      */
     public function garbage_collector()
     {
+        $maxfile = $this->plugin->get_cache_maxfile();
+        $maxfile = $maxfile - 50;
+
         if ($this->plugin->is_docketcachedir($this->plugin->cache_path)) {
             clearstatcache();
+            $cnt = 0;
             foreach ($this->plugin->scanfiles($this->plugin->cache_path) as $object) {
                 $fx = $object->getPathName();
 
                 if (!$object->isFile() || 'file' !== $object->getType() || !$this->plugin->is_php($fx)) {
+                    continue;
+                }
+
+                if ($cnt >= $maxfile) {
+                    $this->plugin->unlink($fx, true);
+                    --$cnt;
                     continue;
                 }
 
@@ -136,6 +156,7 @@ class Event
 
                 if ($fm >= filemtime($fx) && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
                     $this->plugin->unlink($fx, true);
+                    --$cnt;
                     continue;
                 }
 
@@ -143,11 +164,15 @@ class Event
                 if (false !== $data && !empty($data['timeout']) && $fm >= (int) $data['timeout']) {
                     $this->plugin->unlink($fx, false);
                     unset($data);
+                    --$cnt;
                     continue;
                 }
                 unset($data);
+
+                ++$cnt;
             }
         }
+
         $this->plugin->dropino()->delay_expire();
     }
 

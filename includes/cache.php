@@ -710,7 +710,7 @@ class WP_Object_Cache
         $this->cache[$group][$key] = $data;
 
         if (!$this->is_non_persistent_groups($group) && !$this->is_non_persistent_keys($key) || $this->is_filtered_groups($group, $key)) {
-            $expire = $this->maybe_expire($expire);
+            $expire = $this->maybe_expire($group, $expire);
             $this->dc_save($key, $this->cache[$group][$key], $group, $expire);
         }
 
@@ -894,11 +894,17 @@ class WP_Object_Cache
         return @preg_replace('@^\d+:@', '', $key, 1);
     }
 
-    private function maybe_expire($expire = 0)
+    private function maybe_expire($group, $expire = 0)
     {
+        if (empty($expire)) {
+            $expire = 0;
+        }
+
         $expire = $this->fs()->sanitize_second($expire);
-        if (0 !== $this->cache_maxttl && 0 === $expire) {
-            $expire = $this->cache_maxttl;
+
+        // if transient and without expiry, set to 12 hours in our cache
+        if (0 === $expire && \in_array($group, ['site-transient', 'transient'])) {
+            $expire = 43200; // 12h
         }
 
         return $expire;
@@ -1061,7 +1067,7 @@ class WP_Object_Cache
         }
 
         if (!isset($data['timeout'])) {
-            $data['timeout'] = $this->maybe_expire(0);
+            $data['timeout'] = 0;
         } elseif ($data['timeout'] > 0 && time() >= $data['timeout']) {
             $this->dc_log('exp', $this->get_item_hash($file), $group.':'.$key);
             $this->fs()->unlink($file, false);
@@ -1124,11 +1130,6 @@ class WP_Object_Cache
             @$this->fs()->put($this->cache_path.'index.php', $this->fs()->code_stub(time()));
         }
 
-        // if transient and without expiry, set to 12 hours in our cache
-        if (\in_array($group, ['site-transient', 'transient']) && 0 === $expire) {
-            $expire = 'update_plugins' === $key ? 21600 : 43200; // 21600 = 6h, 43200 = 12h
-        }
-
         $file = $this->get_file_path($key, $group);
 
         $timeout = ($expire > 0 ? time() + $expire : 0);
@@ -1162,7 +1163,6 @@ class WP_Object_Cache
         }
 
         $file = $this->get_file_path($key, $group);
-        $meta['timeout'] = $this->maybe_expire($meta['timeout']);
         $meta['data'] = $data;
 
         if (true === $this->dc_code($file, $meta)) {
@@ -1252,10 +1252,13 @@ class WP_Object_Cache
             return;
         }
 
-        // remove query
-        $req_uri = @preg_replace('@\?.*@', '', $_SERVER['REQUEST_URI']);
-        $req_key = json_encode($req_uri);
-        $req_key = $this->item_hash($req_key);
+        // abort
+        if (!empty($_SERVER['QUERY_STRING'])) {
+            return;
+        }
+
+        $req_uri = json_encode($_SERVER['REQUEST_URI']);
+        $req_key = $this->item_hash($req_uri);
 
         $this->dc_precache_get($req_key);
 

@@ -34,9 +34,6 @@ final class Dropino extends Bepart
         $dt['halt'] = WP_CONTENT_DIR.'/.object-cache-delay.txt';
         $dt['after'] = WP_CONTENT_DIR.'/.object-cache-after-delay.txt';
 
-        // for warmup
-        $dt['activate'] = WP_CONTENT_DIR.'/.docket-cache-activate.txt';
-
         return (object) $dt;
     }
 
@@ -141,25 +138,6 @@ final class Dropino extends Bepart
         }
 
         return false;
-    }
-
-    /**
-     * set_activate.
-     */
-    public function set_activate()
-    {
-        $file_activate = $this->resc()->activate;
-        $this->put($file_activate, time());
-    }
-
-    /**
-     * is_activate.
-     */
-    public function is_activate()
-    {
-        $file_activate = $this->resc()->activate;
-
-        return @is_file($file_activate) && @unlink($file_activate);
     }
 
     /**
