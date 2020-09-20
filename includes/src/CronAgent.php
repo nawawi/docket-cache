@@ -12,7 +12,7 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 
-class CronAgent
+final class CronAgent
 {
     private $backend = 'https://cronbot.docketcache.com';
     private $plugin;
@@ -44,7 +44,7 @@ class CronAgent
         );
 
         add_filter(
-            'docket-cache/cronbot-active',
+            'docketcache/cronbot-active',
             function ($status) {
                 $status = $status ? 'on' : 'off';
 
@@ -54,10 +54,12 @@ class CronAgent
         );
 
         add_filter(
-            'docket-cache/cronbot-runevent',
-            function ($status) {
-                $results = $this->run_wpcron();
+            'docketcache/cronbot-runevent',
+            function ($runnow) {
+                $results = $this->run_wpcron($runnow);
                 if (!empty($results) && \is_array($results) && !empty($results['wpcron_return'])) {
+                    set_transient('docketcache/cronbotrun', $results, 10);
+
                     return true;
                 }
 
@@ -74,9 +76,27 @@ class CronAgent
 
     private function site_url()
     {
-        $scheme = $this->plugin->is_ssl() ? 'https' : null;
+        $site_url = site_url();
 
-        return rtrim(network_site_url('', $scheme), '\\/');
+        if (is_multisite() && !is_main_site()) {
+            $site_id = get_main_site_id();
+            if (!empty($site_id)) {
+                $site_url = get_site_url($site_id);
+            }
+        }
+
+        if ('https://' !== substr($site_url, 0, 8) && $this->plugin->is_ssl()) {
+            $site_url = preg_replace('@^(https?:)?//@', 'https://', $site_url);
+        }
+
+        return rtrim($site_url, '/\\');
+    }
+
+    private function site_meta()
+    {
+        $meta = (is_multisite() ? 1 : 0).','.$this->plugin->version().','.$GLOBALS['wp_version'];
+
+        return str_replace('.', '', $meta);
     }
 
     private function send_action($action, $is_hello = false)
@@ -99,7 +119,7 @@ class CronAgent
                 'timestamp' => date('Y-m-d H:i:s T'),
                 'timezone' => wp_timezone_string(),
                 'site' => $this->plugin->base64_encode_url($site_body),
-                'sitem' => is_multisite() ? 1 : 0,
+                'meta' => $this->site_meta(),
                 'status' => $action,
             ],
             'headers' => [
@@ -197,7 +217,7 @@ class CronAgent
         } else {
             $wpdb = $this->plugin->safe_wpdb();
             if ($wpdb) {
-                $row = $wpdb->get_row($wpdb->prepare('SELECT option_value FROM `'.$wpdb->options.'` WHERE option_name = %s LIMIT 1', '_transient_doing_cron'));
+                $row = $wpdb->get_row($wpdb->prepare('SELECT option_value FROM `{$wpdb->options}` WHERE option_name = %s LIMIT 1', '_transient_doing_cron'));
                 if (\is_object($row)) {
                     $value = $row->option_value;
                 }
@@ -216,7 +236,7 @@ class CronAgent
 
         if (false !== strpos($_SERVER['REQUEST_URI'], '/wp-cron.php') || isset($_GET['doing_wp_cron']) || $this->plugin->constans()->is_true('DOING_CRON')) {
             $results['wpcron_return'] = 1;
-            $results['wpcron_msg'] = 'another process currently run';
+            $results['wpcron_msg'] = 'Another process is currently running WP-CRON';
 
             return $results;
         }
@@ -224,7 +244,7 @@ class CronAgent
         $crons = $run_now ? _get_cron_array() : wp_get_ready_cron_jobs();
         if (empty($crons)) {
             $results['wpcron_return'] = 1;
-            $results['wpcron_msg'] = 'no scheduled event ready to run';
+            $results['wpcron_msg'] = 'No scheduled event ready to run';
 
             return $results;
         }
@@ -234,7 +254,7 @@ class CronAgent
 
         if ($doing_cron_transient && ($doing_cron_transient + 60 > $gmt_time)) {
             $results['wpcron_return'] = 1;
-            $results['wpcron_msg'] = 'process locked';
+            $results['wpcron_msg'] = 'Another process is currently running WP-CRON';
 
             return $results;
         }
@@ -245,18 +265,23 @@ class CronAgent
 
         if ($doing_cron_transient !== $doing_wp_cron) {
             $results['wpcron_return'] = 1;
-            $results['wpcron_msg'] = 'process locked';
+            $results['wpcron_msg'] = 'Another process is currently running WP-CRON';
 
             return $results;
         }
 
-        $run_ok = 0;
+        $run_event = 0;
         foreach ($crons as $timestamp => $cronhooks) {
             if (!$run_now && $timestamp > $gmt_time) {
                 break;
             }
 
             foreach ($cronhooks as $hook => $keys) {
+                if (!has_action($hook)) {
+                    wp_clear_scheduled_hook($hook);
+                    continue;
+                }
+
                 foreach ($keys as $k => $v) {
                     $schedule = $v['schedule'];
 
@@ -265,16 +290,25 @@ class CronAgent
                     }
 
                     wp_unschedule_event($timestamp, $hook, $v['args']);
-                    do_action_ref_array($hook, $v['args']);
+
+                    // prevent fatal error if hook has error
+                    try {
+                        do_action_ref_array($hook, $v['args']);
+                        ++$run_event;
+                    } catch (\Exception $e) {
+                        $results['wpcron_error'][$hook] = $e->getMessage();
+                        wp_clear_scheduled_hook($hook);
+                        --$run_event;
+                    }
 
                     if ($this->get_wpcron_lock() !== $doing_wp_cron) {
-                        $results['wpcron_return'] = 0;
-                        $results['wpcron_msg'] = 'process timeout';
+                        $results['wpcron_return'] = 2;
+                        $results['wpcron_msg'] = 'WP-CRON Timeout';
+                        $results['wpcron_event'] = $run_event;
 
                         return $results;
                     }
                 }
-                ++$run_ok;
             }
         }
 
@@ -283,7 +317,7 @@ class CronAgent
         }
 
         $results['wpcron_return'] = 1;
-        $results['wpcron_msg'] = 'number of events: '.$run_ok;
+        $results['wpcron_event'] = $run_event;
 
         return $results;
     }
@@ -313,6 +347,7 @@ class CronAgent
             'timestamp' => date('Y-m-d H:i:s T'),
             'timezone' => wp_timezone_string(),
             'site' => $this->site_url(),
+            'meta' => $this->site_meta(),
             'status' => 1,
         ];
 
@@ -322,18 +357,19 @@ class CronAgent
             $this->close_ping($response);
         }
 
-        $locked = wp_cache_get('receive_ping', 'docketcache-cron');
-        if (!empty($locked) && (int) $locked > time()) {
-            $response['msg'] = 'already received. try again in few minutes';
-            $this->close_ping($response);
+        if ($this->plugin->canopt()->locked('receive_ping', $locked)) {
+            if (!empty($locked) && (int) $locked > time()) {
+                $response['msg'] = 'Already received. Try again in a few minutes';
+                $this->close_ping($response);
 
-            return;
+                return;
+            }
         }
 
         $results = $this->run_wpcron();
         $response = array_merge($response, $results);
 
-        wp_cache_set('receive_ping', time() + 30, 'docketcache-cron');
+        $this->plugin->canopt()->setlock('receive_ping', time() + 60);
 
         $cache[$uip] = $response;
         $this->close_ping($cache[$uip]);
@@ -349,12 +385,11 @@ class CronAgent
             return;
         }
 
-        if ($this->plugin->constans()->is_true('DOCKET_CACHE_DOING_FLUSH') || $this->plugin->constans()->is_true('WP_IMPORTING')) {
+        if ($this->plugin->constans()->is_true('WP_IMPORTING')) {
             return;
         }
 
-        $locked = wp_cache_get('check_connection', 'docketcache-cron');
-        if (!empty($locked) && (int) $locked > time()) {
+        if ($this->plugin->canopt()->lockexp('check_connection')) {
             return;
         }
 
@@ -371,7 +406,7 @@ class CronAgent
             if (\is_array($pingdata) && !empty($pingdata['timestamp'])) {
                 $timestamp = strtotime('+90 minutes', strtotime($pingdata['timestamp']));
                 if ($timestamp > 0 && time() > $timestamp) {
-                    wp_cache_set('check_connection', time() + 30, 'docketcache-cron');
+                    $this->plugin->canopt()->setlock('check_connection', time() + 30);
                     $this->send_action('on', true);
                 }
             }

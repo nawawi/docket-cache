@@ -12,7 +12,7 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 
-class Event
+final class Event
 {
     private $plugin;
 
@@ -26,6 +26,9 @@ class Event
      */
     public function register()
     {
+        // global
+        add_filter('docketcache/garbage-collector', [$this, 'garbage_collector']);
+
         add_filter(
             'cron_schedules',
             function ($schedules) {
@@ -34,7 +37,7 @@ class Event
                         'interval' => 30 * MINUTE_IN_SECONDS,
                         'display' => esc_html__('Every 30 Minutes', 'docket-cache'),
                     ],
-                    'docket_cache_gc_schedule' => [
+                    'docketcache_gc_schedule' => [
                         'interval' => 5 * MINUTE_IN_SECONDS,
                         'display' => esc_html__('Every 5 Minutes', 'docket-cache'),
                     ],
@@ -51,29 +54,30 @@ class Event
         add_action(
             'plugin_loaded',
             function () {
+                // 19092020: standardize. rename hooks
+                foreach (['docket_cache_gc', 'docket_cache_optimizedb', 'docket_cache_monitor'] as $hx) {
+                    if (false !== wp_get_scheduled_event($hx)) {
+                        wp_clear_scheduled_hook($hx);
+                    }
+                }
+
                 // gc
                 if ($this->plugin->constans()->is_true('DOCKET_CACHE_GC')) {
-                    // reset from 30 to 5
-                    $check = wp_get_scheduled_event('docket_cache_gc');
-                    if (\is_object($check) && 'halfhour' === $check->schedule) {
-                        wp_clear_scheduled_hook('docket_cache_gc');
-                    }
+                    add_action('docketcache_gc', [$this, 'garbage_collector']);
 
-                    add_action('docket_cache_gc', [$this, 'garbage_collector']);
-
-                    if (!wp_next_scheduled('docket_cache_gc')) {
-                        wp_schedule_event(time(), 'docket_cache_gc_schedule', 'docket_cache_gc');
+                    if (!wp_next_scheduled('docketcache_gc')) {
+                        wp_schedule_event(time(), 'docketcache_gc_schedule', 'docketcache_gc');
                     }
                 } else {
-                    if (wp_get_schedule('docket_cache_gc')) {
-                        wp_clear_scheduled_hook('docket_cache_gc');
+                    if (wp_get_schedule('docketcache_gc')) {
+                        wp_clear_scheduled_hook('docketcache_gc');
                     }
                 }
 
                 // optimize db
                 $cronoptmzdb = $this->plugin->constans()->value('DOCKET_CACHE_CRONOPTMZDB');
                 if (!empty($cronoptmzdb) && 'never' !== $cronoptmzdb) {
-                    add_action('docket_cache_optimizedb', [$this, 'optimizedb']);
+                    add_action('docketcache_optimizedb', [$this, 'optimizedb']);
 
                     $recurrence = 'weekly';
                     switch ($cronoptmzdb) {
@@ -88,19 +92,19 @@ class Event
                             break;
                     }
 
-                    if (!wp_next_scheduled('docket_cache_optimizedb')) {
-                        wp_schedule_event(time(), $recurrence, 'docket_cache_optimizedb');
+                    if (!wp_next_scheduled('docketcache_optimizedb')) {
+                        wp_schedule_event(time(), $recurrence, 'docketcache_optimizedb');
                     }
                 } else {
-                    if (wp_get_schedule('docket_cache_optimizedb')) {
-                        wp_clear_scheduled_hook('docket_cache_optimizedb');
+                    if (wp_get_schedule('docketcache_optimizedb')) {
+                        wp_clear_scheduled_hook('docketcache_optimizedb');
                     }
                 }
 
                 // monitor
-                add_action('docket_cache_monitor', [$this, 'monitor']);
-                if (!wp_next_scheduled('docket_cache_monitor')) {
-                    wp_schedule_event(time(), 'hourly', 'docket_cache_monitor');
+                add_action('docketcache_watchproc', [$this, 'watchproc']);
+                if (!wp_next_scheduled('docketcache_watchproc')) {
+                    wp_schedule_event(time(), 'hourly', 'docketcache_watchproc');
                 }
             }
         );
@@ -111,7 +115,7 @@ class Event
      */
     public function unregister()
     {
-        foreach (['docket_cache_gc', 'docket_cache_optimizedb', 'docket_cache_monitor'] as $hx) {
+        foreach (['docketcache_gc', 'docketcache_optimizedb', 'docketcache_monitor'] as $hx) {
             wp_clear_scheduled_hook($hx);
         }
     }
@@ -119,61 +123,139 @@ class Event
     /**
      * monitor.
      */
-    public function monitor()
+    public function watchproc()
     {
+        if ($this->plugin->canopt()->lockexp('watchproc')) {
+            return false;
+        }
+        $this->plugin->canopt()->setlock('watchproc', time() + 3600);
+
         $this->clear_unknown_cron();
         $this->delete_expired_transients_db();
-        do_action('docket-cache/suspend_wp_options_autoload');
+        if (has_action('docketcache/suspend_wp_options_autoload')) {
+            do_action('docketcache/suspend_wp_options_autoload');
+        }
+
+        $this->plugin->get_cache_stats();
+        $this->plugin->canopt()->setlock('watchproc', 0);
+
+        return true;
     }
 
     /**
      * garbage_collector.
      */
-    public function garbage_collector()
+    public function garbage_collector($is_filter = false)
     {
         $maxfile = $this->plugin->get_cache_maxfile();
-        $maxfile = $maxfile - 50;
+        $maxfile = $maxfile - 100;
+
+        $maxttl = $this->plugin->get_cache_maxttl();
+        if (!empty($maxttl)) {
+            $maxttl = time() - $maxttl;
+        }
+
+        $maxsizedisk = $this->plugin->get_cache_maxsize_disk();
+        if (!empty($maxsizedisk)) {
+            $maxsizedisk = $maxsizedisk - 1048576;
+        }
+
+        $collect = (object) [
+            'maxttl' => $maxttl,
+            'maxttl_h' => date('Y-m-d H:i:s T', $maxttl),
+            'maxttl_c' => 0,
+            'maxfile' => $maxfile,
+            'maxfile_c' => 0,
+            'total' => 0,
+            'clean' => 0,
+            'expired' => 0,
+            'ignore' => 0,
+        ];
+
+        if ($this->plugin->canopt()->lockexp('garbage_collector')) {
+            if ($is_filter) {
+                return $collect;
+            }
+
+            return false;
+        }
+
+        $this->plugin->canopt()->setlock('garbage_collector', time() + 3600);
 
         if ($this->plugin->is_docketcachedir($this->plugin->cache_path)) {
             clearstatcache();
+            $bytestotal = 0;
             $cnt = 0;
             foreach ($this->plugin->scanfiles($this->plugin->cache_path) as $object) {
                 $fx = $object->getPathName();
 
                 if (!$object->isFile() || 'file' !== $object->getType() || !$this->plugin->is_php($fx)) {
-                    continue;
-                }
-
-                if ($cnt >= $maxfile) {
-                    $this->plugin->unlink($fx, true);
-                    --$cnt;
+                    ++$collect->ignore;
                     continue;
                 }
 
                 $fn = $object->getFileName();
                 $fs = $object->getSize();
                 $fm = time() + 120;
+                $ft = filemtime($fx);
 
-                if ($fm >= filemtime($fx) && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
+                if ($maxttl > 0 && $ft < $maxttl) {
                     $this->plugin->unlink($fx, true);
                     --$cnt;
+                    ++$collect->clean;
+                    ++$collect->maxttl_c;
+                    continue;
+                }
+
+                if ($fm >= $ft && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
+                    $this->plugin->unlink($fx, true);
+                    --$cnt;
+                    ++$collect->clean;
                     continue;
                 }
 
                 $data = $this->plugin->cache_get($fx);
-                if (false !== $data && !empty($data['timeout']) && $fm >= (int) $data['timeout']) {
-                    $this->plugin->unlink($fx, false);
-                    unset($data);
-                    --$cnt;
-                    continue;
+                if (false !== $data) {
+                    if (!empty($data['timeout']) && $fm >= (int) $data['timeout']) {
+                        $this->plugin->unlink($fx, false);
+                        unset($data);
+                        --$cnt;
+                        ++$collect->clean;
+                        ++$collect->expired;
+                        continue;
+                    }
+
+                    $bytestotal += \strlen(serialize($data));
+                    if ((int) $maxsizedisk > 1048576 && $bytestotal > $maxsizedisk) {
+                        $this->plugin->unlink($fx, false);
+                        unset($data);
+                        --$cnt;
+                        ++$collect->clean;
+                    }
                 }
                 unset($data);
 
+                if ($cnt >= $maxfile) {
+                    $this->plugin->unlink($fx, true);
+                    --$cnt;
+                    ++$collect->clean;
+                    ++$collect->maxfile_c;
+                    continue;
+                }
+
                 ++$cnt;
+                ++$collect->total;
             }
         }
 
+        $this->plugin->canopt()->setlock('garbage_collector', 0);
         $this->plugin->dropino()->delay_expire();
+
+        if ($is_filter) {
+            return $collect;
+        }
+
+        return true;
     }
 
     /**
@@ -185,6 +267,12 @@ class Event
         if (!$wpdb) {
             return false;
         }
+
+        if ($this->plugin->canopt()->lockexp('optimizedb')) {
+            return false;
+        }
+
+        $this->plugin->canopt()->setlock('optimizedb', time() + 3600);
 
         $suppress = $wpdb->suppress_errors(true);
         $this->delete_expired_transients_db();
@@ -199,6 +287,8 @@ class Event
         }
 
         $wpdb->suppress_errors($suppress);
+
+        $this->plugin->canopt()->setlock('optimizedb', 0);
 
         return true;
     }

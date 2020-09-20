@@ -19,9 +19,7 @@ class Bepart extends Filesystem
      */
     public function fastcgi_close()
     {
-        if ((\PHP_SAPI === 'fpm-fcgi')
-            && \function_exists('fastcgi_finish_request')) {
-            @session_write_close();
+        if (\function_exists('fastcgi_finish_request')) {
             @fastcgi_finish_request();
         }
     }

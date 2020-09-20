@@ -57,7 +57,7 @@ namespace Nawawi\DocketCache;
                 <strong><?php esc_html_e('CRONBOT', 'docket-cache'); ?></strong><br class="break">
                 <?php
                     /* translators: %s: external scheduler */
-                    printf(esc_html__('The Cronbot is an %s that pings your website every hour in order to keep WordPress Cron running active. Only site Timezone and URL are involved when enabling this service.', 'docket-cache'), '<a href="https://cronbot.docketcache.com" rel="noopener" target="new">external scheduler</a>');
+                    printf(esc_html__('The Cronbot is an %s that pings your website every hour in order to keep WordPress Cron running active. Only site Timezone, URL and version are involved when enabling this service.', 'docket-cache'), '<a href="https://cronbot.docketcache.com" rel="noopener" target="new">external scheduler</a>');
                 ?>
             </p>
             <hr>

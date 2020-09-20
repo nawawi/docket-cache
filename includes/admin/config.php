@@ -32,7 +32,7 @@ namespace Nawawi\DocketCache;
                 </tr>
                 <?php if (DOCKET_CACHE_LOG) : ?>
                 <tr>
-                    <th class="border-b"><?php esc_html_e('Cache Log Time Format', 'docket-cache'); ?></th>
+                    <th class="border-b"><?php esc_html_e('Cache Log View In', 'docket-cache'); ?></th>
                     <td>
                         <?php
                         echo $this->config_select_set(

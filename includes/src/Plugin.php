@@ -82,6 +82,9 @@ final class Plugin extends Bepart
         $this->register_init();
     }
 
+    /**
+     * dropino.
+     */
     public function dropino()
     {
         static $inst;
@@ -92,6 +95,9 @@ final class Plugin extends Bepart
         return $inst;
     }
 
+    /**
+     * canopt.
+     */
     public function canopt()
     {
         static $inst;
@@ -102,6 +108,9 @@ final class Plugin extends Bepart
         return $inst;
     }
 
+    /**
+     * constans.
+     */
     public function constans()
     {
         static $inst;
@@ -110,6 +119,22 @@ final class Plugin extends Bepart
         }
 
         return $inst;
+    }
+
+    /**
+     * get_version.
+     */
+    public function version()
+    {
+        static $version = false;
+
+        if (!empty($version)) {
+            return $version;
+        }
+
+        $version = $this->plugin_meta($this->file)['Version'];
+
+        return $version;
     }
 
     /**
@@ -129,21 +154,8 @@ final class Plugin extends Bepart
              1 => esc_html__('Yes', 'docket-cache'),
          ];
 
-        $cache_stats = (object) [
-             'timeout' => 0,
-             'size' => 0,
-             'filesize' => 0,
-             'files' => 0,
-         ];
-
-        $force_stats = false;
-        if ($this->constans()->is_true('DOCKET_CACHE_WPCLI')) {
-            $force_stats = true;
-        }
-
-        if ($this->constans()->is_true('DOCKET_CACHE_STATS')) {
-            $cache_stats = $this->cache_size($this->cache_path, true, $force_stats);
-        }
+        $force_stats = $this->constans()->is_true('DOCKET_CACHE_WPCLI');
+        $cache_stats = $this->get_cache_stats($force_stats);
 
         $status = $this->get_status();
         $status_text_stats = '';
@@ -190,6 +202,7 @@ final class Plugin extends Bepart
              'cache_path_real' => $this->cache_path,
              'cache_path' => $this->sanitize_rootpath($this->cache_path),
              'cache_maxfile' => $this->get_cache_maxfile(),
+             'cache_maxsize_disk' => $this->normalize_size($this->get_cache_maxsize_disk()),
              'log_file_real' => $this->constans()->value('DOCKET_CACHE_LOG_FILE'),
              'log_file' => $this->sanitize_rootpath($this->constans()->value('DOCKET_CACHE_LOG_FILE')),
              'log_enable' => $this->constans()->is_true('DOCKET_CACHE_LOG') ? 1 : 0,
@@ -273,22 +286,87 @@ final class Plugin extends Bepart
         return (object) $arr;
     }
 
+    /**
+     * get_cache_maxfile.
+     */
     public function get_cache_maxfile()
     {
-        $max_files = $this->constans()->value('DOCKET_CACHE_MAXFILE');
-        if (empty($max_files) || !\is_int($max_files)) {
-            $max_files = 5000;
+        $maxfile = $this->constans()->value('DOCKET_CACHE_MAXFILE');
+        if (empty($maxfile) || !\is_int($maxfile)) {
+            $maxfile = 5000;
         }
 
-        if ($max_files < 200) {
-            $max_files = 5000;
+        if ($maxfile < 200) {
+            $maxfile = 5000;
+        } elseif ($maxfile > 200000) {
+            $maxfile = 200000;
         }
 
-        if ($max_files > 200000) {
-            $max_files = 200000;
+        return $maxfile;
+    }
+
+    /**
+     * get_cache_maxttl.
+     */
+    public function get_cache_maxttl()
+    {
+        $maxttl = $this->constans()->value('DOCKET_CACHE_MAXTTL');
+        $maxttl = $this->sanitize_second($maxttl);
+
+        // 86400 = 1d
+        // 172800 = 2d
+        // 2419200 = 28d
+        if ($maxttl < 86400) {
+            $maxttl = 172800;
+        } elseif ($maxttl > 2419200) {
+            $maxttl = 2419200;
         }
 
-        return $max_files;
+        return $maxttl;
+    }
+
+    /**
+     * get_cache_maxsize_disk.
+     */
+    public function get_cache_maxsize_disk()
+    {
+        $maxsizedisk = $this->constans()->value('DOCKET_CACHE_MAXSIZE_DISK');
+        if (empty($maxsizedisk) || !\is_int($maxsizedisk)) {
+            $maxsizedisk = 524288000; // 500MB
+        }
+
+        if ($maxsizedisk < 104857600) {
+            $maxsizedisk = 104857600;
+        }
+
+        return $maxsizedisk;
+    }
+
+    /**
+     * get_cache_stats.
+     */
+    public function get_cache_stats($force = false)
+    {
+        $cache_stats = false;
+
+        if ($this->constans()->is_true('DOCKET_CACHE_STATS')) {
+            if ($force) {
+                $cache_stats = $this->cache_size($this->cache_path);
+                $this->canopt()->save_part($cache_stats, 'cachestats');
+            } else {
+                $cache_stats = $this->canopt()->get_part('cachestats');
+            }
+        }
+
+        if (empty($cache_stats) || !\is_array($cache_stats)) {
+            $cache_stats = [
+                'size' => 0,
+                'filesize' => 0,
+                'files' => 0,
+            ];
+        }
+
+        return (object) $cache_stats;
     }
 
     /**
@@ -310,7 +388,7 @@ final class Plugin extends Bepart
      */
     public function flush_cache($cleanup = false)
     {
-        $this->constans()->maybe_define('DOCKET_CACHE_DOING_FLUSH', true);
+        $this->canopt()->clear_part('cachestats');
         $this->dropino()->delay();
         $ret = $this->cachedir_flush($this->cache_path, $cleanup);
         if (false === $ret) {
@@ -331,6 +409,8 @@ final class Plugin extends Bepart
             $fx = sanitize_text_field($_GET['idxv']);
             $file = $this->cache_path.$fx.'.php';
             if (@is_file($file)) {
+                $this->canopt()->clear_part('cachestats');
+
                 return $this->unlink($file, true);
             }
         }
@@ -585,7 +665,7 @@ final class Plugin extends Bepart
         if (\defined('DOCKET_CACHE_PRIVATEREPO') && class_exists('Nawawi\\DocketCache\\PrivateRepo')) {
             $repo = $this->constans()->value('DOCKET_CACHE_PRIVATEREPO');
             if (!empty($repo)) {
-                new PrivateRepo($this->slug, $this->hook, $this->plugin_meta($this->file)['Version'], $this->constans()->value('DOCKET_CACHE_PRIVATEREPO'));
+                new PrivateRepo($this->slug, $this->hook, $this->version(), $this->constans()->value('DOCKET_CACHE_PRIVATEREPO'));
             }
         }
 
@@ -610,6 +690,7 @@ final class Plugin extends Bepart
              'docket-connect-cronbot',
              'docket-disconnect-cronbot',
              'docket-runevent-cronbot',
+             'docket-runeventnow-cronbot',
          ];
 
         foreach ($this->canopt()->keys() as $key) {
@@ -710,7 +791,7 @@ final class Plugin extends Bepart
             function ($hook) {
                 $is_debug = $this->constans()->is_true('WP_DEBUG');
                 $plugin_url = plugin_dir_url($this->file);
-                $version = str_replace('.', '', $this->plugin_meta($this->file)['Version']).'x'.($is_debug ? date('his') : date('d'));
+                $version = str_replace('.', '', $this->version()).'x'.($is_debug ? date('his') : date('d'));
                 wp_enqueue_script($this->slug.'-worker', $plugin_url.'includes/admin/worker.js', ['jquery'], $version, false);
                 wp_localize_script(
                     $this->slug.'-worker',
@@ -748,7 +829,7 @@ final class Plugin extends Bepart
                     if ('preload' === $type) {
                         $this->send_json_continue($this->slug.':worker: pong '.$type);
                         $this->dropino()->undelay();
-                        do_action('docket-cache/preload');
+                        do_action('docketcache/preload');
                         exit;
                     }
 
@@ -760,7 +841,7 @@ final class Plugin extends Bepart
 
                     if ('countcachesize' === $type) {
                         $this->send_json_continue($this->slug.':worker: pong '.$type);
-                        do_action('docket-cache/countcachesize');
+                        do_action('docketcache/countcachesize');
                         exit;
                     }
                 }
@@ -825,51 +906,57 @@ final class Plugin extends Bepart
                             case 'docket-enable-occache':
                                 $result = $this->dropino()->install(true);
                                 $message = $result ? 'docket-occache-enabled' : 'docket-occache-enabled-failed';
-                                do_action('docket-cache/object-cache-enable', $result);
+                                do_action('docketcache/object-cache-enable', $result);
                                 break;
 
                             case 'docket-disable-occache':
                                 $result = $this->dropino()->uninstall();
                                 $message = $result ? 'docket-occache-disabled' : 'docket-occache-disabled-failed';
-                                do_action('docket-cache/object-cache-disable', $result);
+                                do_action('docketcache/object-cache-disable', $result);
                                 break;
 
                             case 'docket-update-dropino':
                                 $result = $this->dropino()->install(true);
                                 $message = $result ? 'docket-dropino-updated' : 'docket-dropino-updated-failed';
-                                do_action('docket-cache/object-cache-install', $result);
+                                do_action('docketcache/object-cache-install', $result);
                                 break;
 
                             case 'docket-flush-oclog':
                                 $result = $this->flush_log();
                                 $message = $result ? 'docket-log-flushed' : 'docket-log-flushed-failed';
-                                do_action('docket-cache/flush-log', $result);
+                                do_action('docketcache/flush-log', $result);
                                 break;
 
                             case 'docket-flush-ocfile':
                                 $result = $this->flush_fcache();
                                 $message = $result ? 'docket-file-flushed' : 'docket-file-flushed-failed';
-                                do_action('docket-cache/flush-fcache', $result);
+                                do_action('docketcache/flush-fcache', $result);
                                 break;
                             case 'docket-flush-opcache':
                                 $result = $this->flush_opcache();
                                 $message = $result ? 'docket-opcache-flushed' : 'docket-opcache-flushed-failed';
-                                do_action('docket-cache/flush-opcache', $result);
+                                do_action('docketcache/flush-opcache', $result);
                                 break;
                             case 'docket-connect-cronbot':
-                                $result = apply_filters('docket-cache/cronbot-active', true);
+                                $result = apply_filters('docketcache/cronbot-active', true);
                                 $message = $result ? 'docket-cronbot-connect' : 'docket-cronbot-connect-failed';
-                                do_action('docket-cache/connect-cronbot', $result);
+                                do_action('docketcache/connect-cronbot', $result);
                                 break;
                             case 'docket-disconnect-cronbot':
-                                $result = apply_filters('docket-cache/cronbot-active', false);
+                                $result = apply_filters('docketcache/cronbot-active', false);
                                 $message = $result ? 'docket-cronbot-disconnect' : 'docket-cronbot-disconnect-failed';
-                                do_action('docket-cache/disconnect-cronbot', $result);
+                                do_action('docketcache/disconnect-cronbot', $result);
                                 break;
                             case 'docket-runevent-cronbot':
-                                $result = apply_filters('docket-cache/cronbot-runevent', false);
+                                $result = apply_filters('docketcache/cronbot-runevent', false);
                                 $message = $result ? 'docket-cronbot-runevent' : 'docket-cronbot-runevent-failed';
-                                do_action('docket-cache/runevent-cronbot', $result);
+                                do_action('docketcache/runevent-cronbot', $result);
+                                @Crawler::fetch_admin(admin_url('/'));
+                                break;
+                            case 'docket-runeventnow-cronbot':
+                                $result = apply_filters('docketcache/cronbot-runevent', true);
+                                $message = $result ? 'docket-cronbot-runevent' : 'docket-cronbot-runevent-failed';
+                                do_action('docketcache/runeventnow-cronbot', $result);
                                 @Crawler::fetch_admin(admin_url('/'));
                                 break;
                         }
@@ -979,7 +1066,30 @@ final class Plugin extends Bepart
                             $error = esc_html__('Cronbot failed to disconnect.', 'docket-cache');
                             break;
                         case 'docket-cronbot-runevent':
-                            $message = esc_html__('Cron run successful.', 'docket-cache');
+                            $message = esc_html__('Running cron successful.', 'docket-cache');
+                            $msg = get_transient('docketcache/cronbotrun');
+                            delete_transient('docketcache/cronbotrun');
+                            if (!empty($msg) && \is_array($msg)) {
+                                $wmsg = '';
+                                if (!empty($msg['wpcron_msg'])) {
+                                    $wmsg = $msg['wpcron_msg'];
+                                }
+
+                                if ($msg['wpcron_return'] > 1 && !empty($wmsg)) {
+                                    $error = $message;
+                                }
+
+                                if (empty($error)) {
+                                    if (!empty($wmsg) && empty($msg['wpcron_event'])) {
+                                        $message = $wmsg;
+                                    } else {
+                                        /* translators: %d = cron event */
+                                        $message = sprintf(esc_html__('Executed a total of %d cron events', 'docket-cache'), $msg['wpcron_event']);
+                                    }
+                                }
+                            }
+                            unset($msg, $wmsg);
+
                             break;
                         case 'docket-cronbot-runevent-failed':
                             $error = esc_html__('Failed to run cron.', 'docket-cache');
@@ -1044,7 +1154,7 @@ final class Plugin extends Bepart
         );
 
         add_action(
-            'docket-cache/save-option',
+            'docketcache/save-option',
             function ($name, $value, $status = true) {
                 switch ($name) {
                     case 'log':
@@ -1068,7 +1178,7 @@ final class Plugin extends Bepart
                             'shutdown',
                             function () use ($action) {
                                 if (!$action) {
-                                    apply_filters('docket-cache/cronbot-active', $action);
+                                    apply_filters('docketcache/cronbot-active', $action);
                                 }
                             },
                             PHP_INT_MAX
@@ -1081,7 +1191,7 @@ final class Plugin extends Bepart
         );
 
         add_action(
-            'docket-cache/preload',
+            'docketcache/preload',
             function () {
                 if ($this->constans()->is_true('DOCKET_CACHE_WPCLI')) {
                     return;
@@ -1106,6 +1216,12 @@ final class Plugin extends Bepart
                 add_action(
                     'shutdown',
                     function () {
+                        if ($this->canopt()->lockexp('preload')) {
+                            return false;
+                        }
+
+                        $this->canopt()->setlock('preload', time() + 3600);
+
                         wp_load_alloptions();
                         wp_count_comments(0);
 
@@ -1170,6 +1286,8 @@ final class Plugin extends Bepart
                                 usleep(500000);
                             }
                         }
+
+                        $this->canopt()->setlock('preload', 0);
                     },
                     PHP_INT_MAX
                 );
@@ -1177,27 +1295,29 @@ final class Plugin extends Bepart
         );
 
         add_action(
-            'docket-cache/countcachesize',
+            'docketcache/countcachesize',
             function () {
-                $locked = wp_cache_get('doing_countcachesize', 'docketcache', true);
-                if (empty($locked)) {
-                    wp_cache_set('doing_countcachesize', 1, 'docketcache', 120);
-                    $this->cache_size($this->cache_path, 0, true);
+                $cache_stats = $this->canopt()->save_part('cachestats');
+                if (!empty($cache_stats) && $this->canopt()->lockexp('doing_countcachesize')) {
+                    return;
                 }
-                wp_cache_set('doing_countcachesize', 0, 'docketcache', 0);
+
+                $this->canopt()->setlock('doing_countcachesize', time() + 60);
+                $cache_stats = $this->cache_size($this->cache_path);
+                $this->canopt()->save_part($cache_stats, 'cachestats');
+                $this->canopt()->setlock('doing_countcachesize', 0);
             },
             PHP_INT_MAX
         );
 
         add_action(
-            'docket-cache/suspend_wp_options_autoload',
+            'docketcache/suspend_wp_options_autoload',
             function () {
-                $locked = wp_cache_get('doing_suspend_wp_options_autoload', 'docketcache', true);
-                if (empty($locked)) {
-                    wp_cache_set('doing_suspend_wp_options_autoload', 1, 'docketcache', 120);
+                if (!$this->canopt()->lockexp('doing_suspend_wp_options_autoload')) {
+                    $this->canopt()->setlock('doing_suspend_wp_options_autoload', time() + 3600);
                     $this->suspend_wp_options_autoload(null);
+                    $this->canopt()->setlock('doing_suspend_wp_options_autoload', 0);
                 }
-                wp_cache_set('doing_suspend_wp_options_autoload', 0, 'docketcache', 0);
             },
             PHP_INT_MAX
         );
@@ -1268,7 +1388,7 @@ final class Plugin extends Bepart
 
         // optimize term count
         if ($this->constans()->is_true('DOCKET_CACHE_OPTERMCOUNT') && class_exists('Nawawi\\DocketCache\\TermCount')) {
-            TermCount::init();
+            ( new TermCount($this) )->register();
         }
     }
 
@@ -1299,6 +1419,7 @@ final class Plugin extends Bepart
             \WP_CLI::add_command('cache status', [$cli, 'status']);
             \WP_CLI::add_command('cache type', [$cli, 'type']);
             \WP_CLI::add_command('cache flush', [$cli, 'flush_cache']);
+            \WP_CLI::add_command('cache gc', [$cli, 'rungc']);
         }
     }
 

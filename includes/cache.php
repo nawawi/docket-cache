@@ -354,13 +354,6 @@ class WP_Object_Cache
     private $cache_path;
 
     /**
-     * The cache maximum time-to-live.
-     *
-     * @var int
-     */
-    private $cache_maxttl = 0;
-
-    /**
      * The cache maximum size of cache file.
      *
      * @var int
@@ -393,7 +386,7 @@ class WP_Object_Cache
      */
     public function __construct()
     {
-        $this->multisite = is_multisite();
+        $this->multisite = \function_exists('is_multisite') && is_multisite();
         $this->blog_prefix = $this->switch_to_blog(get_current_blog_id());
         $this->dc_init();
     }
@@ -902,9 +895,12 @@ class WP_Object_Cache
 
         $expire = $this->fs()->sanitize_second($expire);
 
-        // if transient and without expiry, set to 12 hours in our cache
-        if (0 === $expire && \in_array($group, ['site-transient', 'transient'])) {
-            $expire = 43200; // 12h
+        if (0 === $expire) {
+            if (\in_array($group, ['site-transient', 'transient'])) {
+                $expire = 43200; // 12h
+            } elseif (\in_array($group, ['post_meta', 'options'])) {
+                $expire = 86400; // 24h
+            }
         }
 
         return $expire;
@@ -919,6 +915,10 @@ class WP_Object_Cache
     {
         if (!$this->is_valid_key($str)) {
             $str = serialize($str);
+        }
+
+        if (empty($length)) {
+            return md5($str);
         }
 
         return substr(md5($str), 0, $length);
@@ -1149,6 +1149,10 @@ class WP_Object_Cache
         ];
 
         if (true === $this->dc_code($file, $meta)) {
+            if ($timeout > 0) {
+                @touch($file, $timeout);
+            }
+
             return true;
         }
 
@@ -1203,11 +1207,11 @@ class WP_Object_Cache
         $group = 'docketcache-precache';
         $data = [];
 
-        // limit precache list to 1000
+        // limit precache list to 5000
         $cache_hash = $this->get('index', $group);
         if (!empty($cache_hash) && \is_array($cache_hash)) {
-            if (\count($cache_hash) >= 1000) {
-                // flush first 500
+            if (\count($cache_hash) >= 5000) {
+                // flush first 1000
                 $x = 0;
                 foreach ($cache_hash as $h) {
                     if ($x > 500) {
@@ -1239,7 +1243,7 @@ class WP_Object_Cache
         }
 
         if (!empty($data)) {
-            $this->set($hash, $data, $group, 86400); // 24h
+            $this->set($hash, $data, $group, 14400); // 4h
 
             $cache_hash[$hash] = 1;
             $this->set('index', $cache_hash, $group, 86400);
@@ -1252,13 +1256,18 @@ class WP_Object_Cache
             return;
         }
 
-        // abort
-        if (!empty($_SERVER['QUERY_STRING'])) {
+        $req_host = !empty($_SERVER['HTTP_HOST']) ? @preg_replace('@:\d+$@', '', $_SERVER['HTTP_HOST']) : 'localhost';
+        if (\function_exists('is_user_logged_in') && is_user_logged_in() && @preg_match('@/wp-admin/(network/)?.*?\.php\?.*?@', $req_uri)) {
+            $req_uri = $_SERVER['REQUEST_URI'];
+        } else {
+            $req_uri = @preg_replace('@\?.*@', '', $_SERVER['REQUEST_URI']);
+        }
+
+        if (empty($req_host) || empty($req_uri)) {
             return;
         }
 
-        $req_uri = json_encode($_SERVER['REQUEST_URI']);
-        $req_key = $this->item_hash($req_uri);
+        $req_key = $this->item_hash($req_host.$req_uri);
 
         $this->dc_precache_get($req_key);
 
@@ -1273,12 +1282,11 @@ class WP_Object_Cache
 
     private function dc_init()
     {
-        if ($this->cf()->is_int('DOCKET_CACHE_MAXSIZE') && DOCKET_CACHE_MAXSIZE > 1000000) {
+        if ($this->cf()->is_int('DOCKET_CACHE_MAXSIZE') && DOCKET_CACHE_MAXSIZE >= 1000000) {
             $this->cache_maxsize = DOCKET_CACHE_MAXSIZE;
-        }
-
-        if ($this->cf()->is_int('DOCKET_CACHE_MAXTTL')) {
-            $this->cache_maxttl = $this->fs()->sanitize_second(DOCKET_CACHE_MAXTTL);
+            if ($this->cache_maxsize > 10485760) {
+                $this->cache_maxsize = 10485760;
+            }
         }
 
         if ($this->cf()->is_array('DOCKET_CACHE_GLOBAL_GROUPS')) {

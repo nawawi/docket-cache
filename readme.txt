@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.08.11
+Stable tag: 20.08.12
 License: MIT
 License URI: ./license.txt
 
@@ -105,6 +105,29 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.08.12 =
+
+This is an improved version based on previous releases.
+
+- Use our own locking functions instead of wp_cache_* functions.
+- Standardize hook prefix, rename docket-cache to docketcache.
+- Increase default maxfile to 50000.
+- Cronbot, remove scheduled events if hooks has errors or not exist.
+- Cronbot, added "Run All Now" at admin interface.
+- Garbage collector, remove older files if maxttl defined. By default set to 2 days (172800 seconds).
+- Cache group post_meta and options, set to expire in 24 hours if no expiration time.
+- Precaching, data expire set to 4 hours and maximum 5000 lists at a time.
+- Precaching, append site host as key to allow use it on multisite.
+- Precaching allow query string if user_logged_in() true and uri match with "/wp-admin/(network/)?.*?\.php\?.*?".
+- Preloading, add locking to prevent run multiple time in short period.
+- Standardize data size in binary rather than decimal.
+- DOCKET_CACHE_MAXTTL, only numbers between 86400 and 2419200 are accepted (1 day - 28 days).
+- DOCKET_CACHE_MAXSIZE, only numbers between 1000000 and 10485760 are accepted (1 MB - 10 MB).
+- DOCKET_CACHE_MAXSIZE_DISK, minimum 1048576 (1MB), default set to 500MB.
+- CLI, new command to run garbage collector "wp cache gc".
+
+Please do "Flush Cache" after/before installing this update. Thanks.
+
 = 20.08.11 =
 
 This is an enhanced version based on previous fix releases.
@@ -116,7 +139,7 @@ This is an enhanced version based on previous fix releases.
 - Added Transient, Set the expiry time to 12 hours if expiration not set.
 - Added Garbage collector, scheduled to every 5 minutes instead of 30 minutes. Enable cronbot service if your site wp-cron not running active.
 - Added Object cache stats, enable/disable at configuration page.
-- Added DOCKET_CACHE_MAXFILES constant, attempting to reduce cache file if bigger than default 5000 files. Only numbers between 200 and 200000 are accepted.
+- Added DOCKET_CACHE_MAXFILE constant, attempting to reduce cache file if bigger than default 5000 files. Only numbers between 200 and 200000 are accepted.
 
 Please do "Flush Cache" after/before installing this update. Thanks.
 

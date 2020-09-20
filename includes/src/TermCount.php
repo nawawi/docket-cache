@@ -14,40 +14,47 @@ namespace Nawawi\DocketCache;
 
 final class TermCount
 {
-    public $counted_status = ['publish'];
-    public $counted_terms = [];
+    public $counted_status;
+    public $counted_terms;
+    private $plugin;
 
-    private static $inst;
-
-    public function __construct()
+    public function __construct(Plugin $plugin)
     {
-        if (!(\defined('DOING_CRON') && DOING_CRON) && !(\defined('WP_CLI') && WP_CLI) && !(\defined('WP_IMPORTING') && WP_IMPORTING)) {
-            add_action('plugin_loaded', [$this, 'attach']);
-        }
+        $this->plugin = $plugin;
+        $this->counted_status = ['publish'];
+        $this->counted_terms = [];
     }
 
-    public static function init()
+    public function register()
     {
-        if (!isset(self::$inst)) {
-            self::$inst = new self();
-        }
-
-        return self::$inst;
-    }
-
-    public function attach()
-    {
-        if (!isset($GLOBALS['wpdb']) || !$GLOBALS['wpdb']->ready) {
+        if (wp_doing_cron()) {
             return;
         }
 
-        wp_defer_term_counting(true);
-        remove_action('transition_post_status', '_update_term_count_on_transition_post_status');
+        if ($this->plugin->constans()->is_true('WP_IMPORTING')) {
+            return;
+        }
 
-        add_action('transition_post_status', [$this, 'transition_post_status'], 10, 3);
-        add_action('added_term_relationship', [$this, 'added_term_relationship'], 10, 3);
-        add_action('deleted_term_relationships', [$this, 'deleted_term_relationships'], 10, 3);
-        add_action('edit_term', [$this, 'maybe_recount_posts_for_term'], 10, 3);
+        if ($this->plugin->constans()->is_true('WP_CLI')) {
+            return;
+        }
+
+        if (!$this->plugin->safe_wpdb()) {
+            return;
+        }
+
+        add_action(
+            'plugin_loaded',
+            function () {
+                wp_defer_term_counting(true);
+                remove_action('transition_post_status', '_update_term_count_on_transition_post_status');
+
+                add_action('transition_post_status', [$this, 'transition_post_status'], 10, 3);
+                add_action('added_term_relationship', [$this, 'added_term_relationship'], 10, 3);
+                add_action('deleted_term_relationships', [$this, 'deleted_term_relationships'], 10, 3);
+                add_action('edit_term', [$this, 'maybe_recount_posts_for_term'], 10, 3);
+            }
+        );
     }
 
     public function added_term_relationship($object_id, $tt_id, $taxonomy)
@@ -121,18 +128,21 @@ final class TermCount
 
     public function quick_update_terms_count($object_id, $tt_ids, $taxonomy, $transition_type)
     {
-        global $wpdb;
+        $wpdb = $this->plugin->safe_wpdb();
+        if (!$wpdb) {
+            return false;
+        }
 
         if (!$transition_type) {
             return false;
         }
 
-        $taxonomy_obj = get_taxonomy($taxonomy);
-        if ($taxonomy_obj) {
+        $taxonomy_get = get_taxonomy($taxonomy);
+        if ($taxonomy_get) {
             $tt_ids = array_filter(array_map('intval', (array) $tt_ids));
 
-            if (!empty($taxonomy_obj->update_count_callback)) {
-                \call_user_func($taxonomy_obj->update_count_callback, $tt_ids, $taxonomy_obj);
+            if (!empty($taxonomy_get->update_count_callback)) {
+                \call_user_func($taxonomy_get->update_count_callback, $tt_ids, $taxonomy_get);
             } elseif (!empty($tt_ids)) {
                 if (!isset($this->counted_terms[$object_id][$taxonomy][$transition_type])) {
                     $this->counted_terms[$object_id][$taxonomy][$transition_type] = [];

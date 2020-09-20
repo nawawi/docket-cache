@@ -224,7 +224,7 @@ class PostCache
             return $sql;
         }
 
-        if (apply_filters('docket-cache/postcache-skip-type', false, $query->get('post_type'))) {
+        if (apply_filters('docketcache/postcache-skip-type', false, $query->get('post_type'))) {
             return $sql;
         }
 
@@ -275,7 +275,7 @@ class PostCache
 
     public function posts_results($posts, $query)
     {
-        if (apply_filters('docket-cache/postcache-skip-type', false, $query->get('post_type'))) {
+        if (apply_filters('docketcache/postcache-skip-type', false, $query->get('post_type'))) {
             return $posts;
         }
 
@@ -312,7 +312,7 @@ class PostCache
 
     public function post_limits_request($limits, $query)
     {
-        if (apply_filters('docket-cache/postcache-skip-type', false, $query->get('post_type'))) {
+        if (apply_filters('docketcache/postcache-skip-type', false, $query->get('post_type'))) {
             return $limits;
         }
 
@@ -327,7 +327,7 @@ class PostCache
 
     public function found_posts_query($sql, $query)
     {
-        if (apply_filters('docket-cache/postcache-skip-type', false, $query->get('post_type'))) {
+        if (apply_filters('docketcache/postcache-skip-type', false, $query->get('post_type'))) {
             return $sql;
         }
 
@@ -340,7 +340,7 @@ class PostCache
 
     public function found_posts($found_posts, $query)
     {
-        if (apply_filters('docket-cache/postcache-skip-type', false, $query->get('post_type'))) {
+        if (apply_filters('docketcache/postcache-skip-type', false, $query->get('post_type'))) {
             return $found_posts;
         }
 

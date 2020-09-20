@@ -59,6 +59,7 @@ endif;
 
         <div class="box-left">
             <a href="<?php echo $this->plugin->action_query('runevent-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary"><?php esc_html_e('Run WP-CRON', 'docket-cache'); ?></a>
+            <a href="<?php echo $this->plugin->action_query('runeventnow-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary"><?php esc_html_e('Run All Now', 'docket-cache'); ?></a>
         </div>
 
         <?php if ($total_page > 1 || !empty($_GET['s'])) : ?>

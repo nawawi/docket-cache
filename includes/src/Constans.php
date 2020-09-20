@@ -107,13 +107,18 @@ final class Constans
         $this->maybe_define('DOCKET_CACHE_PATH', WP_CONTENT_DIR.'/cache/docket-cache/', false);
 
         // cache file max size: 3MB, 1MB = 1048576 bytes (binary) = 1000000 bytes (decimal)
+        // Only numbers between 1000000 and 10485760 are accepted
         $this->maybe_define('DOCKET_CACHE_MAXSIZE', 3145728);
 
-        // cache file max accelerated files: Only numbers between 200 and 200000 are accepted
-        $this->maybe_define('DOCKET_CACHE_MAXFILE', 5000);
+        // cache file max size total: 500MB, 1MB = 1048576 bytes (binary) = 1000000 bytes (decimal)
+        // minimum 100MB
+        $this->maybe_define('DOCKET_CACHE_MAXSIZE_DISK', 524288000);
 
-        // cache maxttl: 0
-        $this->maybe_define('DOCKET_CACHE_MAXTTL', 0);
+        // cache file max accelerated files: Only numbers between 200 and 200000 are accepted
+        $this->maybe_define('DOCKET_CACHE_MAXFILE', 50000);
+
+        // cache maxttl: cache lifespan.  Only seconds between 86400 and 2419200 are accepted
+        $this->maybe_define('DOCKET_CACHE_MAXTTL', 172800);
 
         // log on/off
         $this->maybe_define('DOCKET_CACHE_LOG', false);

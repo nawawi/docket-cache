@@ -45,6 +45,11 @@ class Command extends WP_CLI_Command
         WP_CLI::halt($status);
     }
 
+    private function title($text, $pad = 15)
+    {
+        return str_pad($text, $pad).': ';
+    }
+
     private function status_color($status, $text)
     {
         switch ($status) {
@@ -71,10 +76,10 @@ class Command extends WP_CLI_Command
         $info = (object) $this->plugin->get_info();
         $halt = $info->status_code ? 0 : 1;
 
-        WP_CLI::line("Cache Status\t: ".$this->status_color($info->status_code, $info->status_text));
-        WP_CLI::line("Cache Path\t: ".$info->cache_path);
+        WP_CLI::line($this->title('Cache Status').$this->status_color($info->status_code, $info->status_text));
+        WP_CLI::line($this->title('Cache Path').$info->cache_path);
         if ($this->plugin->constans()->is_true('DOCKET_CACHE_STATS')) {
-            WP_CLI::line("Cache Size\t: ".$info->cache_size);
+            WP_CLI::line($this->title('Cache Size').$info->cache_size);
         }
         WP_CLI::halt($halt);
     }
@@ -172,6 +177,47 @@ class Command extends WP_CLI_Command
 
         $this->plugin->dropino()->undelay();
         $this->halt_success(__('The cache was flushed.', 'docket-cache'));
+    }
+
+    /**
+     * Run garbage collector.
+     *
+     * Remove empty and older files.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache gc
+     *
+     * @subcommand gc
+     */
+    public function rungc()
+    {
+        if (!has_filter('docketcache/garbage-collector')) {
+            $this->halt_error(__('Garbage collector not available.', 'docket-cache'));
+        }
+
+        $is_debug = \defined('WP_DEBUG') && WP_DEBUG;
+        $pad = $is_debug ? 25 : 10;
+        $collect = apply_filters('docketcache/garbage-collector', true);
+        $header = [
+            'maxttl' => 'MaxTTL Seconds',
+            'maxttl_h' => 'MaxTTL Human',
+            'maxttl_c' => 'MaxTTL Cleaned',
+            'maxfile' => 'MaxFiles',
+            'maxfile_c' => 'MaxFiles Cleaned',
+            'total' => 'Totals',
+            'clean' => 'Cleaned',
+            'expired' => 'Expired',
+            'ignore' => 'Ignored',
+        ];
+        foreach ($collect as $n => $v) {
+            if (!$is_debug && 'max' === substr($n, 0, 3)) {
+                continue;
+            }
+            $n = $this->title($header[$n], $pad);
+            WP_CLI::line($n.$v);
+        }
+        $this->halt_success(__('Executing garbage collector.', 'docket-cache'));
     }
 
     /**

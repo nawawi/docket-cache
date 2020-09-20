@@ -136,7 +136,7 @@ final class Canopt extends Bepart
         }
 
         $ret = $this->put_config($config);
-        do_action('docket-cache/save-option', $name, $value, $ret);
+        do_action('docketcache/save-option', $name, $value, $ret);
 
         return $ret;
     }
@@ -153,5 +153,70 @@ final class Canopt extends Bepart
         $file = $this->path.'/'.$file.'.php';
 
         return $this->read_config($file, $force);
+    }
+
+    public function clear_part($file)
+    {
+        $file = $this->path.'/'.$file.'.php';
+        if (!@is_file($file)) {
+            return true;
+        }
+
+        return @unlink($file);
+    }
+
+    private function lock_file($key)
+    {
+        $key = substr(md5($key), 0, 12);
+        $path = $this->path.'/lock';
+        if (!@wp_mkdir_p($path)) {
+            return false;
+        }
+        $this->placeholder($path);
+
+        return $path.'/lock-'.$key.'.txt';
+    }
+
+    public function setlock($key, $value)
+    {
+        $file = $this->lock_file($key);
+        if (!$file) {
+            return false;
+        }
+
+        return @file_put_contents($file, $value, LOCK_EX);
+    }
+
+    public function unlock($key)
+    {
+        $file = $this->lock_file($key);
+        if (!$file || !@is_file($file)) {
+            return true;
+        }
+
+        return @unlink($file);
+    }
+
+    public function locked($key, &$value = '')
+    {
+        $file = $this->lock_file($key);
+        if (!$file || !@is_file($file)) {
+            return false;
+        }
+
+        $value = @file_get_contents($file);
+
+        return true;
+    }
+
+    public function lockexp($key)
+    {
+        if ($this->locked($key, $locked)) {
+            if (!empty($locked) && (int) $locked > time()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

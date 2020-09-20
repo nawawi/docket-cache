@@ -399,24 +399,8 @@ class Filesystem
     /**
      * cache_size.
      */
-    public function cache_size($dir, $is_stats = false, $force = false)
+    public function cache_size($dir)
     {
-        if (!$force) {
-            $cache_stats = wp_cache_get('cache_stats', 'docketcache-data');
-            if (empty($cache_stats) || !\is_array($cache_stats)) {
-                $cache_stats = [
-                    'timeout' => 0,
-                    'size' => 0,
-                    'filesize' => 0,
-                    'files' => 0,
-                ];
-                wp_cache_set('cache_stats', $cache_stats, 'docketcache-data', DAY_IN_SECONDS);
-            }
-
-            return $is_stats ? (object) $cache_stats : $cache_stats->size;
-        }
-
-        $is_debug = \defined('DOCKET_CACHE_LOG_ALL') && DOCKET_CACHE_LOG_ALL ? true : false;
         $bytestotal = 0;
         $fsizetotal = 0;
         $filestotal = 0;
@@ -447,10 +431,6 @@ class Filesystem
 
                 $data = $this->cache_get($object->getPathName());
                 if (false !== $data) {
-                    if (!$is_debug && !empty($data['group']) && $this->internal_group($data['group'])) {
-                        continue;
-                    }
-
                     $bytestotal += \strlen(serialize($data));
                     ++$filestotal;
                 }
@@ -462,17 +442,12 @@ class Filesystem
             }
         }
 
-        $exp = 5 * MINUTE_IN_SECONDS;
-        $cache_stats = [
-            'timeout' => $exp,
+        return [
+            'time' => time(),
             'size' => $bytestotal,
             'filesize' => $fsizetotal,
             'files' => $filestotal,
         ];
-
-        wp_cache_set('cache_stats', $cache_stats, 'docketcache-data', DAY_IN_SECONDS);
-
-        return $is_stats ? (object) $cache_stats : $bytestotal;
     }
 
     public function cache_get($file)
@@ -514,6 +489,7 @@ class Filesystem
 
     public function code_stub($data = '')
     {
+        $is_debug = \defined('WP_DEBUG') && WP_DEBUG;
         $ucode = '';
         if (!empty($data) && false !== strpos($data, 'Registry::p(')) {
             if (@preg_match_all('@Registry::p\(\'([a-zA-Z_]+)\'\)@', $data, $mm)) {
@@ -521,7 +497,7 @@ class Filesystem
                     $cls = $mm[1];
                     foreach ($cls as $clsname) {
                         if ('stdClass' !== $clsname) {
-                            if (\defined('WP_DEBUG') && WP_DEBUG) {
+                            if ($is_debug) {
                                 $reflector = new \ReflectionClass($clsname);
                                 $clsfname = $reflector->getFileName();
                                 if (false !== $clsfname) {

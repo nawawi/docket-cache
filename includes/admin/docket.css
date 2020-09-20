@@ -333,7 +333,8 @@ body {
         display: none;
     }
 
-    #docket-cache p.submit .button {
+    #docket-cache p.submit .button,
+    #docket-cache .eventlist .box-left .button {
         margin-right: 6px;
     }
 }
@@ -352,10 +353,19 @@ body {
     #docket-cache .nav-select {
         display: block;
         width: 100%;
+        margin-right: 0;
     }
 
     #docket-cache .log p.submit {
         white-space: nowrap;
+    }
+
+    #docket-cache .log span.vcache,
+    #docket-cache .log .bt-fx {
+        display: block;
+        width: 100%;
+        margin-top: 6px;
+        margin-bottom: 6px;
     }
 
     #docket-cache .log p.submit select {
