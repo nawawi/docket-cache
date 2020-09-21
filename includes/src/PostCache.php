@@ -103,7 +103,7 @@ class PostCache
                     unset($stats['awaiting_moderation']);
                     $stats_object = (object) $stats;
 
-                    wp_cache_set($cache_key, $stats_object, $this->prefix, 30 * MINUTE_IN_SECONDS);
+                    wp_cache_set($cache_key, $stats_object, $this->prefix, 1800); // 1800 = 30min
                 }
 
                 return $stats_object;
@@ -112,6 +112,17 @@ class PostCache
             2
         );
 
+        // core
+        foreach (['comment_post', 'wp_set_comment_status'] as $fx) {
+            add_action(
+                $fx,
+                function () {
+                    wp_cache_delete('comments-0', $this->prefix);
+                }
+            );
+        }
+
+        // jetpack
         foreach (['unapproved_to_approved', 'approved_to_unapproved', 'spam_to_approved', 'approved_to_spam'] as $fx) {
             add_action(
                 'comment_'.$fx,

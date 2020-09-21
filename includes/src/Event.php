@@ -61,17 +61,10 @@ final class Event
                     }
                 }
 
-                // gc
-                if ($this->plugin->constans()->is_true('DOCKET_CACHE_GC')) {
-                    add_action('docketcache_gc', [$this, 'garbage_collector']);
-
-                    if (!wp_next_scheduled('docketcache_gc')) {
-                        wp_schedule_event(time(), 'docketcache_gc_schedule', 'docketcache_gc');
-                    }
-                } else {
-                    if (wp_get_schedule('docketcache_gc')) {
-                        wp_clear_scheduled_hook('docketcache_gc');
-                    }
+                // gc: always enable
+                add_action('docketcache_gc', [$this, 'garbage_collector']);
+                if (!wp_next_scheduled('docketcache_gc')) {
+                    wp_schedule_event(time(), 'docketcache_gc_schedule', 'docketcache_gc');
                 }
 
                 // optimize db

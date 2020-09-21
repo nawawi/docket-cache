@@ -141,9 +141,6 @@ final class Constans
         // truncate or delete cache file
         $this->maybe_define('DOCKET_CACHE_FLUSH_DELETE', false);
 
-        // garbage collector
-        $this->maybe_define('DOCKET_CACHE_GC', true);
-
         // optimize db
         $this->maybe_define('DOCKET_CACHE_CRONOPTMZDB', 'never');
 

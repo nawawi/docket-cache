@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.08.12
+Stable tag: 20.08.13
 License: MIT
 License URI: ./license.txt
 
@@ -73,9 +73,11 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache fo
 == Screenshots ==
 1. Plugin Overview.
 2. Cache Log.
-3. Configuration.
-4. Select log to view.
-5. Cache view.
+3. Select log to view.
+4. Cache view.
+5. Cronbot.
+6. Configuration.
+
 
 == Frequently Asked Questions ==
 = What is Object Caching in WordPress? =
@@ -105,6 +107,14 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.08.13 =
+
+Fix release.
+
+- Fixed Advanced Post Cache, invalid comment counting.
+- Fixed Precaching, exclude docketcache-post group.
+- Set garbage collector always enable.
+
 = 20.08.12 =
 
 This is an improved version based on previous releases.

@@ -40,13 +40,6 @@ To use the WP-CLI commands, please refer to [WP-CLI](https://docs.docketcache.co
 ## Screenshots
 ![Overview](./.wordpress.org/screenshot-1.png) Plugin Overview.
 
-![Cache Log](./.wordpress.org/screenshot-2.png) Cache Log.
-
-![Configuration](./.wordpress.org/screenshot-3.png) Configuration.
-
-![Select log to view](./.wordpress.org/screenshot-4.png) Select log to view.
-
-![Cache view](./.wordpress.org/screenshot-5.png) Cache view.
 
 ## How Versions Work
 

@@ -1211,7 +1211,7 @@ class WP_Object_Cache
         $cache_hash = $this->get('index', $group);
         if (!empty($cache_hash) && \is_array($cache_hash)) {
             if (\count($cache_hash) >= 5000) {
-                // flush first 1000
+                // flush first 500
                 $x = 0;
                 foreach ($cache_hash as $h) {
                     if ($x > 500) {
@@ -1230,7 +1230,7 @@ class WP_Object_Cache
         }
 
         foreach ($this->precache as $cache_group => $cache_keys) {
-            if ($cache_group === $group) {
+            if ($cache_group === $group || 'docketcache-post' === substr($cache_group, 0, 16)) {
                 continue;
             }
 
@@ -1319,7 +1319,7 @@ class WP_Object_Cache
                                 function () {
                                     $this->delete('alloptions', 'options');
                                 },
-                                PHP_INT_MAX
+                                PHP_INT_MAX - 1
                             );
                         }
                     }
@@ -1338,7 +1338,7 @@ class WP_Object_Cache
                             function () {
                                 $this->delete(get_network()->site_id.':active_sitewide_plugins', 'site-options');
                             },
-                            PHP_INT_MAX
+                            PHP_INT_MAX - 1
                         );
                     }
                     add_action(
@@ -1346,7 +1346,7 @@ class WP_Object_Cache
                         function () {
                             $this->delete('uninstall_plugins', 'options');
                         },
-                        PHP_INT_MAX
+                        PHP_INT_MAX - 1
                     );
                 },
                 PHP_INT_MAX,
@@ -1363,7 +1363,7 @@ class WP_Object_Cache
                     function () {
                         $this->delete('alloptions', 'options');
                     },
-                    PHP_INT_MAX
+                    PHP_INT_MAX - 1
                 );
             },
             PHP_INT_MAX,

@@ -406,7 +406,7 @@ final class CronAgent
             if (\is_array($pingdata) && !empty($pingdata['timestamp'])) {
                 $timestamp = strtotime('+90 minutes', strtotime($pingdata['timestamp']));
                 if ($timestamp > 0 && time() > $timestamp) {
-                    $this->plugin->canopt()->setlock('check_connection', time() + 30);
+                    $this->plugin->canopt()->setlock('check_connection', time() + 300);
                     $this->send_action('on', true);
                 }
             }
