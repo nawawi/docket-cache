@@ -132,7 +132,7 @@ final class Constans
         // empty file when cache flushed
         $this->maybe_define('DOCKET_CACHE_LOG_FLUSH', true);
 
-        // log time format: utc, local, wp
+        // log time format: utc, local
         $this->maybe_define('DOCKET_CACHE_LOG_TIME', 'utc');
 
         // log file max size: 10MB, 1MB = 1048576 bytes (binary) = 1000000 bytes (decimal)

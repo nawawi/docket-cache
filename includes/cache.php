@@ -1139,6 +1139,19 @@ class WP_Object_Cache
             $data = '';
         }
 
+        if (!empty($data) && \function_exists('nawawi_unserialize')) {
+            if ('string' === $type) {
+                $data = nawawi_unserialize($data);
+            } elseif ('array' === $type && \function_exists('nawawi_arraymap')) {
+                $data_r = nawawi_arraymap('nawawi_unserialize', $data);
+
+                if (!empty($data_r)) {
+                    $data = $data_r;
+                }
+                unset($data_r);
+            }
+        }
+
         $meta = [
             'blog_id' => get_current_blog_id(),
             'group' => $group,

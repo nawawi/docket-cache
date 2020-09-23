@@ -535,24 +535,13 @@ class Filesystem
             }
         }
 
-        $meta = [];
-        $date_format = 'Y-m-d H:i:s T';
-        $timestamp = date($date_format);
-        $meta['timestamp'] = $timestamp;
+        $timestamp = date('Y-m-d H:i:s T');
 
-        if (!empty($caller)) {
-            $meta['caller'] = $caller;
+        $rtag = trim($tag);
+        if (\in_array($rtag, ['hit', 'miss', 'err', 'exp', 'del'])) {
+            $tag = str_pad($rtag, 5);
         }
-
-        if (\is_array($data)) {
-            $log = $this->export_var(array_merge($meta, $data));
-        } else {
-            $rtag = trim($tag);
-            if (\in_array($rtag, ['hit', 'miss', 'err', 'exp', 'del'])) {
-                $tag = str_pad($rtag, 5);
-            }
-            $log = '['.$meta['timestamp'].'] '.$tag.': "'.$id.'" "'.trim($data).'" "'.$caller.'"';
-        }
+        $log = '['.$timestamp.'] '.$tag.': "'.$id.'" "'.trim($data).'" "'.$caller.'"';
 
         return @$this->put($file, $log.PHP_EOL, $do_flush ? 'cb' : 'ab');
     }

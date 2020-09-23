@@ -87,6 +87,14 @@
                         );
                 };
 
+                $selector.find( 'a.btx-spinner' )
+                    .on(
+                        'click',
+                        function() {
+                            spinner();
+                        }
+                    );
+
                 var $psubmit = $selector.find( 'p.submit' );
                 $psubmit.find( 'a.button' )
                     .on(
@@ -109,6 +117,7 @@
                     .on(
                         'change',
                         function() {
+                            spinner();
                             var $self = $( this );
                             var link = $self.children( 'option:selected' )
                                 .attr( 'data-action-link' );

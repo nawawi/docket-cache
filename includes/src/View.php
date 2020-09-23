@@ -35,11 +35,6 @@ final class View
         $this->pageconfig_enable = $this->plugin->constans()->is_true('DOCKET_CACHE_PAGECONFIG');
     }
 
-    public function utc_to_local($gmt_timestamp)
-    {
-        return get_date_from_gmt(date('Y-m-d H:i:s', $gmt_timestamp), 'U');
-    }
-
     private function parse_log_query()
     {
         $ret = (object) [];
@@ -364,5 +359,18 @@ final class View
     private function is_dropin_validate()
     {
         return $this->plugin->dropino()->validate();
+    }
+
+    private function cronbot_eventlist()
+    {
+        static $inst;
+
+        if (!\is_object($inst)) {
+            $inst = new EventList();
+        }
+
+        $inst->prepare_items();
+
+        return $inst;
     }
 }

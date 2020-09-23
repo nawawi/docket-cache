@@ -9,29 +9,6 @@
  */
 \defined('ABSPATH') || exit;
 
-// for early version, cache use symfony directly, only if symfony class not exists
-if (!class_exists('Symfony\\Component\\VarExporter\\Internal\\Hydrator', false) && class_exists('Nawawi\\Symfony\\Component\\VarExporter\\Internal\\Hydrator')) {
-    class_alias('Nawawi\Symfony\Component\VarExporter\Internal\Hydrator', 'Symfony\Component\VarExporter\Internal\Hydrator', false);
-}
-if (!class_exists('Symfony\\Component\\VarExporter\\Internal\\Registry', false) && class_exists('Nawawi\\Symfony\\Component\\VarExporter\\Internal\\Registry')) {
-    class_alias('Nawawi\Symfony\Component\VarExporter\Internal\Registry', 'Symfony\Component\VarExporter\Internal\Registry', false);
-}
-
-// backward < 20.07.17
-if (class_exists('Nawawi\\DocketCache\\Constans')) {
-    class_alias('Nawawi\DocketCache\Constans', 'Nawawi\Docket_Cache\Constans', false);
-}
-if (class_exists('Nawawi\\DocketCache\\Filesystem')) {
-    class_alias('Nawawi\DocketCache\Filesystem', 'Nawawi\Docket_Cache\Files', false);
-}
-
-// backward < 20.08.04
-if (class_exists('Nawawi\\DocketCache\\CachePost')) {
-    class_alias('Nawawi\DocketCache\CachePost', 'Nawawi\DocketCache\Advanced_Post', false);
-    class_alias('Nawawi\DocketCache\CachePost', 'Nawawi\DocketCache\AdvancedPost', false);
-}
-
-// internal classmap
 if (class_exists('Nawawi\\Symfony\\Component\\VarExporter\\VarExporter')) {
     class_alias('Nawawi\Symfony\Component\VarExporter\VarExporter', 'Nawawi\DocketCache\Exporter\VarExporter', false);
 }
@@ -40,4 +17,44 @@ if (class_exists('Nawawi\\Symfony\\Component\\VarExporter\\Internal\\Hydrator'))
 }
 if (class_exists('Nawawi\\Symfony\\Component\\VarExporter\\Internal\\Registry')) {
     class_alias('Nawawi\Symfony\Component\VarExporter\Internal\Registry', 'Nawawi\DocketCache\Exporter\Registry', false);
+}
+
+if (!\function_exists('nawawi_arraymap')) {
+    function nawawi_arraymap($func, $arr)
+    {
+        $new = [];
+        foreach ($arr as $key => $value) {
+            $new[$key] = (\is_array($value) ? nawawi_arraymap($func, $value) : (\is_array($func) ? \call_user_func_array($func, $value) : $func($value)));
+        }
+
+        return $new;
+    }
+}
+
+if (!\function_exists('nawawi_unserialize')) {
+    function nawawi_unserialize($data)
+    {
+        if (!\function_exists('is_serialized')) {
+            @include_once ABSPATH.WPINC.'/functions.php';
+        }
+
+        if (!\function_exists('is_serialized') || !is_serialized($data)) {
+            return $data;
+        }
+
+        $ok = true;
+        if (@preg_match_all('@O:\d+:"([^"]+)"@', $data, $mm)) {
+            if (!empty($mm) && !empty($mm[1])) {
+                foreach ($mm[1] as $v) {
+                    if ('stdClass' !== $v) {
+                        $ok = false;
+                        break;
+                    }
+                }
+                unset($mm);
+            }
+        }
+
+        return !$ok ? $data : @unserialize(trim($data));
+    }
 }

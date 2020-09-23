@@ -19,7 +19,6 @@ return array(
     'Nawawi\\DocketCache\\MoCache' => $baseDir . '/includes/src/MoCache.php',
     'Nawawi\\DocketCache\\Plugin' => $baseDir . '/includes/src/Plugin.php',
     'Nawawi\\DocketCache\\PostCache' => $baseDir . '/includes/src/PostCache.php',
-    'Nawawi\\DocketCache\\PrivateRepo' => $baseDir . '/includes/src/PrivateRepo.php',
     'Nawawi\\DocketCache\\TermCount' => $baseDir . '/includes/src/TermCount.php',
     'Nawawi\\DocketCache\\Tweaks' => $baseDir . '/includes/src/Tweaks.php',
     'Nawawi\\DocketCache\\View' => $baseDir . '/includes/src/View.php',

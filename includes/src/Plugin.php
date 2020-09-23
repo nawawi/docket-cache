@@ -662,13 +662,6 @@ final class Plugin extends Bepart
             ( new CronAgent($this) )->register();
         }
 
-        if (\defined('DOCKET_CACHE_PRIVATEREPO') && class_exists('Nawawi\\DocketCache\\PrivateRepo')) {
-            $repo = $this->constans()->value('DOCKET_CACHE_PRIVATEREPO');
-            if (!empty($repo)) {
-                new PrivateRepo($this->slug, $this->hook, $this->version(), $this->constans()->value('DOCKET_CACHE_PRIVATEREPO'));
-            }
-        }
-
         register_activation_hook($this->hook, [$this, 'activate']);
         register_deactivation_hook($this->hook, [$this, 'deactivate']);
         register_uninstall_hook($this->hook, [__CLASS__, 'uninstall']);

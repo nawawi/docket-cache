@@ -11,8 +11,7 @@
 namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
-$event_list = new EventList();
-$event_list->prepare_items();
+$event_list = $this->cronbot_eventlist();
 $utc_offset = '('.$event_list->get_utc_offset().')';
 $total_page = $event_list->get_pagination_arg('total_pages');
 
@@ -47,10 +46,10 @@ endif;
 
     <p class="submit">
         <?php if ($is_connected) : ?>
-        <a href="<?php echo $this->plugin->action_query('disconnect-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary button-large"><?php esc_html_e('Disconnect', 'docket-cache'); ?></a>
-        <a href="<?php echo $this->plugin->action_query('connect-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary button-large"><?php esc_html_e('Test ping', 'docket-cache'); ?></a>
+        <a href="<?php echo $this->plugin->action_query('disconnect-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary button-large btx-spinner"><?php esc_html_e('Disconnect', 'docket-cache'); ?></a>
+        <a href="<?php echo $this->plugin->action_query('connect-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary button-large btx-spinner"><?php esc_html_e('Test ping', 'docket-cache'); ?></a>
         <?php else : ?>
-        <a href="<?php echo $this->plugin->action_query('connect-cronbot', ['idx' => 'cronbot']); ?>" class="button button-primary button-large"><?php esc_html_e('Connect', 'docket-cache'); ?></a>
+        <a href="<?php echo $this->plugin->action_query('connect-cronbot', ['idx' => 'cronbot']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Connect', 'docket-cache'); ?></a>
         <?php endif; ?>
     </p>
 
@@ -58,8 +57,8 @@ endif;
     <div class="eventlist">
 
         <div class="box-left">
-            <a href="<?php echo $this->plugin->action_query('runevent-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary"><?php esc_html_e('Run WP-CRON', 'docket-cache'); ?></a>
-            <a href="<?php echo $this->plugin->action_query('runeventnow-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary"><?php esc_html_e('Run All Now', 'docket-cache'); ?></a>
+            <a href="<?php echo $this->plugin->action_query('runevent-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary btx-spinner"><?php esc_html_e('Run WP-CRON', 'docket-cache'); ?></a>
+            <a href="<?php echo $this->plugin->action_query('runeventnow-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary btx-spinner"><?php esc_html_e('Run All Now', 'docket-cache'); ?></a>
         </div>
 
         <?php if ($total_page > 1 || !empty($_GET['s'])) : ?>

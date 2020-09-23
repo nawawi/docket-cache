@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.08.13
+Stable tag: 20.08.14
 License: MIT
 License URI: ./license.txt
 
@@ -107,6 +107,12 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.08.14 =
+
+Fix release.
+
+- Fixed unserialize data if serialized before coverting to php code.
+
 = 20.08.13 =
 
 Fix release.
@@ -128,7 +134,7 @@ This is an improved version based on previous releases.
 - Cache group post_meta and options, set to expire in 24 hours if no expiration time.
 - Precaching, data expire set to 4 hours and maximum 5000 lists at a time.
 - Precaching, append site host as key to allow use it on multisite.
-- Precaching allow query string if user_logged_in() true and uri match with "/wp-admin/(network/)?.*?\.php\?.*?".
+- Precaching allow query string if user_logged_in() true and uri match with "/wp-admin/(network/)?.\*?\.php\?.\*?".
 - Preloading, add locking to prevent run multiple time in short period.
 - Standardize data size in binary rather than decimal.
 - DOCKET_CACHE_MAXTTL, only numbers between 86400 and 2419200 are accepted (1 day - 28 days).
