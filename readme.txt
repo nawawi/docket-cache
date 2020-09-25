@@ -100,7 +100,7 @@ Docket Cache converts the object cache into plain PHP code. When read and write 
 = What is a RAM disk in Docket Cache? =
 A RAM disk is a representation of a hard disk using RAM resources, and it can take the form of a hardware device or a virtual disk.
 
-Docket Cache stores the cache as plain PHP files. To increase the performance or to make it close with in-memory solutions, you can use a RAM disk as cache directory.
+Docket Cache stores the cache as plain PHP files. To increase the performance or to make it close to in-memory solutions, you can use a RAM disk as cache directory.
 
 This solution is not for shared hosting server. You need access to the server as root user.
 
