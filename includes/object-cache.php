@@ -3,7 +3,7 @@
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
  * Plugin URI:          http://wordpress.org/plugins/docket-cache/
- * Version:             20.08.14
+ * Version:             20.08.16
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * Author:              Nawawi Jamili
  * Author URI:          https://github.com/nawawi
@@ -77,8 +77,6 @@ if (!class_exists('Nawawi\\DocketCache\\Plugin') || !class_exists('Nawawi\\Docke
  * Check for object-cache-delay.txt file.
  */
 if (@is_file(WP_CONTENT_DIR.'/.object-cache-delay.txt')) {
-    // rarely condition, use function_exists to confirm add_action exists
-    // to avoid fatal error on certain hosting mostly using apache mod_fcgid
     if (!\function_exists('add_action')) {
         return;
     }
@@ -110,11 +108,10 @@ if (@is_file(WP_CONTENT_DIR.'/.object-cache-delay.txt')) {
         add_action(
             'shutdown',
             function () {
-                // only remove expired transient
-                // dont remove all that will lead to heavy load once replace with our dropin
-                if (\function_exists('delete_expired_transients')) {
-                    delete_expired_transients(true);
+                if (\function_exists('nawawi_delete_transient_db')) {
+                    nawawi_delete_transient_db();
                 }
+
                 // previous file format
                 foreach (['object-cache-delay.txt', 'object-cache-after-delay.txt', 'object-cache.log'] as $f) {
                     $fx = WP_CONTENT_DIR.'/'.$f;
@@ -123,7 +120,6 @@ if (@is_file(WP_CONTENT_DIR.'/.object-cache-delay.txt')) {
                     }
                 }
 
-                // execute action after dropin installed
                 @rename(WP_CONTENT_DIR.'/.object-cache-delay.txt', WP_CONTENT_DIR.'/.object-cache-after-delay.txt');
             },
             PHP_INT_MAX

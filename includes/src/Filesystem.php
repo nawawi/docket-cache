@@ -538,7 +538,7 @@ class Filesystem
         $timestamp = date('Y-m-d H:i:s T');
 
         $rtag = trim($tag);
-        if (\in_array($rtag, ['hit', 'miss', 'err', 'exp', 'del'])) {
+        if (\in_array($rtag, ['hit', 'miss', 'err', 'exp', 'del', 'info'])) {
             $tag = str_pad($rtag, 5);
         }
         $log = '['.$timestamp.'] '.$tag.': "'.$id.'" "'.trim($data).'" "'.$caller.'"';
@@ -564,5 +564,12 @@ class Filesystem
         }
 
         return $time;
+    }
+
+    public function valid_timestamp($timestamp)
+    {
+        $timestamp = $this->sanitize_second($timestamp);
+
+        return $timestamp > 0;
     }
 }

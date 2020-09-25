@@ -694,6 +694,7 @@ class WP_Object_Cache
             return false;
         }
 
+        $id = $key;
         $key = $this->dc_key($key, $group);
 
         if (\is_object($data)) {
@@ -703,7 +704,12 @@ class WP_Object_Cache
         $this->cache[$group][$key] = $data;
 
         if (!$this->is_non_persistent_groups($group) && !$this->is_non_persistent_keys($key) || $this->is_filtered_groups($group, $key)) {
-            $expire = $this->maybe_expire($group, $expire);
+            $expire = $this->maybe_expire($group, $expire, $id);
+
+            if (0 === $expire && $this->is_data_updated($id, $group, $this->cache[$group][$key])) {
+                return true;
+            }
+
             $this->dc_save($key, $this->cache[$group][$key], $group, $expire);
         }
 
@@ -834,9 +840,9 @@ class WP_Object_Cache
         return \is_string($key) || \is_int($key);
     }
 
-    private function can_add_signature()
+    private function is_user_logged_in()
     {
-        return \function_exists('is_user_logged_in') && !is_user_logged_in();
+        return \function_exists('is_user_logged_in') && is_user_logged_in();
     }
 
     private function is_filtered_groups($group, $key)
@@ -887,7 +893,7 @@ class WP_Object_Cache
         return @preg_replace('@^\d+:@', '', $key, 1);
     }
 
-    private function maybe_expire($group, $expire = 0)
+    private function maybe_expire($group, $expire = 0, $key = '')
     {
         if (empty($expire)) {
             $expire = 0;
@@ -897,7 +903,11 @@ class WP_Object_Cache
 
         if (0 === $expire) {
             if (\in_array($group, ['site-transient', 'transient'])) {
-                $expire = 43200; // 12h
+                if ('site-transient' === $group && \in_array($key, ['update_plugins', 'update_themes', 'update_core'])) {
+                    $expire = 2419200; // 28d
+                } else {
+                    $expire = 43200; // 12h
+                }
             } elseif (\in_array($group, ['post_meta', 'options'])) {
                 $expire = 86400; // 24h
             }
@@ -934,6 +944,20 @@ class WP_Object_Cache
     private function skip_stats($group)
     {
         return $this->cf()->is_false('DOCKET_CACHE_LOG_ALL') && $this->fs()->internal_group($group);
+    }
+
+    private function is_data_updated($key, $group, $data)
+    {
+        $data_p = $this->dc_get($key, $group, false);
+        if (false !== $data_p && (@md5(@serialize($data_p)) === @md5(@serialize($data)))) {
+            if (\defined('DOCKET_CACHE_DEV') && DOCKET_CACHE_DEV) {
+                $this->dc_log('info', $group.':'.$key, 'data not change');
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     private function fs()
@@ -1153,6 +1177,7 @@ class WP_Object_Cache
         }
 
         $meta = [
+            'timestamp' => time(),
             'blog_id' => get_current_blog_id(),
             'group' => $group,
             'key' => $key,
@@ -1256,8 +1281,11 @@ class WP_Object_Cache
         }
 
         if (!empty($data)) {
-            $this->set($hash, $data, $group, 14400); // 4h
+            if ($this->is_data_updated($hash, $group, $data)) {
+                return;
+            }
 
+            $this->set($hash, $data, $group, 14400); // 4h
             $cache_hash[$hash] = 1;
             $this->set('index', $cache_hash, $group, 86400);
         }
@@ -1269,11 +1297,19 @@ class WP_Object_Cache
             return;
         }
 
-        $req_host = !empty($_SERVER['HTTP_HOST']) ? @preg_replace('@:\d+$@', '', $_SERVER['HTTP_HOST']) : 'localhost';
-        if (\function_exists('is_user_logged_in') && is_user_logged_in() && @preg_match('@/wp-admin/(network/)?.*?\.php\?.*?@', $req_uri)) {
-            $req_uri = $_SERVER['REQUEST_URI'];
-        } else {
-            $req_uri = @preg_replace('@\?.*@', '', $_SERVER['REQUEST_URI']);
+        $req_host = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+        if ('localhost' !== $req_host && false !== strpos($req_host, ':')) {
+            $req_host = @preg_replace('@:\d+$@', '', $req_host);
+        }
+
+        $req_uri = $_SERVER['REQUEST_URI'];
+        $dostrip = !empty($_SERVER['QUERY_STRING']);
+        if ($dostrip && $this->is_user_logged_in() && false !== strpos($req_uri, '.php?') && false !== strpos($req_uri, '/wp-admin/') && @preg_match('@/wp-admin/(network/)?.*?\.php\?.*?@', $req_uri)) {
+            $dostrip = false;
+        }
+
+        if ($dostrip) {
+            $req_uri = @preg_replace('@\?.*@', '', $req_uri);
         }
 
         if (empty($req_host) || empty($req_uri)) {
@@ -1418,7 +1454,7 @@ class WP_Object_Cache
             add_action(
                 'wp_head',
                 function () {
-                    if ($this->can_add_signature()) {
+                    if (!$this->is_user_logged_in()) {
                         $this->add_signature = true;
                     }
                 },
@@ -1428,7 +1464,7 @@ class WP_Object_Cache
             add_action(
                 'shutdown',
                 function () {
-                    if ($this->add_signature && $this->can_add_signature()) {
+                    if ($this->add_signature && !$this->is_user_logged_in()) {
                         echo "\n<!-- Performance optimized by Docket Cache: https://wordpress.org/plugins/docket-cache -->\n";
                     }
                 },

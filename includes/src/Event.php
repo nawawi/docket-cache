@@ -192,14 +192,6 @@ final class Event
                 $fm = time() + 120;
                 $ft = filemtime($fx);
 
-                if ($maxttl > 0 && $ft < $maxttl) {
-                    $this->plugin->unlink($fx, true);
-                    --$cnt;
-                    ++$collect->clean;
-                    ++$collect->maxttl_c;
-                    continue;
-                }
-
                 if ($fm >= $ft && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
                     $this->plugin->unlink($fx, true);
                     --$cnt;
@@ -209,13 +201,24 @@ final class Event
 
                 $data = $this->plugin->cache_get($fx);
                 if (false !== $data) {
-                    if (!empty($data['timeout']) && $fm >= (int) $data['timeout']) {
+                    if (!empty($data['timeout']) && $this->plugin->valid_timestamp($data['timeout']) && $fm >= (int) $data['timeout']) {
                         $this->plugin->unlink($fx, false);
                         unset($data);
                         --$cnt;
                         ++$collect->clean;
                         ++$collect->expired;
                         continue;
+                    }
+
+                    if (empty($data['timeout']) && !empty($data['timestamp']) && $this->plugin->valid_timestamp($data['timestamp']) && $maxttl > 0) {
+                        if ((int) $data['timestamp'] < $maxttl) {
+                            $this->plugin->unlink($fx, false);
+                            unset($data);
+                            --$cnt;
+                            ++$collect->clean;
+                            ++$collect->maxttl_c;
+                            continue;
+                        }
                     }
 
                     $bytestotal += \strlen(serialize($data));
@@ -227,6 +230,14 @@ final class Event
                     }
                 }
                 unset($data);
+
+                if ($maxttl > 0 && $ft < $maxttl) {
+                    $this->plugin->unlink($fx, true);
+                    --$cnt;
+                    ++$collect->clean;
+                    ++$collect->maxttl_c;
+                    continue;
+                }
 
                 if ($cnt >= $maxfile) {
                     $this->plugin->unlink($fx, true);

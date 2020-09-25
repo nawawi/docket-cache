@@ -808,6 +808,31 @@ final class Plugin extends Bepart
             }
         );
 
+        // refresh user_meta
+        if ($this->dropino()->validate()) {
+            // before login
+            add_action(
+                'set_logged_in_cookie',
+                function ($logged_in_cookie, $expire, $expiration, $user_id, $scheme, $token) {
+                    wp_cache_delete($user_id, 'user_meta');
+                },
+                PHP_INT_MAX,
+                6
+            );
+
+            // after logout
+            add_action(
+                'wp_logout',
+                function () {
+                    $user = wp_get_current_user();
+                    if (\is_object($user) && isset($user->ID)) {
+                        wp_cache_delete($user->ID, 'user_meta');
+                    }
+                },
+                PHP_INT_MAX
+            );
+        }
+
         add_action(
             'wp_ajax_docket_worker',
             function () {

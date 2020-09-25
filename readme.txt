@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.08.14
+Stable tag: 20.08.16
 License: MIT
 License URI: ./license.txt
 
@@ -107,6 +107,23 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.08.16 =
+
+Fix release.
+
+- Fixed WP_Object_Cache::set() -> only write to disk if data change and expiry not 0.
+- Fixed WP_Object_Cache::dc_precache_set -> only write to disk if data change.
+
+= 20.08.15 =
+
+Fix release.
+
+- Fixed precaching, invalid conditional for query string.
+- Fixed cache maxttl, missing timestamp in cache meta.
+- Fixed cache, flush user_meta group before login and after logout.
+- Fixed micro optimization, before using regex functions.
+- Fixed transient, remove all from db before activate our dropin.
+
 = 20.08.14 =
 
 Fix release.

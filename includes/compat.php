@@ -43,7 +43,7 @@ if (!\function_exists('nawawi_unserialize')) {
         }
 
         $ok = true;
-        if (@preg_match_all('@O:\d+:"([^"]+)"@', $data, $mm)) {
+        if (false !== strpos($data, 'O:') && @preg_match_all('@O:\d+:"([^"]+)"@', $data, $mm)) {
             if (!empty($mm) && !empty($mm[1])) {
                 foreach ($mm[1] as $v) {
                     if ('stdClass' !== $v) {
@@ -56,5 +56,43 @@ if (!\function_exists('nawawi_unserialize')) {
         }
 
         return !$ok ? $data : @unserialize(trim($data));
+    }
+}
+
+if (!\function_exists('nawawi_delete_transient_db')) {
+    function nawawi_delete_transient_db()
+    {
+        if (!wp_using_ext_object_cache()) {
+            return false;
+        }
+
+        if (!isset($GLOBALS['wpdb']) || !$GLOBALS['wpdb']->ready) {
+            return false;
+        }
+
+        $wpdb = $GLOBALS['wpdb'];
+
+        $suppress = $wpdb->suppress_errors(true);
+
+        // normal setup
+        $wpdb->query(
+            $wpdb->prepare('DELETE FROM `'.$wpdb->options.'` WHERE `option_name` LIKE %s', $wpdb->esc_like('_transient_').'%')
+        );
+
+        // single site
+        $wpdb->query(
+            $wpdb->prepare('DELETE FROM `'.$wpdb->options.'` WHERE `option_name` LIKE %s', $wpdb->esc_like('_site_transient_').'%')
+        );
+
+        // multisite
+        if (is_multisite() && isset($wpdb->sitemeta)) {
+            $wpdb->query(
+                $wpdb->prepare('DELETE FROM `'.$wpdb->sitemeta.'` WHERE `meta_key` LIKE %s', $wpdb->esc_like('_site_transient_').'%')
+            );
+        }
+
+        $wpdb->suppress_errors($suppress);
+
+        return true;
     }
 }

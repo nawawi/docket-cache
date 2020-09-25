@@ -74,6 +74,15 @@ final class CronAgent
         return !empty($_POST['ping']) && !empty($_GET['docketcache_ping']) && !empty($_SERVER['REQUEST_URI']) && false !== strpos($_SERVER['REQUEST_URI'], '/?docketcache_ping=');
     }
 
+    private function site_url_scheme($site_url)
+    {
+        if ('https://' !== substr($site_url, 0, 8) && $this->plugin->is_ssl()) {
+            $site_url = @preg_replace('@^(https?:)?//@', 'https://', $site_url);
+        }
+
+        return rtrim($site_url, '/\\');
+    }
+
     private function site_url()
     {
         $site_url = site_url();
@@ -85,11 +94,7 @@ final class CronAgent
             }
         }
 
-        if ('https://' !== substr($site_url, 0, 8) && $this->plugin->is_ssl()) {
-            $site_url = preg_replace('@^(https?:)?//@', 'https://', $site_url);
-        }
-
-        return rtrim($site_url, '/\\');
+        return $this->site_url_scheme($site_url);
     }
 
     private function site_meta()
@@ -123,7 +128,7 @@ final class CronAgent
                 'status' => $action,
             ],
             'headers' => [
-                'REFERER' => site_url(), // current site
+                'REFERER' => $this->site_url_scheme(site_url()), // current site
                 'DOCKETID' => $site_id,
             ],
         ];
