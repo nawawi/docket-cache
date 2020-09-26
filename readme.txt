@@ -102,14 +102,14 @@ A RAM disk is a representation of a hard disk using RAM resources, and it can ta
 
 Read and write speed on RAM is multiple times faster than SSD drives therefore storing Docket Cache files on a RAM disk greatly increases it's performance.
 
-Do note that creating RAM disks requires server administrative permission so this solution is not available for shared hosting servers.
+Do note that creating RAM disks requires server administrative permission (root access) so this solution is not suitable for shared hosting servers.
 
 This is an example command to create and use a RAM disk with Docket Cache:
 
 `$ cd wp-content/
 $ sudo mount -t tmpfs -o size=500m tmpfs ./cache/docket-cache`
 
-To mount the folder automatically on boot, you need to update your /etc/fstab file.
+To mount the cache path automatically on boot, you need to update your /etc/fstab file.
 
 Kindly refer to the articles below about RAM disk:
 
