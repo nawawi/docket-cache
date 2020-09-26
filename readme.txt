@@ -98,18 +98,18 @@ OPcache is a caching engine built into PHP, improves performance by storing prec
 Docket Cache converts the object cache into plain PHP code. When read and write cache, it will use OPcache directly which results in faster data retrieval and better performance.
 
 = What is a RAM disk in Docket Cache? =
-A RAM disk is a representation of a hard disk using RAM resources, and it can take the form of a hardware device or a virtual disk.
+A RAM disk is a representation of a hard disk using RAM resources, and it can take the form of a hardware device or a virtual disk. 
 
-Docket Cache stores the cache as plain PHP files. To increase the performance or to make it close to in-memory solutions, you can use a RAM disk as cache directory.
+Read and write speed on RAM is multiple times faster than SSD drives therefore storing Docket Cache files on a RAM disk greatly increases it's performance.
 
-This solution is not for shared hosting server. You need access to the server as root user.
+Do note that creating RAM disks requires server administrative permission so this solution is not available for shared hosting servers.
 
 This is an example command to create and use a RAM disk with Docket Cache:
 
 `$ cd wp-content/
 $ sudo mount -t tmpfs -o size=500m tmpfs ./cache/docket-cache`
 
-You need to edit /etc/fstab file to make it available after reboot.
+To mount the folder automatically on boot, you need to update your /etc/fstab file.
 
 Kindly refer to the articles below about RAM disk:
 
