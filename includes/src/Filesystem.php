@@ -16,11 +16,17 @@ use Nawawi\DocketCache\Exporter\VarExporter;
 
 class Filesystem
 {
+    /**
+     * is_docketcachedir.
+     */
     public function is_docketcachedir($dir)
     {
         return 'docket-cache' === basename($dir);
     }
 
+    /**
+     * filesize.
+     */
     public function filesize($file)
     {
         if (!@is_file($file)) {
@@ -30,6 +36,9 @@ class Filesystem
         return sprintf('%u', @filesize($file));
     }
 
+    /**
+     * chmod.
+     */
     public function chmod($file)
     {
         static $cache = [];
@@ -55,6 +64,9 @@ class Filesystem
         clearstatcache();
     }
 
+    /**
+     * copy.
+     */
     public function copy($src, $dst)
     {
         $this->opcache_flush($src);
@@ -69,6 +81,9 @@ class Filesystem
         return false;
     }
 
+    /**
+     * scanfiles.
+     */
     public function scanfiles($dir, $maxdepth = 0)
     {
         $dir = realpath($dir);
@@ -83,6 +98,9 @@ class Filesystem
         return [];
     }
 
+    /**
+     * tail.
+     */
     public function tail($filepath, $limit = 100, $do_last = true)
     {
         $limit = (int) $limit;
@@ -112,6 +130,9 @@ class Filesystem
         return $object;
     }
 
+    /**
+     * export_var.
+     */
     public function export_var($data, &$error = '')
     {
         try {
@@ -139,7 +160,10 @@ class Filesystem
         return $data;
     }
 
-    public function unlink($file, $del = false)
+    /**
+     * unlink.
+     */
+    public function unlink($file, $is_delete = false, $is_block = false)
     {
         // skip if not exist
         if (!@is_file($file)) {
@@ -150,7 +174,8 @@ class Filesystem
 
         $handle = @fopen($file, 'cb');
         if ($handle) {
-            if (@flock($handle, LOCK_EX | LOCK_NB)) {
+            $lock = $is_block ? LOCK_EX : LOCK_EX | LOCK_NB;
+            if (@flock($handle, $lock)) {
                 $ok = @ftruncate($handle, 0);
                 @flock($handle, LOCK_UN);
             }
@@ -160,16 +185,22 @@ class Filesystem
         // bcoz we empty the file
         $this->opcache_flush($file);
 
-        if ((DOCKET_CACHE_FLUSH_DELETE || $del) && @unlink($file)) {
+        $do_delete = (DOCKET_CACHE_FLUSH_DELETE && $this->is_php($file)) || $is_delete;
+
+        if ($do_delete && @unlink($file)) {
             $ok = true;
         }
+
+        clearstatcache();
 
         if (false === $ok) {
             // if failed, try to remove on shutdown instead of truncate
             add_action(
                 'shutdown',
                 function () use ($file) {
-                    @unlink($file);
+                    if (@is_file($file)) {
+                        @unlink($file);
+                    }
                 }
             );
         }
@@ -178,14 +209,18 @@ class Filesystem
         return true;
     }
 
-    public function put($file, $data, $flag = 'cb')
+    /**
+     * put.
+     */
+    public function put($file, $data, $flag = 'cb', $is_block = false)
     {
         if (!$handle = @fopen($file, $flag)) {
             return false;
         }
 
+        $lock = $is_block ? LOCK_EX : LOCK_EX | LOCK_NB;
         $ok = false;
-        if (@flock($handle, LOCK_EX | LOCK_NB)) {
+        if (@flock($handle, $lock)) {
             $len = \strlen($data);
             $cnt = @fwrite($handle, $data);
             @fflush($handle);
@@ -198,7 +233,7 @@ class Filesystem
         clearstatcache();
 
         if (false === $ok) {
-            $this->unlink($file, true);
+            $this->unlink($file, false);
 
             return -1;
         }
@@ -209,6 +244,9 @@ class Filesystem
         return $ok;
     }
 
+    /**
+     * dump.
+     */
     public function dump($file, $data)
     {
         $dir = \dirname($file);
@@ -216,7 +254,9 @@ class Filesystem
         add_action(
             'shutdown',
             function () use ($tmpfile) {
-                @unlink($tmpfile);
+                if (@is_file($tmpfile)) {
+                    @unlink($tmpfile);
+                }
             },
             PHP_INT_MAX
         );
@@ -242,6 +282,9 @@ class Filesystem
         return $ok;
     }
 
+    /**
+     * placeholder.
+     */
     public function placeholder($path)
     {
         if (!@is_dir($path)) {
@@ -258,16 +301,27 @@ class Filesystem
         $this->put($file, $code);
     }
 
+    /**
+     * is_php.
+     */
     public function is_php($file)
     {
+        $file = basename($file);
+
         return '.php' === substr($file, -4);
     }
 
+    /**
+     * is_opcache_enable.
+     */
     public function is_opcache_enable()
     {
         return @ini_get('opcache.enable') && \function_exists('opcache_reset');
     }
 
+    /**
+     * opcache_is_cached.
+     */
     public function opcache_is_cached($file)
     {
         if (!$this->is_opcache_enable()) {
@@ -289,6 +343,9 @@ class Filesystem
         return false;
     }
 
+    /**
+     * opcache_flush.
+     */
     public function opcache_flush($file)
     {
         if (!$this->is_opcache_enable()) {
@@ -307,6 +364,9 @@ class Filesystem
         return false;
     }
 
+    /**
+     * opcache_compile.
+     */
     public function opcache_compile($file)
     {
         if (!$this->is_opcache_enable()) {
@@ -328,6 +388,9 @@ class Filesystem
         return false;
     }
 
+    /**
+     * opcache_reset.
+     */
     public function opcache_reset($dir)
     {
         if (!$this->is_opcache_enable()) {
@@ -362,6 +425,9 @@ class Filesystem
         return true;
     }
 
+    /**
+     * define_cache_path.
+     */
     public function define_cache_path($cache_path)
     {
         $cache_path = !empty($cache_path) && is_dir($cache_path) && '/' !== $cache_path ? rtrim($cache_path, '/\\').'/' : WP_CONTENT_DIR.'/cache/docket-cache/';
@@ -372,8 +438,13 @@ class Filesystem
         return $cache_path;
     }
 
+    /**
+     * cachedir_flush.
+     */
     public function cachedir_flush($dir, $cleanup = false)
     {
+        wp_suspend_cache_addition(true);
+
         clearstatcache();
         $cnt = 0;
         $dir = realpath($dir);
@@ -392,6 +463,8 @@ class Filesystem
         if ($cleanup) {
             $this->unlink($dir.'/index.php', true);
         }
+
+        wp_suspend_cache_addition(false);
 
         return $cnt;
     }
@@ -442,6 +515,8 @@ class Filesystem
             }
         }
 
+        clearstatcache();
+
         return [
             'time' => time(),
             'size' => $bytestotal,
@@ -450,6 +525,9 @@ class Filesystem
         ];
     }
 
+    /**
+     * cache_get.
+     */
     public function cache_get($file)
     {
         if (!@is_file($file) || empty($this->filesize($file))) {
@@ -468,8 +546,8 @@ class Filesystem
                 $data = @include $file;
             } catch (\Exception $e) {
                 $error = $e->getMessage();
-                if (preg_match('@Class.*not found@', $error)) {
-                    @unlink($file);
+                if (false !== strpos($error, 'not found') && @preg_match('@Class.*not found@', $error)) {
+                    $this->unlink($file, false);
                 }
 
                 $this->log('err', 'internalproc-internalfunc', 'cache_get: '.$error);
@@ -487,6 +565,9 @@ class Filesystem
         return $data;
     }
 
+    /**
+     * code_stub.
+     */
     public function code_stub($data = '')
     {
         $is_debug = \defined('WP_DEBUG') && WP_DEBUG;
@@ -525,6 +606,9 @@ class Filesystem
         return $code;
     }
 
+    /**
+     * log.
+     */
     public function log($tag, $id, $data, $caller = '')
     {
         $do_flush = false;
@@ -543,14 +627,30 @@ class Filesystem
         }
         $log = '['.$timestamp.'] '.$tag.': "'.$id.'" "'.trim($data).'" "'.$caller.'"';
 
-        return @$this->put($file, $log.PHP_EOL, $do_flush ? 'cb' : 'ab');
+        $flags = !$do_flush ? FILE_APPEND : LOCK_EX;
+        $do_chmod = !@is_file($file);
+        if (@file_put_contents($file, $log.PHP_EOL, $flags)) {
+            if ($do_chmod) {
+                $this->chmod($file);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
+    /**
+     * internal_group.
+     */
     public function internal_group($group)
     {
         return 'docketcache' === substr($group, 0, 11);
     }
 
+    /**
+     * sanitize_second.
+     */
     public function sanitize_second($time)
     {
         $time = (int) $time;
@@ -566,6 +666,9 @@ class Filesystem
         return $time;
     }
 
+    /**
+     * valid_timestamp.
+     */
     public function valid_timestamp($timestamp)
     {
         $timestamp = $this->sanitize_second($timestamp);

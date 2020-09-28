@@ -16,6 +16,7 @@ final class Canopt extends Bepart
 {
     public $file;
     public $path;
+    public $path_lock;
 
     private static $inst;
 
@@ -23,6 +24,7 @@ final class Canopt extends Bepart
     {
         $this->path = DOCKET_CACHE_DATA_PATH;
         $this->file = $this->path.'/options.php';
+        $this->path_lock = $this->path.'/lock';
     }
 
     public static function init()
@@ -165,11 +167,33 @@ final class Canopt extends Bepart
         return @unlink($file);
     }
 
+    public function clear_lock()
+    {
+        $path = $this->path_lock;
+        if (!@is_dir($path)) {
+            return false;
+        }
+
+        $files = glob($path.'/lock-*.txt', GLOB_MARK | GLOB_NOSORT);
+        if (!empty($files) && \is_array($files)) {
+            foreach ($files as $file) {
+                if (@is_file($file) && @is_writable($file)) {
+                    if (\defined('DocketCache_CLI') && DocketCache_CLI) {
+                        fwrite(STDOUT, basename($file).PHP_EOL);
+                    }
+                    @unlink($file);
+                }
+            }
+        }
+
+        return true;
+    }
+
     private function lock_file($key)
     {
         $key = substr(md5($key), 0, 12);
-        $path = $this->path.'/lock';
-        if (!@wp_mkdir_p($path)) {
+        $path = $this->path_lock;
+        if (!@wp_mkdir_p($path.'/')) {
             return false;
         }
         $this->placeholder($path);
@@ -184,7 +208,16 @@ final class Canopt extends Bepart
             return false;
         }
 
-        return @file_put_contents($file, $value, LOCK_EX);
+        $do_chmod = !@is_file($file);
+        if (@file_put_contents($file, $value, LOCK_EX)) {
+            if ($do_chmod) {
+                $this->chmod($file);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function unlock($key)
@@ -199,6 +232,8 @@ final class Canopt extends Bepart
 
     public function locked($key, &$value = '')
     {
+        clearstatcache();
+
         $file = $this->lock_file($key);
         if (!$file || !@is_file($file)) {
             return false;

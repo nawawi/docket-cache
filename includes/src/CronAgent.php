@@ -28,7 +28,7 @@ final class CronAgent
     public function register()
     {
         add_action(
-            'init',
+            'wp',
             function () {
                 $this->receive_ping();
             },
@@ -85,14 +85,10 @@ final class CronAgent
 
     private function site_url()
     {
-        $site_url = site_url();
+        $blog_id = get_main_site_id();
 
-        if (is_multisite() && !is_main_site()) {
-            $site_id = get_main_site_id();
-            if (!empty($site_id)) {
-                $site_url = get_site_url($site_id);
-            }
-        }
+        $scheme = $this->plugin->is_ssl() ? 'https' : 'http';
+        $site_url = get_site_url($blog_id, '', $scheme);
 
         return $this->site_url_scheme($site_url);
     }

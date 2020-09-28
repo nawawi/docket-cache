@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.08.16
+Stable tag: 20.08.18
 License: MIT
 License URI: ./license.txt
 
@@ -129,6 +129,27 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.08.18 =
+
+This is an enhanced version based on previous fix releases.
+
+- Fixed Cache Log -> change to native file_put_contents instead of put() to avoid early unlock result to truncate.
+- Fixed Filesystem::put() -> add blocking option to avoid early unlock.
+- Fixed dc_save() -> invalid conditional for is_data_updated().
+- Fixed skip_stats() -> add checking for ignored groups.
+- Fixed unlink -> add checking is_file to avoid php warning and make query-monitor happy.
+- Fixed Canopt::setlock() -> set file permission if write true.
+- Added DOCKET_CACHE_IGNORED_PRECACHE constant to exclude group:key from precaching.
+- Added DOCKET_CACHE_IGNORED_GROUPKEY constant to exclude group:key from persistent cache.
+- Added CLI command "unlock" to clear all lock files.
+
+= 20.08.17 =
+
+Fix release.
+
+- Fixed CronAgent, woocommerce -> get_cart - not be called before the wp_loaded action.
+- Fixed WP_Object_Cache::$cache_hits, WP_Object_Cache::$cache_misses -> hit rate.
+
 = 20.08.16 =
 
 Fix release.

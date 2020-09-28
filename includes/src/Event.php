@@ -189,7 +189,7 @@ final class Event
 
                 $fn = $object->getFileName();
                 $fs = $object->getSize();
-                $fm = time() + 120;
+                $fm = time() + 300;
                 $ft = filemtime($fx);
 
                 if ($fm >= $ft && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
@@ -198,6 +198,8 @@ final class Event
                     ++$collect->clean;
                     continue;
                 }
+
+                $domaxttl = false;
 
                 $data = $this->plugin->cache_get($fx);
                 if (false !== $data) {
@@ -217,6 +219,8 @@ final class Event
                             --$cnt;
                             ++$collect->clean;
                             ++$collect->maxttl_c;
+
+                            $domaxttl = true;
                             continue;
                         }
                     }
@@ -231,7 +235,7 @@ final class Event
                 }
                 unset($data);
 
-                if ($maxttl > 0 && $ft < $maxttl) {
+                if (!$domaxttl && $maxttl > 0 && $ft < $maxttl) {
                     $this->plugin->unlink($fx, true);
                     --$cnt;
                     ++$collect->clean;

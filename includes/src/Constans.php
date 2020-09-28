@@ -197,6 +197,19 @@ final class Constans
             ]
         );
 
+        // @private
+        // cache ignored group:key
+        $this->maybe_define('DOCKET_CACHE_IGNORED_GROUPKEY', []);
+
+        // @private
+        // cache ignored precache
+        $this->maybe_define(
+            'DOCKET_CACHE_IGNORED_PRECACHE',
+            [
+                'freemius:fs_accounts',
+            ]
+        );
+
         // misc tweaks
         $this->maybe_define('DOCKET_CACHE_MISC_TWEAKS', true);
 

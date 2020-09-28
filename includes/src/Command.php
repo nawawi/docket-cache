@@ -180,6 +180,23 @@ class Command extends WP_CLI_Command
     }
 
     /**
+     * Clear lock files.
+     *
+     * Remove lock file.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache clearlock
+     *
+     * @subcommand flush
+     */
+    public function clearlock()
+    {
+        $this->plugin->canopt()->clear_lock();
+        $this->halt_success(__('The lock file flushed.', 'docket-cache'));
+    }
+
+    /**
      * Run garbage collector.
      *
      * Remove empty and older files.

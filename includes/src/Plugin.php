@@ -1438,6 +1438,7 @@ final class Plugin extends Bepart
             \WP_CLI::add_command('cache type', [$cli, 'type']);
             \WP_CLI::add_command('cache flush', [$cli, 'flush_cache']);
             \WP_CLI::add_command('cache gc', [$cli, 'rungc']);
+            \WP_CLI::add_command('cache unlock', [$cli, 'clearlock']);
         }
     }
 
