@@ -12,7 +12,8 @@ body {
 }
 
 #docket-cache {
-    margin-top: 20px;
+    margin-top: 10px;
+    max-width: 1440px;
 }
 
 #docket-cache .hide {
@@ -84,6 +85,7 @@ body {
 }
 
 #docket-cache .overview .form-table th,
+#docket-cache .log .form-table th,
 #docket-cache .cronbot .form-table th {
     min-width: 250px;
 }
@@ -106,11 +108,6 @@ body {
     text-align: center;
 }
 
-#docket-cache .button-refresh {
-    opacity: 0.6;
-    font-weight: bold;
-}
-
 #docket-cache .bt-fx {
     min-width: 100px;
     margin-bottom: 4px;
@@ -123,11 +120,17 @@ body {
 #docket-cache .log select {
     display: inline-block;
     margin-bottom: 10px;
+    font-family: monospace, Consolas, Monaco;
+    unicode-bidi: embed;
+    font-size: 12px;
+    min-width: 100px;
 }
 
 #docket-cache .log span.vcache {
-    display: inline-block;
+    display: block;
     margin-top: 5px;
+    margin-bottom: 5px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
 #docket-cache .log textarea {
@@ -140,6 +143,47 @@ body {
     white-space: pre;
     overflow: auto;
     background-color: white;
+}
+
+/* cronbot */
+#docket-cache .cronbot p.submit {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+#docket-cache .cronbot .config-select {
+    min-width: 300px;
+}
+
+#docket-cache .cronbot .button {
+    min-width: 180px;
+}
+
+/* actions */
+#docket-cache div.qact {
+    display: block;
+    width: 100%;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+}
+
+#docket-cache div.qact .button {
+    width: 60%;
+}
+
+#docket-cache div.qact h4 {
+    margin: 0;
+    font-size: 14px;
+}
+
+#docket-cache div.qact p {
+    margin-top: 0;
+}
+
+#docket-cache div.qact hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background-color: #ddd;
 }
 
 /* config */
@@ -220,7 +264,7 @@ body {
 }
 
 #docket-cache .log p.submit {
-    margin-top: 12px;
+    margin-top: 0;
 }
 
 #docket-cache .log textarea {
@@ -245,6 +289,11 @@ body {
     flex-direction: row;
     justify-content: space-between;
     align-items: stretch;
+}
+
+#docket-cache .flex-container div.row {
+    width: 100%;
+    border: none;
 }
 
 #docket-cache .flex-container div.row-left {
@@ -287,40 +336,23 @@ body {
     text-decoration: underline;
 }
 
-#docket-cache .connector-table {
-    width: 100%;
-}
-
-#docket-cache .connector-table td,
-#docket-cache .connector-table th {
-    padding: 6px;
-    text-align: left;
-    vertical-align: middle;
-}
-
-#docket-cache .connector-table th {
-    font-weight: 600;
-    width: 40%;
-}
-
-#docket-cache .connector-table input.api {
-    width: 100%;
-}
-
-#docket-cache .connector-table input.btapi {
-    width: 100%;
-}
-
-#docket-cache .connector-table a {
-    text-decoration: none;
-    margin-right: 6px;
-}
-
-#docket-cache .connector-table a:hover {
-    text-decoration: underline;
+#docket-cache .flex-container .postbox .inside p:last-of-type {
+    margin-bottom: 20px;
 }
 
 /* /flex */
+
+#docket-cache .tab-content {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#docket-cache #dclogo {
+    width: 130px;
+    height: 31px;
+    float: left;
+    margin-bottom: 2px;
+}
 
 /* desktop */
 @media only screen and (min-width: 782px) {
@@ -341,6 +373,10 @@ body {
 
 /* small */
 @media only screen and (max-width:782px) {
+    #docket-cache #dclogo {
+        margin-bottom: 10px;
+    }
+
     #docket-cache .nav-tab {
         display: none;
     }
@@ -372,6 +408,7 @@ body {
         width: 32%;
     }
 
+    #docket-cache div.qact .button,
     #docket-cache p.submit .button {
         display: block;
         width: 100%;
@@ -383,7 +420,7 @@ body {
     }
 
     #docket-cache .form-table td {
-        padding-top: 0;
+        padding-top: 6px;
     }
 
     #docket-cache .border-b {
@@ -417,18 +454,13 @@ body {
         margin: 0;
     }
 
-    #docket-cache .connector-table th,
-    #docket-cache .connector-table td {
-        width: 100%;
-        display: block;
-        float: left;
-        padding-right: 0;
-        padding-left: 0;
-    }
-
     #docket-cache .flex-container .postbox .inside .bt-cx {
         display: block;
         width: 100%;
+    }
+
+    #docket-cache .cronbot a.button:not(:first-of-type) {
+        margin-top: 10px;
     }
 }
 

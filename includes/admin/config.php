@@ -16,39 +16,19 @@ namespace Nawawi\DocketCache;
     <div class="flex-container">
         <div class="row-left">
             <?php $this->tab_title(esc_html__('Configuration', 'docket-cache')); ?>
-            <p class="desc"><?php esc_html_e('The following option allows to quickly change basic configuration, overwrites by constants if defined.', 'docket-cache'); ?></p>
             <table class="form-table form-table-selection">
                 <tr>
-                    <th class="border-b"><?php esc_html_e('Cronbot Service', 'docket-cache'); ?></th>
+                    <th><?php esc_html_e('Cronbot Service', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('cronbot', DOCKET_CACHE_CRONBOT); ?>
                     </td>
                 </tr>
                 <tr>
-                    <th<?php echo !DOCKET_CACHE_LOG ? ' class="border-b"' : ''; ?>><?php esc_html_e('Cache Log', 'docket-cache'); ?></th>
-                        <td>
-                            <?php echo $this->config_select_bool('log', DOCKET_CACHE_LOG); ?>
-                        </td>
-                </tr>
-                <?php if (DOCKET_CACHE_LOG) : ?>
-                <tr>
-                    <th class="border-b"><?php esc_html_e('Cache Log View In', 'docket-cache'); ?></th>
+                    <th class="border-b"><?php esc_html_e('Cache Log', 'docket-cache'); ?></th>
                     <td>
-                        <?php
-                        echo $this->config_select_set(
-                            'log_time',
-                            [
-                                'default' => __('Default', 'docket-cache'),
-                                'utc' => __('UTC', 'docket-cache'),
-                                'local' => __('Local time', 'docket-cache'),
-                                'wp' => __('Site Format', 'docket-cache'),
-                            ],
-                            DOCKET_CACHE_LOG_TIME
-                        );
-                        ?>
+                        <?php echo $this->config_select_bool('log', DOCKET_CACHE_LOG); ?>
                     </td>
                 </tr>
-                <?php endif; ?>
                 <tr>
                     <th><?php esc_html_e('Advanced Post Caching', 'docket-cache'); ?></th>
                     <td>
@@ -125,6 +105,12 @@ namespace Nawawi\DocketCache;
                     <th><?php esc_html_e('Admin Page Loader', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('pageloader', DOCKET_CACHE_PAGELOADER); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php esc_html_e('Auto Update', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('autoupdate', DOCKET_CACHE_AUTOUPDATE); ?>
                     </td>
                 </tr>
                 <tr>

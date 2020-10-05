@@ -297,4 +297,109 @@ class Bepart extends Filesystem
 
         return \function_exists('is_ssl') ? is_ssl() : false;
     }
+
+    public function get_network_sites()
+    {
+        $data = [];
+
+        if (is_multisite()) {
+            $args = [
+                'public' => 1,
+                'spam' => 0,
+                'archived' => 0,
+                'deleted' => 0,
+            ];
+
+            $sites = get_sites();
+            if (!empty($sites) && \is_array($sites)) {
+                $main_site_id = get_main_site_id();
+                foreach ($sites as $num => $site) {
+                    $data[$num]['id'] = $site->blog_id;
+                    switch_to_blog($site->blog_id);
+                    $data[$num]['url'] = get_option('siteurl');
+                    restore_current_blog();
+                    $data[$num]['is_main'] = 0;
+                    if ((int) $site->blog_id === (int) $main_site_id) {
+                        $data[$num]['is_main'] = 1;
+                    }
+                }
+            }
+        } else {
+            $data[0] = [
+                'id' => get_current_blog_id(),
+                'url' => get_option('siteurl'),
+                'is_main' => 1,
+            ];
+        }
+
+        return $data;
+    }
+
+    public function switch_cron_site()
+    {
+        if (is_multisite()) {
+            $cronbot_siteid = $this->get_cron_siteid();
+            if (!empty($cronbot_siteid) && (int) $cronbot_siteid > 0) {
+                switch_to_blog($cronbot_siteid);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function delete_cron_siteid($userid = false)
+    {
+        if (empty($userid)) {
+            $userid = get_current_user_id();
+        }
+
+        return delete_user_meta($userid, 'cronbot-siteid');
+    }
+
+    public function set_cron_siteid($id)
+    {
+        return update_user_meta(get_current_user_id(), 'cronbot-siteid', $id);
+    }
+
+    public function get_cron_siteid()
+    {
+        $siteid = get_user_meta(get_current_user_id(), 'cronbot-siteid', true);
+        if (empty($siteid)) {
+            $siteid = is_multisite() ? get_main_site_id() : get_current_blog_id();
+        }
+
+        return $siteid;
+    }
+
+    public function get_crons($all = false, &$count = 0)
+    {
+        $cron_array = $all ? _get_cron_array() : wp_get_ready_cron_jobs();
+        if (empty($cron_array)) {
+            $count = 0;
+
+            return false;
+        }
+
+        $crons = $cron_array;
+        $count = \count($crons);
+        $cnt = 0;
+        foreach ($cron_array as $timestamp => $cronhooks) {
+            foreach ($cronhooks as $hook => $keys) {
+                if (!has_action($hook)) {
+                    wp_clear_scheduled_hook($hook);
+                    unset($crons[$timestamp]);
+                    continue;
+                }
+                ++$cnt;
+            }
+        }
+
+        unset($cron_array);
+
+        $count = $cnt;
+
+        return $crons;
+    }
 }

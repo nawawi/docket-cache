@@ -23,7 +23,6 @@ final class View
     private $log_max_size;
     private $cache_max_size;
     private $cronbot_enable;
-    private $pageconfig_enable;
 
     public function __construct(Plugin $plugin)
     {
@@ -32,7 +31,6 @@ final class View
         $this->log_max_size = $this->plugin->normalize_size(DOCKET_CACHE_LOG_SIZE);
         $this->cache_max_size = $this->plugin->normalize_size(DOCKET_CACHE_MAXSIZE);
         $this->cronbot_enable = $this->plugin->constans()->is_true('DOCKET_CACHE_CRONBOT');
-        $this->pageconfig_enable = $this->plugin->constans()->is_true('DOCKET_CACHE_PAGECONFIG');
     }
 
     private function parse_log_query()
@@ -173,7 +171,7 @@ final class View
         $idx = !empty($_GET['idx']) ? sanitize_text_field($_GET['idx']) : 'overview';
         switch ($idx) {
             case 'log':
-                if (!$this->log_enable && $this->pageconfig_enable) {
+                if (!$this->log_enable) {
                     $idx = 'config';
                 }
                 break;
@@ -213,12 +211,48 @@ final class View
             unset($lists['cronbot']);
         }
 
-        if (!$this->pageconfig_enable) {
-            unset($lists['config']);
-        }
+        $icon = 'iVBORw0KGgoAAAANSUhEUgAAAHUAAAAfCAYAAADZa4KAAAAABmJLR0QA/wD/AP+gvaeTAAAACXBI';
+        $icon .= 'WXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH5AoBDh8H6q06xwAAB7pJREFUaN7tmnuwlVUZxn/nHFgH';
+        $icon .= 'kZvE5aiIl0AmBAOWkxQYiiJOmubUrDKzvGSUxSSIKThURhEihJNTk+YFggrWkGMjKYbp5ESStLQC';
+        $icon .= 'Cs6h2+QhSbnVgWApnP7Yzzez3O19Lptz8Y/vndmz97e/9a3L+6z3eS/rq6IdEpzpBdQCpwLn6vsE';
+        $icon .= '4CiwG9gONACHgEPWx2Zy6XKpaiOYg4H3AaOBdwL/An4H/ANoEtBDgLHACOA1YAvwe+vjH3M1v81A';
+        $icon .= 'Dc7cKKv8A7DZ+rilDc+cqk0wFngDWGR9fCNXdzeDGpypBR4FNgKrrY972tt5cKY38H5gLnCt9fGV';
+        $icon .= 'XOXdJMGZgcGZh4Mzl+m6qgP62xicsbl2O1+qywRDdwJPWR/X6+9hwZnRlQ5ifdwLXArcGpwZl6u9';
+        $icon .= 'i0EFvg7UWx/XJv8dBuZlllshsAfV94zgzEm56rsI1ODMNcAR6+NDRYC8BvwKWBOc+dxxALsDeA6Y';
+        $icon .= 'kau+C0BVYHSD9fGuMm2fAJ4Grg7O3HccwHrgguDM8Fz9nW+pM4D7WwCjEdgJPALsDc48GJzpX+G4';
+        $icon .= 's4Alufo7EVSlHqcBLwZnBgRnppbxewsVRN0DbAKWBGfqKrDWesAEZ4blEHSepY4CXgEOABE4G3g+';
+        $icon .= 'OOODMzODM2cIjCbg+8Ay6+MjwE+BVRUGPt8GPplD0HmgDgX+bX08bH08JOAeBK4AJgDrgzM7gjOz';
+        $icon .= 'VJCYEJwZbn1cB8wDNgdnBrVz7F8D57VwfwgwEbBAnw5Y63DgDqCmE3V5LTCbQiWt0ty+L3CzmLOy';
+        $icon .= 'iaiw0FtWmtHjUevj/cANwIWyqA8DI4F64ESlOP2tjy8CHwXWtTP4eRM4EJypLnP/GuAFYDnQCCw+';
+        $icon .= 'TkCGqM/qCp7doc1VToYCf1Nccg6w8jjmeoKMaXClC+2hwftQKM4X+741wZmdCqBWWx9vAW4JzkwT';
+        $icon .= 'yA8HZ7YqKv4KcE9w5jbr4642jN0MvK7J7y4D+stiigHANgqHBCt1/z3AuykcKPyCwiFDJmcDk7S+';
+        $icon .= 'LfL/zeozk3OB/wiMZuB8YJw29zr1eyZwOlCnzX2y5tRYNNcVwAbgJl1Xqc+ewHs1H4CX9Emtcjow';
+        $icon .= 'CHhV7gzgCIXDk/HAXuAp1QoAhgEXq+9fUjgV+z/KqBKwR8oENQFwwPjgzPf03wbr42eBOcCfgeu1';
+        $icon .= 'oCbgm+3YVPsB08qmy9qtSPLb6QrWagX6t4DMr4+Wddfp+Q8k/VVROGCYrkKIkfIvB76h++cDP1T7';
+        $icon .= 'QQK6msLp1HhtsFT6CbilRRsWGcvFQHZkuQyYnMxlLXCJ5jRN4zRTONKckmQKWW3gZOAnwClAf7nC';
+        $icon .= 'oZQoC/YIzlwfnLmwJe0HZ0xwZkFw5rniWnBwpk9wZmJw5tngTHNw5t7W0AzO1ARnFgdnTinT5PMU';
+        $icon .= 'TobSlCs7EFgF3Kjfg4EngYt0vRJYUERniD43CsCXgbOSNltkiZnUiwkyeVWWX6oKN5LC+XEpv19V';
+        $icon .= '1H5OkjbeROH4MpNeyXqeAabq+ioVbAAeABYlz3wXuL2UpR4DDooKWkpDovVxvgKozcGZgcm9Juvj';
+        $icon .= 'JuvjVFnNnODMBIF3ZXBmdpkF9xMFt0Vqgf8m/nG7fjeJMgcm4L2QPJc9c0zPrQL2AH9J2oxR/r1T';
+        $icon .= 'dDZAbYvdQdZPKlH/9Sox595irtfVbmESQE0UfWZyONHLAbETwD5RLWKKT2mODcDHRMdvBdX6eEyK';
+        $icon .= 'OakN1lVlffyxOl4UnBlVbLXWx9vkXxfKCv8EnFcin60GBlsfYyt+N5NJipgzBfdKlNBDFIb8ZP8y';
+        $icon .= 'm6hKUfA+KTiTQwpORgngOll/KsfKzPHv6m9yiXsXiH5PE9XfkVj0/hIbpzWJwN1ihzGy6lnlUpq9';
+        $icon .= 'QN/gTM9WrLVZ39uA+RTecuhVot3XgBHWx13WxwZR6dyiZmNEc+WkRj5tihYyKfHXL4m+Bsinnp5Y';
+        $icon .= '3gpgpvxSP+CypL8msdJs0W3mb38kauytz1WK8DPZpQh/XMIIqSwF7pM/PgP4uDZQrWKVGkXFX0gs';
+        $icon .= 'foXGnyLApyV49Ewsujqx1O8AtyauY7IwKAlqvZxwm4sI1sfdiviOlLDo3hmdBGcuF2WfFZx5V9Ls';
+        $icon .= 'M8DqFob4qyLem7Wo6QnlLhGFPiP/uRjYqnvLgccVUGxIfOF+CocSVYr0F8iSalUl2wc8Kwu9IrF8';
+        $icon .= 'gE9IN/NkzaUKKYv0/YT8e7XodYsY5i4Bv03PbFUAOl/R+UzNLQKbkxRzT8JQq7XW5XIxX0oAfwsl';
+        $icon .= 'ZUB8FVhvfdx0vFl4cOYxpTkNGuN5UXZf6+Oy4Ewf4Gnr46S8/tPx0iP5/Shwd3DmN5W8BSigzhS1';
+        $icon .= '/dP6+EBwpsb6eFRNHiqqIc/N1d85Upya3A68aX1c1k4wRyjBHglssz4+3kL7i4APWR+/mKu/c2u/';
+        $icon .= 'mZ+8FxgbnLm0nRFZo3KpRa0AWgd8REl4Ll1hqUmQswqYZ33c3lEDKbL+MhBaAj6XDrZUWeshRYN3';
+        $icon .= 'BmfGdBCgAxT9HcwB7QZLTYAYC3xapbpV1scjFQJ6CXAl8Fvr4w9ylXcjqALkHcAHlag/qfeL2grm';
+        $icon .= 'OSo6NAJr9dJZLt0NqsCpVhXlOgrHbT8HHrM+bi3RdqgS9+uUoy4FGpK0Jpe3A6glgJsGXE2h7FVD';
+        $icon .= 'odZ6IoU67W7gZ8Aa6+PhXL3dI/8DPjBuXO0kT+cAAAAASUVORK5CYII=';
 
+        //$icon = plugin_dir_url($this->plugin->file).'/includes/admin/header.png?'.time();
         $option = '';
         $html = '<nav class="nav-tab-wrapper">';
+        $html .= '<div id="dclogo" style="background: url(data:image/png;base64,'.$icon.') no-repeat left;"></div>';
         foreach ($lists as $id => $text) {
             $link = $this->tab_query($id);
             $active = $this->tab_active($id);
@@ -321,7 +355,7 @@ final class View
         return $html;
     }
 
-    private function config_select_set($name, $options, $default)
+    private function config_select_set($name, $options, $default, $idx = 'config')
     {
         $action = 'save-'.$name;
         $html = '<select id="'.$name.'" class="config-select">';
@@ -329,7 +363,7 @@ final class View
             $url = $this->plugin->action_query(
                 $action,
                 [
-                    'idx' => 'config',
+                    'idx' => $idx,
                     'nv' => $n,
                 ]
             );
@@ -366,7 +400,7 @@ final class View
         static $inst;
 
         if (!\is_object($inst)) {
-            $inst = new EventList();
+            $inst = new EventList($this->plugin);
         }
 
         $inst->prepare_items();

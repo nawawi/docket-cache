@@ -65,7 +65,7 @@ class Command extends WP_CLI_Command
     }
 
     /**
-     * Display the Docket object cache status enable or disable.
+     * Display the Docket Cache status.
      *
      * ## EXAMPLES
      *
@@ -85,10 +85,10 @@ class Command extends WP_CLI_Command
     }
 
     /**
-     * Enables the Docket object cache.
+     * Enables the Docket Cache Drop-In file.
      *
-     * Default behavior is to create the object cache drop-in,
-     * unless an unknown object cache drop-in is present.
+     * Default behavior is to create the object cache Drop-In,
+     * unless an unknown object cache Drop-In is present.
      *
      * ## EXAMPLES
      *
@@ -102,7 +102,7 @@ class Command extends WP_CLI_Command
                 WP_CLI::halt(0);
             }
 
-            $this->halt_error(__('An unknown object cache drop-in was found. To use Docket object cache, run: wp cache update.', 'docket-cache'));
+            $this->halt_error(__('An unknown object cache Drop-In was found. To use Docket object cache, run: wp cache update.', 'docket-cache'));
         }
 
         if ($this->plugin->dropino()->install()) {
@@ -113,10 +113,10 @@ class Command extends WP_CLI_Command
     }
 
     /**
-     * Disables the Docket object cache.
+     * Disables the Docket Cache Drop-In file.
      *
-     * Default behavior is to delete the object cache drop-in,
-     * unless an unknown object cache drop-in is present.
+     * Default behavior is to delete the object cache Drop-In,
+     * unless an unknown object cache Drop-In is present.
      *
      * ## EXAMPLES
      *
@@ -125,11 +125,11 @@ class Command extends WP_CLI_Command
     public function disable()
     {
         if (!$this->plugin->dropino()->exists()) {
-            $this->halt_error(__('No object cache drop-in found.', 'docket-cache'));
+            $this->halt_error(__('No object cache Drop-In found.', 'docket-cache'));
         }
 
         if (!$this->plugin->dropino()->validate()) {
-            $this->halt_error(__('An unknown object cache drop-in was found. To use Docket run: wp cache update.', 'docket-cache'));
+            $this->halt_error(__('An unknown object cache Drop-In was found. To use Docket run: wp cache update.', 'docket-cache'));
         }
 
         if ($this->plugin->dropino()->uninstall()) {
@@ -140,9 +140,9 @@ class Command extends WP_CLI_Command
     }
 
     /**
-     * Updates the Docket object cache drop-in.
+     * Updates the Docket Cache Drop-In file.
      *
-     * Default behavior is to overwrite any existing object cache drop-in.
+     * Default behavior is to overwrite any existing object cache Drop-In.
      *
      * ## EXAMPLES
      *
@@ -153,15 +153,15 @@ class Command extends WP_CLI_Command
     public function update_dropino()
     {
         if ($this->plugin->dropino()->install()) {
-            $this->halt_success(__('Updated object cache drop-in and enabled Docket object cache.', 'docket-cache'));
+            $this->halt_success(__('Updated object cache Drop-In and enabled Docket object cache.', 'docket-cache'));
         }
-        $this->halt_error(__('Object cache drop-in could not be updated.', 'docket-cache'));
+        $this->halt_error(__('Object cache Drop-In could not be updated.', 'docket-cache'));
     }
 
     /**
      * Flushes the object cache.
      *
-     * For WordPress.
+     * Remove the object cache files.
      *
      * ## EXAMPLES
      *
@@ -180,7 +180,7 @@ class Command extends WP_CLI_Command
     }
 
     /**
-     * Clear lock files.
+     * Removes the Docket Cache lock files.
      *
      * Remove lock file.
      *
@@ -197,9 +197,9 @@ class Command extends WP_CLI_Command
     }
 
     /**
-     * Run garbage collector.
+     * Run the Docket Cache garbage collector (GC).
      *
-     * Remove empty and older files.
+     * Remove empty and older files, and execute various actions.
      *
      * ## EXAMPLES
      *

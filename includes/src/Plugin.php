@@ -71,6 +71,20 @@ final class Plugin extends Bepart
     public $cache_path;
 
     /**
+     * API Endpoint.
+     *
+     * @var string
+     */
+    public $api_endpoint;
+
+    /**
+     * Cronbot Endpoint.
+     *
+     * @var string
+     */
+    public $cronbot_endpoint;
+
+    /**
      * constructor.
      */
     public function __construct()
@@ -377,10 +391,39 @@ final class Plugin extends Bepart
         $size = wp_convert_hr_to_bytes($size);
         $size = str_replace([',', ' ', 'B'], '', size_format($size));
         if (is_numeric($size)) {
-            $size = $size.' '.__('Byte', 'docket-cache');
+            $size = $size.'B';
         }
 
         return $size;
+    }
+
+    public function site_url_scheme($site_url)
+    {
+        if ('https://' !== substr($site_url, 0, 8) && $this->is_ssl()) {
+            $site_url = @preg_replace('@^(https?:)?//@', 'https://', $site_url);
+        }
+
+        return rtrim($site_url, '/\\');
+    }
+
+    public function site_url($current = false)
+    {
+        $site_url = get_option('siteurl');
+        if (!$current && is_multisite()) {
+            $blog_id = get_main_site_id();
+            switch_to_blog($blog_id);
+            $site_url = get_option('siteurl');
+            restore_current_blog();
+        }
+
+        return $this->site_url_scheme($site_url);
+    }
+
+    public function site_meta()
+    {
+        $meta = (is_multisite() ? 1 : 0).','.$this->version().','.$GLOBALS['wp_version'];
+
+        return str_replace('.', '', $meta);
     }
 
     /**
@@ -563,11 +606,22 @@ final class Plugin extends Bepart
         $this->wearechampion();
     }
 
+    /**
+     * register_init.
+     */
     private function register_init()
     {
-        $this->page = (is_multisite() ? 'settings.php' : 'options-general.php').'?page='.$this->slug;
-        $this->screen = 'settings_page_docket-cache';
+        $this->page = 'admin.php?page='.$this->slug;
+        $this->screen = 'toplevel_page_docket-cache';
         $this->cache_path = $this->define_cache_path($this->constans()->value('DOCKET_CACHE_PATH'));
+
+        $this->api_endpoint = 'https://api.docketcache.com';
+        $this->cronbot_endpoint = 'https://cronbot.docketcache.com';
+
+        if ($this->constans()->is_true('DOCKET_CACHE_DEV')) {
+            $this->api_endpoint = 'http://api.docketcache.local';
+            $this->cronbot_endpoint = 'http://cronbot.docketcache.local';
+        }
     }
 
     /**
@@ -684,6 +738,7 @@ final class Plugin extends Bepart
              'docket-disconnect-cronbot',
              'docket-runevent-cronbot',
              'docket-runeventnow-cronbot',
+             'docket-selectsite-cronbot',
          ];
 
         foreach ($this->canopt()->keys() as $key) {
@@ -730,20 +785,93 @@ final class Plugin extends Bepart
         add_action(
             $action_name,
             function () {
-                $page_link = is_multisite() ? 'settings.php' : 'options-general.php';
-                $page_cap = is_multisite() ? 'manage_network_options' : 'manage_options';
+                $cap = is_multisite() ? 'manage_network_options' : 'manage_options';
+                $order = is_multisite() ? '25.1' : '80.1';
+                $icon = 'PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJ';
+                $icon .= 'QyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8y';
+                $icon .= 'MDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI+CjxzdmcgdmVyc2lvbj0iMS4wIiB4';
+                $icon .= 'bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMzAwLjAwMDAwMHB0IiBo';
+                $icon .= 'ZWlnaHQ9IjMwMC4wMDAwMDBwdCIgdmlld0JveD0iMCAwIDMwMC4wMDAwMDAgMzAwLjAwMDAwMCIK';
+                $icon .= 'IHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiPgoKPGcgdHJhbnNmb3JtPSJ0cmFu';
+                $icon .= 'c2xhdGUoMC4wMDAwMDAsMzAwLjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIKZmls';
+                $icon .= 'bD0iI2JhYmFiYSIgc3Ryb2tlPSJub25lIj4KPHBhdGggZD0iTTEyODUgMjk5NCBjLTcwIC0xMSAt';
+                $icon .= 'MjUwIC01NyAtMjkwIC03NCAtMTEgLTUgLTQzIC0xOCAtNzEgLTI5IC0yOAotMTEgLTc1IC0zMyAt';
+                $icon .= 'MTA2IC00OSAtMzEgLTE3IC01OSAtMjggLTYyIC0yNSAtMyA0IC02IDEgLTYgLTUgMCAtNyAtNiAt';
+                $icon .= 'MTIKLTE0IC0xMiAtOCAwIC0xNiAtMyAtMTggLTcgLTIgLTUgLTMwIC0yNiAtNjMgLTQ4IC04NiAt';
+                $icon .= 'NTggLTk5IC02OCAtMjE1IC0xODUKLTExNyAtMTE2IC0xMjcgLTEyOSAtMTg1IC0yMTUgLTIyIC0z';
+                $icon .= 'MyAtNDMgLTYxIC00NyAtNjMgLTUgLTIgLTggLTEwIC04IC0xOCAwCi04IC01IC0xNCAtMTIgLTE0';
+                $icon .= 'IC02IDAgLTkgLTMgLTUgLTYgMyAtMyAtOCAtMzEgLTI1IC02MiAtMTYgLTMxIC0zOCAtNzggLTQ5';
+                $icon .= 'Ci0xMDYgLTExIC0yOCAtMjQgLTYwIC0yOSAtNzEgLTEwIC0yMyAtMzEgLTk2IC01NyAtMjAwIC0y';
+                $icon .= 'NiAtMTAyIC0yNiAtNTA4IDAKLTYxMCAyNSAtMTAxIDQ3IC0xNzcgNTcgLTIwMCA1IC0xMSAyNSAt';
+                $icon .= 'NTggNDUgLTEwNSAxOSAtNDcgNDcgLTEwMiA2MCAtMTIyIDE0Ci0yMSAyNSAtNDQgMjUgLTUyIDAg';
+                $icon .= 'LTggMyAtMTYgOCAtMTggMTAgLTUgNjQgLTc4IDU3IC03OCAtNCAwIDAgLTYgNyAtMTQgNyAtNwoz';
+                $icon .= 'MyAtMzcgNTggLTY3IDYxIC03MyAxMDcgLTEyMCAxNTggLTE2MyAyNCAtMjAgNDAgLTM2IDM1IC0z';
+                $icon .= 'NiAtNCAwIDIgLTYgMTQKLTEzIDEyIC02IDY2IC00MiAxMjAgLTc4IDU0IC0zNyAxMzAgLTgyIDE2';
+                $icon .= 'OCAtMTAwIDM5IC0xOCA3MyAtMzcgNzYgLTQyIDMgLTUKMTAgLTggMTUgLTggNSAxIDQzIC0xMCA4';
+                $icon .= 'NCAtMjMgMTg1IC02MCAyOTIgLTc2IDQ5NSAtNzUgMTk4IDAgMzIxIDIwIDQ4NSA3NQozMjMgMTEw';
+                $icon .= 'IDU5NCAzMjUgNzg1IDYyMiA3NiAxMTkgMTUwIDI5MCAxODUgNDMyIDI2IDEwMCAzOSAyMjMgMzkg';
+                $icon .= 'MzY1IDEgMjAzCi0xNyAzMjIgLTc0IDQ5MCAtMTMgMzkgLTI1IDc3IC0yNyA4NSAtMiA4IC02IDE3';
+                $icon .= 'IC05IDIwIC0zIDMgLTIwIDM3IC0zOCA3NQotMTggMzkgLTYzIDExNCAtMTAwIDE2OCAtMzYgNTQg';
+                $icon .= 'LTcyIDEwOCAtNzggMTIwIC03IDEyIC0xMyAxOCAtMTMgMTQgMCAtNSAtMTYKMTEgLTM2IDM1IC00';
+                $icon .= 'MyA1MSAtOTAgOTcgLTE2MyAxNTggLTMwIDI1IC02MCA1MSAtNjcgNTggLTggNyAtMTQgMTEgLTE0';
+                $icon .= 'IDcgMAotNyAtNzMgNDcgLTc4IDU4IC0yIDQgLTEwIDcgLTE4IDcgLTggMCAtMzEgMTEgLTUyIDI1';
+                $icon .= 'IC0yMCAxMyAtNzUgNDEgLTEyMiA2MAotNDcgMjAgLTk0IDQwIC0xMDUgNDUgLTExIDUgLTQ1IDE1';
+                $icon .= 'IC03NSAyNCAtMTY4IDQ3IC0xODIgNDkgLTQwMCA1MiAtMTE4IDEKLTIyOCAwIC0yNDUgLTJ6IG0t';
+                $icon .= 'MzkwIC01NDMgYzcwIC01NyAxMjIgLTk5IDIxNSAtMTc3IDI4OSAtMjQyIDY5MyAtNjMxIDgwOAot';
+                $icon .= 'Nzc2IDE0OCAtMTg4IDE4NSAtMjcwIDE4NiAtNDAzIDAgLTc3IC00IC05OCAtMjggLTE0OSAtMzIg';
+                $icon .= 'LTcwIC0xMTggLTE1OAotMTkyIC0xOTggLTk4IC01MyAtMjgzIC04MSAtMzc5IC01OCAtMzUgOCAt';
+                $icon .= 'NDYgNCAxMTYgNDAgMTY1IDM2IDMxNCAxMzIgMzczCjIzOSAzNiA2NyAzOSAxNDYgOSAyMDYgLTg3';
+                $icon .= 'IDE2OCAtNDkwIDM2OSAtMTE2MyA1NzggLTE4MiA1NyAtMjAwIDU4IC0xNDMgMTMKNTggLTQ0IDI3';
+                $icon .= 'MyAtMjI0IDM4MyAtMzIwIDI0NiAtMjEzIDM5MiAtMzU4IDM3NiAtMzczIC03IC03IC0xMTkgNjYg';
+                $icon .= 'LTIzMSAxNTEKLTg3IDY2IC0zNjcgMjg3IC0zNzUgMjk2IC0zIDMgLTU0IDQ2IC0xMTUgOTUgLTYw';
+                $icon .= 'IDQ5IC0xMjEgOTkgLTEzNSAxMTEgLTI0IDIxCi0yOTAgMjQ0IC0yOTkgMjUxIC00OCAzNyA0NDcg';
+                $icon .= 'LTkyIDc1OCAtMTk4IDYzIC0yMSAxMTYgLTM4IDExNyAtMzYgMSAxIC04NQoxNzUgLTE5MSAzODcg';
+                $icon .= 'LTEwNyAyMTIgLTE5NCAzODkgLTE5NSAzOTMgMCAxMiAxNSAxIDEwNSAtNzJ6IG0xNTA3IC0xMTgx';
+                $icon .= 'IGM4OAotMTc4IDE4NSAtMzg1IDE4MiAtMzg5IC0zIC00IC03OSAyNiAtMTgwIDcwIGwtNDIgMTgg';
+                $icon .= 'LTkzIC00MCBjLTUyIC0yMiAtMTE0Ci00OSAtMTM4IC02MCAtMjQgLTExIC00NSAtMTggLTQ4IC0x';
+                $icon .= 'NiAtNiA2IDI2MyAxODcgMjc3IDE4NyA2IDAgMjkgLTEwIDUwIC0yMgoyMSAtMTMgNDEgLTIwIDQ1';
+                $icon .= 'IC0xNiA1IDQgLTEwNCAyNDQgLTEyMSAyNjYgLTEgMiAtNDEgLTExIC05MCAtMjggLTQ4IC0xNyAt';
+                $icon .= 'OTIKLTI5IC05NyAtMjcgLTUgMSAxOSAyMCA1NCA0MiAzNSAyMSA4MiA1MiAxMDQgNjcgMjIgMTUg';
+                $icon .= 'NDUgMjYgNTAgMjUgNiAtMiAyNwotMzYgNDcgLTc3eiIvPgo8cGF0aCBkPSJNMTAzMCAyMjI5IGMw';
+                $icon .= 'IC0yIDYwIC0xMjMgMTM0IC0yNjkgODIgLTE2MSAxNDEgLTI2NyAxNTIgLTI3MiAxOTIKLTc2IDQ0';
+                $icon .= 'NiAtMTk3IDUwNyAtMjQwIDE1IC0xMSAyNyAtMTcgMjcgLTE0IDAgMTUgLTE3MCAyMDcgLTI5MCAz';
+                $icon .= 'MjYgLTE2NCAxNjMKLTUzMSA0ODggLTUzMCA0Njl6Ii8+CjwvZz4KPC9zdmc+Cg==';
 
-                add_submenu_page(
-                    $page_link,
-                    __('Docket Cache', 'docket-cache'),
-                    __('Docket Cache', 'docket-cache'),
-                    $page_cap,
+                add_menu_page(
+                    'Docket Cache',
+                    'Docket Cache',
+                    $cap,
                     $this->slug,
                     function () {
                         ( new View($this) )->index();
-                    }
+                    },
+                    'data:image/svg+xml;base64,'.$icon,
+                    $order
                 );
             }
+        );
+
+        add_action(
+            'admin_bar_menu',
+            function ($admin_bar) {
+                if (!is_multisite() || !current_user_can('manage_network_options')) {
+                    return;
+                }
+
+                $admin_bar->add_menu(
+                    [
+                        'id' => 'network-admin-docketcache',
+                        'parent' => 'network-admin',
+                        'group' => null,
+                        'title' => 'Docket Cache',
+                        'href' => network_admin_url($this->page),
+                        'meta' => [
+                            'title' => 'Docket Cache',
+                        ],
+                    ]
+                );
+            },
+            PHP_INT_MAX
         );
 
         add_action(
@@ -759,16 +887,16 @@ final class Plugin extends Bepart
                     if ($this->dropino()->validate()) {
                         if ($this->dropino()->is_outdated() && !$this->dropino()->install(true)) {
                             /* translators: %s: url */
-                            $message = sprintf(__('<strong>Docket Cache:</strong> The object-cache.php drop-in is outdated. Please click "Re-Install" to update it now.<p style="padding:0;"><a href="%s" class="button button-primary">Re-Install</a>', 'docket-cache'), $url);
+                            $message = sprintf(__('<strong>Docket Cache:</strong> The object-cache.php Drop-In is outdated. Please click "Re-Install" to update it now.<p style="padding:0;"><a href="%s" class="button button-primary">Re-Install</a>', 'docket-cache'), $url);
                         }
                     } else {
                         /* translators: %s: url */
-                        $message = sprintf(__('<strong>Docket Cache:</strong> An unknown object-cache.php drop-in was found. Please click "Install" to use Docket Cache.<p style="margin-bottom:0;"><a href="%s" class="button button-primary">Install</a></p>', 'docket-cache'), $url);
+                        $message = sprintf(__('<strong>Docket Cache:</strong> An unknown object-cache.php Drop-In was found. Please click "Install" to use Docket Cache.<p style="margin-bottom:0;"><a href="%s" class="button button-primary">Install</a></p>', 'docket-cache'), $url);
                     }
                 }
 
                 if (2 === $this->get_status() && $this->our_screen()) {
-                    $message = esc_html__('The object-cache.php drop-in has been disabled at runtime.', 'docket-cache');
+                    $message = esc_html__('The object-cache.php Drop-In has been disabled at runtime.', 'docket-cache');
                 }
 
                 if (isset($message)) {
@@ -784,7 +912,7 @@ final class Plugin extends Bepart
             function ($hook) {
                 $is_debug = $this->constans()->is_true('WP_DEBUG');
                 $plugin_url = plugin_dir_url($this->file);
-                $version = str_replace('.', '', $this->version()).'x'.($is_debug ? date('his') : date('d'));
+                $version = str_replace('.', '', $this->version()).'xc'.($is_debug ? date('his') : date('d'));
                 wp_enqueue_script($this->slug.'-worker', $plugin_url.'includes/admin/worker.js', ['jquery'], $version, false);
                 wp_localize_script(
                     $this->slug.'-worker',
@@ -808,28 +936,46 @@ final class Plugin extends Bepart
             }
         );
 
-        // refresh user_meta
-        if ($this->dropino()->validate()) {
-            // before login
-            add_action(
-                'set_logged_in_cookie',
-                function ($logged_in_cookie, $expire, $expiration, $user_id, $scheme, $token) {
+        // refresh user_meta: before login
+        add_action(
+            'set_logged_in_cookie',
+            function ($logged_in_cookie, $expire, $expiration, $user_id, $scheme, $token) {
+                if ($this->dropino()->validate()) {
                     wp_cache_delete($user_id, 'user_meta');
-                },
-                PHP_INT_MAX,
-                6
-            );
+                }
+                $this->delete_cron_siteid($user_id);
+            },
+            PHP_INT_MAX,
+            6
+        );
 
-            // after logout
-            add_action(
-                'wp_logout',
-                function () {
-                    $user = wp_get_current_user();
-                    if (\is_object($user) && isset($user->ID)) {
+        // refresh user_meta: after logout
+        add_action(
+            'wp_logout',
+            function () {
+                $user = wp_get_current_user();
+                if (\is_object($user) && isset($user->ID)) {
+                    if ($this->dropino()->validate()) {
                         wp_cache_delete($user->ID, 'user_meta');
                     }
+                    $this->delete_cron_siteid($user->ID);
+                }
+            },
+            PHP_INT_MAX
+        );
+
+        if ($this->constans()->is_true('DOCKET_CACHE_AUTOUPDATE')) {
+            add_filter(
+                'auto_update_plugin',
+                function ($update, $item) {
+                    if ('docket-cache' === $item->slug) {
+                        return true;
+                    }
+
+                    return $update;
                 },
-                PHP_INT_MAX
+                PHP_INT_MAX,
+                2
             );
         }
 
@@ -966,16 +1112,42 @@ final class Plugin extends Bepart
                                 do_action('docketcache/disconnect-cronbot', $result);
                                 break;
                             case 'docket-runevent-cronbot':
+                                $message = 'docket-cronbot-runevent-failed';
                                 $result = apply_filters('docketcache/cronbot-runevent', false);
-                                $message = $result ? 'docket-cronbot-runevent' : 'docket-cronbot-runevent-failed';
+                                if (false !== $result) {
+                                    set_transient('docketcache/cronbotrun', $result, 10);
+                                    $message = 'docket-cronbot-runevent';
+                                }
+
                                 do_action('docketcache/runevent-cronbot', $result);
-                                @Crawler::fetch_admin(admin_url('/'));
                                 break;
                             case 'docket-runeventnow-cronbot':
+                                $message = 'docket-cronbot-runevent-failed';
                                 $result = apply_filters('docketcache/cronbot-runevent', true);
-                                $message = $result ? 'docket-cronbot-runevent' : 'docket-cronbot-runevent-failed';
+                                if (false !== $result) {
+                                    set_transient('docketcache/cronbotrun', $result, 10);
+                                    $message = 'docket-cronbot-runevent';
+                                }
+
                                 do_action('docketcache/runeventnow-cronbot', $result);
-                                @Crawler::fetch_admin(admin_url('/'));
+                                break;
+                            case 'docket-selectsite-cronbot':
+                                if (isset($_GET['nv'])) {
+                                    $nv = sanitize_text_field($_GET['nv']);
+                                    if (!is_numeric($nv)) {
+                                        break;
+                                    }
+                                    update_user_meta(get_current_user_id(), 'cronbot-siteid', $nv);
+                                    $message = 'docket-cronbot-selectsite';
+
+                                    $is_switch = $this->switch_cron_site();
+
+                                    @Crawler::fetch_admin(admin_url('/'));
+
+                                    if ($is_switch) {
+                                        restore_current_blog();
+                                    }
+                                }
                                 break;
                         }
 
@@ -1042,10 +1214,10 @@ final class Plugin extends Bepart
                             $error = esc_html__('Object cache could not be flushed.', 'docket-cache');
                             break;
                         case 'docket-dropino-updated':
-                            $message = esc_html__('Updated object cache drop-in and enabled Docket object cache.', 'docket-cache');
+                            $message = esc_html__('Updated object cache Drop-In and enabled Docket object cache.', 'docket-cache');
                             break;
                         case 'docket-dropino-updated-failed':
-                            $error = esc_html__('Docket object cache drop-in could not be updated.', 'docket-cache');
+                            $error = esc_html__('Object cache Drop-In could not be updated.', 'docket-cache');
                             break;
                         case 'docket-log-flushed':
                             $message = esc_html__('Cache log was flushed.', 'docket-cache');
@@ -1109,6 +1281,9 @@ final class Plugin extends Bepart
                             unset($msg, $wmsg);
 
                             break;
+                        case 'docket-cronbot-selectsite':
+                            $message = '';
+                            break;
                         case 'docket-cronbot-runevent-failed':
                             $error = esc_html__('Failed to run cron.', 'docket-cache');
                             break;
@@ -1129,7 +1304,7 @@ final class Plugin extends Bepart
                             break;
                     }
 
-                    if (isset($message) || isset($error)) {
+                    if (!empty($message) || !empty($error)) {
                         $msg = isset($message) ? $message : $error;
                         $type = isset($message) ? 'updated' : 'error';
                         add_settings_error(is_multisite() ? 'general' : '', $this->slug, $msg, $type);
@@ -1147,7 +1322,7 @@ final class Plugin extends Bepart
                     sprintf(
                         '<a href="%s">%s</a>',
                         network_admin_url($this->page),
-                        __('Settings', 'docket-cache')
+                        __('Overview', 'docket-cache')
                     )
                 );
 
@@ -1161,7 +1336,7 @@ final class Plugin extends Bepart
                         $action = 'disable-occache';
                         break;
                     default:
-                        $text = esc_html__('Install Drop-in', 'docket-cache');
+                        $text = esc_html__('Install Drop-In', 'docket-cache');
                         $action = 'update-dropino';
                 }
 

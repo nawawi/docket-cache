@@ -5,11 +5,11 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.08.18
+Stable tag: 20.09.01
 License: MIT
 License URI: ./license.txt
 
-A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
+Supercharge your website using a persistent object cache, accelerates caching with OPcache backend.
 
 == Description ==
 The Docket cache is a persistent WordPress Object Cache that is stored as a plain PHP code. Intends to provide an alternative option for those who can't use Redis or Memcached server.
@@ -65,18 +65,19 @@ To use the WP-CLI commands, please refer to [WP-CLI](https://docs.docketcache.co
 == Installation ==
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
 
-1. In your WordPress admin click *Plugins -> Add New*
+1. In your WordPress admin click **Plugins -> Add New**
 2. Search plugins "Docket Cache" and click Install Now.
-3. Click *Activate* or *Network Activate* in Multisite setups.
-4. Enable the object cache under Settings -> Docket Cache, or in Multisite setups under Network Admin -> Settings -> Docket Cache.
+3. Click **Activate** or **Network Activate** in Multisite setups.
+4. Click **Docket Cache** in the left menu to access the admin page.
 
 == Screenshots ==
-1. Plugin Overview.
+1. Overview.
 2. Cache Log.
-3. Select log to view.
-4. Cache view.
+3. Cache view.
+4. Cache content.
 5. Cronbot.
 6. Configuration.
+7. Cronbot on multisite.
 
 
 == Frequently Asked Questions ==
@@ -117,7 +118,7 @@ Kindly refer to the articles below about RAM disk:
 2. [What Is /dev/shm And Its Practical Usage](https://www.cyberciti.biz/tips/what-is-devshm-and-its-practical-usage.html)
 4. [Creating A Filesystem In RAM](https://www.cyberciti.biz/faq/howto-create-linux-ram-disk-filesystem/)
 
-To use it in Window OS, create RAM Disk and change [DOCKET_CACHE_PATH](https://docs.docketcache.com/configuration#docket_cache_path) point to RAM Disk drive.
+To use it in Windows OS, create RAM Disk and change [DOCKET_CACHE_PATH](https://docs.docketcache.com/configuration#docket_cache_path) point to RAM Disk drive.
 
 = What’s the difference with the other object cache plugin? =
 Docket Cache is an Object Cache Accelerator. It does some optimization of caching like cache post queries, comments counting, WordPress translation and more before storing the object caches.
@@ -129,6 +130,21 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.09.01 =
+
+This is Major Release based on previous releases.
+
+- Improved admin interface structure.
+- Improved admin menu using top-level instead of submenu from settings.
+- Improved Cronbot to support multisite.
+- Added Actions pane at overview page to flush cache/OPcache and enable/disable object cache.
+- Added Auto update options at configuration page.
+- Added Cron event checkversion to check for critical update, define DOCKET_CACHE_CHECKVERSION constant to false to disable it.
+- Fixed CronAgent issue with doing_cron locked on multisite.
+- Fixed Cron event missing watchproc hook on unregister.
+
+Please do "Flush Cache" after/before installing this update. Thanks.
+
 = 20.08.18 =
 
 This is an enhanced version based on previous fix releases.
@@ -293,8 +309,3 @@ This is an improved version based on previous releases.
 Kindly refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) for previous Changelog.
 
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
-
-
-== Credits ==
-
-* Isometric graphic by upklyak/freepik.com

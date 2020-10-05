@@ -15,10 +15,12 @@ namespace Nawawi\DocketCache;
 final class Event
 {
     private $plugin;
+    private $is_optimizedb;
 
     public function __construct(Plugin $plugin)
     {
         $this->plugin = $plugin;
+        $this->is_optimizedb = false;
     }
 
     /**
@@ -67,9 +69,17 @@ final class Event
                     wp_schedule_event(time(), 'docketcache_gc_schedule', 'docketcache_gc');
                 }
 
+                // monitor: always enable
+                add_action('docketcache_watchproc', [$this, 'watchproc']);
+                if (!wp_next_scheduled('docketcache_watchproc')) {
+                    wp_schedule_event(time(), 'hourly', 'docketcache_watchproc');
+                }
+
                 // optimize db
                 $cronoptmzdb = $this->plugin->constans()->value('DOCKET_CACHE_CRONOPTMZDB');
                 if (!empty($cronoptmzdb) && 'never' !== $cronoptmzdb) {
+                    $this->is_optimizedb = true;
+
                     add_action('docketcache_optimizedb', [$this, 'optimizedb']);
 
                     $recurrence = 'weekly';
@@ -94,10 +104,16 @@ final class Event
                     }
                 }
 
-                // monitor
-                add_action('docketcache_watchproc', [$this, 'watchproc']);
-                if (!wp_next_scheduled('docketcache_watchproc')) {
-                    wp_schedule_event(time(), 'hourly', 'docketcache_watchproc');
+                // check version
+                if ($this->plugin->constans()->is_true('DOCKET_CACHE_CHECKVERSION')) {
+                    add_action('docketcache_checkversion', [$this, 'checkversion']);
+                    if (!wp_next_scheduled('docketcache_checkversion')) {
+                        wp_schedule_event(time(), 'daily', 'docketcache_checkversion');
+                    }
+                } else {
+                    if (wp_get_schedule('docketcache_checkversion')) {
+                        wp_clear_scheduled_hook('docketcache_checkversion');
+                    }
                 }
             }
         );
@@ -108,7 +124,7 @@ final class Event
      */
     public function unregister()
     {
-        foreach (['docketcache_gc', 'docketcache_optimizedb', 'docketcache_monitor'] as $hx) {
+        foreach (['docketcache_gc', 'docketcache_optimizedb', 'docketcache_watchproc', 'docketcache_checkversion'] as $hx) {
             wp_clear_scheduled_hook($hx);
         }
     }
@@ -121,10 +137,14 @@ final class Event
         if ($this->plugin->canopt()->lockexp('watchproc')) {
             return false;
         }
+
         $this->plugin->canopt()->setlock('watchproc', time() + 3600);
 
+        if (!$this->is_optimizedb) {
+            $this->delete_expired_transients_db();
+        }
+
         $this->clear_unknown_cron();
-        $this->delete_expired_transients_db();
         if (has_action('docketcache/suspend_wp_options_autoload')) {
             do_action('docketcache/suspend_wp_options_autoload');
         }
@@ -283,6 +303,8 @@ final class Event
         $this->plugin->canopt()->setlock('optimizedb', time() + 3600);
 
         $suppress = $wpdb->suppress_errors(true);
+
+        @set_time_limit(300);
         $this->delete_expired_transients_db();
 
         $dbname = $wpdb->dbname;
@@ -315,8 +337,6 @@ final class Event
             return false;
         }
 
-        // delete expired transient in db
-        // https://developer.wordpress.org/reference/functions/delete_expired_transients/
         delete_expired_transients(true);
 
         return true;
@@ -345,5 +365,79 @@ final class Event
             }
         }
         unset($crons);
+    }
+
+    public function checkversion()
+    {
+        $part = 'checkversion';
+        if ($this->plugin->canopt()->lockexp($part)) {
+            return false;
+        }
+
+        $this->plugin->canopt()->setlock($part, time() + 3600);
+
+        $main_site_url = $this->plugin->site_url();
+        $site_url = $this->plugin->site_url(true);
+        $stmp = time() + 120;
+        $api_endpoint = $this->plugin->api_endpoint.'/'.$part.'?v='.$stmp;
+
+        $args = [
+            'blocking' => true,
+            'body' => [
+                'timestamp' => date('Y-m-d H:i:s T'),
+                'timezone' => wp_timezone_string(),
+                'site' => $site_url,
+                'token' => $this->plugin->nw_encrypt($main_site_url, md5($site_url)),
+                'meta' => $this->plugin->site_meta(),
+            ],
+            'headers' => [
+                'REFERER' => $site_url,
+            ],
+        ];
+
+        $results = Crawler::post($api_endpoint, $args);
+
+        $output = [
+            'created' => date('Y-m-d H:i:s T'),
+            'endpoint' => $api_endpoint,
+            'request' => [
+                'headers' => $args['headers'],
+                'content' => $args['body'],
+            ],
+        ];
+
+        if (is_wp_error($results)) {
+            $output['error'] = $results->get_error_message();
+            $this->plugin->canopt()->save_part($output, $part);
+
+            return false;
+        }
+
+        $output['response'] = wp_remote_retrieve_body($results);
+        if (!empty($output['response'])) {
+            $output['response'] = json_decode($output['response'], true);
+            if (JSON_ERROR_NONE === json_last_error()) {
+                if (!empty($output['response']['error'])) {
+                    $output['error'] = $output['response']['error'];
+                    $this->plugin->canopt()->save_part($output, $part);
+
+                    return false;
+                }
+            }
+        }
+
+        $code = (int) wp_remote_retrieve_response_code($results);
+        if ($code > 400) {
+            $output['error'] = $code;
+            $this->plugin->canopt()->save_part($output, $part);
+
+            return false;
+        }
+
+        $this->plugin->canopt()->save_part($output, $part);
+
+        $this->plugin->canopt()->setlock($part, 0);
+
+        return true;
     }
 }

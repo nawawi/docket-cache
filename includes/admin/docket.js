@@ -112,7 +112,7 @@
                         }
                     );
 
-                $selector.find( '.config' )
+                $selector.find( '.form-table-selection' )
                     .find( 'select.config-select' )
                     .on(
                         'change',
@@ -190,7 +190,10 @@
                         $bt.attr( 'href', url );
                         $selector.find( 'span.vcache' )
                             .removeClass( 'hide' )
-                            .html( idx );
+                            .html( '<strong>Cache Index:</strong> ' + idx );
+
+                        $selector.find( 'a.button-vcache-c' )
+                            .removeClass( 'hide' );
                     }
                 };
                 $selector.find( '.log' )

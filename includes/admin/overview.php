@@ -27,12 +27,9 @@ if ($this->plugin->is_behind_proxy()) :
 endif;
 ?>
 <div class="section overview">
-    <?php if ($this->pageconfig_enable) : ?>
     <div class="flex-container">
         <div class="row-left">
-            <?php endif; ?>
-            <?php $this->tab_title(esc_html__('Overview', 'docket-cache')); ?>
-            <p class="desc"><?php esc_html_e('The overview panel provides information about the plugin activity status.', 'docket-cache'); ?></p>
+            <?php $this->tab_title(esc_html__('Overview', 'docket-cache'), false); ?>
             <table class="form-table">
                 <tr>
                     <th><?php esc_html_e('Web Server', 'docket-cache'); ?></th>
@@ -53,14 +50,18 @@ endif;
 
                 <tr>
                     <th><?php esc_html_e('Object Cache', 'docket-cache'); ?></th>
-                    <td><?php echo 1 === $this->info->status_code && !empty($this->info->status_text_stats) ? '<a class="btxo" title="'.esc_html__('Flush Cache', 'docket-cache').'" href="'.$this->plugin->action_query('flush-occache').'">'.$this->info->status_text_stats.'<span class="dashicons dashicons-update-alt opcache-flush"></span></a>' : $this->info->status_text; ?></td>
+                    <td>
+                        <?php
+                        echo 1 === $this->info->status_code && !empty($this->info->status_text_stats) ? $this->info->status_text_stats : $this->info->status_text;
+                        ?>
+                    </td>
                 </tr>
 
                 <tr>
                     <th class="border-b"><?php esc_html_e('Zend OPcache', 'docket-cache'); ?></th>
                     <td>
                         <?php
-                        echo 1 === $this->info->opcache_code ? '<a class="btxo" title="'.esc_html__('Flush OPcache', 'docket-cache').'" href="'.$this->plugin->action_query('flush-opcache').'">'.$this->info->opcache_text_stats.'<span class="dashicons dashicons-update-alt opcache-flush"></span></a>' : $this->info->opcache_text;
+                        echo 1 === $this->info->opcache_code && !empty($this->info->opcache_text_stats) ? $this->info->opcache_text_stats : $this->info->opcache_text;
                         ?>
                     </td>
                 </tr>
@@ -121,36 +122,11 @@ endif;
                 </tr>
 
             </table>
-
-            <p class="submit">
-                <?php if (!$this->is_dropin_exists()) : ?>
-
-                <?php if ($this->info->cache_size > 0) : ?>
-                <a href="<?php echo $this->plugin->action_query('flush-occache'); ?>" class="button button-secondary button-large"><?php esc_html_e('Flush Cache', 'docket-cache'); ?></a>
-                <?php endif; ?>
-
-                <?php if (2 !== $this->info->status_code) : ?>
-                <a href="<?php echo $this->plugin->action_query('enable-occache'); ?>" class="button button-primary button-large"><?php esc_html_e('Enable Object Cache', 'docket-cache'); ?></a>
-                <?php endif; ?>
-
-                <?php elseif ($this->is_dropin_validate()) : ?>
-
-                <?php if ($this->info->cache_size > 0) : ?>
-                <a href="<?php echo $this->plugin->action_query('flush-occache'); ?>" class="button button-primary button-large"><?php esc_html_e('Flush Cache', 'docket-cache'); ?></a>
-                <?php else : ?>
-                <a href="<?php echo $this->tab_query('overview'); ?>" class="button button-secondary button-refresh button-large" id="refresh"><?php esc_html_e('Refresh', 'docket-cache'); ?></a>
-                <?php endif; ?>
-
-                <a href="<?php echo $this->plugin->action_query('disable-occache'); ?>" class="button button-secondary button-large"><?php esc_html_e('Disable Object Cache', 'docket-cache'); ?></a>
-                <?php endif; ?>
-            </p>
-            <?php if ($this->pageconfig_enable) : ?>
         </div>
         <div class="row-right">
-            <?php $this->page('resource'); ?>
+            <?php $this->page('actcmd'); ?>
         </div>
     </div>
-    <?php endif; ?>
 </div>
 <?php
 if ($this->plugin->constans()->is_true('DOCKET_CACHE_STATS')) :

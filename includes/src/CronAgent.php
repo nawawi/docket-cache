@@ -14,15 +14,13 @@ namespace Nawawi\DocketCache;
 
 final class CronAgent
 {
-    private $backend = 'https://cronbot.docketcache.com';
+    private $is_pingpong;
     private $plugin;
 
     public function __construct(Plugin $plugin)
     {
         $this->plugin = $plugin;
-        if ($this->plugin->constans()->is_true('DOCKET_CACHE_DEV')) {
-            $this->backend = 'http://cronbot.docketcache.local';
-        }
+        $this->is_pingpong = false;
     }
 
     public function register()
@@ -56,14 +54,21 @@ final class CronAgent
         add_filter(
             'docketcache/cronbot-runevent',
             function ($runnow) {
-                $results = $this->run_wpcron($runnow);
-                if (!empty($results) && \is_array($results) && !empty($results['wpcron_return'])) {
-                    set_transient('docketcache/cronbotrun', $results, 10);
+                $is_switch = $this->plugin->switch_cron_site();
 
-                    return true;
+                $results = $this->run_wpcron($runnow);
+
+                if (!empty($results) && \is_array($results) && !empty($results['wpcron_return'])) {
+                    @Crawler::fetch_admin(admin_url('/'));
+                } else {
+                    $results = false;
                 }
 
-                return false;
+                if ($is_switch) {
+                    restore_current_blog();
+                }
+
+                return $results;
             },
             PHP_INT_MAX
         );
@@ -72,32 +77,6 @@ final class CronAgent
     private function is_ping_request()
     {
         return !empty($_POST['ping']) && !empty($_GET['docketcache_ping']) && !empty($_SERVER['REQUEST_URI']) && false !== strpos($_SERVER['REQUEST_URI'], '/?docketcache_ping=');
-    }
-
-    private function site_url_scheme($site_url)
-    {
-        if ('https://' !== substr($site_url, 0, 8) && $this->plugin->is_ssl()) {
-            $site_url = @preg_replace('@^(https?:)?//@', 'https://', $site_url);
-        }
-
-        return rtrim($site_url, '/\\');
-    }
-
-    private function site_url()
-    {
-        $blog_id = get_main_site_id();
-
-        $scheme = $this->plugin->is_ssl() ? 'https' : 'http';
-        $site_url = get_site_url($blog_id, '', $scheme);
-
-        return $this->site_url_scheme($site_url);
-    }
-
-    private function site_meta()
-    {
-        $meta = (is_multisite() ? 1 : 0).','.$this->plugin->version().','.$GLOBALS['wp_version'];
-
-        return str_replace('.', '', $meta);
     }
 
     private function send_action($action, $is_hello = false)
@@ -109,7 +88,7 @@ final class CronAgent
             return $cache[$uip];
         }
 
-        $site_url = $this->site_url();
+        $site_url = $this->plugin->site_url();
         $site_key = substr(md5($site_url), 0, 22);
         $site_body = $this->plugin->nw_encrypt($site_url, $site_key);
         $site_id = $this->plugin->nw_encrypt($site_key, $site_body);
@@ -120,16 +99,18 @@ final class CronAgent
                 'timestamp' => date('Y-m-d H:i:s T'),
                 'timezone' => wp_timezone_string(),
                 'site' => $this->plugin->base64_encode_url($site_body),
-                'meta' => $this->site_meta(),
+                'meta' => $this->plugin->site_meta(),
                 'status' => $action,
             ],
             'headers' => [
-                'REFERER' => $this->site_url_scheme(site_url()), // current site
+                'REFERER' => $this->plugin->site_url(true),
                 'DOCKETID' => $site_id,
             ],
         ];
 
-        $results = Crawler::post($this->backend, $args);
+        $stmp = time() + 120;
+        $cronbot_endpoint = $this->plugin->cronbot_endpoint.'/checkstatus?v='.$stmp;
+        $results = Crawler::post($cronbot_endpoint, $args);
 
         if ($is_hello) {
             return true;
@@ -137,6 +118,7 @@ final class CronAgent
 
         $output = [
             'created' => date('Y-m-d H:i:s T'),
+            'endpoint' => $cronbot_endpoint,
             'connected' => false,
             'last_status' => $action,
             'request' => [
@@ -235,40 +217,38 @@ final class CronAgent
             'wpcron_msg' => '',
         ];
 
-        if (false !== strpos($_SERVER['REQUEST_URI'], '/wp-cron.php') || isset($_GET['doing_wp_cron']) || $this->plugin->constans()->is_true('DOING_CRON')) {
+        $crons = $this->plugin->get_crons($run_now, $cron_event);
+        if (empty($crons)) {
             $results['wpcron_return'] = 1;
-            $results['wpcron_msg'] = 'Another process is currently running WP-CRON';
+            $results['wpcron_msg'] = 'No scheduled event ready to run';
+            $results['wpcron_event'] = $cron_event;
 
             return $results;
         }
 
-        $crons = $run_now ? _get_cron_array() : wp_get_ready_cron_jobs();
-        if (empty($crons)) {
+        if (false !== strpos($_SERVER['REQUEST_URI'], '/wp-cron.php') || isset($_GET['doing_wp_cron']) || $this->plugin->constans()->is_true('DOING_CRON')) {
             $results['wpcron_return'] = 1;
-            $results['wpcron_msg'] = 'No scheduled event ready to run';
+            $results['wpcron_msg'] = 'Another cron process is currently running wp-cron.php';
+            $results['wpcron_event'] = $cron_event;
 
             return $results;
         }
 
         $gmt_time = microtime(true);
         $doing_cron_transient = get_transient('doing_cron');
+        $doing_wp_cron = $doing_cron_transient;
 
-        if ($doing_cron_transient && ($doing_cron_transient + 60 > $gmt_time)) {
-            $results['wpcron_return'] = 1;
-            $results['wpcron_msg'] = 'Another process is currently running WP-CRON';
+        if ($this->is_pingpong) {
+            if (!empty($doing_cron_transient) && ((int) $doing_cron_transient + 60 > $gmt_time)) {
+                $results['wpcron_return'] = 1;
+                $results['wpcron_msg'] = 'Process locked, doing_cron not finish yet';
+                $results['wpcron_event'] = $cron_event;
 
-            return $results;
-        }
+                return $results;
+            }
 
-        $doing_wp_cron = sprintf('%.22F', microtime(true));
-        $doing_cron_transient = $doing_wp_cron;
-        set_transient('doing_cron', $doing_wp_cron);
-
-        if ($doing_cron_transient !== $doing_wp_cron) {
-            $results['wpcron_return'] = 1;
-            $results['wpcron_msg'] = 'Another process is currently running WP-CRON';
-
-            return $results;
+            $doing_wp_cron = sprintf('%.22F', microtime(true));
+            set_transient('doing_cron', $doing_wp_cron, 120);
         }
 
         $run_event = 0;
@@ -302,9 +282,9 @@ final class CronAgent
                         --$run_event;
                     }
 
-                    if ($this->get_wpcron_lock() !== $doing_wp_cron) {
+                    if ($this->is_pingpong && ($this->get_wpcron_lock() !== $doing_wp_cron)) {
                         $results['wpcron_return'] = 2;
-                        $results['wpcron_msg'] = 'WP-CRON Timeout';
+                        $results['wpcron_msg'] = 'Timeout, another cron process stole the lock';
                         $results['wpcron_event'] = $run_event;
 
                         return $results;
@@ -313,7 +293,7 @@ final class CronAgent
             }
         }
 
-        if ($this->get_wpcron_lock() === $doing_wp_cron) {
+        if ($this->is_pingpong && ($this->get_wpcron_lock() === $doing_wp_cron)) {
             delete_transient('doing_cron');
         }
 
@@ -330,10 +310,25 @@ final class CronAgent
         }
 
         if ($_POST['ping'] !== md5($_GET['docketcache_ping'])) {
+            $this->close_ping('Invalid ping');
+
             return;
         }
 
+        $site_url = $this->plugin->site_url();
+
+        if (!empty($_POST['token'])) {
+            $verify = $this->plugin->nw_decrypt($_POST['token'], $_POST['ping']);
+            if ($verify !== $site_url) {
+                $this->close_ping('Invalid token');
+
+                return;
+            }
+        }
+
         if (!@preg_match('@compatible;\s+cronbot/[0-9\.]+;\s+docket\-cache/[0-9\.]+;\s+@', $this->plugin->get_user_agent())) {
+            $this->close_ping('Invalid version');
+
             return;
         }
 
@@ -347,8 +342,8 @@ final class CronAgent
         $response = [
             'timestamp' => date('Y-m-d H:i:s T'),
             'timezone' => wp_timezone_string(),
-            'site' => $this->site_url(),
-            'meta' => $this->site_meta(),
+            'site' => $this->plugin->site_url(),
+            'meta' => $this->plugin->site_meta(),
             'status' => 1,
         ];
 
@@ -367,18 +362,47 @@ final class CronAgent
             }
         }
 
-        $results = $this->run_wpcron();
-        $response = array_merge($response, $results);
+        $this->is_pingpong = true;
+        $is_multisite = is_multisite();
+        $sites = $this->plugin->get_network_sites();
+        foreach ($sites as $num => $site) {
+            if ($is_multisite) {
+                switch_to_blog($site['id']);
+                $response['site'] = $site['url'];
+            }
+
+            $results = $this->run_wpcron();
+
+            if ($is_multisite) {
+                restore_current_blog();
+            }
+
+            if ($site['is_main']) {
+                $response = array_merge($response, $results);
+            } else {
+                $response['site_'.$site['id']] = [
+                    'site' => $site['url'],
+                    'wpcron' => $results,
+                ];
+            }
+        }
 
         $this->plugin->canopt()->setlock('receive_ping', time() + 60);
 
         $cache[$uip] = $response;
+
+        $this->is_pingpong = false;
         $this->close_ping($cache[$uip]);
     }
 
     private function check_connection()
     {
         if (\function_exists('wp_is_maintenance_mode') && wp_is_maintenance_mode()) {
+            return;
+        }
+
+        // only main site
+        if (!is_main_site()) {
             return;
         }
 

@@ -245,13 +245,16 @@ final class Constans
         $this->maybe_define('DOCKET_CACHE_PAGELOADER', true);
 
         // docket cronbot
-        $this->maybe_define('DOCKET_CACHE_CRONBOT', false);
-
-        // config page
-        $this->maybe_define('DOCKET_CACHE_PAGECONFIG', true);
+        $this->maybe_define('DOCKET_CACHE_CRONBOT', true);
 
         // cache stats
         $this->maybe_define('DOCKET_CACHE_STATS', true);
+
+        // check version
+        $this->maybe_define('DOCKET_CACHE_CHECKVERSION', true);
+
+        // auto update
+        $this->maybe_define('DOCKET_CACHE_AUTOUPDATE', true);
 
         // backwards-compatible
         $this->maybe_define('DOCKET_CACHE_COMMENT', DOCKET_CACHE_SIGNATURE);

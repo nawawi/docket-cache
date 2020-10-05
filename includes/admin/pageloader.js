@@ -14,7 +14,7 @@
                 window.setTimeout(
                     function() {
                         var uh = window.location.href;
-                        if ( uh.match( /\/update.*\.php/ ) === null ) {
+                        if ( uh.match( /\/update.*\.php/ ) === null && uh.match( /\/wp-admin\/post\.php\?post=\d+\&action=edit/ ) === null ) {
                             $( 'body' )
                                 .removeClass( 'docket-cache-page-loading' )
                                 .addClass( 'docket-cache-page-loading' );

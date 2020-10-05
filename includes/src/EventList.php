@@ -24,7 +24,9 @@ if (!class_exists('\\WP_List_Table', false)) {
 
 class EventList extends \WP_List_Table
 {
-    public function __construct()
+    private $plugin;
+
+    public function __construct(Plugin $plugin)
     {
         parent::__construct(
             [
@@ -34,6 +36,8 @@ class EventList extends \WP_List_Table
                 'screen' => 'eventlist-events',
             ]
         );
+
+        $this->plugin = $plugin;
     }
 
     public function get_schedules()
@@ -58,10 +62,16 @@ class EventList extends \WP_List_Table
 
     public function get_crons()
     {
-        $crons = _get_cron_array();
+        $is_switch = $this->plugin->switch_cron_site();
+
+        $crons = $this->plugin->get_crons(true);
         $events = [];
 
         if (empty($crons)) {
+            if ($is_switch) {
+                restore_current_blog();
+            }
+
             return [];
         }
 
@@ -94,6 +104,10 @@ class EventList extends \WP_List_Table
                 return ($a->time > $b->time) ? 1 : -1;
             }
         );
+
+        if ($is_switch) {
+            restore_current_blog();
+        }
 
         return $events;
     }
@@ -193,37 +207,6 @@ class EventList extends \WP_List_Table
         }
 
         return $actions;
-    }
-
-    public function output_callback($callback)
-    {
-        $callback = (array) $callback;
-
-        $qm = WP_PLUGIN_DIR.'/query-monitor/query-monitor.php';
-        $html = plugin_dir_path($qm).'output/Html.php';
-
-        if (class_exists('\QueryMonitor') && file_exists($html)) {
-            require_once $html;
-
-            if (class_exists('\QM_Output_Html')) {
-                if (!empty($callback['callback']['error'])) {
-                    $return = '<code>'.$callback['callback']['name'].'</code>';
-                    $return .= '<br><span style="color:#c00"><span class="dashicons dashicons-warning" aria-hidden="true"></span> ';
-                    $return .= esc_html($callback['callback']['error']->get_error_message());
-                    $return .= '</span>';
-
-                    return $return;
-                }
-
-                return \QM_Output_Html::output_filename(
-                    $callback['callback']['name'],
-                    $callback['callback']['file'],
-                    $callback['callback']['line']
-                );
-            }
-        }
-
-        return '<code>'.$callback['callback']['name'].'</code>';
     }
 
     public function get_schedule_name(\stdClass $event)
@@ -381,7 +364,7 @@ class EventList extends \WP_List_Table
         if (empty($event->args)) {
             return sprintf(
                     '<em>%s</em>',
-                    esc_html__('None', 'wp-crontrol')
+                    esc_html__('None', 'docket-cache')
                 );
         }
 
@@ -399,7 +382,7 @@ class EventList extends \WP_List_Table
             $callbacks = [];
 
             foreach ($hook_callbacks as $callback) {
-                $callbacks[] = $this->output_callback($callback);
+                $callbacks[] = '<code>'.$callback['callback']['name'].'</code>';
             }
 
             return implode('<br>', $callbacks);

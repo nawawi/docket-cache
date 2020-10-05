@@ -11,6 +11,7 @@
 namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
+settings_errors((is_multisite() && is_network_admin() ? 'general' : ''));
 
 if (1 === $this->info->status_code && isset($this->plugin->token)) {
     switch ($this->plugin->token) {
@@ -31,10 +32,6 @@ if (1 === $this->info->status_code && isset($this->plugin->token)) {
     if ($this->plugin->constans()->is_false('DOCKET_CACHE_PRELOAD') || 2 === $this->info->status_code) {
         $this->do_preload = false;
     }
-}
-
-if (is_multisite() && is_network_admin()) {
-    settings_errors('general');
 }
 ?>
 <div class="wrap" id="docket-cache">
