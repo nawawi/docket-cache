@@ -3,7 +3,7 @@
 Enhance and Fix release.
 
 - Cron event, docketcache_optimizedb and docketcache_checkversion only run on main site if multisite.
-- Cron event, checkversion change to every 3 days to avoid excessive usage.
+- Cron event, checkversion change to every 3 days to avoid excessive process.
 - Cronbot, change Test Ping to use it own action, to avoid conflict with connect/disconnect action.
 - Cronbot, max to 5 sites if multisite, define DOCKET_CACHE_CRONBOT_MAX to change it.
 - CronAgent::send_action, allow capture error if second argument set to pong.

@@ -135,7 +135,7 @@ Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docke
 Enhance and Fix release.
 
 - Cron event, docketcache_optimizedb and docketcache_checkversion only run on main site if multisite.
-- Cron event, checkversion change to every 3 days to avoid excessive usage.
+- Cron event, checkversion change to every 3 days to avoid excessive process.
 - Cronbot, change Test Ping to use it own action, to avoid conflict with connect/disconnect action.
 - Cronbot, max to 5 sites if multisite, define DOCKET_CACHE_CRONBOT_MAX to change it.
 - CronAgent::send_action, allow capture error if second argument set to pong.
@@ -174,6 +174,6 @@ This is an enhanced version based on previous fix releases.
 - Added CLI command "unlock" to clear all lock files.
 
 
-Kindly refer to [changelog.txt](https://github.com/nawawi/docket-cache/changelog.txt) for previous changes.
+Kindly refer to [changelog.txt](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt) for previous changes.
 
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
