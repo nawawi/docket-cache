@@ -298,10 +298,10 @@ class Bepart extends Filesystem
         return \function_exists('is_ssl') ? is_ssl() : false;
     }
 
-    public function get_network_sites()
+    public function get_network_sites(&$counts = 0)
     {
         $data = [];
-
+        $cnt = 0;
         if (is_multisite()) {
             $args = [
                 'public' => 1,
@@ -322,6 +322,7 @@ class Bepart extends Filesystem
                     if ((int) $site->blog_id === (int) $main_site_id) {
                         $data[$num]['is_main'] = 1;
                     }
+                    ++$cnt;
                 }
             }
         } else {
@@ -330,7 +331,10 @@ class Bepart extends Filesystem
                 'url' => get_option('siteurl'),
                 'is_main' => 1,
             ];
+            $cnt = 1;
         }
+
+        $counts = $cnt;
 
         return $data;
     }
@@ -373,19 +377,27 @@ class Bepart extends Filesystem
         return $siteid;
     }
 
-    public function get_crons($all = false, &$count = 0)
+    public function get_crons($all = false, &$count_all = 0, &$count_run = 0)
     {
-        $cron_array = $all ? _get_cron_array() : wp_get_ready_cron_jobs();
+        $cron_array = _get_cron_array();
         if (empty($cron_array)) {
-            $count = 0;
+            $count_all = 0;
+            $count_run = 0;
 
             return false;
         }
 
+        $count_all = \count($cron_array);
+
+        $gmt_time = microtime(true);
         $crons = $cron_array;
-        $count = \count($crons);
         $cnt = 0;
         foreach ($cron_array as $timestamp => $cronhooks) {
+            if (!$all && $timestamp > $gmt_time) {
+                unset($crons[$timestamp]);
+                continue;
+            }
+
             foreach ($cronhooks as $hook => $keys) {
                 if (!has_action($hook)) {
                     wp_clear_scheduled_hook($hook);
@@ -398,7 +410,7 @@ class Bepart extends Filesystem
 
         unset($cron_array);
 
-        $count = $cnt;
+        $count_run = $cnt;
 
         return $crons;
     }

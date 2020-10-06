@@ -247,6 +247,9 @@ final class Constans
         // docket cronbot
         $this->maybe_define('DOCKET_CACHE_CRONBOT', true);
 
+        // docket cronbot
+        $this->maybe_define('DOCKET_CACHE_CRONBOT_MAX', 5);
+
         // cache stats
         $this->maybe_define('DOCKET_CACHE_STATS', true);
 

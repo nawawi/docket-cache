@@ -357,16 +357,17 @@ final class View
 
     private function config_select_set($name, $options, $default, $idx = 'config')
     {
+        if (\is_array($idx) && !empty($idx) && !empty($idx['idx'])) {
+            $args = $idx;
+        } else {
+            $args = ['idx' => $idx];
+        }
+
         $action = 'save-'.$name;
         $html = '<select id="'.$name.'" class="config-select">';
         foreach ((array) $options as $n => $v) {
-            $url = $this->plugin->action_query(
-                $action,
-                [
-                    'idx' => $idx,
-                    'nv' => $n,
-                ]
-            );
+            $args['nv'] = $n;
+            $url = $this->plugin->action_query($action, $args);
             $selected = $n === $default ? ' selected' : '';
             $html .= '<option value="'.$n.'" data-action-link="'.$url.'"'.$selected.'>'.$v.'</option>';
         }

@@ -39,13 +39,17 @@ final class Event
                         'interval' => 30 * MINUTE_IN_SECONDS,
                         'display' => esc_html__('Every 30 Minutes', 'docket-cache'),
                     ],
+                    'monthly' => [
+                        'interval' => MONTH_IN_SECONDS,
+                        'display' => esc_html__('Once Monthly', 'docket-cache'),
+                    ],
                     'docketcache_gc_schedule' => [
                         'interval' => 5 * MINUTE_IN_SECONDS,
                         'display' => esc_html__('Every 5 Minutes', 'docket-cache'),
                     ],
-                    'monthly' => [
-                        'interval' => MONTH_IN_SECONDS,
-                        'display' => esc_html__('Once Monthly', 'docket-cache'),
+                    'docketcache_checkversion_schedule' => [
+                        'interval' => 3 * DAY_IN_SECONDS,
+                        'display' => esc_html__('Every 3 Days', 'docket-cache'),
                     ],
                 ];
 
@@ -77,12 +81,8 @@ final class Event
 
                 // optimize db
                 $cronoptmzdb = $this->plugin->constans()->value('DOCKET_CACHE_CRONOPTMZDB');
-                if (!empty($cronoptmzdb) && 'never' !== $cronoptmzdb) {
-                    $this->is_optimizedb = true;
-
-                    add_action('docketcache_optimizedb', [$this, 'optimizedb']);
-
-                    $recurrence = 'weekly';
+                if (!empty($cronoptmzdb) && 'never' !== $cronoptmzdb && is_main_site()) {
+                    $recurrence = '';
                     switch ($cronoptmzdb) {
                         case 'daily':
                             $recurrence = 'daily';
@@ -95,8 +95,15 @@ final class Event
                             break;
                     }
 
-                    if (!wp_next_scheduled('docketcache_optimizedb')) {
-                        wp_schedule_event(time(), $recurrence, 'docketcache_optimizedb');
+                    if (empty($recurrence)) {
+                        wp_clear_scheduled_hook('docketcache_checkversion');
+                    } else {
+                        $this->is_optimizedb = true;
+                        add_action('docketcache_optimizedb', [$this, 'optimizedb']);
+
+                        if (!wp_next_scheduled('docketcache_optimizedb')) {
+                            wp_schedule_event(time(), $recurrence, 'docketcache_optimizedb');
+                        }
                     }
                 } else {
                     if (wp_get_schedule('docketcache_optimizedb')) {
@@ -105,10 +112,16 @@ final class Event
                 }
 
                 // check version
-                if ($this->plugin->constans()->is_true('DOCKET_CACHE_CHECKVERSION')) {
+                if ($this->plugin->constans()->is_true('DOCKET_CACHE_CHECKVERSION') && is_main_site()) {
+                    // 06102020: reset to 2 days
+                    $check = wp_get_scheduled_event('docketcache_checkversion');
+                    if (\is_object($check) && 'docketcache_checkversion_schedule' !== $check->schedule) {
+                        wp_clear_scheduled_hook('docketcache_checkversion');
+                    }
+
                     add_action('docketcache_checkversion', [$this, 'checkversion']);
                     if (!wp_next_scheduled('docketcache_checkversion')) {
-                        wp_schedule_event(time(), 'daily', 'docketcache_checkversion');
+                        wp_schedule_event(time(), 'docketcache_checkversion_schedule', 'docketcache_checkversion');
                     }
                 } else {
                     if (wp_get_schedule('docketcache_checkversion')) {
@@ -307,18 +320,18 @@ final class Event
         @set_time_limit(300);
         $this->delete_expired_transients_db();
 
-        $dbname = $wpdb->dbname;
-        $tables = $wpdb->get_results('SHOW TABLES FROM '.$dbname, ARRAY_A);
-        if (!empty($tables) && \is_array($tables)) {
-            foreach ($tables as $table) {
-                $tbl = $table['Tables_in_'.$dbname];
-                $wpdb->query('OPTIMIZE TABLE `'.$tbl.'`');
+        if (is_main_site()) {
+            $dbname = $wpdb->dbname;
+            $tables = $wpdb->get_results('SHOW TABLES FROM '.$dbname, ARRAY_A);
+            if (!empty($tables) && \is_array($tables)) {
+                foreach ($tables as $table) {
+                    $tbl = $table['Tables_in_'.$dbname];
+                    $wpdb->query('OPTIMIZE TABLE `'.$tbl.'`');
+                }
             }
         }
 
         $wpdb->suppress_errors($suppress);
-
-        $this->plugin->canopt()->setlock('optimizedb', 0);
 
         return true;
     }
@@ -369,7 +382,12 @@ final class Event
 
     public function checkversion()
     {
+        if (!is_main_site()) {
+            return false;
+        }
+
         $part = 'checkversion';
+
         if ($this->plugin->canopt()->lockexp($part)) {
             return false;
         }

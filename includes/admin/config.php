@@ -114,7 +114,7 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr>
-                    <th><?php esc_html_e('Object Cache Stats', 'docket-cache'); ?></th>
+                    <th><?php esc_html_e('Object Cache File Stats', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('stats', DOCKET_CACHE_STATS); ?>
                     </td>

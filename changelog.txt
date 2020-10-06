@@ -1,3 +1,15 @@
+= v20.09.02 (20202-10-06)
+
+Enhance and Fix release.
+
+- Cron event, docketcache_optimizedb and docketcache_checkversion only run on main site if multisite.
+- Cron event, checkversion change to every 3 days to avoid excessive usage.
+- Cronbot, change Test Ping to use it own action, to avoid conflict with connect/disconnect action.
+- Cronbot, max to 5 sites if multisite, define DOCKET_CACHE_CRONBOT_MAX to change it.
+- CronAgent::send_action, allow capture error if second argument set to pong.
+- Canopt::keys, added description for each key.
+- Cleanup admin interface.
+
 = v20.09.01 (2020-10-05)
 
 - Improved admin interface structure.

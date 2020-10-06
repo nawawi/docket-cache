@@ -36,27 +36,37 @@ final class Canopt extends Bepart
         return self::$inst;
     }
 
-    public function keys()
+    public function keys($key = false)
     {
-        return [
-             'log',
-             'log_time',
-             'preload',
-             'advcpost',
-             'optermcount',
-             'precache',
-             'mocache',
-             'misc_tweaks',
-             'postmissedschedule',
-             'wootweaks',
-             'pageloader',
-             'wpoptaload',
-             'cronoptmzdb',
-             'cronbot',
-             'stats',
-             'autoupdate',
-             'checkversion',
-         ];
+        $data = [
+            'log' => esc_html__('Cache Log', 'docket-cache'),
+            'log_time' => esc_html__('Log Timestamp', 'docket-cache'),
+            'preload' => esc_html__('Admin Page Cache Preloading', 'docket-cache'),
+            'advcpost' => esc_html__('Advanced Post Caching', 'docket-cache'),
+            'optermcount' => esc_html__('Optimize Term Count Queries', 'docket-cache'),
+            'precache' => esc_html__('Object Cache Precaching', 'docket-cache'),
+            'mocache' => esc_html__('WordPress Translation Caching', 'docket-cache'),
+            'misc_tweaks' => esc_html__('Misc Performance Tweaks', 'docket-cache'),
+            'postmissedschedule' => esc_html__('Post Missed Schedule Tweaks', 'docket-cache'),
+            'wootweaks' => esc_html__('Misc WooCommerce Tweaks', 'docket-cache'),
+            'pageloader' => esc_html__('Admin Page Loader', 'docket-cache'),
+            'wpoptaload' => esc_html__('Suspend WP Options Autoload', 'docket-cache'),
+            'cronoptmzdb' => esc_html__('Optimize Database Tables', 'docket-cache'),
+            'cronbot' => esc_html__('Cronbot Service', 'docket-cache'),
+            'stats' => esc_html__('Object Cache File Stats', 'docket-cache'),
+            'autoupdate' => esc_html__('Auto Update', 'docket-cache'),
+            'checkversion' => esc_html__('Critical Notice Checking', 'docket-cache'),
+        ];
+
+        if (false !== $key) {
+            if (!empty($data[$key])) {
+                return $data[$key];
+            }
+
+            return false;
+        }
+
+        return array_keys($data);
     }
 
     private function read_config($file = '', $force = false)

@@ -736,6 +736,7 @@ final class Plugin extends Bepart
              'docket-flush-opcache',
              'docket-connect-cronbot',
              'docket-disconnect-cronbot',
+             'docket-pong-cronbot',
              'docket-runevent-cronbot',
              'docket-runeventnow-cronbot',
              'docket-selectsite-cronbot',
@@ -1111,6 +1112,11 @@ final class Plugin extends Bepart
                                 $message = $result ? 'docket-cronbot-disconnect' : 'docket-cronbot-disconnect-failed';
                                 do_action('docketcache/disconnect-cronbot', $result);
                                 break;
+                            case 'docket-pong-cronbot':
+                                $result = apply_filters('docketcache/cronbot-pong', false);
+                                $message = 'docket-cronbot-pong';
+                                do_action('docketcache/pong-cronbot', $result);
+                                break;
                             case 'docket-runevent-cronbot':
                                 $message = 'docket-cronbot-runevent-failed';
                                 $result = apply_filters('docketcache/cronbot-runevent', false);
@@ -1151,10 +1157,12 @@ final class Plugin extends Bepart
                                 break;
                         }
 
+                        $option_name = '';
                         if (empty($message) && preg_match('@^docket-(default|enable|disable|save)-([a-z_]+)$@', $action, $mm)) {
                             $nk = $mm[1];
                             $nx = $mm[2];
                             if (\in_array($nx, $this->canopt()->keys())) {
+                                $option_name = $nx;
                                 if ('save' === $nk && isset($_GET['nv'])) {
                                     $nv = sanitize_text_field($_GET['nv']);
                                     $message = $this->canopt()->save($nx, $nv) ? 'docket-option-save' : 'docket-option-failed';
@@ -1172,6 +1180,14 @@ final class Plugin extends Bepart
 
                             if (!empty($_GET['idx'])) {
                                 $args['idx'] = sanitize_text_field($_GET['idx']);
+
+                                if (!empty($_GET['quiet']) && 1 === (int) $_GET['quiet']) {
+                                    $args['message'] = '';
+                                }
+
+                                if (!empty($option_name)) {
+                                    $args['nx'] = $option_name;
+                                }
                             }
 
                             $query = add_query_arg($args, $this->page);
@@ -1194,6 +1210,15 @@ final class Plugin extends Bepart
                 if (isset($_GET['message'])) {
                     $token = sanitize_text_field($_GET['message']);
                     $this->token = $token;
+
+                    $option_name = esc_html('Option');
+                    if (!empty($_GET['nx'])) {
+                        $nx = $this->canopt()->keys(sanitize_text_field($_GET['nx']));
+                        if (!empty($nx)) {
+                            $option_name = $nx;
+                        }
+                    }
+
                     switch ($token) {
                         case 'docket-occache-enabled':
                             $message = esc_html__('Object cache enabled.', 'docket-cache');
@@ -1255,6 +1280,18 @@ final class Plugin extends Bepart
                         case 'docket-cronbot-disconnect-failed':
                             $error = esc_html__('Cronbot failed to disconnect.', 'docket-cache');
                             break;
+                        case 'docket-cronbot-pong':
+                            $endpoint = @preg_replace('@^(https?:)?//@', '', $this->cronbot_endpoint);
+                            $errmsg = get_transient('docketcache/cronboterror');
+                            delete_transient('docketcache/cronboterror');
+                            if (!empty($errmsg)) {
+                                /* translators: %1$s: cronbot endpoint, %2$s = error message */
+                                $error = sprintf(esc_html__('Pong from %1$s: %2$s.', 'docket-cache'), $endpoint, $errmsg);
+                            } else {
+                                /* translators: %s: cronbot endpoint */
+                                $message = sprintf(esc_html__('Pong from %s : connected.', 'docket-cache'), $endpoint);
+                            }
+                            break;
                         case 'docket-cronbot-runevent':
                             $message = esc_html__('Running cron successful.', 'docket-cache');
                             $msg = get_transient('docketcache/cronbotrun');
@@ -1288,19 +1325,24 @@ final class Plugin extends Bepart
                             $error = esc_html__('Failed to run cron.', 'docket-cache');
                             break;
                         case 'docket-option-enable':
-                            $message = esc_html__('Option enabled.', 'docket-cache');
+                            /* translators: %s = option name */
+                            $message = sprintf(esc_html__('%s enabled.', 'docket-cache'), $option_name);
                             break;
                         case 'docket-option-disable':
-                            $message = esc_html__('Option disabled.', 'docket-cache');
+                            /* translators: %s = option name */
+                            $message = sprintf(esc_html__('%s disabled.', 'docket-cache'), $option_name);
                             break;
                         case 'docket-option-save':
-                            $message = esc_html__('Option saved.', 'docket-cache');
+                            /* translators: %s = option name */
+                            $message = sprintf(esc_html__('%s updated.', 'docket-cache'), $option_name);
                             break;
                         case 'docket-option-default':
-                            $message = esc_html__('Option resets to default.', 'docket-cache');
+                            /* translators: %s = option name */
+                            $message = sprintf(esc_html__('%s resets to default.', 'docket-cache'), $option_name);
                             break;
                         case 'docket-option-failed':
-                            $error = esc_html__('Failed to change options.', 'docket-cache');
+                            /* translators: %s = option name */
+                            $error = sprintf(esc_html__('Failed to update %s.', 'docket-cache'), $option_name);
                             break;
                     }
 

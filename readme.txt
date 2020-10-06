@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.09.01
+Stable tag: 20.09.02
 License: MIT
 License URI: ./license.txt
 
@@ -130,6 +130,20 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.09.02 =
+
+Enhance and Fix release.
+
+- Cron event, docketcache_optimizedb and docketcache_checkversion only run on main site if multisite.
+- Cron event, checkversion change to every 3 days to avoid excessive usage.
+- Cronbot, change Test Ping to use it own action, to avoid conflict with connect/disconnect action.
+- Cronbot, max to 5 sites if multisite, define DOCKET_CACHE_CRONBOT_MAX to change it.
+- CronAgent::send_action, allow capture error if second argument set to pong.
+- Canopt::keys, added description for each key.
+- Cleanup admin interface.
+
+Thanks.
+
 = 20.09.01 =
 
 This is Major Release based on previous releases.
@@ -159,153 +173,7 @@ This is an enhanced version based on previous fix releases.
 - Added DOCKET_CACHE_IGNORED_GROUPKEY constant to exclude group:key from persistent cache.
 - Added CLI command "unlock" to clear all lock files.
 
-= 20.08.17 =
 
-Fix release.
-
-- Fixed CronAgent, woocommerce -> get_cart - not be called before the wp_loaded action.
-- Fixed WP_Object_Cache::$cache_hits, WP_Object_Cache::$cache_misses -> hit rate.
-
-= 20.08.16 =
-
-Fix release.
-
-- Fixed WP_Object_Cache::set() -> only write to disk if data change and expiry not 0.
-- Fixed WP_Object_Cache::dc_precache_set -> only write to disk if data change.
-
-= 20.08.15 =
-
-Fix release.
-
-- Fixed precaching, invalid conditional for query string.
-- Fixed cache maxttl, missing timestamp in cache meta.
-- Fixed cache, flush user_meta group before login and after logout.
-- Fixed micro optimization, before using regex functions.
-- Fixed transient, remove all from db before activate our dropin.
-
-= 20.08.14 =
-
-Fix release.
-
-- Fixed unserialize data if serialized before coverting to php code.
-
-= 20.08.13 =
-
-Fix release.
-
-- Fixed Advanced Post Cache, invalid comment counting.
-- Fixed Precaching, exclude docketcache-post group.
-- Set garbage collector always enable.
-
-= 20.08.12 =
-
-This is an improved version based on previous releases.
-
-- Use our own locking functions instead of wp_cache_* functions.
-- Standardize hook prefix, rename docket-cache to docketcache.
-- Increase default maxfile to 50000.
-- Cronbot, remove scheduled events if hooks has errors or not exist.
-- Cronbot, added "Run All Now" at admin interface.
-- Garbage collector, remove older files if maxttl defined. By default set to 2 days (172800 seconds).
-- Cache group post_meta and options, set to expire in 24 hours if no expiration time.
-- Precaching, data expire set to 4 hours and maximum 5000 lists at a time.
-- Precaching, append site host as key to allow use it on multisite.
-- Precaching allow query string if user_logged_in() true and uri match with "/wp-admin/(network/)?.\*?\.php\?.\*?".
-- Preloading, add locking to prevent run multiple time in short period.
-- Standardize data size in binary rather than decimal.
-- DOCKET_CACHE_MAXTTL, only numbers between 86400 and 2419200 are accepted (1 day - 28 days).
-- DOCKET_CACHE_MAXSIZE, only numbers between 1000000 and 10485760 are accepted (1 MB - 10 MB).
-- DOCKET_CACHE_MAXSIZE_DISK, minimum 1048576 (1MB), default set to 500MB.
-- CLI, new command to run garbage collector "wp cache gc".
-
-Please do "Flush Cache" after/before installing this update. Thanks.
-
-= 20.08.11 =
-
-This is an enhanced version based on previous fix releases.
-
-- Fixed Object cache stats, counting using ajax worker and only run on the overview page.
-- Fixed Precaching, completely ignore query string and limit to 1000 urls.
-- Fixed Caching, maxttl always set to 0 to avoid unexpected behavior from others plugin.
-- Fixed Cronbot, bepart::is_ssl() check if site behind cloudflare/proxy.
-- Added Transient, Set the expiry time to 12 hours if expiration not set.
-- Added Garbage collector, scheduled to every 5 minutes instead of 30 minutes. Enable cronbot service if your site wp-cron not running active.
-- Added Object cache stats, enable/disable at configuration page.
-- Added DOCKET_CACHE_MAXFILE constant, attempting to reduce cache file if bigger than default 5000 files. Only numbers between 200 and 200000 are accepted.
-
-Please do "Flush Cache" after/before installing this update. Thanks.
-
-= 20.08.10 =
-
-This is a hotfix release. Please do "Flush Cache" after/before installing this update. Thanks.
-
-- Fixed cache file grow quickly if enable advanced post cache, maxttl should always set to 0.
-
-= 20.08.09 =
-
-This is a hotfix release. Please do "Flush Cache" after/before installing this update. Thanks.
-
-- Fixed empty value return by constans->is_int, constans->is_array.
-
-= 20.08.08 =
-
-This is a hotfix release.
-
-- Fixed cache stats, do collecting data in background to avoid lagging.
-- Fixed cronbot, execute cron process directly without wp-cron.php, to avoid http connection error. 
-- Added cache stats options, Enable/disable object cache stats at Overview page. 
-
-= 20.08.07 =
-
-Fix release.
-
-- Fixed precaching, ignore query to avoid junk query string
-- Fixed cronbot, add locking to avoid multiple send in short period
-- Fixed cronbot, remove site url trailing slash
-- Fixed cache stats overview
-
-= 20.08.06 =
-
-Fix release.
-
-- Fixed precache "class not found"
-- Fixed cronbot send site url instead of main site url if multisite
-- Fixed cronbot recheck connection
-
-= 20.08.05 =
-
-New features and fix release.
-
-- Added Cronbot Service
-- Fixed precache overmissed
-- Fixed for security reason, exclude *user* group from cache log if WP_DEBUG false
-- Fixed cache_read() -> Registry::getClassReflector -> fatal error class not found
-- Fixed PostCache::setup_hooks() -> array_shift error byreference
-- Fixed get_proxy_ip() -> return bool instead of IP string
-- Fixed ajax worker -> cache preload, cache flush, log flush
-
-= 20.08.04 =
-
-New features and fix release.
-
-- Added Object Cache Precaching
-- Added Optimize Database Tables
-- Added Suspend WP Options Autoload
-- Added Post Missed Schedule Tweaks
-- Added OPcache reset
-- Added Cache/OPcache Statistics
-- Fixed Invalid variable at "maybe_recount_posts_for_term"
-- Fixed Checking if file at cachedir_flush, cache_size
-- Fixed Cache flush and Drop-in installation, return false if dir/file is not writable
-
-= 20.08.03 =
-
-This is an improved version based on previous releases.
-
-- Added WordPres Translation Caching
-- Added Optimization for Term Count Queries
-
-
-Kindly refer to [Github Repo](https://github.com/nawawi/docket-cache/releases) for previous Changelog.
+Kindly refer to [changelog.txt](https://github.com/nawawi/docket-cache/changelog.txt) for previous changes.
 
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.

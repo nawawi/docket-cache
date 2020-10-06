@@ -49,7 +49,7 @@ endif;
             <p class="submit">
                 <?php if ($is_connected) : ?>
                 <a href="<?php echo $this->plugin->action_query('disconnect-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary button-large btx-spinner"><?php esc_html_e('Disconnect', 'docket-cache'); ?></a>
-                <a href="<?php echo $this->plugin->action_query('connect-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary button-large btx-spinner"><?php esc_html_e('Test Ping', 'docket-cache'); ?></a>
+                <a href="<?php echo $this->plugin->action_query('pong-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary button-large btx-spinner"><?php esc_html_e('Test Ping', 'docket-cache'); ?></a>
                 <?php else : ?>
                 <a href="<?php echo $this->plugin->action_query('connect-cronbot', ['idx' => 'cronbot']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Connect', 'docket-cache'); ?></a>
                 <?php endif; ?>

@@ -52,6 +52,14 @@ final class CronAgent
         );
 
         add_filter(
+            'docketcache/cronbot-pong',
+            function ($status) {
+                return $this->send_action('on', 'pong');
+            },
+            PHP_INT_MAX
+        );
+
+        add_filter(
             'docketcache/cronbot-runevent',
             function ($runnow) {
                 $is_switch = $this->plugin->switch_cron_site();
@@ -81,6 +89,9 @@ final class CronAgent
 
     private function send_action($action, $is_hello = false)
     {
+        $is_quick = $is_hello && 'pong' !== $is_hello ? true : false;
+        $is_pong = 'pong' === $is_hello;
+
         $uip = $this->plugin->get_user_ip();
 
         static $cache = [];
@@ -94,7 +105,7 @@ final class CronAgent
         $site_id = $this->plugin->nw_encrypt($site_key, $site_body);
 
         $args = [
-            'blocking' => $is_hello ? false : true,
+            'blocking' => $is_quick ? false : true,
             'body' => [
                 'timestamp' => date('Y-m-d H:i:s T'),
                 'timezone' => wp_timezone_string(),
@@ -112,7 +123,7 @@ final class CronAgent
         $cronbot_endpoint = $this->plugin->cronbot_endpoint.'/checkstatus?v='.$stmp;
         $results = Crawler::post($cronbot_endpoint, $args);
 
-        if ($is_hello) {
+        if ($is_quick) {
             return true;
         }
 
@@ -129,8 +140,12 @@ final class CronAgent
 
         if (is_wp_error($results)) {
             $output['error'] = $results->get_error_message();
-            $this->plugin->canopt()->save_part($output, 'cronbot');
-            set_transient('docketcache/cronboterror', $output['error'], 10);
+
+            if (!$is_pong) {
+                $this->plugin->canopt()->save_part($output, 'cronbot');
+            }
+
+            set_transient('docketcache/cronboterror', $output['error'], 60);
 
             $cache[$uip] = false;
 
@@ -143,8 +158,12 @@ final class CronAgent
             if (JSON_ERROR_NONE === json_last_error()) {
                 if (!empty($output['response']['error'])) {
                     $output['error'] = $output['response']['error'];
-                    $this->plugin->canopt()->save_part($output, 'cronbot');
-                    set_transient('docketcache/cronboterror', $output['error'], 10);
+
+                    if (!$is_pong) {
+                        $this->plugin->canopt()->save_part($output, 'cronbot');
+                    }
+
+                    set_transient('docketcache/cronboterror', $output['error'], 60);
 
                     $cache[$uip] = false;
 
@@ -156,8 +175,12 @@ final class CronAgent
         $code = (int) wp_remote_retrieve_response_code($results);
         if ($code > 400) {
             $output['error'] = $code;
-            $this->plugin->canopt()->save_part($output, 'cronbot');
-            set_transient('docketcache/cronboterror', $output['error'], 10);
+
+            if (!$is_pong) {
+                $this->plugin->canopt()->save_part($output, 'cronbot');
+            }
+
+            set_transient('docketcache/cronboterror', 'Error '.$output['error'], 60);
 
             $cache[$uip] = false;
 
@@ -165,7 +188,10 @@ final class CronAgent
         }
 
         $output['connected'] = 'off' === $action ? false : true;
-        $this->plugin->canopt()->save_part($output, 'cronbot');
+
+        if (!$is_pong) {
+            $this->plugin->canopt()->save_part($output, 'cronbot');
+        }
 
         $cache[$uip] = true;
 
@@ -212,16 +238,18 @@ final class CronAgent
 
     private function run_wpcron($run_now = false)
     {
+        $crons = $this->plugin->get_crons($run_now, $cron_event);
+
         $results = [
             'wpcron_return' => 0,
             'wpcron_msg' => '',
+            'wpcron_crons' => $cron_event,
+            'wpcron_event' => 0,
         ];
 
-        $crons = $this->plugin->get_crons($run_now, $cron_event);
         if (empty($crons)) {
             $results['wpcron_return'] = 1;
             $results['wpcron_msg'] = 'No scheduled event ready to run';
-            $results['wpcron_event'] = $cron_event;
 
             return $results;
         }
@@ -229,7 +257,6 @@ final class CronAgent
         if (false !== strpos($_SERVER['REQUEST_URI'], '/wp-cron.php') || isset($_GET['doing_wp_cron']) || $this->plugin->constans()->is_true('DOING_CRON')) {
             $results['wpcron_return'] = 1;
             $results['wpcron_msg'] = 'Another cron process is currently running wp-cron.php';
-            $results['wpcron_event'] = $cron_event;
 
             return $results;
         }
@@ -242,7 +269,6 @@ final class CronAgent
             if (!empty($doing_cron_transient) && ((int) $doing_cron_transient + 60 > $gmt_time)) {
                 $results['wpcron_return'] = 1;
                 $results['wpcron_msg'] = 'Process locked, doing_cron not finish yet';
-                $results['wpcron_event'] = $cron_event;
 
                 return $results;
             }
@@ -253,8 +279,8 @@ final class CronAgent
 
         $run_event = 0;
         foreach ($crons as $timestamp => $cronhooks) {
-            if (!$run_now && $timestamp > $gmt_time) {
-                break;
+            if (false === $run_now && ($timestamp > $gmt_time)) {
+                continue;
             }
 
             foreach ($cronhooks as $hook => $keys) {
@@ -272,7 +298,6 @@ final class CronAgent
 
                     wp_unschedule_event($timestamp, $hook, $v['args']);
 
-                    // prevent fatal error if hook has error
                     try {
                         do_action_ref_array($hook, $v['args']);
                         ++$run_event;
@@ -362,16 +387,31 @@ final class CronAgent
             }
         }
 
+        $this->plugin->canopt()->setlock('receive_ping', time() + 60);
+
         $this->is_pingpong = true;
         $is_multisite = is_multisite();
-        $sites = $this->plugin->get_network_sites();
+        $siteall = 0;
+        $sites = $this->plugin->get_network_sites($siteall);
+        $maxrun = 0;
+        $maxcan = (int) $this->plugin->constans()->value('DOCKET_CACHE_CRONBOT_MAX');
+        $maxcan = $maxcan < 1 ? 5 : $maxcan;
         foreach ($sites as $num => $site) {
             if ($is_multisite) {
                 switch_to_blog($site['id']);
                 $response['site'] = $site['url'];
             }
 
-            $results = $this->run_wpcron();
+            if ($maxrun >= $maxcan) {
+                $results = [
+                    'wpcron_return' => 3,
+                    'wpcron_msg' => 'Reach maximum run: '.$maxrun.'/'.$siteall,
+                    'wpcron_crons' => 0,
+                    'wpcron_event' => 0,
+                ];
+            } else {
+                $results = $this->run_wpcron();
+            }
 
             if ($is_multisite) {
                 restore_current_blog();
@@ -379,15 +419,15 @@ final class CronAgent
 
             if ($site['is_main']) {
                 $response = array_merge($response, $results);
+                --$maxrun;
             } else {
                 $response['site_'.$site['id']] = [
                     'site' => $site['url'],
                     'wpcron' => $results,
                 ];
             }
+            ++$maxrun;
         }
-
-        $this->plugin->canopt()->setlock('receive_ping', time() + 60);
 
         $cache[$uip] = $response;
 

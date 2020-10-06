@@ -39,7 +39,10 @@ $log = $this->parse_log_query();
                                 'wp' => __('Site Format', 'docket-cache'),
                             ],
                             DOCKET_CACHE_LOG_TIME,
-                            'log'
+                            [
+                                'idx' => 'log',
+                                'quiet' => 1,
+                            ]
                         );
                         ?>
                     </td>
