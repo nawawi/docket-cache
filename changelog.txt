@@ -1,0 +1,207 @@
+= v20.09.01 (2020-10-05)
+
+- Improved admin interface structure.
+- Improved admin menu using top-level instead of submenu from settings.
+- Improved Cronbot to support multisite.
+- Added Actions pane at overview page to flush cache/OPcache and enable/disable object cache.
+- Added Auto update options at configuration page.
+- Added Cron event checkversion to check for critical update, define DOCKET_CACHE_CHECKVERSION constant to false to disable it.
+- Fixed CronAgent issue with doing_cron locked on multisite.
+- Fixed Cron event missing watchproc hook on unregister.
+
+= v20.08.18 (2020-09-29)
+
+- Fixed Cache Log -> change to native file_put_contents instead of put() to avoid early unlock result to truncate.
+- Fixed Filesystem::put() -> add blocking option to avoid early unlock.
+- Fixed dc_save() -> invalid conditional for is_data_updated().
+- Fixed skip_stats() -> add checking for ignored groups.
+- Fixed unlink -> add checking is_file to avoid php warning and make query-monitor happy.
+- Fixed Canopt::setlock() -> set file permission if write true.
+- Added DOCKET_CACHE_IGNORED_PRECACHE constant to exclude group:key from precaching.
+- Added DOCKET_CACHE_IGNORED_GROUPKEY constant to exclude group:key from persistent cache.
+- Added CLI command "unlock" to clear all lock files.
+
+= v20.08.17 (2020-09-27)
+
+- Fixed CronAgent, woocommerce -> get_cart - not be called before the wp_loaded action.
+- Fixed WP_Object_Cache::$cache_hits, WP_Object_Cache::$cache_misses -> hit rate.
+
+= v20.08.16 (2020-09-25)
+
+- Fixed WP_Object_Cache::set() -> only write to disk if data change and expiry not 0.
+- Fixed WP_Object_Cache::dc_precache_set -> only write to disk if data change.
+
+= v20.08.15 (2020-09-25)
+
+- Fixed precaching, invalid conditional for query string.
+- Fixed cache maxttl, missing timestamp in cache meta.
+- Fixed cache, flush user_meta group before login and after logout.
+- Fixed micro optimization, before using regex functions.
+- Fixed transient, remove all from db before activate our dropin.
+
+= v20.08.14 (2020-09-24)
+
+- Fixed unserialize data if serialized before coverting to php code.
+
+= v20.08.13 (2020-09-21)
+
+- Fixed Advanced Post Cache, invalid comment counting.
+- Fixed Precaching, exclude docketcache-post group.
+- Set garbage collector always enable.
+
+= v20.08.12 (2020-09-20)
+
+- Use our own locking functions instead of wp_cache_* functions.
+- Standardize hook prefix, rename docket-cache to docketcache.
+- Increase default maxfile to 50000.
+- Cronbot, remove scheduled events if hooks has errors or not exist.
+- Cronbot, added "Run All Now" at admin interface.
+- Garbage collector, remove older files if maxttl defined. By default set to 2 days (172800 seconds).
+- Cache group post_meta and options, set to expire in 24 hours if no expiration time.
+- Precaching, data expire set to 4 hours and maximum 5000 lists at a time.
+- Precaching, append site host as key to allow use it on multisite.
+- Precaching allow query string if user_logged_in() true and uri match with "/wp-admin/(network/)?.\*?\.php\?.\*?".
+- Preloading, add locking to prevent run multiple time in short period.
+- Standardize data size in binary rather than decimal.
+- DOCKET_CACHE_MAXTTL, only numbers between 86400 and 2419200 are accepted (1 day - 28 days).
+- DOCKET_CACHE_MAXSIZE, only numbers between 1000000 and 10485760 are accepted (1 MB - 10 MB).
+- DOCKET_CACHE_MAXSIZE_DISK, minimum 1048576 (1MB), default set to 500MB.
+- CLI, new command to run garbage collector "wp cache gc".
+
+= v20.08.11 (2020-09-17)
+
+- Fixed Object cache stats, counting using ajax worker and only run on the overview page.
+- Fixed Precaching, completely ignore query string and limit to 1000 urls.
+- Fixed Caching, maxttl always set to 0 to avoid unexpected behavior from others plugin.
+- Fixed Cronbot, bepart::is_ssl() check if site behind cloudflare/proxy.
+- Fixed Missing wp_is_maintenance_mode(), wp < 5.5.1
+- Added Transient, Set the expiry time to 12 hours if expiration not set.
+- Added Garbage collector, scheduled to every 5 minutes instead of 30 minutes. Enable cronbot service if your site wp-cron not running active.
+- Added Object cache stats, enable/disable at configuration page.
+- Added DOCKET_CACHE_MAXFILES constant, attempting to reduce cache file if bigger than default 5000 files. Only numbers between 200 and 200000 are accepted.
+
+= v20.08.10 (2020-09-17)
+
+- Fixed cache file grow quickly if enable advanced post cache, maxttl should always set to 0.
+
+= v20.08.09 (2020-09-16)
+
+- Fixed empty value return by constans->is_int, constans->is_array.
+
+= v20.08.08 (2020-09-16)
+
+- Fixed cache stats, do collecting data in background to avoid lagging.
+- Fixed cronbot, execute cron process directly without wp-cron.php, to avoid http connection error.
+- Added cache stats options, Enable/disable object cache stats at Overview page.
+
+= v20.08.07 (2020-09-13)
+
+- Fixed precaching, ignore query to avoid junk query string
+- Fixed cronbot, add locking to avoid multiple send in short period
+- Fixed cronbot, remove site url trailing slash
+- Fixed cache stats overview
+
+= v20.08.06 (2020-09-07)
+
+- Fixed precache “class not found”
+- Fixed cronbot send site url instead of main site url if multisite
+- Fixed cronbot recheck connection
+
+= v20.08.05 (2020-09-01)
+
+- Added Cronbot Service
+- Fixed precache overmissed
+- Fixed for security reason, exclude user group from cache log if WP_DEBUG false
+- Fixed cache_read() -> Registry::getClassReflector -> fatal error class not found
+- Fixed PostCache::setup_hooks() -> array_shift error byreference
+- Fixed get_proxy_ip() -> return bool instead of IP string
+- Fixed ajax worker -> cache preload, cache flush, log flush
+
+= v20.08.04 (2020-08-18)
+
+- Added Object Cache Precaching.
+- Added Optimize Database Tables.
+- Added Suspend WP Options Autoload.
+- Added Post Missed Schedule Tweaks.
+- Added OPcache reset.
+- Added Cache/OPcache Statistics.
+- Fixed Invalid variable at "maybe_recount_posts_for_term".
+- Fixed Checking if file at cachedir_flush, cache_size.
+- Fixed Cache flush and Drop-in installation, return false if dir/file is not writable.
+
+= v20.08.03 (2020-08-03)
+
+- Added WordPres Translation Caching.
+- Added Optimization for Term Count Queries.
+
+= v20.07.27 (2020-07-27)
+
+- Added delete expired transients before replace dropin
+- Fixed rarely condition, check wp function if exists before use at drop-in file to avoid fatal error, mostly if using apache mod_fcgid
+
+= v20.07.24 (2020-07-24)
+
+- Added basic configuration interface.
+- Improved cache read/write.
+
+= v20.07.20 (2020-07-20)
+
+- Cache performance, replace file_exists with is_file.
+
+= v20.07.19 (2020-07-19)
+
+- Automatically enable object cache when plugin activate.
+- Delay caching object when installing drop-in file.
+- Sorting option by first and last line at cache log page.
+- Prevent fatal error at drop-in file.
+
+= v20.07.17 (2020-07-17)
+
+- Updated: use shorter class name in cache file.
+- Updated: admin interface. add overlay when window unload to prevent click.
+- Updated: rename Files() class to Filesystem() since its more than files.
+- Added: View() class to handle admin page.
+- Added: log order and line for view log at admin page.
+- Fixed: add nonce to ajax for preload.
+
+= v20.07.16 (2020-07-16)
+
+- Fixed: misc tweaks, remove heartbeat, had issue with elementor.
+- Fixed: run opcache_flush when truncate cache files.
+- Fixed: cache path always suffix with docket-cache.
+- Fixed: add prefix NAWAWI at vendor namespace to avoid conflict with others plugins.
+- Added: compat.php to fix older cache files.
+- Updated: admin page.
+- Updated: dropin follow plugin version.
+
+= v20.07.14 (2020-07-14)
+
+- Fixed: wrong conditional -> sanitize_second.
+- Fixed: using class method instead of closure function.
+- Fixed: cache file, write to temp file first to avoid data half write.
+- Fixed: dont cache if size more than 1MB.
+- Fixed: null type data, set data to empty -> object-cache.php.
+- Fixed: chmod wrong file -> object-cache.php.
+- Fixed: file locking when read write cache file.
+- Fixed: only truncate when flush the cache files.
+- Fixed: DOCKET_CACHE_DISABLED doesnt work.
+- Added: tweaks for woocommerce.
+- Added: filtered_group to cache group with conditional.
+- Added: class Files to handle most of filesystem functions.
+- Added: garbage collector.
+- Added: DOCKET_CACHE_GC constant to disable garbage collector.
+- Added: DOCKET_CACHE_FLUSH_DELETE to enable remove rather than truncate when flush.
+- Updated: replace DOCKET_CACHE_DEBUG* to DOCKET_CACHE_LOG*.
+- Updated: using trigger_error instead of throw Exception when library not found -> object-cache.php.
+
+= v20.07.09 (2020-07-09)
+
+- Versions are as follows: Year.Month.Day of release.
+- Fixed: Invalid data -> docket_update, docket_get.
+- Added: opcache_invalidate after updating cache -> opcache_flush_file.
+- Added: performance tweaks -> register_tweaks.
+- Added: Advanced Post Cache from vip-go.
+
+= 1.0.0 (2020-07-08)
+
+- Initial release of the plugin.
