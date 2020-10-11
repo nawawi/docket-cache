@@ -78,7 +78,8 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache fo
 4. Cache content.
 5. Cronbot.
 6. Configuration.
-7. Cronbot on multisite.
+7. Multisite / Multi-Network Overview.
+8. Multisite / Multi-Network Cronbot.
 
 
 == Frequently Asked Questions ==
