@@ -19,11 +19,6 @@ $log = $this->parse_log_query();
     <div class="flex-container">
         <div class="row">
             <?php $this->tab_title(!$this->has_vcache() ? esc_html__('Cache Log', 'docket-cache') : esc_html__('Cache View', 'docket-cache')); ?>
-            <p class="desc">
-                <?php if (!$this->has_vcache()) : ?>
-                <?php esc_html_e('The cache log intends to provide information on how the cache works. For performance and security concerns, deactivate if no longer needed.', 'docket-cache'); ?>
-                <?php endif; ?>
-            </p>
             <table class="form-table noborder-b">
                 <?php if (!$this->has_vcache()) : ?>
                 <tr class="form-table-selection">
@@ -38,7 +33,7 @@ $log = $this->parse_log_query();
                                 'local' => __('Local time', 'docket-cache'),
                                 'wp' => __('Site Format', 'docket-cache'),
                             ],
-                            DOCKET_CACHE_LOG_TIME,
+                            'dcdefault',
                             [
                                 'idx' => 'log',
                                 'quiet' => 1,
@@ -81,7 +76,7 @@ $log = $this->parse_log_query();
                         <?php if ($this->has_vcache()) : ?>
                         <a href="
 							<?php
-                            echo $this->plugin->action_query(
+                            echo $this->pt->action_query(
                                 'flush-ocfile',
                                 [
                                     'idx' => 'log',
@@ -139,7 +134,7 @@ $log = $this->parse_log_query();
                     ?>
                 </select>
                 <br>
-                <a href="<?php echo $this->plugin->action_query('flush-oclog', ['idx' => 'log']); ?>" class="button button-primary button-large"><?php esc_html_e('Flush Log', 'docket-cache'); ?></a>
+                <a href="<?php echo $this->pt->action_query('flush-oclog', ['idx' => 'log']); ?>" class="button button-primary button-large"><?php esc_html_e('Flush Log', 'docket-cache'); ?></a>
                 <?php endif; ?>
 
                 <?php if (($this->info->log_enable || !$log->output_empty) && !$this->has_vcache()) : ?>

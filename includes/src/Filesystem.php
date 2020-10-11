@@ -21,7 +21,14 @@ class Filesystem
      */
     public function is_docketcachedir($dir)
     {
-        return 'docket-cache' === basename($dir);
+        $dir = rtrim($dir, '/').'/';
+
+        // as long we in /docket-cache/
+        if (false !== strpos($dir, '/docket-cache/')) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -99,38 +106,6 @@ class Filesystem
     }
 
     /**
-     * tail.
-     */
-    public function tail($filepath, $limit = 100, $do_last = true)
-    {
-        $limit = (int) $limit;
-        $file = new \SplFileObject($filepath);
-        $file->seek(PHP_INT_MAX);
-        $total_lines = $file->key();
-
-        if ($limit > $total_lines) {
-            $limit = $total_lines;
-        }
-
-        if ($do_last) {
-            $total_lines = $total_lines > $limit ? $total_lines - $limit : $total_lines;
-        } else {
-            $total_lines = $limit;
-        }
-
-        $object = [];
-        if ($total_lines > 0) {
-            if ($do_last) {
-                $object = new \LimitIterator($file, $total_lines);
-            } else {
-                $object = new \LimitIterator($file, 0, $total_lines);
-            }
-        }
-
-        return $object;
-    }
-
-    /**
      * export_var.
      */
     public function export_var($data, &$error = '')
@@ -185,7 +160,7 @@ class Filesystem
         // bcoz we empty the file
         $this->opcache_flush($file);
 
-        $do_delete = (DOCKET_CACHE_FLUSH_DELETE && $this->is_php($file)) || $is_delete;
+        $do_delete = (nwdcx_construe('FLUSH_DELETE') && $this->is_php($file)) || $is_delete;
 
         if ($do_delete && @unlink($file)) {
             $ok = true;
@@ -263,7 +238,7 @@ class Filesystem
 
         $this->opcache_flush($file);
 
-        $ok = $this->put($tmpfile, $data);
+        $ok = $this->put($tmpfile, $data, 'cb', true);
         if (true === $ok) {
             if (@rename($tmpfile, $file)) {
                 $this->chmod($file);
@@ -402,7 +377,7 @@ class Filesystem
         }
 
         $dir = realpath($dir);
-        if (false !== $dir && is_dir($dir) && is_writable($dir) && $this->is_docketcachedir($dir)) {
+        if (false !== $dir && @is_dir($dir) && @is_writable($dir) && $this->is_docketcachedir($dir)) {
             foreach ($this->scanfiles($dir) as $object) {
                 $fx = $object->getPathName();
                 if (!$object->isFile() || 'file' !== $object->getType() || !$this->is_php($fx)) {
@@ -430,7 +405,7 @@ class Filesystem
      */
     public function define_cache_path($cache_path)
     {
-        $cache_path = !empty($cache_path) && is_dir($cache_path) && '/' !== $cache_path ? rtrim($cache_path, '/\\').'/' : WP_CONTENT_DIR.'/cache/docket-cache/';
+        $cache_path = !empty($cache_path) && @is_dir($cache_path) && '/' !== $cache_path ? rtrim($cache_path, '/\\').'/' : WP_CONTENT_DIR.'/cache/docket-cache/';
         if (!$this->is_docketcachedir($cache_path)) {
             $cache_path = rtim($cache_path, '/').'docket-cache/';
         }
@@ -452,6 +427,11 @@ class Filesystem
             return false;
         }
 
+        $flush_lock = WP_CONTENT_DIR.'/.object-cache-flush.txt';
+        if ($this->put($flush_lock, time())) {
+            @touch($flush_lock, time() + 120);
+        }
+
         foreach ($this->scanfiles($dir) as $object) {
             if (!$object->isFile() || 'file' !== $object->getType()) {
                 continue;
@@ -465,6 +445,10 @@ class Filesystem
         }
 
         wp_suspend_cache_addition(false);
+
+        if (@is_file($flush_lock)) {
+            @unlink($flush_lock);
+        }
 
         return $cnt;
     }
@@ -612,9 +596,22 @@ class Filesystem
     public function log($tag, $id, $data, $caller = '')
     {
         $do_flush = false;
-        $file = DOCKET_CACHE_LOG_FILE;
+        $file = nwdcx_constval('LOG_FILE');
+        if (empty($file)) {
+            return false;
+        }
+
+        $logsize = nwdcx_constval('LOG_SIZE');
+        if (empty($logsize) || !\is_int($logsize)) {
+            $logsize = 0;
+        }
+
+        if (is_multisite()) {
+            $file = nwdcx_network_filepath($file);
+        }
+
         if (@is_file($file)) {
-            if (DOCKET_CACHE_LOG_FLUSH && 'flush' === $tag || $this->filesize($file) >= (int) DOCKET_CACHE_LOG_SIZE) {
+            if (nwdcx_construe('LOG_FLUSH') && 'flush' === $tag || ($logsize > 0 && $this->filesize($file) >= $logsize)) {
                 $do_flush = true;
             }
         }
@@ -627,7 +624,7 @@ class Filesystem
         }
         $log = '['.$timestamp.'] '.$tag.': "'.$id.'" "'.trim($data).'" "'.$caller.'"';
 
-        $flags = !$do_flush ? FILE_APPEND : LOCK_EX;
+        $flags = !$do_flush ? LOCK_EX | FILE_APPEND : LOCK_EX;
         $do_chmod = !@is_file($file);
         if (@file_put_contents($file, $log.PHP_EOL, $flags)) {
             if ($do_chmod) {

@@ -11,12 +11,13 @@
 /**
  * @wordpress-plugin
  * Plugin Name:         Docket Cache
- * Version:             20.09.02
- * VerPrev:             20.09.01
+ * Plugin URI:          https://wordpress.org/plugins/docket-cache/
+ * Version:             20.09.03
+ * VerPrev:             20.09.02
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * GitHub Plugin URI:   https://github.com/nawawi/docket-cache
  * Author:              Nawawi Jamili
- * Author URI:          https://github.com/nawawi
+ * Author URI:          https://docketcache.com
  * Requires at least:   5.4
  * Requires PHP:        7.2.5
  * Network:             true
@@ -32,4 +33,4 @@ namespace Nawawi\DocketCache;
 
 \define('DOCKET_CACHE_FILE', __FILE__);
 require __DIR__.'/includes/load.php';
-( new Plugin() )->attach();
+( new Plugin() )->register();

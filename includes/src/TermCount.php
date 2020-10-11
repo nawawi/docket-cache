@@ -16,35 +16,25 @@ final class TermCount
 {
     public $counted_status;
     public $counted_terms;
-    private $plugin;
 
-    public function __construct(Plugin $plugin)
+    public function __construct()
     {
-        $this->plugin = $plugin;
         $this->counted_status = ['publish'];
         $this->counted_terms = [];
     }
 
     public function register()
     {
-        if (wp_doing_cron()) {
+        if (nwdcx_construe('WP_CLI') || nwdcx_construe('WP_IMPORTING') || wp_doing_cron()) {
             return;
         }
 
-        if ($this->plugin->constans()->is_true('WP_IMPORTING')) {
-            return;
-        }
-
-        if ($this->plugin->constans()->is_true('WP_CLI')) {
-            return;
-        }
-
-        if (!$this->plugin->safe_wpdb()) {
+        if (!nwdcx_wpdb()) {
             return;
         }
 
         add_action(
-            'plugin_loaded',
+            'init',
             function () {
                 wp_defer_term_counting(true);
                 remove_action('transition_post_status', '_update_term_count_on_transition_post_status');
@@ -128,13 +118,12 @@ final class TermCount
 
     public function quick_update_terms_count($object_id, $tt_ids, $taxonomy, $transition_type)
     {
-        $wpdb = $this->plugin->safe_wpdb();
-        if (!$wpdb) {
-            return false;
+        if (!nwdcx_wpdb($wpdb)) {
+            return;
         }
 
         if (!$transition_type) {
-            return false;
+            return;
         }
 
         $taxonomy_get = get_taxonomy($taxonomy);

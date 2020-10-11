@@ -14,13 +14,6 @@ namespace Nawawi\DocketCache;
 
 final class Tweaks
 {
-    private $plugin;
-
-    public function __construct(Plugin $plugin)
-    {
-        $this->plugin = $plugin;
-    }
-
     public function wpquery()
     {
         // vipcom: prevent core from doing filename lookups for media search.
@@ -128,7 +121,7 @@ final class Tweaks
         // wp: disable xmlrpc
         // https://www.wpbeginner.com/plugins/how-to-disable-xml-rpc-in-wordpress/
         // https://kinsta.com/blog/xmlrpc-php/
-        if ($this->plugin->constans()->is_false('DOCKET_CACHE_TWEAKS_XMLRPC_DISABLED')) {
+        if (nwdcx_consfalse('TWEAKS_XMLRPC_DISABLED')) {
             add_filter('xmlrpc_enabled', '__return_false');
             add_filter('pre_update_option_enable_xmlrpc', '__return_false');
             add_filter('pre_option_enable_xmlrpc', '__return_zero');
@@ -144,7 +137,7 @@ final class Tweaks
             );
         }
 
-        if ($this->plugin->constans()->is_false('DOCKET_CACHE_TWEAKS_WPCOOKIE_DISABLED')) {
+        if (nwdcx_consfalse('TWEAKS_WPCOOKIE_DISABLED')) {
             // wp: comment cookie lifetime, default to 30000000 second = 12 months
             add_filter(
                 'comment_cookie_lifetime',
@@ -209,10 +202,11 @@ final class Tweaks
 
     public function post_missed_schedule()
     {
-        $wpdb = $this->plugin->safe_wpdb();
-        if (!$wpdb) {
+        if (!nwdcx_wpdb($wpdb)) {
             return false;
         }
+
+        $suppress = $wpdb->suppress_errors(true);
 
         // check
         $query = "SELECT ID FROM `{$wpdb->posts}` WHERE post_status='future' ORDER BY ID ASC LIMIT 1";
@@ -239,9 +233,7 @@ final class Tweaks
             $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page') AND post_status='future' AND post_date_gmt < %s ORDER BY ID ASC LIMIT %d", $now, $limit);
         }
 
-        $suppress = $wpdb->suppress_errors(true);
         $results = $wpdb->get_results($query, ARRAY_A);
-        $wpdb->suppress_errors($suppress);
 
         if (!empty($results)) {
             while ($row = @array_shift($results)) {
@@ -249,6 +241,8 @@ final class Tweaks
                 wp_publish_post($id);
             }
         }
+
+        $wpdb->suppress_errors($suppress);
 
         return true;
     }

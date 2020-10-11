@@ -25,11 +25,8 @@ class PostCache
     public $found_posts;
     public $cache_func;
 
-    private $plugin;
-
-    public function __construct(Plugin $plugin)
+    public function __construct()
     {
-        $this->plugin = $plugin;
         $this->prefix = 'docketcache-post';
         $this->group_prefix = $this->prefix.'-';
 
@@ -44,7 +41,10 @@ class PostCache
         $this->cached_posts = [];
         $this->found_posts = false;
         $this->cache_func = 'wp_cache_add';
+    }
 
+    public function register()
+    {
         $this->setup_for_blog();
         $this->setup_hooks();
     }
@@ -140,8 +140,7 @@ class PostCache
                 $months = wp_cache_get('media_library_months_with_files', $cache_group);
 
                 if (false === $months) {
-                    $wpdb = $this->plugin->safe_wpdb();
-                    if (!$wpdb) {
+                    if (!nwdcx_wpdb($wpdb)) {
                         return $months;
                     }
 
@@ -165,8 +164,7 @@ class PostCache
                     return;
                 }
 
-                $wpdb = $this->plugin->safe_wpdb();
-                if (!$wpdb) {
+                if (!nwdcx_wpdb($wpdb)) {
                     return;
                 }
 
@@ -230,8 +228,7 @@ class PostCache
 
     public function posts_request($sql, $query)
     {
-        $wpdb = $this->plugin->safe_wpdb();
-        if (!$wpdb) {
+        if (!nwdcx_wpdb($wpdb)) {
             return $sql;
         }
 

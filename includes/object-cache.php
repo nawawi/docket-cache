@@ -3,10 +3,10 @@
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
  * Plugin URI:          http://wordpress.org/plugins/docket-cache/
- * Version:             20.09.02
+ * Version:             20.09.03
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * Author:              Nawawi Jamili
- * Author URI:          https://github.com/nawawi
+ * Author URI:          https://docketcache.com
  * Requires at least:   5.4
  * Requires PHP:        7.2.5
  * License:             MIT
@@ -19,7 +19,7 @@ if (!\defined('ABSPATH')) {
 /*
  * Check if doing action.
  */
-if (isset($_GET['_wpnonce'], $_GET['action'], $_GET['page']) && !empty($_GET['page']) && 'docket-cache' === $_GET['page'] && false === strpos($_GET['action'], 'cronbot')) {
+if (!empty($_GET['_wpnonce']) && !empty($_GET['action']) && !empty($_GET['page']) && 'docket-cache' === $_GET['page']) {
     return;
 }
 
@@ -69,7 +69,25 @@ if (!@is_file(WP_PLUGIN_DIR.'/docket-cache/includes/load.php')) {
  * Determine if we can load docket cache library.
  */
 @include_once WP_PLUGIN_DIR.'/docket-cache/includes/load.php';
-if (!class_exists('Nawawi\\DocketCache\\Plugin') || !class_exists('Nawawi\\DocketCache\\Constans')) {
+if (!class_exists('Nawawi\\DocketCache\\Plugin') || !class_exists('Nawawi\\DocketCache\\Constans') || !class_exists('Nawawi\\DocketCache\\Filesystem') || !\function_exists('nwdcx_constfx')) {
+    return;
+}
+
+/*
+ * Check if doing flush.
+ */
+if (@is_file(WP_CONTENT_DIR.'/.object-cache-flush.txt')) {
+    if (time() > @filemtime(WP_CONTENT_DIR.'/.object-cache-flush.txt')) {
+        @unlink(WP_CONTENT_DIR.'/.object-cache-flush.txt');
+    }
+
+    return;
+}
+
+/*
+ * Determine if we're on multinetwork and has object cache locking.
+ */
+if (\function_exists('nwdcx_network_ignore') && nwdcx_network_ignore()) {
     return;
 }
 
@@ -108,8 +126,8 @@ if (@is_file(WP_CONTENT_DIR.'/.object-cache-delay.txt')) {
         add_action(
             'shutdown',
             function () {
-                if (\function_exists('nawawi_delete_transient_db')) {
-                    nawawi_delete_transient_db();
+                if (\function_exists('nwdcx_deltransdb')) {
+                    nwdcx_deltransdb();
                 }
 
                 // previous file format

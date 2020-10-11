@@ -14,15 +14,15 @@ namespace Nawawi\DocketCache;
 
 $has_proxy = false;
 $proxy_title = '';
-if ($this->plugin->is_behind_proxy()) :
+if ($this->pt->is_behind_proxy()) :
     $has_proxy = true;
-    $cf = $this->plugin->is_cloudflare();
+    $cf = $this->pt->is_cloudflare();
     if (false !== $cf) :
         $proxy_title = 'Cloudflare';
         $proxy_text = esc_html($cf);
     else :
         $proxy_title = esc_html__('Web Proxy', 'docket-cache');
-        $proxy_text = $this->plugin->get_proxy_ip();
+        $proxy_text = $this->pt->get_proxy_ip();
     endif;
 endif;
 ?>
@@ -33,7 +33,7 @@ endif;
             <table class="form-table">
                 <tr>
                     <th><?php esc_html_e('Web Server', 'docket-cache'); ?></th>
-                    <td><?php echo $this->plugin->get_server_software(); ?></td>
+                    <td><?php echo $this->pt->get_server_software(); ?></td>
                 </tr>
 
                 <tr>
@@ -48,24 +48,45 @@ endif;
                 </tr>
                 <?php endif; ?>
 
+                <?php if (!empty($this->info->status_text_stats) && !empty($this->info->opcache_dc_stats)) : ?>
+                <tr>
+                    <th><?php esc_html_e('Object Cache Stats', 'docket-cache'); ?></th>
+                    <td id="objectcache-stats">
+                        <?php
+                        echo $this->info->status_text_stats;
+                        ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php esc_html_e('Object OPcache Stats', 'docket-cache'); ?></th>
+                    <td id="dcopcache-stats">
+                        <?php echo $this->info->opcache_dc_stats; ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="border-b"><?php esc_html_e('WP OPcache Stats', 'docket-cache'); ?></th>
+                    <td id="wpopcache-stats">
+                        <?php echo $this->info->opcache_wp_stats; ?>
+                    </td>
+                </tr>
+                <?php else : ?>
                 <tr>
                     <th><?php esc_html_e('Object Cache', 'docket-cache'); ?></th>
-                    <td>
+                    <td id="objectcache0-stats">
                         <?php
                         echo 1 === $this->info->status_code && !empty($this->info->status_text_stats) ? $this->info->status_text_stats : $this->info->status_text;
                         ?>
                     </td>
                 </tr>
-
                 <tr>
                     <th class="border-b"><?php esc_html_e('Zend OPcache', 'docket-cache'); ?></th>
-                    <td>
+                    <td id="opcache-stats0">
                         <?php
                         echo 1 === $this->info->opcache_code && !empty($this->info->opcache_text_stats) ? $this->info->opcache_text_stats : $this->info->opcache_text;
                         ?>
                     </td>
                 </tr>
-
+                <?php endif; ?>
                 <tr>
                     <th><?php esc_html_e('PHP Memory Limit', 'docket-cache'); ?></th>
                     <td><?php echo $this->info->php_memory_limit; ?></td>
@@ -80,6 +101,32 @@ endif;
                     <th class="border-b"><?php esc_html_e('WP Backend Memory Limit', 'docket-cache'); ?></th>
                     <td><?php echo $this->info->wp_max_memory_limit; ?></td>
                 </tr>
+
+                <?php
+                if (is_multisite()) :
+                    $wp_multinetlock = $this->info->wp_multinetlock;
+                    ?>
+
+                <?php if (empty($wp_multinetlock)) : ?>
+                <tr>
+                    <th class="border-b"><?php esc_html_e('WP Multi Site', 'docket-cache'); ?></th>
+                    <td><?php echo $this->info->wp_multisite; ?></td>
+                </tr>
+                <?php else : ?>
+                <tr>
+                    <th><?php esc_html_e('WP Multi Network', 'docket-cache'); ?></th>
+                    <td><?php echo $this->info->wp_multisite; ?></td>
+                </tr>
+                <tr>
+                    <th><?php esc_html_e('Primary Network', 'docket-cache'); ?></th>
+                    <td><?php echo $this->info->wp_multinetmain; ?></td>
+                </tr>
+                <tr>
+                    <th class="border-b"><?php esc_html_e('Network Locking File', 'docket-cache'); ?></th>
+                    <td><?php echo $this->info->wp_multinetlock; ?></td>
+                </tr>
+                <?php endif; ?>
+                <?php endif; ?>
 
                 <tr>
                     <th><?php esc_html_e('Drop-in Writable', 'docket-cache'); ?></th>
@@ -129,6 +176,6 @@ endif;
     </div>
 </div>
 <?php
-if ($this->plugin->constans()->is_true('DOCKET_CACHE_STATS')) :
-    echo $this->plugin->code_worker('countcachesize');
+if ($this->vcf()->is_dctrue('STATS')) :
+    echo $this->pt->code_worker('repeat_countcachesize');
 endif;

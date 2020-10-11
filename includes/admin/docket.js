@@ -67,11 +67,17 @@
                         }
                     );
 
+                window.dospinner = false;
                 var spinner = function() {
+                    if ( !window.dospinner ) {
+                        return;
+                    }
+
                     $( window )
                         .on(
                             'beforeunload',
                             function() {
+                                window.dospinner = false;
                                 $( document )
                                     .find( '#docket-cache-overlay' )
                                     .css( 'display', 'block' );
@@ -91,6 +97,11 @@
                     .on(
                         'click',
                         function() {
+                            if ( $( this )
+                                .attr( 'disabled' ) ) {
+                                return;
+                            }
+                            window.dospinner = true;
                             spinner();
                         }
                     );
@@ -100,6 +111,7 @@
                     .on(
                         'click',
                         function() {
+                            window.dospinner = true;
                             spinner();
                         }
                     );
@@ -108,6 +120,7 @@
                     .on(
                         'change',
                         function() {
+                            window.dospinner = true;
                             spinner();
                         }
                     );

@@ -17,19 +17,9 @@ namespace Nawawi\DocketCache;
     <div class="inside">
         <div>
             <p>
-                <strong><?php esc_html_e('CONSTANTS', 'docket-cache'); ?></strong><br class="break">
-                <?php
-                    /* translators: %s: <a href="https://github.com/nawawi/docket-cache/wiki/Constants" rel="noopener" target="new">Configuration Wiki</a> */
-                    printf(esc_html__('This plugin uses constants variable as main configuration methods. To adjust the plugin behaviour, please refer to %s documentation for details.', 'docket-cache'), '<a href="https://docs.docketcache.com/configuration" rel="noopener" target="new">Configuration</a>');
-                ?>
-            </p>
-            <hr>
-            <p>
-                <strong>WP-CLI</strong><br class="break">
-                <?php
-                    /* translators: %s: <a href="https://github.com/nawawi/docket-cache/wiki/WP-CLI" rel="noopener" target="new">WP-CLI Wiki</a> */
-                    printf(esc_html__('You can manage this plugin through a command line. Please refer to %s documentation for available commands.', 'docket-cache'), '<a href="https://docs.docketcache.com/wp-cli" rel="noopener" target="new">WP-CLI</a>');
-                ?>
+                <strong><?php esc_html_e('DOCUMENTATION', 'docket-cache'); ?></strong><br class="break">
+                <?php esc_html_e('This plugin uses constants variable as main configuration methods. To adjust the plugin behaviour and manage through a command line, please refer to the documentation page for details.', 'docket-cache'); ?>
+                <a href="https://docs.docketcache.com/" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Dcoumenation', 'docket-cache'); ?></a>
             </p>
             <hr>
             <p>
@@ -38,6 +28,11 @@ namespace Nawawi\DocketCache;
                     /* translators: %s: external service */
                     printf(esc_html__('The Cronbot is an %s that pings your website every hour to keep WordPress Cron running actively. Only site Timezone, URL and version are involved when enabling this service.', 'docket-cache'), '<a href="https://cronbot.docketcache.com" rel="noopener" target="new">external service</a>');
                 ?>
+            </p>
+            <hr>
+            <p>
+                <strong><?php esc_html_e('CACHE LOG', 'docket-cache'); ?></strong><br class="break">
+                <?php esc_html_e('The cache log intends to provide information on how the cache works. For performance and security concerns, deactivate if no longer needed.', 'docket-cache'); ?>
             </p>
             <hr>
             <p>

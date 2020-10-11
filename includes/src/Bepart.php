@@ -37,13 +37,22 @@ class Bepart extends Filesystem
     }
 
     /**
+     * json_header.
+     */
+    public function json_header()
+    {
+        if (!headers_sent()) {
+            @header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
+            @header('Content-Type: application/json; charset=UTF-8');
+        }
+    }
+
+    /**
      * send_json_continue.
      */
     public function send_json_continue($msg, $success = true)
     {
-        if (!headers_sent()) {
-            header('Content-Type: application/json; charset=UTF-8');
-        }
+        $this->json_header();
 
         $response = ['success' => $success];
         $response['data'] = $msg;
@@ -95,27 +104,34 @@ class Bepart extends Filesystem
             return;
         }
 
+        $repeat_funcs = [];
+
         $code = '<script>'.PHP_EOL;
         $code .= 'if ( "undefined" !== typeof(jQuery) && "undefined" !== typeof(docket_cache_config) && "function" === typeof(docket_cache_worker) ) {'.PHP_EOL;
         $code .= '    jQuery( document ).ready( function() {'.PHP_EOL;
         $code .= '        var config = docket_cache_config;'.PHP_EOL;
         foreach ($types as $type) {
+            if (false !== strpos($type, 'repeat_')) {
+                $repeat_funcs[] = str_replace('repeat_', '', $type);
+                continue;
+            }
             $code .= '        docket_cache_worker( "'.$type.'", config );'.PHP_EOL;
         }
+
+        if (!empty($repeat_funcs)) {
+            foreach ($repeat_funcs as $func) {
+                $code .= '        if ( location.href.match(/admin\.php\?page=docket\-cache/) ) {'.PHP_EOL;
+                $code .= '            docket_cache_worker( "'.$func.'", config );'.PHP_EOL;
+                $code .= '            window.setInterval(function() { docket_cache_worker( "'.$func.'", config ); }, 60000);'.PHP_EOL;
+                $code .= '        }'.PHP_EOL;
+            }
+        }
+
         $code .= '    });'.PHP_EOL;
         $code .= '}'.PHP_EOL;
         $code .= '</script>';
 
         return $code;
-    }
-
-    public function safe_wpdb()
-    {
-        if (!isset($GLOBALS['wpdb']) || !$GLOBALS['wpdb']->ready) {
-            return false;
-        }
-
-        return $GLOBALS['wpdb'];
     }
 
     /**
@@ -298,19 +314,20 @@ class Bepart extends Filesystem
         return \function_exists('is_ssl') ? is_ssl() : false;
     }
 
-    public function get_network_sites(&$counts = 0)
+    public function get_network_sites(&$counts = 0, $all = false)
     {
         $data = [];
         $cnt = 0;
         if (is_multisite()) {
             $args = [
-                'public' => 1,
-                'spam' => 0,
-                'archived' => 0,
-                'deleted' => 0,
+                'no_found_rows' => true,
             ];
 
-            $sites = get_sites();
+            if (!$all) {
+                $args['network_id'] = get_current_network_id();
+            }
+
+            $sites = get_sites($args);
             if (!empty($sites) && \is_array($sites)) {
                 $main_site_id = get_main_site_id();
                 foreach ($sites as $num => $site) {
@@ -337,44 +354,6 @@ class Bepart extends Filesystem
         $counts = $cnt;
 
         return $data;
-    }
-
-    public function switch_cron_site()
-    {
-        if (is_multisite()) {
-            $cronbot_siteid = $this->get_cron_siteid();
-            if (!empty($cronbot_siteid) && (int) $cronbot_siteid > 0) {
-                switch_to_blog($cronbot_siteid);
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function delete_cron_siteid($userid = false)
-    {
-        if (empty($userid)) {
-            $userid = get_current_user_id();
-        }
-
-        return delete_user_meta($userid, 'cronbot-siteid');
-    }
-
-    public function set_cron_siteid($id)
-    {
-        return update_user_meta(get_current_user_id(), 'cronbot-siteid', $id);
-    }
-
-    public function get_cron_siteid()
-    {
-        $siteid = get_user_meta(get_current_user_id(), 'cronbot-siteid', true);
-        if (empty($siteid)) {
-            $siteid = is_multisite() ? get_main_site_id() : get_current_blog_id();
-        }
-
-        return $siteid;
     }
 
     public function get_crons($all = false, &$count_all = 0, &$count_run = 0)

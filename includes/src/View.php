@@ -14,7 +14,7 @@ namespace Nawawi\DocketCache;
 
 final class View
 {
-    private $plugin;
+    private $pt;
     private $info;
     private $do_preload;
     private $do_flush;
@@ -24,13 +24,55 @@ final class View
     private $cache_max_size;
     private $cronbot_enable;
 
-    public function __construct(Plugin $plugin)
+    public function __construct(Plugin $pt)
     {
-        $this->plugin = $plugin;
-        $this->log_enable = $this->plugin->constans()->is_true('DOCKET_CACHE_LOG');
-        $this->log_max_size = $this->plugin->normalize_size(DOCKET_CACHE_LOG_SIZE);
-        $this->cache_max_size = $this->plugin->normalize_size(DOCKET_CACHE_MAXSIZE);
-        $this->cronbot_enable = $this->plugin->constans()->is_true('DOCKET_CACHE_CRONBOT');
+        $this->pt = $pt;
+        $this->register();
+    }
+
+    public function vcf()
+    {
+        return $this->pt->cf();
+    }
+
+    public function register()
+    {
+        $this->log_enable = $this->vcf()->is_dctrue('LOG');
+        $this->log_max_size = $this->pt->normalize_size($this->vcf()->dcvalue('LOG_SIZE'));
+        $this->cache_max_size = $this->pt->normalize_size($this->vcf()->dcvalue('MAXSIZE'));
+        $this->cronbot_enable = $this->vcf()->is_dctrue('CRONBOT');
+    }
+
+    /**
+     * tail.
+     */
+    public function tail($filepath, $limit = 100, $do_last = true)
+    {
+        $limit = (int) $limit;
+        $file = new \SplFileObject($filepath);
+        $file->seek(PHP_INT_MAX);
+        $total_lines = $file->key();
+
+        if ($limit > $total_lines) {
+            $limit = $total_lines;
+        }
+
+        if ($do_last) {
+            $total_lines = $total_lines > $limit ? $total_lines - $limit : $total_lines;
+        } else {
+            $total_lines = $limit;
+        }
+
+        $object = [];
+        if ($total_lines > 0) {
+            if ($do_last) {
+                $object = new \LimitIterator($file, $total_lines);
+            } else {
+                $object = new \LimitIterator($file, 0, $total_lines);
+            }
+        }
+
+        return $object;
     }
 
     private function parse_log_query()
@@ -45,15 +87,15 @@ final class View
         $ret->row_size = 15;
 
         if ($this->has_vcache()) {
-            $cache_path = $this->plugin->cache_path;
+            $cache_path = $this->pt->cache_path;
             $vache = $this->idx_vcache();
             $file = $cache_path.$vache.'.php';
-            if ($this->plugin->filesize($file) > 0) {
-                $data = $this->plugin->cache_get($file);
+            if ($this->pt->filesize($file) > 0) {
+                $data = $this->pt->cache_get($file);
                 if (false !== $data) {
-                    $ret->output = $this->plugin->export_var($data);
+                    $ret->output = $this->pt->export_var($data);
                     $ret->output_empty = empty($ret->output);
-                    $ret->log_size = $this->plugin->normalize_size(\strlen(serialize($data)));
+                    $ret->log_size = $this->pt->normalize_size(\strlen(serialize($data)));
                     $ret->output_size = $ret->log_size;
                     if ($ret->output_size > 15) {
                         $ret->row_size = 25;
@@ -74,7 +116,7 @@ final class View
             $ret->output = $this->read_log($ret->default_line, 'last' === $ret->default_order ? true : false);
             $ret->output_empty = empty($ret->output);
             $ret->output_size = !$ret->output_empty ? \count($ret->output) : 0;
-            $ret->log_size = $this->plugin->get_logsize();
+            $ret->log_size = $this->pt->get_logsize();
             if ($ret->output_size < 15) {
                 $ret->row_size = $ret->output_size;
             }
@@ -86,7 +128,7 @@ final class View
 
     private function cronbot_status()
     {
-        $data = $this->plugin->canopt()->get_part('cronbot');
+        $data = $this->pt->co()->get_part('cronbot');
         if (!empty($data) && \is_array($data)) {
             return $data;
         }
@@ -96,7 +138,7 @@ final class View
 
     private function cronbot_pings()
     {
-        $data = $this->plugin->canopt()->get_part('pings');
+        $data = $this->pt->co()->get_part('pings');
         if (!empty($data) && \is_array($data)) {
             return $data;
         }
@@ -128,8 +170,8 @@ final class View
 
     private function page($index)
     {
-        $this->info = (object) $this->plugin->get_info();
-        $file = $this->plugin->path.'/includes/admin/'.$index.'.php';
+        $this->info = (object) $this->pt->get_info();
+        $file = $this->pt->path.'/includes/admin/'.$index.'.php';
         if (@is_file($file)) {
             include_once $file;
         }
@@ -137,11 +179,18 @@ final class View
 
     public function index()
     {
+        if (!empty($_SERVER['REQUEST_URI']) && false === strpos($_SERVER['REQUEST_URI'], '/'.$this->pt->page)) {
+            $url = network_admin_url('/'.$this->pt->page);
+            echo '<meta http-equiv="refresh" content="3;url='.$url.'">';
+            echo '<script>window.setTimeout(function() { location.assign("'.$url.'"); }, 2000);</script>';
+            exit('<div class="wrap"><p>[ '.date('Y-m-d H:i:s').' ] Redirect to /'.$this->pt->page.'</p></div>');
+        }
+
         $this->do_preload = false;
         $this->do_flush = false;
         $this->do_fetch = false;
         $this->page('wrap');
-        $this->plugin->dropino()->delay_expire();
+        $this->pt->cx()->delay_expire();
     }
 
     private function tab_title($title, $add_loader = true, $css = '')
@@ -163,7 +212,7 @@ final class View
             $args_extra
         );
 
-        return network_admin_url(add_query_arg($args, $this->plugin->page));
+        return network_admin_url(add_query_arg($args, $this->pt->page));
     }
 
     private function is_index()
@@ -249,7 +298,7 @@ final class View
         $icon .= 'OSo6NAJr9dJZLt0NqsCpVhXlOgrHbT8HHrM+bi3RdqgS9+uUoy4FGpK0Jpe3A6glgJsGXE2h7FVD';
         $icon .= 'odZ6IoU67W7gZ8Aa6+PhXL3dI/8DPjBuXO0kT+cAAAAASUVORK5CYII=';
 
-        //$icon = plugin_dir_url($this->plugin->file).'/includes/admin/header.png?'.time();
+        //$icon = plugin_dir_url($this->pt->file).'/includes/admin/header.png?'.time();
         $option = '';
         $html = '<nav class="nav-tab-wrapper">';
         $html .= '<div id="dclogo" style="background: url(data:image/png;base64,'.$icon.') no-repeat left;"></div>';
@@ -274,7 +323,7 @@ final class View
     private function change_timestamp($time)
     {
         $timestamp = '';
-        $val = $this->plugin->constans()->value('DOCKET_CACHE_LOG_TIME');
+        $val = $this->vcf()->dcvalue('LOG_TIME');
         if ('utc' !== $val) {
             switch ($val) {
                 case 'local':
@@ -323,8 +372,11 @@ final class View
     {
         $limit = (int) $limit;
         $output = [];
-        if ($this->plugin->has_log()) {
-            foreach ($this->plugin->tail(DOCKET_CACHE_LOG_FILE, $limit, $do_last) as $line) {
+        if ($this->pt->has_log($logfile)) {
+            if (!@is_file($logfile)) {
+                $output = [];
+            }
+            foreach ($this->tail($logfile, $limit, $do_last) as $line) {
                 $line = trim($line);
                 if (empty($line)) {
                     continue;
@@ -336,8 +388,12 @@ final class View
         return $output;
     }
 
-    private function config_select_bool($name, $default)
+    private function config_select_bool($name, $default = 'dcdefault')
     {
+        if ('dcdefault' === $default) {
+            $default = $this->vcf()->dcvalue(strtoupper($name));
+        }
+
         $default = $default ? 'enable' : 'disable';
         $html = '<select id="'.$name.'" class="config-select">';
         foreach ([
@@ -346,7 +402,7 @@ final class View
             'disable' => __('Disable', 'docket-cache'),
         ] as $n => $v) {
             $action = $n.'-'.$name;
-            $url = $this->plugin->action_query($action, ['idx' => 'config']);
+            $url = $this->pt->action_query($action, ['idx' => 'config']);
             $selected = $n === $default ? ' selected' : '';
             $html .= '<option value="'.$n.'" data-action-link="'.$url.'"'.$selected.'>'.$v.'</option>';
         }
@@ -355,8 +411,12 @@ final class View
         return $html;
     }
 
-    private function config_select_set($name, $options, $default, $idx = 'config')
+    private function config_select_set($name, $options, $default = 'dcdefault', $idx = 'config')
     {
+        if ('dcdefault' === $default) {
+            $default = $this->vcf()->dcvalue(strtoupper($name));
+        }
+
         if (\is_array($idx) && !empty($idx) && !empty($idx['idx'])) {
             $args = $idx;
         } else {
@@ -367,7 +427,7 @@ final class View
         $html = '<select id="'.$name.'" class="config-select">';
         foreach ((array) $options as $n => $v) {
             $args['nv'] = $n;
-            $url = $this->plugin->action_query($action, $args);
+            $url = $this->pt->action_query($action, $args);
             $selected = $n === $default ? ' selected' : '';
             $html .= '<option value="'.$n.'" data-action-link="'.$url.'"'.$selected.'>'.$v.'</option>';
         }
@@ -388,12 +448,17 @@ final class View
 
     private function is_dropin_exists()
     {
-        return $this->plugin->dropino()->exists();
+        return $this->pt->cx()->exists();
     }
 
     private function is_dropin_validate()
     {
-        return $this->plugin->dropino()->validate();
+        return $this->pt->cx()->validate();
+    }
+
+    private function is_dropin_multinet()
+    {
+        return $this->pt->cx()->multinet_me();
     }
 
     private function cronbot_eventlist()
@@ -401,7 +466,7 @@ final class View
         static $inst;
 
         if (!\is_object($inst)) {
-            $inst = new EventList($this->plugin);
+            $inst = new EventList($this->pt);
         }
 
         $inst->prepare_items();

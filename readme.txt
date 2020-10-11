@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.09.02
+Stable tag: 20.09.03
 License: MIT
 License URI: ./license.txt
 
@@ -39,6 +39,7 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 - Cache Log
 - Cronbot Service
 - Multisite support
+- Multi-Network support
 
 == Requirements ==
 
@@ -130,6 +131,19 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.09.03 =
+
+New features and fix release.
+
+- Added Multi-Network for Multisite.
+- Added Object OPcache, WP OPcache stats.
+- Added lookup_* methods to handle our temp internal data.
+- Added locking file to suspend cache addition when doing flush.
+- Fixed replace update_user_meta with lookup function to makes query-monitor happy.
+- Fixed Admin interface, loading spinner should not display when no action.
+- Fixed CronAgent::run_wpcron(), reset doing_cron if locked.
+- Fixed CronAgent::run_wpcron(), halt if run reach maximum CRONBOX_MAX for site in multisite.
+
 = 20.09.02 =
 
 Enhance and Fix release.

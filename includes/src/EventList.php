@@ -9,7 +9,7 @@
  */
 
 /*
- * Based on:
+ * Reference:
  *  plugins/wp-crontrol/src/event-list-table.php
  *	plugins/wp-crontrol/src/event.php
  */
@@ -24,9 +24,9 @@ if (!class_exists('\\WP_List_Table', false)) {
 
 class EventList extends \WP_List_Table
 {
-    private $plugin;
+    private $pt;
 
-    public function __construct(Plugin $plugin)
+    public function __construct(Plugin $pt)
     {
         parent::__construct(
             [
@@ -37,7 +37,7 @@ class EventList extends \WP_List_Table
             ]
         );
 
-        $this->plugin = $plugin;
+        $this->pt = $pt;
     }
 
     public function get_schedules()
@@ -62,9 +62,9 @@ class EventList extends \WP_List_Table
 
     public function get_crons()
     {
-        $is_switch = $this->plugin->switch_cron_site();
+        $is_switch = $this->pt->switch_cron_site();
 
-        $crons = $this->plugin->get_crons(true);
+        $crons = $this->pt->get_crons(true);
         $events = [];
 
         if (empty($crons)) {

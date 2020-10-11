@@ -14,12 +14,12 @@ namespace Nawawi\DocketCache;
 
 final class Event
 {
-    private $plugin;
+    private $pt;
     private $is_optimizedb;
 
-    public function __construct(Plugin $plugin)
+    public function __construct(Plugin $pt)
     {
-        $this->plugin = $plugin;
+        $this->pt = $pt;
         $this->is_optimizedb = false;
     }
 
@@ -80,7 +80,7 @@ final class Event
                 }
 
                 // optimize db
-                $cronoptmzdb = $this->plugin->constans()->value('DOCKET_CACHE_CRONOPTMZDB');
+                $cronoptmzdb = $this->pt->cf()->dcvalue('CRONOPTMZDB');
                 if (!empty($cronoptmzdb) && 'never' !== $cronoptmzdb && is_main_site()) {
                     $recurrence = '';
                     switch ($cronoptmzdb) {
@@ -112,7 +112,7 @@ final class Event
                 }
 
                 // check version
-                if ($this->plugin->constans()->is_true('DOCKET_CACHE_CHECKVERSION') && is_main_site()) {
+                if ($this->pt->cf()->is_dctrue('CHECKVERSION') && is_main_site() && is_main_network()) {
                     // 06102020: reset to 2 days
                     $check = wp_get_scheduled_event('docketcache_checkversion');
                     if (\is_object($check) && 'docketcache_checkversion_schedule' !== $check->schedule) {
@@ -147,11 +147,9 @@ final class Event
      */
     public function watchproc()
     {
-        if ($this->plugin->canopt()->lockexp('watchproc')) {
+        if ($this->pt->co()->lockproc('watchproc', time() + 3600)) {
             return false;
         }
-
-        $this->plugin->canopt()->setlock('watchproc', time() + 3600);
 
         if (!$this->is_optimizedb) {
             $this->delete_expired_transients_db();
@@ -162,8 +160,8 @@ final class Event
             do_action('docketcache/suspend_wp_options_autoload');
         }
 
-        $this->plugin->get_cache_stats();
-        $this->plugin->canopt()->setlock('watchproc', 0);
+        $this->pt->get_cache_stats();
+        $this->pt->co()->lockreset('watchproc');
 
         return true;
     }
@@ -173,15 +171,15 @@ final class Event
      */
     public function garbage_collector($is_filter = false)
     {
-        $maxfile = $this->plugin->get_cache_maxfile();
+        $maxfile = $this->pt->get_cache_maxfile();
         $maxfile = $maxfile - 100;
 
-        $maxttl = $this->plugin->get_cache_maxttl();
+        $maxttl = $this->pt->get_cache_maxttl();
         if (!empty($maxttl)) {
             $maxttl = time() - $maxttl;
         }
 
-        $maxsizedisk = $this->plugin->get_cache_maxsize_disk();
+        $maxsizedisk = $this->pt->get_cache_maxsize_disk();
         if (!empty($maxsizedisk)) {
             $maxsizedisk = $maxsizedisk - 1048576;
         }
@@ -198,7 +196,7 @@ final class Event
             'ignore' => 0,
         ];
 
-        if ($this->plugin->canopt()->lockexp('garbage_collector')) {
+        if ($this->pt->co()->lockproc('garbage_collector', time() + 3600)) {
             if ($is_filter) {
                 return $collect;
             }
@@ -206,16 +204,14 @@ final class Event
             return false;
         }
 
-        $this->plugin->canopt()->setlock('garbage_collector', time() + 3600);
-
-        if ($this->plugin->is_docketcachedir($this->plugin->cache_path)) {
+        if ($this->pt->is_docketcachedir($this->pt->cache_path)) {
             clearstatcache();
             $bytestotal = 0;
             $cnt = 0;
-            foreach ($this->plugin->scanfiles($this->plugin->cache_path) as $object) {
+            foreach ($this->pt->scanfiles($this->pt->cache_path) as $object) {
                 $fx = $object->getPathName();
 
-                if (!$object->isFile() || 'file' !== $object->getType() || !$this->plugin->is_php($fx)) {
+                if (!$object->isFile() || 'file' !== $object->getType() || !$this->pt->is_php($fx)) {
                     ++$collect->ignore;
                     continue;
                 }
@@ -226,7 +222,7 @@ final class Event
                 $ft = filemtime($fx);
 
                 if ($fm >= $ft && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
-                    $this->plugin->unlink($fx, true);
+                    $this->pt->unlink($fx, true);
                     --$cnt;
                     ++$collect->clean;
                     continue;
@@ -234,10 +230,10 @@ final class Event
 
                 $domaxttl = false;
 
-                $data = $this->plugin->cache_get($fx);
+                $data = $this->pt->cache_get($fx);
                 if (false !== $data) {
-                    if (!empty($data['timeout']) && $this->plugin->valid_timestamp($data['timeout']) && $fm >= (int) $data['timeout']) {
-                        $this->plugin->unlink($fx, false);
+                    if (!empty($data['timeout']) && $this->pt->valid_timestamp($data['timeout']) && $fm >= (int) $data['timeout']) {
+                        $this->pt->unlink($fx, false);
                         unset($data);
                         --$cnt;
                         ++$collect->clean;
@@ -245,9 +241,9 @@ final class Event
                         continue;
                     }
 
-                    if (empty($data['timeout']) && !empty($data['timestamp']) && $this->plugin->valid_timestamp($data['timestamp']) && $maxttl > 0) {
+                    if (empty($data['timeout']) && !empty($data['timestamp']) && $this->pt->valid_timestamp($data['timestamp']) && $maxttl > 0) {
                         if ((int) $data['timestamp'] < $maxttl) {
-                            $this->plugin->unlink($fx, false);
+                            $this->pt->unlink($fx, false);
                             unset($data);
                             --$cnt;
                             ++$collect->clean;
@@ -260,7 +256,7 @@ final class Event
 
                     $bytestotal += \strlen(serialize($data));
                     if ((int) $maxsizedisk > 1048576 && $bytestotal > $maxsizedisk) {
-                        $this->plugin->unlink($fx, false);
+                        $this->pt->unlink($fx, false);
                         unset($data);
                         --$cnt;
                         ++$collect->clean;
@@ -269,7 +265,7 @@ final class Event
                 unset($data);
 
                 if (!$domaxttl && $maxttl > 0 && $ft < $maxttl) {
-                    $this->plugin->unlink($fx, true);
+                    $this->pt->unlink($fx, true);
                     --$cnt;
                     ++$collect->clean;
                     ++$collect->maxttl_c;
@@ -277,7 +273,7 @@ final class Event
                 }
 
                 if ($cnt >= $maxfile) {
-                    $this->plugin->unlink($fx, true);
+                    $this->pt->unlink($fx, true);
                     --$cnt;
                     ++$collect->clean;
                     ++$collect->maxfile_c;
@@ -289,8 +285,8 @@ final class Event
             }
         }
 
-        $this->plugin->canopt()->setlock('garbage_collector', 0);
-        $this->plugin->dropino()->delay_expire();
+        $this->pt->co()->lockreset('garbage_collector');
+        $this->pt->cx()->delay_expire();
 
         if ($is_filter) {
             return $collect;
@@ -304,23 +300,20 @@ final class Event
      */
     public function optimizedb()
     {
-        $wpdb = $this->plugin->safe_wpdb();
-        if (!$wpdb) {
+        if (!nwdcx_wpdb($wpdb)) {
             return false;
         }
 
-        if ($this->plugin->canopt()->lockexp('optimizedb')) {
+        if ($this->pt->co()->lockproc('optimizedb', time() + 3600)) {
             return false;
         }
-
-        $this->plugin->canopt()->setlock('optimizedb', time() + 3600);
 
         $suppress = $wpdb->suppress_errors(true);
 
         @set_time_limit(300);
         $this->delete_expired_transients_db();
 
-        if (is_main_site()) {
+        if (is_main_site() && is_main_network()) {
             $dbname = $wpdb->dbname;
             $tables = $wpdb->get_results('SHOW TABLES FROM '.$dbname, ARRAY_A);
             if (!empty($tables) && \is_array($tables)) {
@@ -345,8 +338,7 @@ final class Event
             return false;
         }
 
-        $wpdb = $this->plugin->safe_wpdb();
-        if (!$wpdb) {
+        if (!nwdcx_wpdb($wpdb)) {
             return false;
         }
 
@@ -388,16 +380,14 @@ final class Event
 
         $part = 'checkversion';
 
-        if ($this->plugin->canopt()->lockexp($part)) {
+        if ($this->pt->co()->lockproc($part, time() + 3600)) {
             return false;
         }
 
-        $this->plugin->canopt()->setlock($part, time() + 3600);
-
-        $main_site_url = $this->plugin->site_url();
-        $site_url = $this->plugin->site_url(true);
+        $main_site_url = $this->pt->site_url();
+        $site_url = $this->pt->site_url(true);
         $stmp = time() + 120;
-        $api_endpoint = $this->plugin->api_endpoint.'/'.$part.'?v='.$stmp;
+        $api_endpoint = $this->pt->api_endpoint.'/'.$part.'?v='.$stmp;
 
         $args = [
             'blocking' => true,
@@ -405,8 +395,8 @@ final class Event
                 'timestamp' => date('Y-m-d H:i:s T'),
                 'timezone' => wp_timezone_string(),
                 'site' => $site_url,
-                'token' => $this->plugin->nw_encrypt($main_site_url, md5($site_url)),
-                'meta' => $this->plugin->site_meta(),
+                'token' => $this->pt->nw_encrypt($main_site_url, md5($site_url)),
+                'meta' => $this->pt->site_meta(),
             ],
             'headers' => [
                 'REFERER' => $site_url,
@@ -426,7 +416,7 @@ final class Event
 
         if (is_wp_error($results)) {
             $output['error'] = $results->get_error_message();
-            $this->plugin->canopt()->save_part($output, $part);
+            $this->pt->co()->save_part($output, $part);
 
             return false;
         }
@@ -437,7 +427,7 @@ final class Event
             if (JSON_ERROR_NONE === json_last_error()) {
                 if (!empty($output['response']['error'])) {
                     $output['error'] = $output['response']['error'];
-                    $this->plugin->canopt()->save_part($output, $part);
+                    $this->pt->co()->save_part($output, $part);
 
                     return false;
                 }
@@ -447,14 +437,12 @@ final class Event
         $code = (int) wp_remote_retrieve_response_code($results);
         if ($code > 400) {
             $output['error'] = $code;
-            $this->plugin->canopt()->save_part($output, $part);
+            $this->pt->co()->save_part($output, $part);
 
             return false;
         }
 
-        $this->plugin->canopt()->save_part($output, $part);
-
-        $this->plugin->canopt()->setlock($part, 0);
+        $this->pt->co()->save_part($output, $part);
 
         return true;
     }

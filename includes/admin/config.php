@@ -20,37 +20,37 @@ namespace Nawawi\DocketCache;
                 <tr>
                     <th><?php esc_html_e('Cronbot Service', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('cronbot', DOCKET_CACHE_CRONBOT); ?>
+                        <?php echo $this->config_select_bool('cronbot'); ?>
                     </td>
                 </tr>
                 <tr>
                     <th class="border-b"><?php esc_html_e('Cache Log', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('log', DOCKET_CACHE_LOG); ?>
+                        <?php echo $this->config_select_bool('log'); ?>
                     </td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Advanced Post Caching', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('advcpost', DOCKET_CACHE_ADVCPOST); ?>
+                        <?php echo $this->config_select_bool('advcpost'); ?>
                     </td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Object Cache Precaching', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('precache', DOCKET_CACHE_PRECACHE); ?>
+                        <?php echo $this->config_select_bool('precache'); ?>
                     </td>
                 </tr>
                 <tr>
                     <th class="border-b"><?php esc_html_e('WordPress Translation Caching', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('mocache', DOCKET_CACHE_MOCACHE); ?>
+                        <?php echo $this->config_select_bool('mocache'); ?>
                     </td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Optimize Term Count Queries', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('optermcount', DOCKET_CACHE_OPTERMCOUNT); ?>
+                        <?php echo $this->config_select_bool('optermcount'); ?>
                     </td>
                 </tr>
                 <tr>
@@ -65,8 +65,7 @@ namespace Nawawi\DocketCache;
                                     'weekly' => __('Weekly', 'docket-cache'),
                                     'monthly' => __('Monthly', 'docket-cache'),
                                     'never' => __('Never', 'docket-cache'),
-                                ],
-                                DOCKET_CACHE_CRONOPTMZDB
+                                ]
                             );
                             ?>
                     </td>
@@ -74,49 +73,56 @@ namespace Nawawi\DocketCache;
                 <tr>
                     <th class="border-b"><?php esc_html_e('Suspend WP Options Autoload', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wpoptaload', DOCKET_CACHE_WPOPTALOAD); ?>
+                        <?php echo $this->config_select_bool('wpoptaload'); ?>
                     </td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Post Missed Schedule Tweaks', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('postmissedschedule', DOCKET_CACHE_POSTMISSEDSCHEDULE); ?>
+                        <?php echo $this->config_select_bool('postmissedschedule'); ?>
                     </td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Misc Performance Tweaks', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('misc_tweaks', DOCKET_CACHE_MISC_TWEAKS); ?>
+                        <?php echo $this->config_select_bool('misc_tweaks'); ?>
                     </td>
                 </tr>
                 <tr>
                     <th class="border-b"><?php esc_html_e('Misc WooCommerce Tweaks', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wootweaks', DOCKET_CACHE_WOOTWEAKS); ?>
+                        <?php echo $this->config_select_bool('wootweaks'); ?>
                     </td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Admin Page Cache Preloading', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('preload', DOCKET_CACHE_PRELOAD); ?>
+                        <?php echo $this->config_select_bool('preload'); ?>
                     </td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Admin Page Loader', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('pageloader', DOCKET_CACHE_PAGELOADER); ?>
+                        <?php echo $this->config_select_bool('pageloader'); ?>
                     </td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Auto Update', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('autoupdate', DOCKET_CACHE_AUTOUPDATE); ?>
+                        <?php echo $this->config_select_bool('autoupdate'); ?>
                     </td>
                 </tr>
                 <tr>
-                    <th><?php esc_html_e('Object Cache File Stats', 'docket-cache'); ?></th>
+                    <th><?php esc_html_e('Check Critical Version', 'docket-cache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('stats', DOCKET_CACHE_STATS); ?>
+                        <?php echo $this->config_select_bool('checkversion'); ?>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th><?php esc_html_e('Object Cache Data Stats', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('stats'); ?>
                     </td>
                 </tr>
             </table>

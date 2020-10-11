@@ -1,3 +1,11 @@
+= v20.09.03 (20202-10-11)
+
+- Added Multisite Multi-Network.
+- Added Object OPcache, WP OPcache stats.
+- Fixed Admin interface, loading spinner should not display when no action.
+- Fixed CronAgent::run_wpcron(), reset doing_cron if locked.
+- Fixed CronAgent::run_wpcron(), halt if run reach maximum CRONBOX_MAX for site in multisite.
+
 = v20.09.02 (20202-10-06)
 
 Enhance and Fix release.

@@ -22,7 +22,31 @@ final class Canopt extends Bepart
 
     public function __construct()
     {
-        $this->path = DOCKET_CACHE_DATA_PATH;
+        $this->define_path();
+    }
+
+    private function define_path()
+    {
+        $path = '';
+        $constfx = nwdcx_constfx('DATA_PATH');
+        if (\defined($constfx)) {
+            $path = \constant($constfx);
+        }
+
+        if (!empty($path)) {
+            if ('docket-cache-data' !== basename($path)) {
+                $path = rtrim($path, '/').'/docket-cache-data';
+            }
+        } else {
+            $path = WP_CONTENT_DIR.'/docket-cache-data';
+        }
+
+        if (is_multisite()) {
+            $path = nnwdcx_network_dirpath($path);
+        }
+
+        $this->path = rtrim($path, '/');
+
         $this->file = $this->path.'/options.php';
         $this->path_lock = $this->path.'/lock';
     }
@@ -55,7 +79,7 @@ final class Canopt extends Bepart
             'cronbot' => esc_html__('Cronbot Service', 'docket-cache'),
             'stats' => esc_html__('Object Cache File Stats', 'docket-cache'),
             'autoupdate' => esc_html__('Auto Update', 'docket-cache'),
-            'checkversion' => esc_html__('Critical Notice Checking', 'docket-cache'),
+            'checkversion' => esc_html__('Critical Version Checking', 'docket-cache'),
         ];
 
         if (false !== $key) {
@@ -105,9 +129,7 @@ final class Canopt extends Bepart
         if (!empty($config) && \is_array($config)) {
             $keys = $this->keys();
             foreach ($config as $name => $value) {
-                $nx = str_replace('DOCKET_CACHE_', '', $name);
-                $nx = strtolower($nx);
-
+                $nx = strtolower(nwdcx_constfx($name, true));
                 if (!\in_array($nx, $keys)) {
                     unset($config[$name]);
                 }
@@ -140,7 +162,7 @@ final class Canopt extends Bepart
         $config = $this->cleanup($config);
 
         if (\in_array($name, $this->keys())) {
-            $nx = 'DOCKET_CACHE_'.strtoupper($name);
+            $nx = nwdcx_constfx($name);
 
             if ('default' === $value) {
                 unset($config[$nx]);
@@ -186,7 +208,7 @@ final class Canopt extends Bepart
             return false;
         }
 
-        $files = glob($path.'/lock-*.txt', GLOB_MARK | GLOB_NOSORT);
+        $files = @glob($path.'/lock-*.txt', GLOB_MARK | GLOB_NOSORT);
         if (!empty($files) && \is_array($files)) {
             foreach ($files as $file) {
                 if (@is_file($file) && @is_writable($file)) {
@@ -265,5 +287,57 @@ final class Canopt extends Bepart
         }
 
         return false;
+    }
+
+    // if expire set new lock
+    public function lockproc($key, $value)
+    {
+        if ($this->lockexp($key)) {
+            return true;
+        }
+
+        $this->setlock($key, $value);
+
+        return false;
+    }
+
+    public function lockreset($key)
+    {
+        return $this->setlock($key, 0);
+    }
+
+    // lookup
+    public function lookup_set($key, $value)
+    {
+        $fkey = 'lockup-'.$key;
+
+        return $this->setlock($fkey, maybe_serialize($value));
+    }
+
+    public function lookup_get($key, $forget = false)
+    {
+        $fkey = 'lockup-'.$key;
+        if ($this->locked($fkey, $value)) {
+            if (!empty($value)) {
+                if ($forget) {
+                    $this->lookup_delete($key);
+                }
+
+                return maybe_unserialize($value);
+            }
+        }
+
+        if ($forget) {
+            $this->lookup_delete($key);
+        }
+
+        return false;
+    }
+
+    public function lookup_delete($key)
+    {
+        $fkey = 'lockup-'.$key;
+
+        return $this->unlock($fkey);
     }
 }
