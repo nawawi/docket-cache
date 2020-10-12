@@ -143,7 +143,7 @@ New features and fix release.
 - Fixed replace update_user_meta with lookup function to makes query-monitor happy.
 - Fixed Admin interface, loading spinner should not display when no action.
 - Fixed CronAgent::run_wpcron(), reset doing_cron if locked.
-- Fixed CronAgent::run_wpcron(), halt if run reach maximum CRONBOX_MAX for site in multisite.
+- Fixed CronAgent::run_wpcron(), halt if run reach maximum CRONBOT_MAX for site in multisite.
 
 = 20.09.02 =
 
