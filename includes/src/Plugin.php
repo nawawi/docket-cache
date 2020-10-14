@@ -237,9 +237,9 @@ final class Plugin extends Bepart
 
         $file_dropin = WP_CONTENT_DIR.'/object-cache.php';
         if (@is_file($file_dropin)) {
-            $write_dropin = is_writable($file_dropin);
+            $write_dropin = @is_writable($file_dropin);
         } else {
-            $write_dropin = is_writable(WP_CONTENT_DIR.'/');
+            $write_dropin = @is_writable(WP_CONTENT_DIR.'/');
         }
 
         return [
@@ -346,11 +346,9 @@ final class Plugin extends Bepart
                     $total_files = $data['opcache_statistics']['num_cached_scripts'];
                 }
 
-                $dcfiles = 0;
-                $dcbytes = 0;
                 if (!empty($data['scripts']) && \is_array($data['scripts'])) {
                     foreach ($data['scripts'] as $script => $arr) {
-                        if ($this->is_docketcachedir(\dirname($script))) {
+                        if ($this->is_docketcachedir(\dirname($script)) && preg_match('@^([a-z0-9]+)\-([a-z0-9]+).*\.php$@', basename($script))) {
                             ++$dcfiles;
                             if (isset($arr['memory_consumption'])) {
                                 $dcbytes += $arr['memory_consumption'];
@@ -414,9 +412,10 @@ final class Plugin extends Bepart
 
         // 86400 = 1d
         // 172800 = 2d
+        // 345600 = 4d
         // 2419200 = 28d
         if ($maxttl < 86400) {
-            $maxttl = 172800;
+            $maxttl = 345600;
         } elseif ($maxttl > 2419200) {
             $maxttl = 2419200;
         }
@@ -485,9 +484,9 @@ final class Plugin extends Bepart
     public function site_url_scheme($site_url)
     {
         if ('https://' !== substr($site_url, 0, 8) && $this->is_ssl()) {
-            $site_url = @preg_replace('@^(https?:)?//@', 'https://', $site_url);
+            $site_url = nwdcx_fixscheme($site_url, 'https://');
         } elseif (!@preg_match('@^(https?:)?//@', $site_url)) {
-            $site_url = 'http://'.$site_url;
+            $site_url = nwdcx_fixscheme($site_url, 'http://');
         }
 
         return rtrim($site_url, '/\\');
@@ -775,6 +774,7 @@ final class Plugin extends Bepart
         $this->api_endpoint = 'https://api.docketcache.com';
         $this->cronbot_endpoint = 'https://cronbot.docketcache.com';
 
+        // use Constans() to trigger default
         if ($this->cf()->is_dctrue('DEV')) {
             $this->api_endpoint = 'http://api.docketcache.local';
             $this->cronbot_endpoint = 'http://cronbot.docketcache.local';

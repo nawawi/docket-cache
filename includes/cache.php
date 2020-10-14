@@ -978,16 +978,24 @@ class WP_Object_Cache
             return false;
         }
 
-        $meta = [
-            'timestamp' => time(),
-            'network_id' => get_current_network_id(),
-            'site_id' => get_current_blog_id(),
-            'group' => $group,
-            'key' => $cache_key,
-            'type' => $type,
-            'timeout' => $timeout,
-            'data' => $data,
-        ];
+        $meta = [];
+        $meta['timestamp'] = time();
+
+        if ($this->multisite) {
+            // try to avoid error-prone
+            try {
+                $meta['network_id'] = get_current_network_id();
+            } catch (\Exception $e) {
+                $meta['network_id'] = 0;
+            }
+        }
+
+        $meta['site_id'] = get_current_blog_id();
+        $meta['group'] = $group;
+        $meta['key'] = $cache_key;
+        $meta['type'] = $type;
+        $meta['timeout'] = $timeout;
+        $meta['data'] = $data;
 
         if (true === $this->dc_code($file, $meta)) {
             if ($timeout > 0) {
@@ -1190,7 +1198,7 @@ class WP_Object_Cache
         }
 
         $this->cache_path = $this->fs()->define_cache_path($this->cf()->dcvalue('PATH'));
-        if (is_multisite()) {
+        if ($this->multisite) {
             $this->cache_path = nnwdcx_network_dirpath($this->cache_path);
         }
 
@@ -1281,6 +1289,59 @@ class WP_Object_Cache
                 'delete_post',
                 function ($post_id) {
                     $this->flush_filtered_groups('delete_post', [$post_id]);
+                },
+                -PHP_INT_MAX
+            );
+        }
+
+        if ($this->cf()->is_dctrue('OPTWPQUERY')) {
+            add_action(
+                'pre_get_posts',
+                function (&$args) {
+                    if (\is_object($args)) {
+                        $args->no_found_rows = true;
+                        $args->order = 'ASC';
+                    } elseif (\is_array($args)) {
+                        $args['no_found_rows'] = true;
+                        $args['order'] = 'ASC';
+                    }
+                },
+                -PHP_INT_MAX
+            );
+
+            add_action(
+                'parse_query',
+                function (&$args) {
+                    if (\is_object($args)) {
+                        $args->no_found_rows = true;
+                        $args->order = 'ASC';
+                    } elseif (\is_array($args)) {
+                        $args['no_found_rows'] = true;
+                        $args['order'] = 'ASC';
+                    }
+                },
+                -PHP_INT_MAX
+            );
+
+            add_action(
+                'pre_get_users',
+                function ($wpq) {
+                    if (nwdcx_wpdb($wpdb) && !empty($wpq->query_vars['count_total'])) {
+                        $wpq->query_vars['count_total'] = false;
+                        $wpq->query_vars['nwdcx_count_total'] = true;
+                    }
+                },
+                -PHP_INT_MAX
+            );
+
+            add_action(
+                'pre_user_query',
+                function ($wpq) {
+                    if (nwdcx_wpdb($wpdb) && !empty($wpq->query_vars['nwdcx_count_total'])) {
+                        unset($wpq->query_vars['nwdcx_count_total']);
+                        $sql = "SELECT COUNT(*) {$wpq->query_from} {$wpq->query_where}";
+                        $wpq->total_users = $wpdb->get_var($sql);
+                    }
                 },
                 -PHP_INT_MAX
             );

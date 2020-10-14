@@ -1,3 +1,10 @@
+= v20.09.04 (20202-10-14)
+
+- Fixed OPcache Stats, invalid calculation for cache files.
+- Fixed Cronbot, run scheduled event in multisite.
+- Added Optimize WP Query option at configuration page.
+- Added the Check Critical Version description to comply with WordPress policy.
+
 = v20.09.03 (20202-10-11)
 
 - Added Multisite Multi-Network.
@@ -7,8 +14,6 @@
 - Fixed CronAgent::run_wpcron(), halt if run reach maximum CRONBOT_MAX for site in multisite.
 
 = v20.09.02 (20202-10-06)
-
-Enhance and Fix release.
 
 - Cron event, docketcache_optimizedb and docketcache_checkversion only run on main site if multisite.
 - Cron event, checkversion change to every 3 days to avoid excessive process.

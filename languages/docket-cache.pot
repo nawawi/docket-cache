@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Docket Cache plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 20.09.03\n"
+"Project-Id-Version: Docket Cache 20.09.04\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-10-11T15:51:42+00:00\n"
+"POT-Creation-Date: 2020-10-14T13:06:01+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -110,77 +110,83 @@ msgid "WordPress Translation Caching"
 msgstr ""
 
 #: includes/admin/config.php:51
+#: includes/src/Canopt.php:83
+msgid "Optimize WP Query"
+msgstr ""
+
+#: includes/admin/config.php:57
 #: includes/src/Canopt.php:70
 msgid "Optimize Term Count Queries"
 msgstr ""
 
-#: includes/admin/config.php:57
+#: includes/admin/config.php:63
 #: includes/src/Canopt.php:78
 msgid "Optimize Database Tables"
 msgstr ""
 
-#: includes/admin/config.php:63
+#: includes/admin/config.php:69
 #: includes/admin/log.php:31
 #: includes/src/View.php:400
 msgid "Default"
 msgstr ""
 
-#: includes/admin/config.php:64
+#: includes/admin/config.php:70
 msgid "Daily"
 msgstr ""
 
-#: includes/admin/config.php:65
+#: includes/admin/config.php:71
 msgid "Weekly"
 msgstr ""
 
-#: includes/admin/config.php:66
+#: includes/admin/config.php:72
 msgid "Monthly"
 msgstr ""
 
-#: includes/admin/config.php:67
+#: includes/admin/config.php:73
 msgid "Never"
 msgstr ""
 
-#: includes/admin/config.php:74
+#: includes/admin/config.php:80
 #: includes/src/Canopt.php:77
 msgid "Suspend WP Options Autoload"
 msgstr ""
 
-#: includes/admin/config.php:80
+#: includes/admin/config.php:86
 #: includes/src/Canopt.php:74
 msgid "Post Missed Schedule Tweaks"
 msgstr ""
 
-#: includes/admin/config.php:86
+#: includes/admin/config.php:92
 #: includes/src/Canopt.php:73
 msgid "Misc Performance Tweaks"
 msgstr ""
 
-#: includes/admin/config.php:92
+#: includes/admin/config.php:98
 #: includes/src/Canopt.php:75
 msgid "Misc WooCommerce Tweaks"
 msgstr ""
 
-#: includes/admin/config.php:98
+#: includes/admin/config.php:104
 #: includes/src/Canopt.php:68
 msgid "Admin Page Cache Preloading"
 msgstr ""
 
-#: includes/admin/config.php:104
+#: includes/admin/config.php:110
 #: includes/src/Canopt.php:76
 msgid "Admin Page Loader"
 msgstr ""
 
-#: includes/admin/config.php:110
+#: includes/admin/config.php:116
 #: includes/src/Canopt.php:81
 msgid "Auto Update"
 msgstr ""
 
-#: includes/admin/config.php:116
+#: includes/admin/config.php:122
 msgid "Check Critical Version"
 msgstr ""
 
-#: includes/admin/config.php:123
+#: includes/admin/config.php:129
+#: includes/src/Canopt.php:80
 msgid "Object Cache Data Stats"
 msgstr ""
 
@@ -427,7 +433,7 @@ msgid "DOCUMENTATION"
 msgstr ""
 
 #: includes/admin/resource.php:21
-msgid "This plugin uses constants variable as main configuration methods. To adjust the plugin behaviour and manage through a command line, please refer to the documentation page for details."
+msgid "To adjust the plugin behaviour and manage through a command line, please refer to the documentation page for details."
 msgstr ""
 
 #: includes/admin/resource.php:22
@@ -452,35 +458,39 @@ msgid "The cache log intends to provide information on how the cache works. For 
 msgstr ""
 
 #: includes/admin/resource.php:39
-msgid "FEEDBACK"
+msgid "CHECK VERSION"
 msgstr ""
 
 #: includes/admin/resource.php:40
-msgid "Kindly write a review of your experience if Docket Cache is beneficial to the performance of your website."
+msgid "The Check Critical Version allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid any error-prone."
 msgstr ""
 
-#: includes/admin/resource.php:41
-msgid "Write Your Review"
+#: includes/admin/resource.php:44
+msgid "FEEDBACK"
 msgstr ""
 
 #: includes/admin/resource.php:45
-msgid "SPONSOR"
+msgid "Kindly write a review of your experience using this plugin."
 msgstr ""
 
 #: includes/admin/resource.php:46
-msgid "Docket Cache is an Open Source project sponsored by you."
+msgid "Submit Review"
 msgstr ""
 
-#: includes/admin/resource.php:47
-msgid "Sponsor This Project"
+#: includes/admin/resource.php:50
+msgid "SPONSOR"
+msgstr ""
+
+#: includes/admin/resource.php:51
+msgid "Become our sponsor to funding further development of this project."
+msgstr ""
+
+#: includes/admin/resource.php:52
+msgid "Become Sponsor"
 msgstr ""
 
 #: includes/src/Canopt.php:67
 msgid "Log Timestamp"
-msgstr ""
-
-#: includes/src/Canopt.php:80
-msgid "Object Cache File Stats"
 msgstr ""
 
 #: includes/src/Canopt.php:82

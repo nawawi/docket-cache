@@ -21,14 +21,40 @@ class Filesystem
      */
     public function is_docketcachedir($dir)
     {
-        $dir = rtrim($dir, '/').'/';
+        $name = 'docket-cache';
+        $ok = false;
 
-        // as long we in /docket-cache/
-        if (false !== strpos($dir, '/docket-cache/')) {
-            return true;
+        if (false === strpos($dir.'/', '/'.$name.'/')) {
+            return $ok;
         }
 
-        return false;
+        $dir = array_reverse(explode('/', trim($dir, '/')));
+
+        // depth = 2
+        foreach ($dir as $n => $c) {
+            if ($n <= 2 && 0 === strcmp($name, $c)) {
+                $ok = true;
+                break;
+            }
+        }
+
+        return $ok;
+    }
+
+    /**
+     * is_dirempty.
+     */
+    public function is_dirempty($dir)
+    {
+        foreach (new \DirectoryIterator($dir) as $object) {
+            if ($object->isDot()) {
+                continue;
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -425,6 +451,10 @@ class Filesystem
         $dir = realpath($dir);
         if (false === $dir || !@is_dir($dir) || !@is_writable($dir) || !$this->is_docketcachedir($dir)) {
             return false;
+        }
+
+        if ($this->is_dirempty($dir)) {
+            return true;
         }
 
         $flush_lock = WP_CONTENT_DIR.'/.object-cache-flush.txt';

@@ -70,10 +70,26 @@ if (!\function_exists('nwdcx_fixhost')) {
     }
 }
 
+if (!\function_exists('nwdcx_fixscheme')) {
+    // replace http scheme
+    function nwdcx_fixscheme($url, $scheme = 'http://')
+    {
+        return @preg_replace('@^((([a-zA-Z]+)?:)?(//))?@', $scheme, $url);
+    }
+}
+
+if (!\function_exists('nwdcx_noscheme')) {
+    // replace http scheme
+    function nwdcx_noscheme($url)
+    {
+        return nwdcx_fixscheme($url, '');
+    }
+}
+
 if (!\function_exists('nwdcx_wpdb')) {
     function nwdcx_wpdb(&$wpdb = '')
     {
-        if (!isset($GLOBALS['wpdb']) || !\is_object($GLOBALS['wpdb']) || !$GLOBALS['wpdb']->ready) {
+        if (!isset($GLOBALS['wpdb']) || !\is_object($GLOBALS['wpdb']) || (isset($GLOBALS['wpdb']->ready) && !$GLOBALS['wpdb']->ready)) {
             $wpdb = false;
 
             return false;

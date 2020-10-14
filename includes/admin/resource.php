@@ -18,7 +18,7 @@ namespace Nawawi\DocketCache;
         <div>
             <p>
                 <strong><?php esc_html_e('DOCUMENTATION', 'docket-cache'); ?></strong><br class="break">
-                <?php esc_html_e('This plugin uses constants variable as main configuration methods. To adjust the plugin behaviour and manage through a command line, please refer to the documentation page for details.', 'docket-cache'); ?>
+                <?php esc_html_e('To adjust the plugin behaviour and manage through a command line, please refer to the documentation page for details.', 'docket-cache'); ?>
                 <a href="https://docs.docketcache.com/" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Dcoumenation', 'docket-cache'); ?></a>
             </p>
             <hr>
@@ -36,15 +36,20 @@ namespace Nawawi\DocketCache;
             </p>
             <hr>
             <p>
+                <strong><?php esc_html_e('CHECK VERSION', 'docket-cache'); ?></strong><br class="break">
+                <?php esc_html_e('The Check Critical Version allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid any error-prone.', 'docket-cache'); ?>
+            </p>
+            <hr>
+            <p>
                 <strong><?php esc_html_e('FEEDBACK', 'docket-cache'); ?></strong><br class="break">
-                <?php esc_html_e('Kindly write a review of your experience if Docket Cache is beneficial to the performance of your website.', 'docket-cache'); ?>
-                <a href="https://wordpress.org/support/plugin/docket-cache/reviews/" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Write Your Review', 'docket-cache'); ?></a>
+                <?php esc_html_e('Kindly write a review of your experience using this plugin.', 'docket-cache'); ?>
+                <a href="https://docketcache.com/feedback" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Submit Review', 'docket-cache'); ?></a>
             </p>
             <hr>
             <p>
                 <strong><?php esc_html_e('SPONSOR', 'docket-cache'); ?></strong><br class="break">
-                <?php esc_html_e('Docket Cache is an Open Source project sponsored by you.', 'docket-cache'); ?>
-                <a href="https://www.paypal.com/paypalme/ghostbirdme/10usd" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Sponsor This Project', 'docket-cache'); ?></a>
+                <?php esc_html_e('Become our sponsor to funding further development of this project.', 'docket-cache'); ?>
+                <a href="https://docketcache.com/sponsorship" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Become Sponsor', 'docket-cache'); ?></a>
             </p>
         </div>
     </div>

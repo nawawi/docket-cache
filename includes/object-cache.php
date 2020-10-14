@@ -2,8 +2,8 @@
 /**
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
- * Plugin URI:          http://wordpress.org/plugins/docket-cache/
- * Version:             20.09.03
+ * Plugin URI:          https://wordpress.org/plugins/docket-cache/
+ * Version:             20.09.04
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * Author:              Nawawi Jamili
  * Author URI:          https://docketcache.com
@@ -19,7 +19,7 @@ if (!\defined('ABSPATH')) {
 /*
  * Check if doing action.
  */
-if (!empty($_GET['_wpnonce']) && !empty($_GET['action']) && !empty($_GET['page']) && 'docket-cache' === $_GET['page']) {
+if (!empty($_GET['_wpnonce']) && !empty($_GET['action']) && !empty($_GET['page']) && 'docket-cache' === $_GET['page'] && false === strpos($_GET['action'], 'cronbot')) {
     return;
 }
 

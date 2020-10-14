@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.09.03
+Stable tag: 20.09.04
 License: MIT
 License URI: ./license.txt
 
@@ -31,11 +31,13 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 - Advanced Post Caching
 - Object Cache Precaching
 - WordPress Translation Caching
+- WordPress Core Query Optimization
 - Term Count Queries Optimization
 - Post, Page, Comment Count Optimization
 - Database Tables Optimization
 - WP Options Autoload suspension
 - Post Missed Schedule Tweaks
+- Object Cache + OPcache Stats
 - Cache Log
 - Cronbot Service
 - Multisite support
@@ -59,9 +61,9 @@ To use the WP-CLI commands, please refer to [WP-CLI](https://docs.docketcache.co
 
 == Development ==
 - [Report issues](https://github.com/nawawi/docket-cache/issues)
-- [Send Pull requests](https://github.com/nawawi/docket-cache/pulls)
-- [Changelog](https://github.com/nawawi/docket-cache/releases)
+- [Changelog](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt)
 - [Documentation](https://docs.docketcache.com)
+- [Sponsorship](https://docketcache.com/sponsorship)
 
 == Installation ==
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
@@ -70,6 +72,8 @@ To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache fo
 2. Search plugins "Docket Cache" and click Install Now.
 3. Click **Activate** or **Network Activate** in Multisite setups.
 4. Click **Docket Cache** in the left menu to access the admin page.
+
+Please wait around 5 seconds for Docket Cache ready to cache the objects.
 
 == Screenshots ==
 1. Overview.
@@ -132,6 +136,15 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.09.04 =
+
+Enhance and Fix release.
+
+- Fixed OPcache Stats, invalid calculation for cache files.
+- Fixed Cronbot, run scheduled event in multisite.
+- Added Optimize WP Query option at configuration page.
+- Added the Check Critical Version description to comply with WordPress policy.
+
 = 20.09.03 =
 
 New features and fix release.

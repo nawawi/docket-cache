@@ -48,6 +48,12 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr>
+                    <th><?php esc_html_e('Optimize WP Query', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('optwpquery'); ?>
+                    </td>
+                </tr>
+                <tr>
                     <th><?php esc_html_e('Optimize Term Count Queries', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('optermcount'); ?>

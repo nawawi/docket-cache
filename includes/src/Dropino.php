@@ -73,7 +73,7 @@ final class Dropino extends Bepart
             return false;
         }
 
-        if (0 !== strcmp($this->meta('dropino')['PluginURI'], $this->meta('plugin')['PluginURI'])) {
+        if (0 !== strcmp(nwdcx_noscheme($this->meta('dropino')['PluginURI']), nwdcx_noscheme($this->meta('plugin')['PluginURI']))) {
             return false;
         }
 
@@ -156,6 +156,9 @@ final class Dropino extends Bepart
             }
 
             if ($this->copy($src, $dst)) {
+                // refresh
+                $this->opcache_flush($dst);
+
                 $this->multinet_active(true);
 
                 return true;

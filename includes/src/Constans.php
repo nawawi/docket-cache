@@ -159,7 +159,7 @@ final class Constans
         $this->maybe_define($this->px('MAXFILE'), 50000);
 
         // cache maxttl: cache lifespan.  Only seconds between 86400 and 2419200 are accepted
-        $this->maybe_define($this->px('MAXTTL'), 172800);
+        $this->maybe_define($this->px('MAXTTL'), 345600);
 
         // log on/off
         $this->maybe_define($this->px('LOG'), false);
@@ -248,6 +248,9 @@ final class Constans
             $this->px('IGNORED_PRECACHE'),
             [
                 'freemius:fs_accounts',
+                'site-transient:update_themes',
+                'site-transient:update_plugins',
+                'site-transient:update_core',
             ]
         );
 
@@ -299,6 +302,9 @@ final class Constans
 
         // auto update
         $this->maybe_define($this->px('AUTOUPDATE'), true);
+
+        // optimize post query
+        $this->maybe_define($this->px('OPTWPQUERY'), true);
 
         // backwards-compatible
         $this->maybe_define($this->px('COMMENT'), $this->dcvalue('SIGNATURE'));

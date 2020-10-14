@@ -77,9 +77,10 @@ final class Canopt extends Bepart
             'wpoptaload' => esc_html__('Suspend WP Options Autoload', 'docket-cache'),
             'cronoptmzdb' => esc_html__('Optimize Database Tables', 'docket-cache'),
             'cronbot' => esc_html__('Cronbot Service', 'docket-cache'),
-            'stats' => esc_html__('Object Cache File Stats', 'docket-cache'),
+            'stats' => esc_html__('Object Cache Data Stats', 'docket-cache'),
             'autoupdate' => esc_html__('Auto Update', 'docket-cache'),
             'checkversion' => esc_html__('Critical Version Checking', 'docket-cache'),
+            'optwpquery' => esc_html__('Optimize WP Query', 'docket-cache'),
         ];
 
         if (false !== $key) {
