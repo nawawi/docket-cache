@@ -132,6 +132,9 @@ Docket Cache is an Object Cache Accelerator. It does some optimization of cachin
 = Can I pair using it with other cache plugin? =
 Yes and No. You can pair using it with page caching plugin, but not with the object cache plugin.
 
+= I'm using a VPS server. Can I use Docket Cache to replace Redis? =
+Yes, you can. It can boost more your WordPress performance since there is no network connection need to makes and no worry about memory burst, cache-key conflict and error-prone caused by the improper settings.
+
 == Upgrade Notice ==
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
