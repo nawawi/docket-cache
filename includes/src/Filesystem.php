@@ -702,4 +702,122 @@ class Filesystem
 
         return $timestamp > 0;
     }
+
+    public function optimize_alloptions()
+    {
+        add_filter(
+            'pre_cache_alloptions',
+            function ($alloptions) {
+                $wp_options = [
+                    'siteurl' => 1,
+                    'home' => 1,
+                    'blogname' => 1,
+                    'blogdescription' => 1,
+                    'users_can_register' => 1,
+                    'admin_email' => 1,
+                    'start_of_week' => 1,
+                    'use_balanceTags' => 1,
+                    'use_smilies' => 1,
+                    'require_name_email' => 1,
+                    'comments_notify' => 1,
+                    'posts_per_rss' => 1,
+                    'rss_use_excerpt' => 1,
+                    'mailserver_url' => 1,
+                    'mailserver_login' => 1,
+                    'mailserver_pass' => 1,
+                    'mailserver_port' => 1,
+                    'default_category' => 1,
+                    'default_comment_status' => 1,
+                    'default_ping_status' => 1,
+                    'default_pingback_flag' => 1,
+                    'posts_per_page' => 1,
+                    'date_format' => 1,
+                    'time_format' => 1,
+                    'links_updated_date_format' => 1,
+                    'comment_moderation' => 1,
+                    'moderation_notify' => 1,
+                    'permalink_structure' => 1,
+                    'hack_file' => 1,
+                    'blog_charset' => 1,
+                    'category_base' => 1,
+                    'ping_sites' => 1,
+                    'comment_max_links' => 1,
+                    'gmt_offset' => 1,
+                    'default_email_category' => 1,
+                    'template' => 1,
+                    'stylesheet' => 1,
+                    'comment_registration' => 1,
+                    'html_type' => 1,
+                    'use_trackback' => 1,
+                    'default_role' => 1,
+                    'db_version' => 1,
+                    'uploads_use_yearmonth_folders' => 1,
+                    'upload_path' => 1,
+                    'blog_public' => 1,
+                    'default_link_category' => 1,
+                    'show_on_front' => 1,
+                    'tag_base' => 1,
+                    'show_avatars' => 1,
+                    'avatar_rating' => 1,
+                    'upload_url_path' => 1,
+                    'thumbnail_size_w' => 1,
+                    'thumbnail_size_h' => 1,
+                    'thumbnail_crop' => 1,
+                    'medium_size_w' => 1,
+                    'medium_size_h' => 1,
+                    'avatar_default' => 1,
+                    'large_size_w' => 1,
+                    'large_size_h' => 1,
+                    'image_default_link_type' => 1,
+                    'image_default_size' => 1,
+                    'image_default_align' => 1,
+                    'close_comments_for_old_posts' => 1,
+                    'close_comments_days_old' => 1,
+                    'thread_comments' => 1,
+                    'thread_comments_depth' => 1,
+                    'page_comments' => 1,
+                    'comments_per_page' => 1,
+                    'default_comments_page' => 1,
+                    'comment_order' => 1,
+                    'timezone_string' => 1,
+                    'page_for_posts' => 1,
+                    'page_on_front' => 1,
+                    'default_post_format' => 1,
+                    'link_manager_enabled' => 1,
+                    'finished_splitting_shared_terms' => 1,
+                    'site_icon' => 1,
+                    'medium_large_size_w' => 1,
+                    'medium_large_size_h' => 1,
+                    'wp_page_for_privacy_policy' => 1,
+                    'show_comments_cookies_opt_in' => 1,
+                    'admin_email_lifespan' => 1,
+                    'initial_db_version' => 1,
+                    'fresh_site' => 1,
+                    'current_theme' => 1,
+                    'theme_switched' => 1,
+                    'generate_update_core_typography' => 1,
+                    'WPLANG' => 1,
+                    'new_admin_email' => 1,
+                    'recovery_mode_email_last_sent' => 1,
+                    'comment_previously_approved' => 1,
+                    'finished_updating_comment_type' => 1,
+                    'db_upgraded' => 1,
+                ];
+
+                foreach ($alloptions as $key => $value) {
+                    // skip
+                    if (empty($value)) {
+                        continue;
+                    }
+
+                    if (!\array_key_exists($key, $wp_options)) {
+                        unset($alloptions[$key]);
+                    }
+                }
+
+                return $alloptions;
+            },
+            -PHP_INT_MAX
+        );
+    }
 }

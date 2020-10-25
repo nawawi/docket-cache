@@ -48,6 +48,7 @@ class ComposerStaticInit71169967e8f502f7da209e4236957996
         'Nawawi\\DocketCache\\MoCache' => __DIR__ . '/../../..' . '/includes/src/MoCache.php',
         'Nawawi\\DocketCache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',
         'Nawawi\\DocketCache\\PostCache' => __DIR__ . '/../../..' . '/includes/src/PostCache.php',
+        'Nawawi\\DocketCache\\ReqAction' => __DIR__ . '/../../..' . '/includes/src/ReqAction.php',
         'Nawawi\\DocketCache\\TermCount' => __DIR__ . '/../../..' . '/includes/src/TermCount.php',
         'Nawawi\\DocketCache\\Tweaks' => __DIR__ . '/../../..' . '/includes/src/Tweaks.php',
         'Nawawi\\DocketCache\\View' => __DIR__ . '/../../..' . '/includes/src/View.php',

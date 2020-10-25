@@ -3,7 +3,7 @@
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
  * Plugin URI:          https://wordpress.org/plugins/docket-cache/
- * Version:             20.09.04
+ * Version:             20.09.05
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * Author:              Nawawi Jamili
  * Author URI:          https://docketcache.com
@@ -19,7 +19,7 @@ if (!\defined('ABSPATH')) {
 /*
  * Check if doing action.
  */
-if (!empty($_GET['_wpnonce']) && !empty($_GET['action']) && !empty($_GET['page']) && 'docket-cache' === $_GET['page'] && false === strpos($_GET['action'], 'cronbot')) {
+if (!empty($_GET['_wpnonce']) && !empty($_GET['action']) && !empty($_GET['page']) && 'docket-cache' === $_GET['page'] && false === strpos($_GET['action'], 'cronbot') && false === strpos($_GET['action'], 'wpoptaload')) {
     return;
 }
 
@@ -100,9 +100,9 @@ if (@is_file(WP_CONTENT_DIR.'/.object-cache-delay.txt')) {
     }
 
     if (time() > @filemtime(WP_CONTENT_DIR.'/.object-cache-delay.txt')) {
-        if (!\function_exists('__dc_halt_transient')) {
+        if (!\function_exists('nwdcx_halttransient')) {
             // prevent from transient save to db before replace with our dropin
-            function __dc_halt_transient($value, $option, $old_value = '')
+            function nwdcx_halttransient($value, $option, $old_value = '')
             {
                 if (false !== strpos($option, '_transient_')) {
                     return false;
@@ -111,33 +111,92 @@ if (@is_file(WP_CONTENT_DIR.'/.object-cache-delay.txt')) {
                 return $value;
             }
 
-            add_filter('pre_update_option', '__dc_halt_transient', -PHP_INT_MAX, 3);
-            add_filter('pre_get_option', '__dc_halt_transient', -PHP_INT_MAX, 3);
+            add_filter('pre_update_option', 'nwdcx_halttransient', -PHP_INT_MAX, 3);
+            add_filter('pre_get_option', 'nwdcx_halttransient', -PHP_INT_MAX, 3);
             add_filter(
                 'added_option',
                 function ($option, $value) {
-                    return __dc_halt_transient($value, $option);
+                    return nwdcx_halttransient($value, $option);
                 },
                 -PHP_INT_MAX,
                 2
             );
         }
 
-        add_action(
-            'shutdown',
-            function () {
-                if (\function_exists('nwdcx_deltransdb')) {
-                    nwdcx_deltransdb();
+        if (!\function_exists('nwdcx_cleanuptransient')) {
+            function nwdcx_cleanuptransient()
+            {
+                if (!nwdcx_wpdb($wpdb)) {
+                    return false;
                 }
 
-                // previous file format
-                foreach (['object-cache-delay.txt', 'object-cache-after-delay.txt', 'object-cache.log'] as $f) {
-                    $fx = WP_CONTENT_DIR.'/'.$f;
-                    if (@is_file($fx)) {
-                        @unlink($fx);
+                $suppress = $wpdb->suppress_errors(true);
+
+                $collect = [];
+
+                $results = $wpdb->get_results('SELECT `option_id`,`option_name`,`option_value` FROM `'.$wpdb->options.'` WHERE `option_name` LIKE "_transient_%" OR `option_name` LIKE "_site_transient_%"', ARRAY_A);
+
+                if (!empty($results) && \is_array($results)) {
+                    while ($row = @array_shift($results)) {
+                        $id = $row['option_id'];
+                        $collect[$id] = $id;
+
+                        if (false !== strpos($row['option_name'], '_transient_timeout_') && (int) $row['option_value'] > time()) {
+                            unset($collect[$id]);
+                        }
+                    }
+
+                    if (!empty($collect)) {
+                        foreach ($collect as $id) {
+                            if ((int) $id > 0) {
+                                $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_id`='{$id}'");
+                            }
+                        }
                     }
                 }
 
+                $collect = [];
+
+                if (is_multisite() && isset($wpdb->sitemeta)) {
+                    $results = $wpdb->get_results('SELECT `meta_id`,`meta_key`,`meta_value` FROM `'.$wpdb->sitemeta.'` WHERE `meta_key` LIKE "_site_transient_%"', ARRAY_A);
+                    if (!empty($results) && \is_array($results)) {
+                        while ($row = @array_shift($results)) {
+                            $id = $row['meta_id'];
+                            $collect[$id] = $id;
+
+                            if (false !== strpos($row['meta_key'], '_site_transient_timeout_') && (int) $row['meta_value'] > time()) {
+                                unset($collect[$id]);
+                            }
+                        }
+
+                        if (!empty($collect)) {
+                            foreach ($collect as $id) {
+                                if ((int) $id > 0) {
+                                    $wpdb->query("DELETE FROM `{$wpdb->sitemeta}` WHERE `meta_id`='{$id}'");
+                                }
+                            }
+                        }
+                    }
+                }
+
+                unset($collect, $results);
+                $wpdb->suppress_errors($suppress);
+
+                return true;
+            }
+
+            add_action(
+                'shutdown',
+                function () {
+                    nwdcx_cleanuptransient();
+                },
+                PHP_INT_MAX - 1
+            );
+        }
+
+        add_action(
+            'shutdown',
+            function () {
                 @rename(WP_CONTENT_DIR.'/.object-cache-delay.txt', WP_CONTENT_DIR.'/.object-cache-after-delay.txt');
             },
             PHP_INT_MAX

@@ -69,6 +69,33 @@ final class Tweaks
             PHP_INT_MAX
         );
 
+        // jetpack: enables object caching for the response sent by instagram when querying for instagram image html
+        // https://developer.jetpack.com/hooks/instagram_cache_oembed_api_response_body/
+        add_filter('instagram_cache_oembed_api_response_body', '__return_true');
+
+        if (nwdcx_consfalse('TWEAKS_WPCOOKIE_DISABLED')) {
+            // wp: comment cookie lifetime, default to 30000000 second = 12 months
+            add_filter(
+                'comment_cookie_lifetime',
+                function () {
+                    return 12 * HOUR_IN_SECONDS;
+                },
+                -PHP_INT_MAX
+            );
+
+            // wp: protected post, expire when browser close
+            add_filter(
+                'post_password_expires',
+                function () {
+                    return 0;
+                },
+                -PHP_INT_MAX
+            );
+        }
+    }
+
+    public function headerjunk()
+    {
         // wp: header junk
         add_action(
             'after_setup_theme',
@@ -88,6 +115,45 @@ final class Tweaks
             PHP_INT_MAX
         );
 
+        add_filter('the_generator', '__return_empty_string', PHP_INT_MAX);
+
+        add_action(
+            'after_setup_theme',
+            function () {
+                nwdcx_consdef('doing_buffer_headerjunk', true);
+                @ob_start(null, 700000);
+            },
+            -PHP_INT_MAX
+        );
+
+        add_action(
+            'wp_head',
+            function () {
+                if (nwdcx_construe('doing_buffer_headerjunk')) {
+                    $content = @ob_get_clean();
+                    if (empty($content)) {
+                        return;
+                    }
+
+                    if (false !== strpos($content, 'gmpg.org/xfn/11')) {
+                        $regexp = '@<link[^>]+href=(?:\'|")(https?:)?\/\/gmpg.org\/xfn\/11(?:\'|")(?:[^>]+)?>@';
+                        $content = @preg_replace($regexp, '', $content);
+                    }
+
+                    if (false !== strpos($content, 'rel="pingback"')) {
+                        $regexp = '@(<link.*?rel=("|\')pingback("|\').*?href=("|\')(.*?)("|\')(.*?)?\/?>|<link.*?href=("|\')(.*?)("|\').*?rel=("|\')pingback("|\')(.*?)?\/?>)@';
+                        $content = @preg_replace($regexp, '', $content);
+                    }
+
+                    echo $content;
+                }
+            },
+            PHP_INT_MAX
+        );
+    }
+
+    public function pingback()
+    {
         // wp: disable pingback
         add_action(
             'pre_ping',
@@ -114,48 +180,22 @@ final class Tweaks
             PHP_INT_MAX
         );
 
-        // jetpack: enables object caching for the response sent by instagram when querying for instagram image html
-        // https://developer.jetpack.com/hooks/instagram_cache_oembed_api_response_body/
-        add_filter('instagram_cache_oembed_api_response_body', '__return_true');
-
         // wp: disable xmlrpc
         // https://www.wpbeginner.com/plugins/how-to-disable-xml-rpc-in-wordpress/
         // https://kinsta.com/blog/xmlrpc-php/
-        if (nwdcx_consfalse('TWEAKS_XMLRPC_DISABLED')) {
-            add_filter('xmlrpc_enabled', '__return_false');
-            add_filter('pre_update_option_enable_xmlrpc', '__return_false');
-            add_filter('pre_option_enable_xmlrpc', '__return_zero');
-            add_action(
-                'plugins_loaded',
-                function () {
-                    if (isset($_SERVER['REQUEST_URI']) && '/xmlrpc.php' === $_SERVER['REQUEST_URI']) {
-                        http_response_code(403);
-                        exit('xmlrpc.php not available.');
-                    }
-                },
-                PHP_INT_MAX
-            );
-        }
-
-        if (nwdcx_consfalse('TWEAKS_WPCOOKIE_DISABLED')) {
-            // wp: comment cookie lifetime, default to 30000000 second = 12 months
-            add_filter(
-                'comment_cookie_lifetime',
-                function () {
-                    return 12 * HOUR_IN_SECONDS;
-                },
-                -PHP_INT_MAX
-            );
-
-            // wp: protected post, expire when browser close
-            add_filter(
-                'post_password_expires',
-                function () {
-                    return 0;
-                },
-                -PHP_INT_MAX
-            );
-        }
+        add_filter('xmlrpc_enabled', '__return_false');
+        add_filter('pre_update_option_enable_xmlrpc', '__return_false');
+        add_filter('pre_option_enable_xmlrpc', '__return_zero');
+        add_action(
+            'plugins_loaded',
+            function () {
+                if (isset($_SERVER['REQUEST_URI']) && '/xmlrpc.php' === $_SERVER['REQUEST_URI']) {
+                    http_response_code(403);
+                    exit('xmlrpc.php not available.');
+                }
+            },
+            PHP_INT_MAX
+        );
     }
 
     public function woocommerce()
@@ -245,5 +285,169 @@ final class Tweaks
         $wpdb->suppress_errors($suppress);
 
         return true;
+    }
+
+    public function wpemoji()
+    {
+        remove_action('wp_head', 'print_emoji_detection_script', 7);
+        remove_action('admin_print_scripts', 'print_emoji_detection_script');
+        remove_action('wp_print_styles', 'print_emoji_styles');
+        remove_action('admin_print_styles', 'print_emoji_styles');
+        remove_filter('the_content_feed', 'wp_staticize_emoji');
+        remove_filter('comment_text_rss', 'wp_staticize_emoji');
+        remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
+
+        add_filter('emoji_svg_url', '__return_false');
+
+        add_filter(
+            'tiny_mce_plugins',
+            function ($plugins) {
+                if (\is_array($plugins)) {
+                    return array_diff($plugins, ['wpemoji']);
+                }
+
+                return [];
+            }
+        );
+
+        add_filter(
+            'wp_resource_hints',
+            function ($urls, $relation_type) {
+                if ('dns-prefetch' === (string) $relation_type) {
+                    $emoji_url = 'https://s.w.org/images/core/emoji/';
+                    foreach ($urls as $key => $url) {
+                        if (false !== strpos($url, $emoji_url)) {
+                            unset($urls[$key]);
+                        }
+                    }
+                }
+
+                return $urls;
+            },
+            10,
+            2
+        );
+    }
+
+    public function wpembed()
+    {
+        if (isset($GLOBALS['wp']) && \is_object($GLOBALS['wp']) && isset($GLOBALS['wp']->public_query_vars)) {
+            $GLOBALS['wp']->public_query_vars = array_diff($GLOBALS['wp']->public_query_vars, ['embed']);
+        }
+
+        if (isset($GLOBALS['wp_embed']) && \is_object($GLOBALS['wp_embed'])) {
+            remove_filter('the_content', [$GLOBALS['wp_embed'], 'autoembed'], 8);
+        }
+
+        remove_filter('the_content_feed', '_oembed_filter_feed_content');
+        remove_action('plugins_loaded', 'wp_maybe_load_embeds', 0);
+        add_filter('pre_option_embed_autourls', '__return_false');
+        add_filter('embed_oembed_discover', '__return_false');
+        remove_action('rest_api_init', 'wp_oembed_register_route');
+        remove_filter('rest_pre_serve_request', '_oembed_rest_pre_serve_request');
+        remove_action('wp_head', 'wp_oembed_add_discovery_links');
+        remove_action('wp_head', 'wp_oembed_add_host_js');
+        remove_action('embed_head', 'enqueue_embed_scripts', 1);
+        remove_action('embed_head', 'print_emoji_detection_script');
+        remove_action('embed_head', 'print_embed_styles');
+        remove_action('embed_head', 'wp_print_head_scripts', 20);
+        remove_action('embed_head', 'wp_print_styles', 20);
+        remove_action('embed_head', 'wp_no_robots');
+        remove_action('embed_head', 'rel_canonical');
+        remove_action('embed_head', 'locale_stylesheet', 30);
+        remove_action('embed_content_meta', 'print_embed_comments_button');
+        remove_action('embed_content_meta', 'print_embed_sharing_button');
+        remove_action('embed_footer', 'print_embed_sharing_dialog');
+        remove_action('embed_footer', 'print_embed_scripts');
+        remove_action('embed_footer', 'wp_print_footer_scripts', 20);
+        remove_filter('excerpt_more', 'wp_embed_excerpt_more', 20);
+        remove_filter('the_excerpt_embed', 'wptexturize');
+        remove_filter('the_excerpt_embed', 'convert_chars');
+        remove_filter('the_excerpt_embed', 'wpautop');
+        remove_filter('the_excerpt_embed', 'shortcode_unautop');
+        remove_filter('the_excerpt_embed', 'wp_embed_excerpt_attachment');
+        remove_filter('oembed_dataparse', 'wp_filter_oembed_result');
+        remove_filter('oembed_response_data', 'get_oembed_response_data_rich');
+        remove_filter('pre_oembed_result', 'wp_filter_pre_oembed_result');
+        remove_filter('woocommerce_short_description', 'wc_do_oembeds');
+
+        add_filter(
+            'tiny_mce_plugins',
+            function ($plugins) {
+                return array_diff($plugins, ['wpembed', 'wpview']);
+            }
+        );
+
+        add_filter(
+            'rewrite_rules_array',
+            function ($rules) {
+                $results = [];
+                foreach ($rules as $rule => $val) {
+                    if (false !== ($pos = strpos($val, '?'))) {
+                        $args = explode('&', substr($val, $pos + 1));
+                        if (\in_array('embed=true', $args)) {
+                            continue;
+                        }
+                    }
+                    $results[$rule] = $val;
+                }
+
+                return $results;
+            }
+        );
+
+        add_filter(
+            'body_class',
+            function ($classes, $class) {
+                foreach ($classes as $num => $name) {
+                    if ('wp-embed-responsive' === $name) {
+                        unset($classes[$num]);
+                    }
+                }
+
+                return $classes;
+            },
+            PHP_INT_MAX,
+            2
+        );
+
+        add_action(
+            'wp_footer',
+            function () {
+                wp_dequeue_script('wp-embed');
+            },
+            PHP_INT_MAX
+        );
+    }
+
+    public function wpfeed()
+    {
+        add_action(
+            'wp_loaded',
+            function () {
+                remove_action('wp_head', 'feed_links', 2);
+                remove_action('wp_head', 'feed_links_extra', 3);
+            }
+        );
+
+        add_action(
+            'init',
+            function () {
+                if (isset($GLOBALS['wp_rewrite']) && \is_object($GLOBALS['wp_rewrite']) && isset($GLOBALS['wp_rewrite']->feeds)) {
+                    $GLOBALS['wp_rewrite']->feeds = [];
+                }
+            }
+        );
+
+        foreach (['rdf', 'rss', 'rss2', 'atom', 'rss2_comments', 'atom_comments'] as $feed) {
+            add_action(
+                'do_feed_'.$feed,
+                function () {
+                    wp_redirect(home_url(), 302);
+                    exit;
+                },
+                1
+            );
+        }
     }
 }

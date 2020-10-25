@@ -60,6 +60,19 @@ final class Canopt extends Bepart
         return self::$inst;
     }
 
+    public function is_options_writable()
+    {
+        if (@is_file($this->file)) {
+            return @is_writable($this->file);
+        }
+
+        if (@is_dir($this->path)) {
+            return @is_writable($this->path);
+        }
+
+        return @is_writable(\dirname($this->path));
+    }
+
     public function keys($key = false)
     {
         $data = [
@@ -81,6 +94,11 @@ final class Canopt extends Bepart
             'autoupdate' => esc_html__('Auto Update', 'docket-cache'),
             'checkversion' => esc_html__('Critical Version Checking', 'docket-cache'),
             'optwpquery' => esc_html__('Optimize WP Query', 'docket-cache'),
+            'pingback' => esc_html__('Remove XML-RPC / Pingbacks', 'docket-cache'),
+            'headerjunk' => esc_html__('Remove WP Header Junk', 'docket-cache'),
+            'wpemoji' => esc_html__('Remove WP Emoji', 'docket-cache'),
+            'wpembed' => esc_html__('Remove WP Embed', 'docket-cache'),
+            'wpfeed' => esc_html__('Remove WP Feed', 'docket-cache'),
         ];
 
         if (false !== $key) {
@@ -115,6 +133,8 @@ final class Canopt extends Bepart
         $file = empty($file) ? $this->file : $file;
         if (empty($config) || !\is_array($config)) {
             @unlink($file);
+
+            clearstatcache();
 
             return false;
         }
@@ -199,7 +219,10 @@ final class Canopt extends Bepart
             return true;
         }
 
-        return @unlink($file);
+        $ret = @unlink($file);
+        clearstatcache();
+
+        return $ret;
     }
 
     public function clear_lock()
@@ -220,6 +243,8 @@ final class Canopt extends Bepart
                 }
             }
         }
+
+        clearstatcache();
 
         return true;
     }
@@ -262,7 +287,10 @@ final class Canopt extends Bepart
             return true;
         }
 
-        return @unlink($file);
+        $ret = @unlink($file);
+        clearstatcache();
+
+        return $ret;
     }
 
     public function locked($key, &$value = '')

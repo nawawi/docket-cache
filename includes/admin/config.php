@@ -101,6 +101,36 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr>
+                    <th><?php esc_html_e('Remove XML-RPC / Pingbacks', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('pingback'); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php esc_html_e('Remove WP Header Junk', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('headerjunk'); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php esc_html_e('Remove WP Emoji', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('wpemoji'); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php esc_html_e('Remove WP Feed', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('wpfeed'); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="border-b"><?php esc_html_e('Remove WP Embed', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('wpembed'); ?>
+                    </td>
+                </tr>
+                <tr>
                     <th><?php esc_html_e('Admin Page Cache Preloading', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('preload'); ?>
@@ -113,6 +143,12 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr>
+                    <th class="border-b"><?php esc_html_e('Object Cache Data Stats', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('stats'); ?>
+                    </td>
+                </tr>
+                <tr>
                     <th><?php esc_html_e('Auto Update', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('autoupdate'); ?>
@@ -122,13 +158,6 @@ namespace Nawawi\DocketCache;
                     <th><?php esc_html_e('Check Critical Version', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('checkversion'); ?>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th><?php esc_html_e('Object Cache Data Stats', 'docket-cache'); ?></th>
-                    <td>
-                        <?php echo $this->config_select_bool('stats'); ?>
                     </td>
                 </tr>
             </table>

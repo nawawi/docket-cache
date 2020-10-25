@@ -311,7 +311,7 @@ final class View
             $option .= '<option value="'.$id.'" data-action-link="'.$link.'"'.$selected.'>'.$text.'</option>';
         }
 
-        $html .= '<select class="nav-select">';
+        $html .= '<select class="nav-select" style="display:none;">';
         $html .= $option;
         $html .= '</select>';
 

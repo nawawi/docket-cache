@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.09.04
+Stable tag: 20.09.05
 License: MIT
 License URI: ./license.txt
 
@@ -126,7 +126,10 @@ Kindly refer to the articles below about RAM disk:
 
 To use it in Windows OS, create RAM Disk and change [DOCKET_CACHE_PATH](https://docs.docketcache.com/configuration#docket_cache_path) point to RAM Disk drive.
 
-= What’s the difference with the other object cache plugin? =
+= What is the minimum RAM required to use with shared hosting? =
+By default, WordPress allocates the memory limit to 256 MB. Combined with MySQL and Web Server, you need more than 256 MB. If you're using a cheap hosting plan that allocates only 256 MB for totals usage. It is not enough, and Docket Cache can't improve your website performance.
+
+= What’s the difference with the other object cache plugins? =
 Docket Cache is an Object Cache Accelerator. It does some optimization of caching like cache post queries, comments counting, WordPress translation and more before storing the object caches.
 
 = Can I pair using it with other cache plugin? =
@@ -139,6 +142,18 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.09.05 =
+
+Enhance and Fix release.
+
+- Fixed Suspend WP Options Autoload. Use hook instead of change autoload value in the database. WordPress will treat all key as autoload if none has set to yes.
+- Fixed Drop-in after delay. Remove transient from database if expiry not set and already expired.
+- Added Remove XML-RPC / Pingbacks, WP Header Junk into the configuration instead of bundling with Misc Performance Tweaks.
+- Added Remove WP Emoji, WP Feed, WP Embed options.
+- Added ReqAction class to handle action.
+- Added wp_cache_flush_group.
+- Added try to set SQL_BIG_SELECTS=1 for shared hosting.
+
 = 20.09.04 =
 
 Enhance and Fix release.

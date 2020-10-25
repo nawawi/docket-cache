@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Docket Cache plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 20.09.04\n"
+"Project-Id-Version: Docket Cache 20.09.05\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-10-14T13:06:01+00:00\n"
+"POT-Creation-Date: 2020-10-25T01:47:32+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -68,12 +68,12 @@ msgid "Enable / Disable Drop-In usage."
 msgstr ""
 
 #: includes/admin/actcmd.php:39
-#: includes/src/Plugin.php:1615
+#: includes/src/Plugin.php:1325
 msgid "Disable Object Cache"
 msgstr ""
 
 #: includes/admin/actcmd.php:41
-#: includes/src/Plugin.php:1611
+#: includes/src/Plugin.php:1321
 msgid "Enable Object Cache"
 msgstr ""
 
@@ -83,44 +83,44 @@ msgid "Configuration"
 msgstr ""
 
 #: includes/admin/config.php:21
-#: includes/src/Canopt.php:79
+#: includes/src/Canopt.php:92
 msgid "Cronbot Service"
 msgstr ""
 
 #: includes/admin/config.php:27
 #: includes/admin/log.php:21
-#: includes/src/Canopt.php:66
+#: includes/src/Canopt.php:79
 #: includes/src/View.php:250
 msgid "Cache Log"
 msgstr ""
 
 #: includes/admin/config.php:33
-#: includes/src/Canopt.php:69
+#: includes/src/Canopt.php:82
 msgid "Advanced Post Caching"
 msgstr ""
 
 #: includes/admin/config.php:39
-#: includes/src/Canopt.php:71
+#: includes/src/Canopt.php:84
 msgid "Object Cache Precaching"
 msgstr ""
 
 #: includes/admin/config.php:45
-#: includes/src/Canopt.php:72
+#: includes/src/Canopt.php:85
 msgid "WordPress Translation Caching"
 msgstr ""
 
 #: includes/admin/config.php:51
-#: includes/src/Canopt.php:83
+#: includes/src/Canopt.php:96
 msgid "Optimize WP Query"
 msgstr ""
 
 #: includes/admin/config.php:57
-#: includes/src/Canopt.php:70
+#: includes/src/Canopt.php:83
 msgid "Optimize Term Count Queries"
 msgstr ""
 
 #: includes/admin/config.php:63
-#: includes/src/Canopt.php:78
+#: includes/src/Canopt.php:91
 msgid "Optimize Database Tables"
 msgstr ""
 
@@ -147,47 +147,72 @@ msgid "Never"
 msgstr ""
 
 #: includes/admin/config.php:80
-#: includes/src/Canopt.php:77
+#: includes/src/Canopt.php:90
 msgid "Suspend WP Options Autoload"
 msgstr ""
 
 #: includes/admin/config.php:86
-#: includes/src/Canopt.php:74
+#: includes/src/Canopt.php:87
 msgid "Post Missed Schedule Tweaks"
 msgstr ""
 
 #: includes/admin/config.php:92
-#: includes/src/Canopt.php:73
+#: includes/src/Canopt.php:86
 msgid "Misc Performance Tweaks"
 msgstr ""
 
 #: includes/admin/config.php:98
-#: includes/src/Canopt.php:75
+#: includes/src/Canopt.php:88
 msgid "Misc WooCommerce Tweaks"
 msgstr ""
 
 #: includes/admin/config.php:104
-#: includes/src/Canopt.php:68
-msgid "Admin Page Cache Preloading"
+#: includes/src/Canopt.php:97
+msgid "Remove XML-RPC / Pingbacks"
 msgstr ""
 
 #: includes/admin/config.php:110
-#: includes/src/Canopt.php:76
-msgid "Admin Page Loader"
+#: includes/src/Canopt.php:98
+msgid "Remove WP Header Junk"
 msgstr ""
 
 #: includes/admin/config.php:116
-#: includes/src/Canopt.php:81
-msgid "Auto Update"
+#: includes/src/Canopt.php:99
+msgid "Remove WP Emoji"
 msgstr ""
 
 #: includes/admin/config.php:122
-msgid "Check Critical Version"
+#: includes/src/Canopt.php:101
+msgid "Remove WP Feed"
 msgstr ""
 
-#: includes/admin/config.php:129
-#: includes/src/Canopt.php:80
+#: includes/admin/config.php:128
+#: includes/src/Canopt.php:100
+msgid "Remove WP Embed"
+msgstr ""
+
+#: includes/admin/config.php:134
+#: includes/src/Canopt.php:81
+msgid "Admin Page Cache Preloading"
+msgstr ""
+
+#: includes/admin/config.php:140
+#: includes/src/Canopt.php:89
+msgid "Admin Page Loader"
+msgstr ""
+
+#: includes/admin/config.php:146
+#: includes/src/Canopt.php:93
 msgid "Object Cache Data Stats"
+msgstr ""
+
+#: includes/admin/config.php:152
+#: includes/src/Canopt.php:94
+msgid "Auto Update"
+msgstr ""
+
+#: includes/admin/config.php:158
+msgid "Check Critical Version"
 msgstr ""
 
 #: includes/admin/cronbot.php:19
@@ -339,7 +364,6 @@ msgid "Web Proxy"
 msgstr ""
 
 #: includes/admin/overview.php:32
-#: includes/src/Plugin.php:1605
 #: includes/src/View.php:249
 msgid "Overview"
 msgstr ""
@@ -489,11 +513,11 @@ msgstr ""
 msgid "Become Sponsor"
 msgstr ""
 
-#: includes/src/Canopt.php:67
+#: includes/src/Canopt.php:80
 msgid "Log Timestamp"
 msgstr ""
 
-#: includes/src/Canopt.php:82
+#: includes/src/Canopt.php:95
 msgid "Critical Version Checking"
 msgstr ""
 
@@ -506,12 +530,12 @@ msgid "An unknown object cache Drop-In was found. To use Docket object cache, ru
 msgstr ""
 
 #: includes/src/Command.php:109
-#: includes/src/Plugin.php:1465
+#: includes/src/ReqAction.php:251
 msgid "Object cache enabled."
 msgstr ""
 
 #: includes/src/Command.php:112
-#: includes/src/Plugin.php:1468
+#: includes/src/ReqAction.php:254
 msgid "Object cache could not be enabled."
 msgstr ""
 
@@ -524,27 +548,27 @@ msgid "An unknown object cache Drop-In was found. To use Docket run: wp cache up
 msgstr ""
 
 #: includes/src/Command.php:136
-#: includes/src/Plugin.php:1471
+#: includes/src/ReqAction.php:257
 msgid "Object cache disabled."
 msgstr ""
 
 #: includes/src/Command.php:139
-#: includes/src/Plugin.php:1474
+#: includes/src/ReqAction.php:260
 msgid "Object cache could not be disabled."
 msgstr ""
 
 #: includes/src/Command.php:156
-#: includes/src/Plugin.php:1483
+#: includes/src/ReqAction.php:269
 msgid "Updated object cache Drop-In and enabled Docket object cache."
 msgstr ""
 
 #: includes/src/Command.php:158
-#: includes/src/Plugin.php:1486
+#: includes/src/ReqAction.php:272
 msgid "Object cache Drop-In could not be updated."
 msgstr ""
 
 #: includes/src/Command.php:175
-#: includes/src/Plugin.php:1480
+#: includes/src/ReqAction.php:266
 msgid "Object cache could not be flushed."
 msgstr ""
 
@@ -732,125 +756,138 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:1125
+#: includes/src/Plugin.php:1136
 msgid "<strong>Docket Cache:</strong> The object-cache.php Drop-In is outdated. Please click \"Re-Install\" to update it now.<p style=\"padding:0;\"><a href=\"%s\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:1129
+#: includes/src/Plugin.php:1140
 msgid "<strong>Docket Cache:</strong> An unknown object-cache.php Drop-In was found. Please click \"Install\" to use Docket Cache.<p style=\"margin-bottom:0;\"><a href=\"%s\" class=\"button button-primary\">Install</a></p>"
 msgstr ""
 
-#: includes/src/Plugin.php:1134
+#: includes/src/Plugin.php:1145
 msgid "The object-cache.php Drop-In has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: version
-#: includes/src/Plugin.php:1272
-#: includes/src/Plugin.php:1286
+#: includes/src/Plugin.php:1283
+#: includes/src/Plugin.php:1297
 msgid "Version %s"
 msgstr ""
 
+#: includes/src/Plugin.php:1315
+msgid "Settings"
+msgstr ""
+
+#: includes/src/Plugin.php:1329
+msgid "Install Drop-In"
+msgstr ""
+
 #. translators: %s: php version
-#: includes/src/Plugin.php:1448
+#: includes/src/ReqAction.php:234
 msgid "This plugin requires PHP %s or greater."
 msgstr ""
 
-#: includes/src/Plugin.php:1477
+#: includes/src/ReqAction.php:241
+msgid "Option"
+msgstr ""
+
+#: includes/src/ReqAction.php:263
 msgid "Object cache was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:1489
+#: includes/src/ReqAction.php:275
 msgid "Cache log was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:1492
+#: includes/src/ReqAction.php:278
 msgid "Cache log could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:1495
+#: includes/src/ReqAction.php:281
 msgid "Cache file was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:1498
+#: includes/src/ReqAction.php:284
 msgid "Cache file could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:1501
+#: includes/src/ReqAction.php:287
 msgid "OPcache was flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:1505
+#: includes/src/ReqAction.php:291
 msgid "OPcache could not be flushed."
 msgstr ""
 
-#: includes/src/Plugin.php:1508
+#: includes/src/ReqAction.php:294
 msgid "Cronbot connected."
 msgstr ""
 
 #. translators: %s = error message
-#: includes/src/Plugin.php:1514
+#: includes/src/ReqAction.php:300
 msgid "Cronbot failed to connect%s"
 msgstr ""
 
-#: includes/src/Plugin.php:1518
+#: includes/src/ReqAction.php:304
 msgid "Cronbot disconnected."
 msgstr ""
 
-#: includes/src/Plugin.php:1521
+#: includes/src/ReqAction.php:307
 msgid "Cronbot failed to disconnect."
 msgstr ""
 
 #. translators: %1$s: cronbot endpoint, %2$s = error message
-#: includes/src/Plugin.php:1528
+#: includes/src/ReqAction.php:314
 msgid "Pong from %1$s: %2$s."
 msgstr ""
 
 #. translators: %s: cronbot endpoint
-#: includes/src/Plugin.php:1531
+#: includes/src/ReqAction.php:317
 msgid "Pong from %s : connected."
 msgstr ""
 
-#: includes/src/Plugin.php:1535
+#: includes/src/ReqAction.php:321
 msgid "Running cron successful."
 msgstr ""
 
 #. translators: %d = cron event
-#: includes/src/Plugin.php:1552
+#: includes/src/ReqAction.php:338
 msgid "Executed a total of %d cron events"
 msgstr ""
 
-#: includes/src/Plugin.php:1563
+#: includes/src/ReqAction.php:349
 msgid "Failed to run cron."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/Plugin.php:1567
+#: includes/src/ReqAction.php:353
 msgid "%s enabled."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/Plugin.php:1571
+#: includes/src/ReqAction.php:357
 msgid "%s disabled."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/Plugin.php:1575
+#: includes/src/ReqAction.php:361
 msgid "%s updated."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/Plugin.php:1579
+#: includes/src/ReqAction.php:365
 msgid "%s resets to default."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/Plugin.php:1583
-msgid "Failed to update %s."
+#: includes/src/ReqAction.php:369
+msgid "Failed to update option %s."
 msgstr ""
 
-#: includes/src/Plugin.php:1619
-msgid "Install Drop-In"
+#. translators: %s = option name
+#: includes/src/ReqAction.php:373
+msgid "Failed to execute the action request. Please try again."
 msgstr ""
 
 #: includes/src/View.php:401

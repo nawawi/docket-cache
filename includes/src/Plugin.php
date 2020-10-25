@@ -267,7 +267,7 @@ final class Plugin extends Bepart
              'log_enable' => $log_enable,
              'log_enable_text' => $status_code[$log_enable],
              'config_path' => $this->sanitize_rootpath($this->co()->path),
-             'write_config' => $yesno[is_writable($this->co()->path)],
+             'write_config' => $yesno[$this->co()->is_options_writable()],
              'wp_multisite' => $multisite_text,
              'wp_multinetlock' => $multinets_lock,
              'wp_multinetmain' => $yesno[is_main_network()],
@@ -532,6 +532,9 @@ final class Plugin extends Bepart
     {
         $this->co()->clear_part('cachestats');
         $this->cx()->delay();
+
+        delete_expired_transients(true);
+
         $ret = $this->cachedir_flush($this->cache_path, $cleanup);
         if (false === $ret) {
             $this->cx()->undelay();
@@ -599,44 +602,28 @@ final class Plugin extends Bepart
      */
     public function suspend_wp_options_autoload($status = null)
     {
+        if (version_compare($this->version(), '20.09.05', '>')) {
+            return false;
+        }
+
         if (!nwdcx_wpdb($wpdb)) {
             return false;
         }
 
-        if (null === $status) {
-            $status = $this->cf()->is_dctrue('WPOPTALOAD') ? true : false;
-        }
+        // 20201020: always false for compat. now handle by Filesystem::optimize_alloptions()
+        $status = false;
 
         $suspend_value = 'docketcache-no';
         $options_tbl = $wpdb->options;
 
         // check
-        $query = $wpdb->prepare("SELECT autoload FROM `{$options_tbl}` WHERE autoload='yes' OR autoload=%s ORDER BY option_id ASC LIMIT 1", $suspend_value);
+        $query = $wpdb->prepare("SELECT autoload FROM `{$options_tbl}` WHERE autoload=%s ORDER BY option_id ASC LIMIT 1", $suspend_value);
         $check = $wpdb->query($query);
-
         if ($check < 1) {
             return false;
         }
 
-        if ($status) {
-            $query = "SELECT autoload FROM `{$options_tbl}` WHERE autoload='yes' ORDER BY option_id ASC LIMIT 1";
-            $check = $wpdb->query($query);
-            if ($check < 1) {
-                return false;
-            }
-        } else {
-            $query = $wpdb->prepare("SELECT autoload FROM `{$options_tbl}` WHERE autoload=%s ORDER BY option_id ASC LIMIT 1", $suspend_value);
-            $check = $wpdb->query($query);
-            if ($check < 1) {
-                return false;
-            }
-        }
-
-        if ($status) {
-            $query = $wpdb->prepare("UPDATE `{$options_tbl}` SET autoload=%s WHERE autoload='yes' ORDER BY option_id ASC", $suspend_value);
-        } else {
-            $query = $wpdb->prepare("UPDATE `{$options_tbl}` SET autoload='yes' WHERE autoload=%s ORDER BY option_id ASC", $suspend_value);
-        }
+        $query = $wpdb->prepare("UPDATE `{$options_tbl}` SET autoload='yes' WHERE autoload=%s ORDER BY option_id ASC", $suspend_value);
 
         $suppress = $wpdb->suppress_errors(true);
         $result = $wpdb->query($query);
@@ -909,6 +896,29 @@ final class Plugin extends Bepart
             0
         );
 
+        add_action(
+            'plugin_loaded',
+            function () {
+                if (nwdcx_wpdb($wpdb)) {
+                    static $done = false;
+
+                    if (!$done) {
+                        $done = true;
+
+                        $suppress = $wpdb->suppress_errors(true);
+
+                        $ok = $wpdb->get_var('SELECT @@SESSION.SQL_BIG_SELECTS');
+                        if (empty($ok)) {
+                            $wpdb->query('SET SESSION SQL_BIG_SELECTS=1');
+                        }
+
+                        $wpdb->suppress_errors($suppress);
+                    }
+                }
+            },
+            -PHP_INT_MAX
+        );
+
         if ($this->cf()->is_dctrue('AUTOUPDATE')) {
             add_filter(
                 'auto_update_plugin',
@@ -934,37 +944,6 @@ final class Plugin extends Bepart
     }
 
     /**
-     * actions.
-     */
-    public function action_token()
-    {
-        $keys = [
-             'docket-enable-occache',
-             'docket-disable-occache',
-             'docket-flush-occache',
-             'docket-update-dropino',
-             'docket-flush-oclog',
-             'docket-flush-ocfile',
-             'docket-flush-opcache',
-             'docket-connect-cronbot',
-             'docket-disconnect-cronbot',
-             'docket-pong-cronbot',
-             'docket-runevent-cronbot',
-             'docket-runeventnow-cronbot',
-             'docket-selectsite-cronbot',
-         ];
-
-        foreach ($this->co()->keys() as $key) {
-            $keys[] = 'docket-default-'.$key;
-            $keys[] = 'docket-enable-'.$key;
-            $keys[] = 'docket-disable-'.$key;
-            $keys[] = 'docket-save-'.$key;
-        }
-
-        return $keys;
-    }
-
-    /**
      * action_query.
      */
     public function action_query($key, $args_extra = [])
@@ -986,7 +965,17 @@ final class Plugin extends Bepart
 
     public function our_screen()
     {
-        return substr(get_current_screen()->id, 0, \strlen($this->screen)) === $this->screen;
+        $current_screen = get_current_screen()->id;
+        if (substr($current_screen, 0, \strlen($this->screen)) === $this->screen) {
+            return true;
+        }
+
+        $subsplug = $this->slug.'_page_'.$this->slug.'-';
+        if (substr($current_screen, 0, \strlen($subsplug)) === $subsplug) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -1061,6 +1050,28 @@ final class Plugin extends Bepart
                     'data:image/svg+xml;base64,'.$icon,
                     $order
                 );
+
+                /*add_submenu_page(
+                    $this->slug,
+                    'Settings',
+                    'Settings',
+                    $cap,
+                    $this->slug,
+                    function () {
+                        ( new View($this) )->index();
+                    }
+                );
+
+                add_submenu_page(
+                    $this->slug,
+                    'Docket Cache',
+                    'Advanced',
+                    $cap,
+                    $this->slug.'-advanced',
+                    function () {
+                        ( new View($this) )->index();
+                    }
+                );*/
             }
         );
 
@@ -1159,7 +1170,7 @@ final class Plugin extends Bepart
                         'debug' => $is_debug ? 'true' : 'false',
                     ]
                 );
-                if ($hook === $this->screen) {
+                if ($hook === $this->screen || $this->our_screen()) {
                     wp_enqueue_style($this->slug.'-core', $plugin_url.'includes/admin/docket.css', null, $version);
                     wp_enqueue_script($this->slug.'-core', $plugin_url.'includes/admin/docket.js', ['jquery'], $version, true);
                 }
@@ -1292,307 +1303,6 @@ final class Plugin extends Bepart
             );
         }
 
-        add_action(
-            'load-'.$this->screen,
-            function () {
-                if (isset($_GET['_wpnonce'], $_GET['action'])) {
-                    $action = sanitize_text_field($_GET['action']);
-
-                    if (\in_array($action, $this->action_token())) {
-                        if (!wp_verify_nonce($_GET['_wpnonce'], $action)) {
-                            return;
-                        }
-                        if ('docket-flush-occache' === $action) {
-                            $message = $this->flush_cache() ? 'docket-occache-flushed' : 'docket-occache-flushed-failed';
-                        }
-
-                        switch ($action) {
-                            case 'docket-enable-occache':
-                                $result = $this->cx()->install(true);
-                                $message = $result ? 'docket-occache-enabled' : 'docket-occache-enabled-failed';
-                                do_action('docketcache/object-cache-enable', $result);
-                                break;
-
-                            case 'docket-disable-occache':
-                                $result = $this->cx()->uninstall();
-                                $message = $result ? 'docket-occache-disabled' : 'docket-occache-disabled-failed';
-                                do_action('docketcache/object-cache-disable', $result);
-                                break;
-
-                            case 'docket-update-dropino':
-                                $result = $this->cx()->install(true);
-                                $message = $result ? 'docket-dropino-updated' : 'docket-dropino-updated-failed';
-                                do_action('docketcache/object-cache-install', $result);
-                                break;
-
-                            case 'docket-flush-oclog':
-                                $result = $this->flush_log();
-                                $message = $result ? 'docket-log-flushed' : 'docket-log-flushed-failed';
-                                do_action('docketcache/flush-log', $result);
-                                break;
-
-                            case 'docket-flush-ocfile':
-                                $result = $this->flush_fcache();
-                                $message = $result ? 'docket-file-flushed' : 'docket-file-flushed-failed';
-                                do_action('docketcache/flush-fcache', $result);
-                                break;
-                            case 'docket-flush-opcache':
-                                $result = $this->flush_opcache();
-                                $message = $result ? 'docket-opcache-flushed' : 'docket-opcache-flushed-failed';
-                                do_action('docketcache/flush-opcache', $result);
-                                break;
-                            case 'docket-connect-cronbot':
-                                $result = apply_filters('docketcache/cronbot-active', true);
-                                $message = $result ? 'docket-cronbot-connect' : 'docket-cronbot-connect-failed';
-                                do_action('docketcache/connect-cronbot', $result);
-                                break;
-                            case 'docket-disconnect-cronbot':
-                                $result = apply_filters('docketcache/cronbot-active', false);
-                                $message = $result ? 'docket-cronbot-disconnect' : 'docket-cronbot-disconnect-failed';
-                                do_action('docketcache/disconnect-cronbot', $result);
-                                break;
-                            case 'docket-pong-cronbot':
-                                $result = apply_filters('docketcache/cronbot-pong', false);
-                                $message = 'docket-cronbot-pong';
-                                do_action('docketcache/pong-cronbot', $result);
-                                break;
-                            case 'docket-runevent-cronbot':
-                                $message = 'docket-cronbot-runevent-failed';
-                                $result = apply_filters('docketcache/cronbot-runevent', false);
-                                if (false !== $result) {
-                                    $this->co()->lookup_set('cronbotrun', $result);
-                                    $message = 'docket-cronbot-runevent';
-                                }
-
-                                do_action('docketcache/runevent-cronbot', $result);
-                                break;
-                            case 'docket-runeventnow-cronbot':
-                                $message = 'docket-cronbot-runevent-failed';
-                                $result = apply_filters('docketcache/cronbot-runevent', true);
-                                if (false !== $result) {
-                                    $this->co()->lookup_set('cronbotrun', $result);
-                                    $message = 'docket-cronbot-runevent';
-                                }
-
-                                do_action('docketcache/runeventnow-cronbot', $result);
-                                break;
-                            case 'docket-selectsite-cronbot':
-                                if (isset($_GET['nv'])) {
-                                    $nv = sanitize_text_field($_GET['nv']);
-                                    if (!is_numeric($nv)) {
-                                        break;
-                                    }
-
-                                    $this->set_cron_siteid($nv);
-
-                                    $message = 'docket-cronbot-selectsite';
-
-                                    $is_switch = $this->switch_cron_site();
-
-                                    @Crawler::fetch_admin(admin_url('/'));
-
-                                    if ($is_switch) {
-                                        restore_current_blog();
-                                    }
-                                }
-                                break;
-                        }
-
-                        $option_name = '';
-                        if (empty($message) && preg_match('@^docket-(default|enable|disable|save)-([a-z_]+)$@', $action, $mm)) {
-                            $nk = $mm[1];
-                            $nx = $mm[2];
-                            if (\in_array($nx, $this->co()->keys())) {
-                                $option_name = $nx;
-                                if ('save' === $nk && isset($_GET['nv'])) {
-                                    $nv = sanitize_text_field($_GET['nv']);
-                                    $message = $this->co()->save($nx, $nv) ? 'docket-option-save' : 'docket-option-failed';
-                                } else {
-                                    $okmsg = 'default' === $nk ? 'docket-option-default' : 'docket-option-'.$nk;
-                                    $message = $this->co()->save($nx, $nk) ? $okmsg : 'docket-option-failed';
-                                }
-                            }
-                        }
-
-                        if (!empty($message)) {
-                            $args = [
-                                'message' => $message,
-                            ];
-
-                            if (!empty($_GET['idx'])) {
-                                $args['idx'] = sanitize_text_field($_GET['idx']);
-
-                                if (!empty($_GET['quiet']) && 1 === (int) $_GET['quiet']) {
-                                    $args['message'] = '';
-                                }
-
-                                if (!empty($option_name)) {
-                                    $args['nx'] = $option_name;
-                                }
-                            }
-
-                            $query = add_query_arg($args, $this->page);
-                            wp_safe_redirect(network_admin_url($query));
-                            exit;
-                        }
-                    }
-                }
-            }
-        );
-
-        add_action(
-            'load-'.$this->screen,
-            function () {
-                if (version_compare(PHP_VERSION, $this->plugin_meta($this->file)['RequiresPHP'], '<')) {
-                    /* translators: %s: php version */
-                    add_settings_error(is_multisite() ? 'general' : '', $this->slug, sprintf(__('This plugin requires PHP %s or greater.', 'docket-cache'), $this->plugin_meta($this->file)['RequiresPHP']));
-                }
-
-                if (isset($_GET['message'])) {
-                    $token = sanitize_text_field($_GET['message']);
-                    $this->token = $token;
-
-                    $option_name = esc_html('Option');
-                    if (!empty($_GET['nx'])) {
-                        $nx = $this->co()->keys(sanitize_text_field($_GET['nx']));
-                        if (!empty($nx)) {
-                            $option_name = $nx;
-                        }
-                    }
-
-                    switch ($token) {
-                        case 'docket-occache-enabled':
-                            $message = esc_html__('Object cache enabled.', 'docket-cache');
-                            break;
-                        case 'docket-occache-enabled-failed':
-                            $error = esc_html__('Object cache could not be enabled.', 'docket-cache');
-                            break;
-                        case 'docket-occache-disabled':
-                            $message = esc_html__('Object cache disabled.', 'docket-cache');
-                            break;
-                        case 'docket-occache-disabled-failed':
-                            $error = esc_html__('Object cache could not be disabled.', 'docket-cache');
-                            break;
-                        case 'docket-occache-flushed':
-                            $message = esc_html__('Object cache was flushed.', 'docket-cache');
-                            break;
-                        case 'docket-occache-flushed-failed':
-                            $error = esc_html__('Object cache could not be flushed.', 'docket-cache');
-                            break;
-                        case 'docket-dropino-updated':
-                            $message = esc_html__('Updated object cache Drop-In and enabled Docket object cache.', 'docket-cache');
-                            break;
-                        case 'docket-dropino-updated-failed':
-                            $error = esc_html__('Object cache Drop-In could not be updated.', 'docket-cache');
-                            break;
-                        case 'docket-log-flushed':
-                            $message = esc_html__('Cache log was flushed.', 'docket-cache');
-                            break;
-                        case 'docket-log-flushed-failed':
-                            $error = esc_html__('Cache log could not be flushed.', 'docket-cache');
-                            break;
-                        case 'docket-file-flushed':
-                            $message = esc_html__('Cache file was flushed.', 'docket-cache');
-                            break;
-                        case 'docket-file-flushed-failed':
-                            $error = esc_html__('Cache file could not be flushed.', 'docket-cache');
-                            break;
-                        case 'docket-opcache-flushed':
-                            $message = esc_html__('OPcache was flushed.', 'docket-cache');
-                            $this->flush_opcache();
-                            break;
-                        case 'docket-opcache-flushed-failed':
-                            $error = esc_html__('OPcache could not be flushed.', 'docket-cache');
-                            break;
-                        case 'docket-cronbot-connect':
-                            $message = esc_html__('Cronbot connected.', 'docket-cache');
-                            break;
-                        case 'docket-cronbot-connect-failed':
-                            $msg = $this->co()->lookup_get('cronboterror', true);
-                            $errmsg = !empty($msg) ? ': '.$msg : '.';
-                            /* translators: %s = error message */
-                            $error = sprintf(esc_html__('Cronbot failed to connect%s', 'docket-cache'), $errmsg);
-                            unset($msg, $errmsg);
-                            break;
-                        case 'docket-cronbot-disconnect':
-                            $message = esc_html__('Cronbot disconnected.', 'docket-cache');
-                            break;
-                        case 'docket-cronbot-disconnect-failed':
-                            $error = esc_html__('Cronbot failed to disconnect.', 'docket-cache');
-                            break;
-                        case 'docket-cronbot-pong':
-                            $endpoint = parse_url($this->cronbot_endpoint, PHP_URL_HOST);
-                            $errmsg = $this->co()->lookup_get('cronboterror', true);
-                            if (!empty($errmsg)) {
-                                /* translators: %1$s: cronbot endpoint, %2$s = error message */
-                                $error = sprintf(esc_html__('Pong from %1$s: %2$s.', 'docket-cache'), $endpoint, $errmsg);
-                            } else {
-                                /* translators: %s: cronbot endpoint */
-                                $message = sprintf(esc_html__('Pong from %s : connected.', 'docket-cache'), $endpoint);
-                            }
-                            break;
-                        case 'docket-cronbot-runevent':
-                            $message = esc_html__('Running cron successful.', 'docket-cache');
-                            $msg = $this->co()->lookup_get('cronbotrun', true);
-                            if (!empty($msg) && \is_array($msg)) {
-                                $wmsg = '';
-                                if (!empty($msg['wpcron_msg'])) {
-                                    $wmsg = $msg['wpcron_msg'];
-                                }
-
-                                if ($msg['wpcron_return'] > 1 && !empty($wmsg)) {
-                                    $error = $message;
-                                }
-
-                                if (empty($error)) {
-                                    if (!empty($wmsg) && empty($msg['wpcron_event'])) {
-                                        $message = $wmsg;
-                                    } else {
-                                        /* translators: %d = cron event */
-                                        $message = sprintf(esc_html__('Executed a total of %d cron events', 'docket-cache'), $msg['wpcron_event']);
-                                    }
-                                }
-                            }
-                            unset($msg, $wmsg);
-
-                            break;
-                        case 'docket-cronbot-selectsite':
-                            $message = '';
-                            break;
-                        case 'docket-cronbot-runevent-failed':
-                            $error = esc_html__('Failed to run cron.', 'docket-cache');
-                            break;
-                        case 'docket-option-enable':
-                            /* translators: %s = option name */
-                            $message = sprintf(esc_html__('%s enabled.', 'docket-cache'), $option_name);
-                            break;
-                        case 'docket-option-disable':
-                            /* translators: %s = option name */
-                            $message = sprintf(esc_html__('%s disabled.', 'docket-cache'), $option_name);
-                            break;
-                        case 'docket-option-save':
-                            /* translators: %s = option name */
-                            $message = sprintf(esc_html__('%s updated.', 'docket-cache'), $option_name);
-                            break;
-                        case 'docket-option-default':
-                            /* translators: %s = option name */
-                            $message = sprintf(esc_html__('%s resets to default.', 'docket-cache'), $option_name);
-                            break;
-                        case 'docket-option-failed':
-                            /* translators: %s = option name */
-                            $error = sprintf(esc_html__('Failed to update %s.', 'docket-cache'), $option_name);
-                            break;
-                    }
-
-                    if (!empty($message) || !empty($error)) {
-                        $msg = !empty($message) ? $message : (!empty($error) ? $error : '');
-                        $type = !empty($message) ? 'updated' : 'error';
-                        add_settings_error(is_multisite() ? 'general' : '', $this->slug, $msg, $type);
-                    }
-                }
-            }
-        );
-
         $filter_name = sprintf('%splugin_action_links_%s', is_multisite() ? 'network_admin_' : '', $this->hook);
         add_filter(
             $filter_name,
@@ -1602,7 +1312,7 @@ final class Plugin extends Bepart
                     sprintf(
                         '<a href="%s">%s</a>',
                         network_admin_url($this->page),
-                        __('Overview', 'docket-cache')
+                        __('Settings', 'docket-cache')
                     )
                 );
 
@@ -1641,6 +1351,19 @@ final class Plugin extends Bepart
                     case 'wpoptaload':
                         $opt = 'enable' === $value ? true : false;
                         $this->suspend_wp_options_autoload($opt);
+
+                        add_action(
+                            'shutdown',
+                            function () {
+                                wp_cache_delete('alloptions', 'options');
+                                if (\function_exists('wp_cache_flush_group')) {
+                                    wp_cache_flush_group('options');
+                                    wp_cache_flush_group('docketcache-precache');
+                                }
+                            },
+                            PHP_INT_MAX
+                        );
+
                         break;
                     case 'cronoptmzdb':
                         $this->unregister_cronjob();
@@ -1677,6 +1400,7 @@ final class Plugin extends Bepart
                         function () {
                             wp_load_alloptions();
                             wp_count_comments(0);
+                            wp_count_posts();
                             @Crawler::fetch_home();
                         },
                         PHP_INT_MAX
@@ -1695,6 +1419,7 @@ final class Plugin extends Bepart
 
                         wp_load_alloptions();
                         wp_count_comments(0);
+                        wp_count_posts();
 
                         @Crawler::fetch_home();
 
@@ -1799,6 +1524,11 @@ final class Plugin extends Bepart
             },
             PHP_INT_MAX
         );
+
+        // page action
+        if (class_exists('Nawawi\\DocketCache\\ReqAction')) {
+            ( new ReqAction($this) )->register();
+        }
     }
 
     /**
@@ -1810,10 +1540,37 @@ final class Plugin extends Bepart
 
         if (class_exists('Nawawi\\DocketCache\\Tweaks')) {
             $tweaks = new Tweaks();
-            $tweaks->wpquery();
+
+            if ($this->cf()->is_dctrue('OPTWPQUERY')) {
+                $tweaks->wpquery();
+            }
 
             if ($this->cf()->is_dctrue('WOOTWEAKS')) {
                 $tweaks->woocommerce();
+            }
+
+            if ($this->cf()->is_dctrue('MISC_TWEAKS')) {
+                $tweaks->misc();
+            }
+
+            if ($this->cf()->is_dctrue('HEADERJUNK')) {
+                $tweaks->headerjunk();
+            }
+
+            if ($this->cf()->is_dctrue('PINGBACK')) {
+                $tweaks->pingback();
+            }
+
+            if ($this->cf()->is_dctrue('WPEMOJI')) {
+                $tweaks->wpemoji();
+            }
+
+            if ($this->cf()->is_dctrue('WPFEED')) {
+                $tweaks->wpfeed();
+            }
+
+            if ($this->cf()->is_dctrue('WPEMBED')) {
+                $tweaks->wpembed();
             }
 
             if ($this->cf()->is_dctrue('POSTMISSEDSCHEDULE')) {
@@ -1826,10 +1583,6 @@ final class Plugin extends Bepart
                         PHP_INT_MAX
                     );
                 }
-            }
-
-            if ($this->cf()->is_dctrue('MISC_TWEAKS')) {
-                $tweaks->misc();
             }
         }
 

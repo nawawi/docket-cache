@@ -126,42 +126,6 @@ if (!\function_exists('nwdcx_optget')) {
     }
 }
 
-if (!\function_exists('nwdcx_deltransdb')) {
-    function nwdcx_deltransdb()
-    {
-        if (!wp_using_ext_object_cache()) {
-            return false;
-        }
-
-        if (!nwdcx_wpdb($wpdb)) {
-            return false;
-        }
-
-        $suppress = $wpdb->suppress_errors(true);
-
-        // normal setup
-        $wpdb->query(
-            $wpdb->prepare('DELETE FROM `'.$wpdb->options.'` WHERE `option_name` LIKE %s', $wpdb->esc_like('_transient_').'%')
-        );
-
-        // single site
-        $wpdb->query(
-            $wpdb->prepare('DELETE FROM `'.$wpdb->options.'` WHERE `option_name` LIKE %s', $wpdb->esc_like('_site_transient_').'%')
-        );
-
-        // multisite
-        if (is_multisite() && isset($wpdb->sitemeta)) {
-            $wpdb->query(
-                $wpdb->prepare('DELETE FROM `'.$wpdb->sitemeta.'` WHERE `meta_key` LIKE %s', $wpdb->esc_like('_site_transient_').'%')
-            );
-        }
-
-        $wpdb->suppress_errors($suppress);
-
-        return true;
-    }
-}
-
 if (!\function_exists('nwdcx_constfx')) {
     function nwdcx_constfx($name, $is_strip = false)
     {
@@ -201,6 +165,15 @@ if (!\function_exists('nwdcx_constval')) {
         }
 
         return $value;
+    }
+}
+
+if (!\function_exists('nwdcx_consdef')) {
+    function nwdcx_consdef($name, $value)
+    {
+        $name = nwdcx_constfx($name);
+
+        return !\defined($name) && \define($name, $value);
     }
 }
 

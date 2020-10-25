@@ -79,6 +79,7 @@ class Bepart extends Filesystem
             'Name' => 'Plugin Name',
             'PluginURI' => 'Plugin URI',
             'Version' => 'Version',
+            'VerPrev' => 'VerPrev',
             'Description' => 'Description',
             'Author' => 'Author',
             'AuthorURI' => 'Author URI',

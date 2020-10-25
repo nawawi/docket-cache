@@ -306,7 +306,19 @@ final class Constans
         // optimize post query
         $this->maybe_define($this->px('OPTWPQUERY'), true);
 
-        // backwards-compatible
-        $this->maybe_define($this->px('COMMENT'), $this->dcvalue('SIGNATURE'));
+        // xmlrpc pingbacks
+        $this->maybe_define($this->px('PINGBACK'), true);
+
+        // header junk
+        $this->maybe_define($this->px('HEADERJUNK'), true);
+
+        // wp emoji
+        $this->maybe_define($this->px('WPEMOJI'), false);
+
+        // wp embed
+        $this->maybe_define($this->px('WPEMBED'), false);
+
+        // wp feed
+        $this->maybe_define($this->px('WPFEED'), false);
     }
 }

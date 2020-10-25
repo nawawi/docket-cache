@@ -868,6 +868,31 @@ class WP_Object_Cache
     }
 
     /**
+     * dc_remove_group.
+     */
+    public function dc_remove_group($group)
+    {
+        $match = $this->item_hash($group).'-';
+        if ($this->fs()->is_docketcachedir($this->cache_path)) {
+            foreach ($this->fs()->scanfiles($this->cache_path) as $object) {
+                $fx = $object->getPathName();
+                if (!$object->isFile() || 'file' !== $object->getType() || !$this->fs()->is_php($fx)) {
+                    continue;
+                }
+
+                $fn = $object->getFileName();
+                if ($match === substr($fn, 0, \strlen($match))) {
+                    $this->fs()->unlink($fx, false);
+                    $this->dc_log('flush', $this->get_item_hash($fx), $group.':*');
+                }
+            }
+        }
+        unset($this->cache[$group]);
+
+        return true;
+    }
+
+    /**
      * dc_get.
      */
     private function dc_get($key, $group, $is_raw = false)
@@ -1200,6 +1225,10 @@ class WP_Object_Cache
         $this->cache_path = $this->fs()->define_cache_path($this->cf()->dcvalue('PATH'));
         if ($this->multisite) {
             $this->cache_path = nnwdcx_network_dirpath($this->cache_path);
+        }
+
+        if ($this->cf()->is_dctrue('WPOPTALOAD')) {
+            $this->fs()->optimize_alloptions();
         }
 
         foreach (['added', 'updated', 'deleted'] as $prefix) {
@@ -1647,4 +1676,11 @@ function wp_cache_stats()
 {
     global $wp_object_cache;
     $wp_object_cache->stats();
+}
+
+function wp_cache_flush_group($group = 'default')
+{
+    global $wp_object_cache;
+
+    return $wp_object_cache->dc_remove_group($group);
 }
