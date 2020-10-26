@@ -1,6 +1,7 @@
 = v20.09.06 (2020-10-27)
 
 - Fixed Misc WooCommerce Tweaks, remove checking for woo class exist since we at the first sequence.
+- Fixed Precaching, strip query string, replace preg_replace with strtok.
 - Added Deactivate WooCommerce Admin, Widget, Dashboard Metabox to configuration page instead of bundling with misc tweaks.
 
 = v20.09.05 (2020-10-25)

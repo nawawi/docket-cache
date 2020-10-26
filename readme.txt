@@ -1,6 +1,6 @@
 === Docket Cache - Object Cache Accelerator ===
 Contributors: nawawijamili
-Tags: object cache, OPcache, fastcgi, cache, database, optimization, performance, redis, memcached, speed, multisite, server load, docket
+Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance, redis, memcached, speed, multisite, server load, docket
 Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
@@ -31,10 +31,11 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 - Advanced Post Caching
 - Object Cache Precaching
 - WordPress Translation Caching
-- WordPress Core Query Optimization
-- Term Count Queries Optimization
-- Post, Page, Comment Count Optimization
-- Database Tables Optimization
+- WordPress Core Query Optimisation
+- Term Count Queries Optimisation
+- Post, Page, Comment Count Optimisation
+- Database Tables Optimisation
+- WooCommerce Optimisation
 - WP Options Autoload suspension
 - Post Missed Schedule Tweaks
 - Object Cache + OPcache Stats
@@ -130,7 +131,7 @@ To use it in Windows OS, create RAM Disk and change [DOCKET_CACHE_PATH](https://
 By default, WordPress allocates the memory limit to 256 MB. Combined with MySQL and Web Server, you need more than 256 MB. If you're using a cheap hosting plan that allocates only 256 MB for totals usage. It is not enough, and Docket Cache can't improve your website performance.
 
 = What’s the difference with the other object cache plugins? =
-Docket Cache is an Object Cache Accelerator. It does some optimization of caching like cache post queries, comments counting, WordPress translation and more before storing the object caches.
+Docket Cache is an Object Cache Accelerator. It does some Optimisation of caching like cache post queries, comments counting, WordPress translation and more before storing the object caches.
 
 = Can I pair using it with other cache plugin? =
 Yes and No. You can pair using it with page caching plugin, but not with the object cache plugin.
@@ -147,6 +148,7 @@ Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docke
 Fix release.
 
 - Fixed Misc WooCommerce Tweaks, remove checking for woo class exist since we at the first sequence.
+- Fixed Precaching, strip query string, replace preg_replace with strtok.
 - Added Deactivate WooCommerce Admin, Widget, Dashboard Metabox to configuration page instead of bundling with misc tweaks.
 
 = 20.09.05 =
