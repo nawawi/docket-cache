@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Docket Cache plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 20.09.05\n"
+"Project-Id-Version: Docket Cache 20.09.06\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-10-25T01:47:32+00:00\n"
+"POT-Creation-Date: 2020-10-26T19:40:59+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -83,7 +83,7 @@ msgid "Configuration"
 msgstr ""
 
 #: includes/admin/config.php:21
-#: includes/src/Canopt.php:92
+#: includes/src/Canopt.php:95
 msgid "Cronbot Service"
 msgstr ""
 
@@ -110,7 +110,7 @@ msgid "WordPress Translation Caching"
 msgstr ""
 
 #: includes/admin/config.php:51
-#: includes/src/Canopt.php:96
+#: includes/src/Canopt.php:99
 msgid "Optimize WP Query"
 msgstr ""
 
@@ -120,7 +120,7 @@ msgid "Optimize Term Count Queries"
 msgstr ""
 
 #: includes/admin/config.php:63
-#: includes/src/Canopt.php:91
+#: includes/src/Canopt.php:94
 msgid "Optimize Database Tables"
 msgstr ""
 
@@ -147,7 +147,7 @@ msgid "Never"
 msgstr ""
 
 #: includes/admin/config.php:80
-#: includes/src/Canopt.php:90
+#: includes/src/Canopt.php:93
 msgid "Suspend WP Options Autoload"
 msgstr ""
 
@@ -167,51 +167,66 @@ msgid "Misc WooCommerce Tweaks"
 msgstr ""
 
 #: includes/admin/config.php:104
-#: includes/src/Canopt.php:97
-msgid "Remove XML-RPC / Pingbacks"
+#: includes/src/Canopt.php:89
+msgid "Deactivate WooCommerce Admin"
 msgstr ""
 
 #: includes/admin/config.php:110
-#: includes/src/Canopt.php:98
-msgid "Remove WP Header Junk"
+#: includes/src/Canopt.php:90
+msgid "Deactivate WooCommerce Widget"
 msgstr ""
 
 #: includes/admin/config.php:116
-#: includes/src/Canopt.php:99
-msgid "Remove WP Emoji"
+#: includes/src/Canopt.php:91
+msgid "Deactivate WooCommerce WP Dashboard"
 msgstr ""
 
 #: includes/admin/config.php:122
-#: includes/src/Canopt.php:101
-msgid "Remove WP Feed"
+#: includes/src/Canopt.php:100
+msgid "Remove XML-RPC / Pingbacks"
 msgstr ""
 
 #: includes/admin/config.php:128
-#: includes/src/Canopt.php:100
-msgid "Remove WP Embed"
+#: includes/src/Canopt.php:101
+msgid "Remove WP Header Junk"
 msgstr ""
 
 #: includes/admin/config.php:134
+#: includes/src/Canopt.php:102
+msgid "Remove WP Emoji"
+msgstr ""
+
+#: includes/admin/config.php:140
+#: includes/src/Canopt.php:104
+msgid "Remove WP Feed"
+msgstr ""
+
+#: includes/admin/config.php:146
+#: includes/src/Canopt.php:103
+msgid "Remove WP Embed"
+msgstr ""
+
+#: includes/admin/config.php:152
 #: includes/src/Canopt.php:81
 msgid "Admin Page Cache Preloading"
 msgstr ""
 
-#: includes/admin/config.php:140
-#: includes/src/Canopt.php:89
+#: includes/admin/config.php:158
+#: includes/src/Canopt.php:92
 msgid "Admin Page Loader"
 msgstr ""
 
-#: includes/admin/config.php:146
-#: includes/src/Canopt.php:93
+#: includes/admin/config.php:164
+#: includes/src/Canopt.php:96
 msgid "Object Cache Data Stats"
 msgstr ""
 
-#: includes/admin/config.php:152
-#: includes/src/Canopt.php:94
+#: includes/admin/config.php:170
+#: includes/src/Canopt.php:97
 msgid "Auto Update"
 msgstr ""
 
-#: includes/admin/config.php:158
+#: includes/admin/config.php:176
 msgid "Check Critical Version"
 msgstr ""
 
@@ -486,7 +501,7 @@ msgid "CHECK VERSION"
 msgstr ""
 
 #: includes/admin/resource.php:40
-msgid "The Check Critical Version allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid any error-prone."
+msgid "The Check Critical Version allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid error-prone."
 msgstr ""
 
 #: includes/admin/resource.php:44
@@ -517,7 +532,7 @@ msgstr ""
 msgid "Log Timestamp"
 msgstr ""
 
-#: includes/src/Canopt.php:95
+#: includes/src/Canopt.php:98
 msgid "Critical Version Checking"
 msgstr ""
 

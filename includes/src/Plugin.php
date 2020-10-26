@@ -1546,7 +1546,19 @@ final class Plugin extends Bepart
             }
 
             if ($this->cf()->is_dctrue('WOOTWEAKS')) {
-                $tweaks->woocommerce();
+                $tweaks->woocommerce_misc();
+            }
+
+            if ($this->cf()->is_dctrue('WOOADMINOFF')) {
+                $tweaks->woocommerce_admin_disabled();
+            }
+
+            if ($this->cf()->is_dctrue('WOOWPDASHBOARDOFF')) {
+                $tweaks->woocommerce_dashboard_status_remove();
+            }
+
+            if ($this->cf()->is_dctrue('WOOWIDGETOFF')) {
+                $tweaks->woocommerce_widget_remove();
             }
 
             if ($this->cf()->is_dctrue('MISC_TWEAKS')) {

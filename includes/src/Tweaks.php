@@ -116,6 +116,7 @@ final class Tweaks
         );
 
         add_filter('the_generator', '__return_empty_string', PHP_INT_MAX);
+        add_filter('x_redirect_by', '__return_false', PHP_INT_MAX);
 
         add_action(
             'after_setup_theme',
@@ -186,10 +187,65 @@ final class Tweaks
         add_filter('xmlrpc_enabled', '__return_false');
         add_filter('pre_update_option_enable_xmlrpc', '__return_false');
         add_filter('pre_option_enable_xmlrpc', '__return_zero');
+
+        // additional
+        add_filter('pings_open', '__return_false');
+        add_filter('pre_option_default_ping_status', '__return_zero');
+        add_filter('pre_option_default_pingback_flag', '__return_zero');
+        add_filter(
+            'xmlrpc_methods',
+            function ($methods) {
+                unset($methods['pingback.ping']);
+                unset($methods['pingback.extensions.getPingbacks']);
+                unset($methods['wp.getUsersBlogs']);
+                unset($methods['system.multicall']);
+                unset($methods['system.listMethods']);
+                unset($methods['system.getCapabilities']);
+                unset($methods['demo.sayHello']);
+
+                return $methods;
+            }
+        );
+
+        add_action(
+            'xmlrpc_call',
+            function ($method) {
+                if ('pingback.ping' !== $method) {
+                    return;
+                }
+                http_response_code(403);
+                exit('This site does not have pingback.');
+            }
+        );
+
+        add_filter(
+            'template_redirect',
+            function () {
+                header_remove('X-Pingback');
+            },
+            PHP_INT_MAX
+        );
+
+        add_filter(
+            'wp_headers',
+            function ($headers) {
+                unset($headers['X-Pingback']);
+
+                return $headers;
+            },
+            PHP_INT_MAX
+        );
+
         add_action(
             'plugins_loaded',
             function () {
                 if (isset($_SERVER['REQUEST_URI']) && '/xmlrpc.php' === $_SERVER['REQUEST_URI']) {
+                    http_response_code(403);
+                    exit('xmlrpc.php not available.');
+                }
+
+                // additional
+                if (isset($_SERVER['SCRIPT_FILENAME']) && 'xmlrpc.php' === basename($_SERVER['SCRIPT_FILENAME'])) {
                     http_response_code(403);
                     exit('xmlrpc.php not available.');
                 }
@@ -198,35 +254,20 @@ final class Tweaks
         );
     }
 
-    public function woocommerce()
+    public function woocommerce_misc()
     {
-        if (!class_exists('woocommerce')) {
-            return;
-        }
-        // wc: remove counts slowing down the dashboard
-        remove_filter('wp_count_comments', ['WC_Comments', 'wp_count_comments'], 10);
-
-        // wc: remove order count from admin menu
-        add_filter('woocommerce_include_processing_order_count_in_menu', '__return_false');
-
-        // wc: remove Processing Order Count in wp-admin
-        //add_filter('woocommerce_menu_order_count', '__return_false');
-
         // wc: action_scheduler_migration_dependencies_met
-        add_filter('action_scheduler_migration_dependencies_met', '__return_false');
+        add_filter('action_scheduler_migration_dependencies_met', '__return_false', PHP_INT_MAX);
 
         // wc: disable background image regeneration
-        add_filter('woocommerce_background_image_regeneration', '__return_false');
+        add_filter('woocommerce_background_image_regeneration', '__return_false', PHP_INT_MAX);
 
         // wc: remove marketplace suggestions
         // https://rudrastyh.com/woocommerce/remove-marketplace-suggestions.html
-        add_filter('woocommerce_allow_marketplace_suggestions', '__return_false');
+        add_filter('woocommerce_allow_marketplace_suggestions', '__return_false', PHP_INT_MAX);
 
         // wc: remove connect your store to WooCommerce.com admin notice
-        add_filter('woocommerce_helper_suppress_admin_notices', '__return_true');
-
-        // wc: disable the WooCommerce Admin
-        //add_filter('woocommerce_admin_disabled', '__return_true');
+        add_filter('woocommerce_helper_suppress_admin_notices', '__return_true', PHP_INT_MAX);
 
         // wc: disable the WooCommere Marketing Hub
         add_filter(
@@ -236,7 +277,54 @@ final class Tweaks
                 unset($features[$marketing]);
 
                 return $features;
-            }
+            },
+            PHP_INT_MAX
+        );
+        add_filter('woocommerce_marketing_menu_items', '__return_empty_array', PHP_INT_MAX);
+
+        // jetpack
+        add_filter('jetpack_just_in_time_msgs', '__return_false', PHP_INT_MAX);
+        add_filter('jetpack_show_promotions', '__return_false', PHP_INT_MAX);
+    }
+
+    public function woocommerce_admin_disabled()
+    {
+        // wc: disable the WooCommerce Admin
+        add_filter('woocommerce_admin_disabled', '__return_true', PHP_INT_MAX);
+    }
+
+    public function woocommerce_dashboard_status_remove()
+    {
+        add_action(
+            'wp_dashboard_setup',
+            function () {
+                remove_meta_box('woocommerce_dashboard_status', 'dashboard', 'normal');
+                remove_meta_box('woocommerce_dashboard_recent_reviews', 'dashboard', 'normal');
+                remove_meta_box('woocommerce_network_orders', 'dashboard', 'normal');
+            },
+            PHP_INT_MAX
+        );
+    }
+
+    public function woocommerce_widget_remove()
+    {
+        add_action(
+            'widgets_init',
+            function () {
+                unregister_widget('WC_Widget_Products');
+                unregister_widget('WC_Widget_Product_Categories');
+                unregister_widget('WC_Widget_Product_Tag_Cloud');
+                unregister_widget('WC_Widget_Cart');
+                unregister_widget('WC_Widget_Layered_Nav');
+                unregister_widget('WC_Widget_Layered_Nav_Filters');
+                unregister_widget('WC_Widget_Price_Filter');
+                unregister_widget('WC_Widget_Product_Search');
+                unregister_widget('WC_Widget_Recently_Viewed');
+                unregister_widget('WC_Widget_Recent_Reviews');
+                unregister_widget('WC_Widget_Top_Rated_Products');
+                unregister_widget('WC_Widget_Rating_Filter');
+            },
+            PHP_INT_MAX
         );
     }
 

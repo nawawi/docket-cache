@@ -260,6 +260,15 @@ final class Constans
         // woocommerce tweaks
         $this->maybe_define($this->px('WOOTWEAKS'), true);
 
+        // woocommerce admin
+        $this->maybe_define($this->px('WOOADMINOFF'), false);
+
+        // woocommerce dashboard status meta box
+        $this->maybe_define($this->px('WOOWPDASHBOARDOFF'), false);
+
+        // woocommerce widget
+        $this->maybe_define($this->px('WOOWIDGETOFF'), false);
+
         // post missed schedule
         $this->maybe_define($this->px('POSTMISSEDSCHEDULE'), false);
 

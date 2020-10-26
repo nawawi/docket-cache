@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname(dirname($vendorDir));
 
 return array(
+    'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
     'Nawawi\\DocketCache\\Bepart' => $baseDir . '/includes/src/Bepart.php',
     'Nawawi\\DocketCache\\Canopt' => $baseDir . '/includes/src/Canopt.php',
     'Nawawi\\DocketCache\\Command' => $baseDir . '/includes/src/Command.php',

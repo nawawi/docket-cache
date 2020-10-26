@@ -1,3 +1,8 @@
+= v20.09.06 (2020-10-27)
+
+- Fixed Misc WooCommerce Tweaks, remove checking for woo class exist since we at the first sequence.
+- Added Deactivate WooCommerce Admin, Widget, Dashboard Metabox to configuration page instead of bundling with misc tweaks.
+
 = v20.09.05 (2020-10-25)
 
 - Fixed Suspend WP Options Autoload. Use hook instead of change autoload value in the database. WordPress will treat all key as autoload if none has set to yes.

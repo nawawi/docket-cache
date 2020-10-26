@@ -1164,7 +1164,7 @@ class WP_Object_Cache
         }
 
         if ($dostrip) {
-            $req_uri = @preg_replace('@\?.*@', '', $req_uri);
+            $req_uri = strtok($req_uri, '?#');
         }
 
         if (empty($req_host) || empty($req_uri)) {

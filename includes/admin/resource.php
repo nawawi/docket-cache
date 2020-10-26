@@ -37,7 +37,7 @@ namespace Nawawi\DocketCache;
             <hr>
             <p>
                 <strong><?php esc_html_e('CHECK VERSION', 'docket-cache'); ?></strong><br class="break">
-                <?php esc_html_e('The Check Critical Version allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid any error-prone.', 'docket-cache'); ?>
+                <?php esc_html_e('The Check Critical Version allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid error-prone.', 'docket-cache'); ?>
             </p>
             <hr>
             <p>

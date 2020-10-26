@@ -1,6 +1,6 @@
 {
     "name": "nawawi/docket-cache",
-    "description": "A file-based persistent WordPress Object Cache stored as a plain PHP code.",
+    "description": "A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.",
     "keywords": [
         "object cache",
         "cache",

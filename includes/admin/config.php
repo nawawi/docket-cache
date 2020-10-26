@@ -95,9 +95,27 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr>
-                    <th class="border-b"><?php esc_html_e('Misc WooCommerce Tweaks', 'docket-cache'); ?></th>
+                    <th><?php esc_html_e('Misc WooCommerce Tweaks', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wootweaks'); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php esc_html_e('Deactivate WooCommerce Admin', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('wooadminoff'); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php esc_html_e('Deactivate WooCommerce Widget', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('woowidgetoff'); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="border-b"><?php esc_html_e('Deactivate WooCommerce WP Dashboard', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('woowpdashboardoff'); ?>
                     </td>
                 </tr>
                 <tr>

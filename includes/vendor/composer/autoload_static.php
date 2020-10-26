@@ -35,6 +35,7 @@ class ComposerStaticInit71169967e8f502f7da209e4236957996
     );
 
     public static $classMap = array (
+        'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Nawawi\\DocketCache\\Bepart' => __DIR__ . '/../../..' . '/includes/src/Bepart.php',
         'Nawawi\\DocketCache\\Canopt' => __DIR__ . '/../../..' . '/includes/src/Canopt.php',
         'Nawawi\\DocketCache\\Command' => __DIR__ . '/../../..' . '/includes/src/Command.php',
