@@ -1163,6 +1163,10 @@ class WP_Object_Cache
             $dostrip = false;
         }
 
+        if (!$dostrip && (isset($_GET['doing_wp_cron']) || isset($_GET['_fs_blog_admin']))) {
+            $dostrip = true;
+        }
+
         if ($dostrip) {
             $req_uri = strtok($req_uri, '?#');
         }

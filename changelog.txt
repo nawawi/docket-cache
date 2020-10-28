@@ -1,3 +1,9 @@
+= v20.09.07 (2020-10-28)
+
+- Fixed Deactivate WooCommerce Widget, prevent error notice _doing_it_wrong for the_widget.
+- Fixed Precaching, always strip query string doing_wp_cron.
+- Fixed nwdcx_network_multi function, replace with simple query to detect multinetwork condition.
+
 = v20.09.06 (2020-10-27)
 
 - Fixed Misc WooCommerce Tweaks, remove checking for woo class exist since we at the first sequence.

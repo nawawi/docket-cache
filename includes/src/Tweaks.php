@@ -254,6 +254,11 @@ final class Tweaks
         );
     }
 
+    private function has_woocommerce()
+    {
+        return isset($GLOBALS['woocommerce']) && \is_object($GLOBALS['woocommerce']);
+    }
+
     public function woocommerce_misc()
     {
         // wc: action_scheduler_migration_dependencies_met
@@ -298,6 +303,10 @@ final class Tweaks
         add_action(
             'wp_dashboard_setup',
             function () {
+                if (!$this->has_woocommerce()) {
+                    return;
+                }
+
                 remove_meta_box('woocommerce_dashboard_status', 'dashboard', 'normal');
                 remove_meta_box('woocommerce_dashboard_recent_reviews', 'dashboard', 'normal');
                 remove_meta_box('woocommerce_network_orders', 'dashboard', 'normal');
@@ -311,18 +320,33 @@ final class Tweaks
         add_action(
             'widgets_init',
             function () {
-                unregister_widget('WC_Widget_Products');
-                unregister_widget('WC_Widget_Product_Categories');
-                unregister_widget('WC_Widget_Product_Tag_Cloud');
-                unregister_widget('WC_Widget_Cart');
-                unregister_widget('WC_Widget_Layered_Nav');
-                unregister_widget('WC_Widget_Layered_Nav_Filters');
-                unregister_widget('WC_Widget_Price_Filter');
-                unregister_widget('WC_Widget_Product_Search');
-                unregister_widget('WC_Widget_Recently_Viewed');
-                unregister_widget('WC_Widget_Recent_Reviews');
-                unregister_widget('WC_Widget_Top_Rated_Products');
-                unregister_widget('WC_Widget_Rating_Filter');
+                if (!$this->has_woocommerce()) {
+                    return;
+                }
+
+                // includes/wc-widget-functions.php
+                $widgets = [
+                    'WC_Widget_Cart',
+                    'WC_Widget_Layered_Nav_Filters',
+                    'WC_Widget_Layered_Nav',
+                    'WC_Widget_Price_Filter',
+                    'WC_Widget_Product_Categories',
+                    'WC_Widget_Product_Search',
+                    'WC_Widget_Product_Tag_Cloud',
+                    'WC_Widget_Products',
+                    'WC_Widget_Recently_Viewed',
+                    'WC_Widget_Top_Rated_Products',
+                    'WC_Widget_Recent_Reviews',
+                    'WC_Widget_Rating_Filter',
+                ];
+                foreach ($widgets as $widget) {
+                    // remove
+                    unregister_widget($widget);
+
+                    // prevent error notice _doing_it_wrong
+                    // see wp-includes/widgets.php -> the_widget()
+                    register_widget($widget, null);
+                }
             },
             PHP_INT_MAX
         );

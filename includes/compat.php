@@ -217,8 +217,8 @@ if (!\function_exists('nwdcx_network_multi')) {
         $table = $wpdb->base_prefix.'site';
 
         $suppress = $wpdb->suppress_errors(true);
-        $query = "SELECT COUNT(id) as cnt FROM `{$table}` WHERE id > 0 ORDER BY id ASC LIMIT 1";
-        $check = $wpdb->get_var($query);
+        $query = "SELECT id FROM `{$table}` WHERE id > 0 ORDER BY id ASC LIMIT 2";
+        $check = $wpdb->query($query);
         $wpdb->suppress_errors($suppress);
         $ok = !empty($check) && $check > 1 ? true : false;
 

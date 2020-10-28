@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.09.06
+Stable tag: 20.09.07
 License: MIT
 License URI: ./license.txt
 
@@ -143,6 +143,14 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.09.07 =
+
+Fix release.
+
+- Fixed Deactivate WooCommerce Widget, prevent error notice _doing_it_wrong for the_widget.
+- Fixed Precaching, always strip query string doing_wp_cron.
+- Fixed nwdcx_network_multi function, replace with simple query to detect multinetwork condition.
+
 = 20.09.06 =
 
 Fix release.
