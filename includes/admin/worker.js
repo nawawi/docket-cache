@@ -41,6 +41,10 @@ function docket_cache_worker( name, config ) {
                             .html( response.cachestats.opcdc );
                         $selector.find( 'td#wpopcache-stats' )
                             .html( response.cachestats.opcwp );
+                        $selector.find( 'td#file-stats' )
+                            .html( response.cachestats.ofile );
+                        $selector.find( 'td#disk-stats' )
+                            .html( response.cachestats.odisk );
                     },
                     3000
                 );

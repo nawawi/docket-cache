@@ -161,13 +161,19 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr>
-                    <th class="border-b"><?php esc_html_e('Object Cache Data Stats', 'docket-cache'); ?></th>
+                    <th><?php esc_html_e('Object Cache Data Stats', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('stats'); ?>
                     </td>
                 </tr>
                 <tr>
-                    <th><?php esc_html_e('Auto Update', 'docket-cache'); ?></th>
+                    <th class="border-b"><?php esc_html_e('Garbage Collector Action Button', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('gcaction'); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php esc_html_e('Docket Cache Auto Update', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('autoupdate'); ?>
                     </td>

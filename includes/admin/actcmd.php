@@ -35,10 +35,27 @@ $opdisabled = 2 === $this->info->opcache_code || 0 === $this->info->opcache_code
         <p>
             <?php esc_html_e('Enable / Disable Drop-In usage.', 'docket-cache'); ?>
         </p>
+        <?php if ($this->info->dropin_isalt && !$this->info->dropin_wp_isexist) : ?>
+        <p class="text-red">
+            <?php esc_html_e('Drop-In Wrapper not available.', 'docket-cache'); ?>
+        </p>
+        <?php endif; ?>
+
         <?php if ($this->is_dropin_validate() && $this->is_dropin_multinet()) : ?>
         <a href="<?php echo $this->pt->action_query('disable-occache'); ?>" class="button button-primary button-large btx-spinner" <?php echo $ocdisabled; ?>><?php esc_html_e('Disable Object Cache', 'docket-cache'); ?></a>
         <?php else : ?>
         <a href="<?php echo $this->pt->action_query('enable-occache'); ?>" class="button button-secondary button-large btx-spinner" <?php echo $ocdisabled; ?>><?php esc_html_e('Enable Object Cache', 'docket-cache'); ?></a>
         <?php endif; ?>
+
+        <?php if ($this->vcf()->is_dctrue('GCACTION')) : ?>
+        <hr>
+
+        <h4><?php esc_html_e('Garbage Collector', 'docket-cache'); ?></h4>
+        <p>
+            <?php esc_html_e('Execute the Garbage Collector Task.', 'docket-cache'); ?>
+        </p>
+        <a href="<?php echo $this->pt->action_query('rungc'); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Run Garbage Collector', 'docket-cache'); ?></a>
+        <?php endif; ?>
+
     </div>
 </div>

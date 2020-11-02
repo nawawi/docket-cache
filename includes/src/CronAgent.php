@@ -227,7 +227,7 @@ final class CronAgent
             $value = wp_cache_get('doing_cron', 'transient', true);
         } else {
             if (nwdcx_wpdb($wpdb)) {
-                $row = $wpdb->get_row($wpdb->prepare('SELECT option_value FROM `{$wpdb->options}` WHERE option_name = %s LIMIT 1', '_transient_doing_cron'));
+                $row = $wpdb->get_row("SELECT `option_value` FROM `{$wpdb->options}` WHERE `option_name` = '_transient_doing_cron' LIMIT 1");
                 if (\is_object($row)) {
                     $value = $row->option_value;
                 }
@@ -267,24 +267,29 @@ final class CronAgent
         $doing_wp_cron = $doing_cron_transient;
 
         if ($this->is_pingpong) {
+            $doing_wp_cron = sprintf('%.22F', microtime(true));
             if (!empty($doing_cron_transient) && ((int) $doing_cron_transient + 60 > $gmt_time)) {
-                /*$results['wpcron_return'] = 1;
-                $results['wpcron_msg'] = 'Process locked, doing_cron not finish yet';
-                return $results;*/
-
                 // hijack current process
                 $results['wpcron_doing'] = 'Process locked, reset current lock';
+                $doing_wp_cron = $doing_wp_cron + 60;
             }
 
-            $doing_wp_cron = sprintf('%.22F', microtime(true));
             set_transient('doing_cron', $doing_wp_cron, 120);
         }
 
         $run_event = 0;
+        $slowdown = 0;
         foreach ($crons as $timestamp => $cronhooks) {
             if (false === $run_now && ($timestamp > $gmt_time)) {
                 continue;
             }
+
+            if ($slowdown > 10) {
+                $slowdown = 0;
+                usleep(200);
+            }
+
+            ++$slowdown;
 
             foreach ($cronhooks as $hook => $keys) {
                 if (!has_action($hook)) {

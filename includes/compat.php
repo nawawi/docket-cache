@@ -206,7 +206,7 @@ if (!\function_exists('nwdcx_network_multi')) {
 
         // this lock file should only exists if network more than 1
         // see Dropino::multinet_active
-        $lock_file = WP_CONTENT_DIR.'/.object-cache-network-multi.txt';
+        $lock_file = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-multi.txt';
         $timeout = time() + 86400;
         if (@is_file($lock_file) && @is_readable($lock_file) && $timeout > @filemtime($lock_file)) {
             $ok = !empty(@file_get_contents($lock_file)) ? true : false;
@@ -230,7 +230,7 @@ if (!\function_exists('nwdcx_network_ignore')) {
     function nwdcx_network_ignore()
     {
         if (nwdcx_network_multi()) {
-            if (!@is_file(WP_CONTENT_DIR.'/.object-cache-network-'.nwdcx_network_id().'.txt')) {
+            if (!@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-'.nwdcx_network_id().'.txt')) {
                 return true;
             }
 
@@ -268,7 +268,7 @@ if (!\function_exists('nwdcx_network_main')) {
             return true;
         }
 
-        $lock_file = WP_CONTENT_DIR.'/.object-cache-network-main.txt';
+        $lock_file = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-main.txt';
         $timeout = time() + 86400;
         if (@is_file($lock_file) && @is_readable($lock_file) && $timeout > @filemtime($lock_file)) {
             $data = @file_get_contents($lock_file);

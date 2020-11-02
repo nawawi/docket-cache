@@ -105,6 +105,13 @@ class WP_Object_Cache
     private $cache_maxsize = 5000000;
 
     /**
+     * The cache file lifespan.
+     *
+     * @var int
+     */
+    private $cache_maxttl = 0;
+
+    /**
      * List of filtered groups.
      *
      * @var array
@@ -668,10 +675,10 @@ class WP_Object_Cache
                 if ('site-transient' === $group && \in_array($key, ['update_plugins', 'update_themes', 'update_core'])) {
                     $expire = 2419200; // 28d
                 } else {
-                    $expire = 345600; // 4d
+                    $expire = 604800; // 7d
                 }
             } elseif (\in_array($group, ['post_meta', 'options'])) {
-                $expire = 172800; // 2d
+                $expire = 1209600; // 14d
             }
         }
 
@@ -911,9 +918,19 @@ class WP_Object_Cache
             return false;
         }
 
+        $is_timeout = false;
         if (!empty($data['timeout']) && $this->fs()->valid_timestamp($data['timeout']) && time() >= $data['timeout']) {
             $this->dc_log('exp', $this->get_item_hash($file), $group.':'.$key);
             $this->fs()->unlink($file, false);
+            $is_timeout = true;
+        }
+
+        if (!$is_timeout && !empty($this->cache_maxttl) && !empty($data['timestamp']) && $this->fs()->valid_timestamp($data['timestamp'])) {
+            $maxttl = time() - $this->cache_maxttl;
+            if ($data['timestamp'] < $maxttl) {
+                $this->dc_log('exp', $this->get_item_hash($file), $group.':'.$key);
+                $this->fs()->unlink($file, false);
+            }
         }
 
         if (!$this->skip_stats($group)) {
@@ -967,7 +984,7 @@ class WP_Object_Cache
             return false;
         }
 
-        if (!@wp_mkdir_p($this->cache_path)) {
+        if (!wp_mkdir_p($this->cache_path)) {
             return false;
         }
 
@@ -1063,6 +1080,7 @@ class WP_Object_Cache
         $keys = $this->get($hash, $group);
 
         if (!empty($keys) && \is_array($keys)) {
+            $slowdown = 0;
             foreach ($keys as $cache_group => $arr) {
                 foreach ($arr as $cache_key) {
                     // reduce our load
@@ -1073,6 +1091,13 @@ class WP_Object_Cache
                     if (false !== $this->get($cache_key, $cache_group)) {
                         $cached[$cache_key.$cache_group] = 1;
                     }
+
+                    if ($slowdown > 10) {
+                        $slowdown = 0;
+                        usleep(100);
+                    }
+
+                    ++$slowdown;
                 }
             }
         }
@@ -1090,30 +1115,8 @@ class WP_Object_Cache
         $group = 'docketcache-precache';
         $data = [];
 
-        // limit precache list to 10000
-        $cache_hash = $this->get('index', $group);
-        if (!empty($cache_hash) && \is_array($cache_hash)) {
-            if (\count($cache_hash) >= 10000) {
-                // flush first 500
-                $x = 0;
-                foreach ($cache_hash as $h) {
-                    if ($x > 500) {
-                        break;
-                    }
-
-                    $this->delete($h, $group);
-                    unset($cache_hash[$h]);
-                    ++$x;
-                }
-
-                if ($x > 0) {
-                    $this->set('index', $cache_hash, $group, 86400);
-                }
-            }
-        }
-
         foreach ($this->precache as $cache_group => $cache_keys) {
-            if ($cache_group === $group || 'docketcache-post' === substr($cache_group, 0, 16)) {
+            if ($cache_group === $group || 'docketcache-post' === substr($cache_group, 0, 16) || 'docketcache-mo' === substr($cache_group, 0, 14)) {
                 continue;
             }
 
@@ -1133,8 +1136,6 @@ class WP_Object_Cache
             }
 
             $this->set($hash, $data, $group, 86400); // 1d
-            $cache_hash[$hash] = 1;
-            $this->set('index', $cache_hash, $group, 86400);
         }
     }
 
@@ -1147,13 +1148,21 @@ class WP_Object_Cache
             return;
         }
 
+        $dostrip = !empty($_SERVER['QUERY_STRING']);
+        if ($dostrip && !empty($_GET) && !empty($_GET['_wpnonce']) || !empty($_GET['action']) || !empty($_GET['message']) || isset($_GET['doing_wp_cron']) || isset($_GET['_fs_blog_admin'])) {
+            return;
+        }
+
+        $req_uri = $_SERVER['REQUEST_URI'];
+        if (false !== strpos($req_uri, '/wp-json/')) {
+            return;
+        }
+
         $req_host = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
         if ('localhost' !== $req_host) {
             $req_host = nwdcx_fixhost($req_host);
         }
 
-        $req_uri = $_SERVER['REQUEST_URI'];
-        $dostrip = !empty($_SERVER['QUERY_STRING']);
         if ($dostrip && $this->is_user_logged_in() && false !== strpos($req_uri, '.php?') && false !== strpos($req_uri, '/wp-admin/') && @preg_match('@/wp-admin/(network/)?.*?\.php\?.*?@', $req_uri)) {
             $dostrip = false;
         }
@@ -1161,10 +1170,6 @@ class WP_Object_Cache
         // without pretty permalink
         if ($dostrip && !empty($_GET) && empty($_GET['s']) && empty($_GET['q']) && (false !== strpos($req_uri, '/?p=') || false !== strpos($req_uri, '/?cat=') || false !== strpos($req_uri, '/?m=') || false !== strpos($req_uri, '/?page_id=') || false !== strpos($req_uri, '/index.php/')) && !@nwdcx_optget('permalink_structure')) {
             $dostrip = false;
-        }
-
-        if (!$dostrip && (isset($_GET['doing_wp_cron']) || isset($_GET['_fs_blog_admin']))) {
-            $dostrip = true;
         }
 
         if ($dostrip) {
@@ -1199,6 +1204,17 @@ class WP_Object_Cache
                 if ($this->cache_maxsize > 10485760) {
                     $this->cache_maxsize = 10485760;
                 }
+            }
+        }
+
+        if ($this->cf()->is_dcint('MAXTTL', $dcvalue)) {
+            if (!empty($dcvalue)) {
+                if ($dcvalue < 86400) {
+                    $dcvalue = 345600;
+                } elseif ($dcvalue > 2419200) {
+                    $dcvalue = 2419200;
+                }
+                $this->cache_maxttl = $dcvalue;
             }
         }
 

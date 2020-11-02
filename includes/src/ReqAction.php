@@ -66,6 +66,7 @@ final class ReqAction
              'docket-runevent-cronbot',
              'docket-runeventnow-cronbot',
              'docket-selectsite-cronbot',
+             'docket-rungc',
          ];
 
         foreach ($this->pt->co()->keys() as $key) {
@@ -182,6 +183,14 @@ final class ReqAction
                             if ($is_switch) {
                                 restore_current_blog();
                             }
+                        }
+                        break;
+                    case 'docket-rungc':
+                        $message = 'docket-gcrun-failed';
+                        $result = apply_filters('docketcache/rungc', false);
+                        if (!empty($result) && \is_object($result)) {
+                            $this->pt->co()->lookup_set('gcrun', (array) $result);
+                            $message = 'docket-gcrun';
                         }
                         break;
                 }
@@ -342,11 +351,11 @@ final class ReqAction
                     unset($msg, $wmsg);
 
                     break;
-                case 'docket-cronbot-selectsite':
-                    $message = '';
-                    break;
                 case 'docket-cronbot-runevent-failed':
                     $error = esc_html__('Failed to run cron.', 'docket-cache');
+                    break;
+                case 'docket-cronbot-selectsite':
+                    $message = '';
                     break;
                 case 'docket-option-enable':
                     /* translators: %s = option name */
@@ -371,6 +380,20 @@ final class ReqAction
                 case 'docket-action-failed':
                     /* translators: %s = option name */
                     $error = esc_html__('Failed to execute the action request. Please try again.', 'docket-cache');
+                    break;
+                case 'docket-gcrun':
+                    $message = esc_html__('Running the garbage collector successful.', 'docket-cache');
+                    $msg = $this->pt->co()->lookup_get('gcrun', true);
+                    if (!empty($msg) && \is_array($msg)) {
+                        if ((int) $msg['clean'] > 0) {
+                            /* translators: %d = cache file */
+                            $message = sprintf(esc_html__('Removed total of %d files', 'docket-cache'), $msg['clean']);
+                        }
+                    }
+                    unset($msg, $wmsg);
+                    break;
+                case 'docket-gcrun-failed':
+                    $error = esc_html__('Failed to run the garbage collector.', 'docket-cache');
                     break;
             }
 

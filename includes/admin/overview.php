@@ -25,6 +25,9 @@ if ($this->pt->is_behind_proxy()) :
         $proxy_text = $this->pt->get_proxy_ip();
     endif;
 endif;
+
+$has_stats = $this->vcf()->is_dctrue('STATS');
+
 ?>
 <div class="section overview">
     <div class="flex-container">
@@ -134,9 +137,24 @@ endif;
                 </tr>
 
                 <tr>
-                    <th class="border-b"><?php esc_html_e('Drop-in File', 'docket-cache'); ?></th>
-                    <td><?php echo $this->info->dropin_path; ?></td>
+                    <th<?php echo !$this->info->dropin_isalt ? ' class="border-b"' : ''; ?>><?php esc_html_e('Drop-in File', 'docket-cache'); ?></th>
+                        <td><?php echo $this->info->dropin_path; ?></td>
                 </tr>
+
+                <?php if ($this->info->dropin_isalt) : ?>
+                <tr>
+                    <th><?php esc_html_e('Drop-in use Wrapper', 'docket-cache'); ?></th>
+                    <td><?php echo $this->info->dropin_alt; ?></td>
+                </tr>
+                <tr>
+                    <th><?php esc_html_e('Drop-in Wrapper Available', 'docket-cache'); ?></th>
+                    <td><?php echo $this->info->dropin_wp_exist; ?></td>
+                </tr>
+                <tr>
+                    <th class="border-b"><?php esc_html_e('Drop-in Wrapper File', 'docket-cache'); ?></th>
+                    <td><?php echo $this->info->dropin_wp; ?></td>
+                </tr>
+                <?php endif; ?>
 
                 <tr>
                     <th><?php esc_html_e('Cache Writable', 'docket-cache'); ?></th>
@@ -145,12 +163,12 @@ endif;
 
                 <tr>
                     <th><?php esc_html_e('Cache Files Limit', 'docket-cache'); ?></th>
-                    <td><?php echo $this->info->cache_maxfile; ?></td>
+                    <td id="file-stats"><?php echo $this->info->cache_file_stats; ?></td>
                 </tr>
 
                 <tr>
                     <th><?php esc_html_e('Cache Disk Limit', 'docket-cache'); ?></th>
-                    <td><?php echo $this->info->cache_maxsize_disk; ?></td>
+                    <td id="disk-stats"><?php echo $this->info->cache_disk_stats; ?></td>
                 </tr>
 
                 <tr>
@@ -176,6 +194,6 @@ endif;
     </div>
 </div>
 <?php
-if ($this->vcf()->is_dctrue('STATS')) :
+if ($has_stats) :
     echo $this->pt->code_worker('repeat_countcachesize');
 endif;

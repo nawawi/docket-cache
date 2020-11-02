@@ -179,7 +179,7 @@ final class Plugin extends Bepart
              case 1:
                  if ($this->cf()->is_dctrue('STATS')) {
                      /* translators: %1$s = size, %2$s number of file */
-                     $status_text_stats = sprintf(esc_html__(_n('%1$s size of %2$s file', '%1$s size of %2$s files', $cache_stats->files < 1 ? 1 : $cache_stats->files, 'docket-cache')), $this->normalize_size($cache_stats->size), $cache_stats->files);
+                     $status_text_stats = sprintf(esc_html__(_n('%1$s object of %2$s file', '%1$s object of %2$s files', $cache_stats->files < 1 ? 1 : $cache_stats->files, 'docket-cache')), $this->normalize_size($cache_stats->size), $cache_stats->files);
                  }
                  $status_text = $status_code[1];
                  break;
@@ -235,11 +235,33 @@ final class Plugin extends Bepart
             }
         }
 
-        $file_dropin = WP_CONTENT_DIR.'/object-cache.php';
+        $file_dropin = $this->cx()->resc()->dst;
         if (@is_file($file_dropin)) {
             $write_dropin = @is_writable($file_dropin);
         } else {
-            $write_dropin = @is_writable(WP_CONTENT_DIR.'/');
+            $write_dropin = @is_writable($this->cx()->condir.'/');
+        }
+
+        $file_dropin_wp = $this->cx()->resc()->wpdst;
+        $dropin_wp_exist = false;
+
+        $is_dropin_alternative = $this->cx()->is_alternative();
+        if ($is_dropin_alternative) {
+            $dropin_wp_exist = @is_file($file_dropin_wp) || @is_link($file_dropin_wp);
+        }
+
+        $file_max = $this->get_cache_maxfile();
+        $disk_max = $this->normalize_size($this->get_cache_maxsize_disk());
+
+        $file_stats = $file_max;
+        $disk_stats = $disk_max;
+
+        if (isset($cache_stats->files) && !empty($cache_stats->files)) {
+            $file_stats = $cache_stats->files.' / '.$file_max;
+        }
+
+        if (isset($cache_stats->filesize) && !empty($cache_stats->filesize)) {
+            $disk_stats = $this->normalize_size($cache_stats->filesize).' / '.$disk_max;
         }
 
         return [
@@ -256,12 +278,19 @@ final class Plugin extends Bepart
              'wp_max_memory_limit' => $this->normalize_size(WP_MAX_MEMORY_LIMIT),
              'write_dropin' => $yesno[$write_dropin],
              'dropin_path' => $this->sanitize_rootpath($file_dropin),
+             'dropin_isalt' => $is_dropin_alternative,
+             'dropin_alt' => $yesno[$is_dropin_alternative],
+             'dropin_wp' => $this->sanitize_rootpath($file_dropin_wp),
+             'dropin_wp_isexist' => $dropin_wp_exist,
+             'dropin_wp_exist' => $yesno[$dropin_wp_exist],
              'write_cache' => $yesno[is_writable($this->cache_path)],
              'cache_size' => $this->normalize_size($cache_stats->size),
              'cache_path_real' => $this->cache_path,
              'cache_path' => $this->sanitize_rootpath($this->cache_path),
-             'cache_maxfile' => $this->get_cache_maxfile(),
+             'cache_maxfile' => $file_max,
+             'cache_file_stats' => $file_stats,
              'cache_maxsize_disk' => $this->normalize_size($this->get_cache_maxsize_disk()),
+             'cache_disk_stats' => $disk_stats,
              'log_file_real' => $log_file,
              'log_file' => $this->sanitize_rootpath($log_file),
              'log_enable' => $log_enable,
@@ -907,7 +936,7 @@ final class Plugin extends Bepart
 
                         $suppress = $wpdb->suppress_errors(true);
 
-                        $ok = $wpdb->get_var('SELECT @@SESSION.SQL_BIG_SELECTS');
+                        $ok = $wpdb->get_var('SELECT @@SESSION.SQL_BIG_SELECTS LIMIT 1');
                         if (empty($ok)) {
                             $wpdb->query('SET SESSION SQL_BIG_SELECTS=1');
                         }
@@ -1158,7 +1187,7 @@ final class Plugin extends Bepart
             function ($hook) {
                 $is_debug = $this->cf()->is_true('WP_DEBUG');
                 $plugin_url = plugin_dir_url($this->file);
-                $version = str_replace('.', '', $this->version()).'xc'.($is_debug ? date('his') : date('d'));
+                $version = str_replace('.', '', $this->version()).'xd'.($is_debug ? date('his') : date('d'));
                 wp_enqueue_script($this->slug.'-worker', $plugin_url.'includes/admin/worker.js', ['jquery'], $version, false);
                 wp_localize_script(
                     $this->slug.'-worker',
@@ -1182,28 +1211,13 @@ final class Plugin extends Bepart
             }
         );
 
-        // refresh user_meta: before login
-        add_action(
-            'set_logged_in_cookie',
-            function ($logged_in_cookie, $expire, $expiration, $user_id, $scheme, $token) {
-                if ($this->cx()->validate()) {
-                    wp_cache_delete($user_id, 'user_meta');
-                }
-                $this->delete_cron_siteid($user_id);
-            },
-            PHP_INT_MAX,
-            6
-        );
-
         // refresh user_meta: after logout
         add_action(
             'wp_logout',
             function () {
                 $user = wp_get_current_user();
                 if (\is_object($user) && isset($user->ID)) {
-                    if ($this->cx()->validate()) {
-                        wp_cache_delete($user->ID, 'user_meta');
-                    }
+                    wp_cache_delete($user->ID, 'user_meta');
                     $this->delete_cron_siteid($user->ID);
                 }
             },
@@ -1254,6 +1268,9 @@ final class Plugin extends Bepart
                         $stats['opcs'] = $info->opcache_text_stats;
                         $stats['opcdc'] = $opcache_dc_stats;
                         $stats['opcwp'] = $opcache_wp_stats;
+
+                        $stats['ofile'] = $info->cache_file_stats;
+                        $stats['odisk'] = $info->cache_disk_stats;
 
                         $response['cachestats'] = $stats;
                         wp_send_json($response);

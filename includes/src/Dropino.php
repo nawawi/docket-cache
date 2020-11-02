@@ -15,26 +15,29 @@ namespace Nawawi\DocketCache;
 final class Dropino extends Bepart
 {
     private $path;
-    private $wpcondir;
+    public $wpcondir;
+    public $condir;
 
     public function __construct($path)
     {
         $this->path = $path;
         $this->wpcondir = \defined('WP_CONTENT_DIR') ? WP_CONTENT_DIR : ABSPATH.'wp-content';
+        $this->condir = \defined('DOCKET_CACHE_CONTENT_PATH') ? DOCKET_CACHE_CONTENT_PATH : WP_CONTENT_DIR;
     }
 
     /**
      * file.
      */
-    private function resc()
+    public function resc()
     {
         $dt = [];
         $dt['src'] = $this->path.'/includes/object-cache.php';
-        $dt['dst'] = $this->wpcondir.'/object-cache.php';
+        $dt['dst'] = $this->condir.'/object-cache.php';
+        $dt['wpdst'] = $this->wpcondir.'/object-cache.php';
 
         // sync with includes/object-cache.php
-        $dt['halt'] = $this->wpcondir.'/.object-cache-delay.txt';
-        $dt['after'] = $this->wpcondir.'/.object-cache-after-delay.txt';
+        $dt['halt'] = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-delay.txt';
+        $dt['after'] = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-after-delay.txt';
 
         return (object) $dt;
     }
@@ -44,7 +47,7 @@ final class Dropino extends Bepart
      */
     public function exists()
     {
-        return @is_file($this->wpcondir.'/object-cache.php');
+        return @is_file($this->resc()->dst);
     }
 
     /**
@@ -58,7 +61,7 @@ final class Dropino extends Bepart
             return $cache[$key];
         }
 
-        $cache['dropino'] = $this->plugin_meta($this->wpcondir.'/object-cache.php');
+        $cache['dropino'] = $this->plugin_meta($this->condir.'/object-cache.php');
         $cache['plugin'] = $this->plugin_meta($this->path.'/includes/object-cache.php');
 
         return $cache[$key];
@@ -233,7 +236,7 @@ final class Dropino extends Bepart
         }
 
         if (null !== $network_id) {
-            @file_put_contents($this->wpcondir.'/.object-cache-network-main.txt', $network_id, FILE_EX);
+            @file_put_contents(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-main.txt', $network_id, FILE_EX);
         }
 
         $wpdb->suppress_errors($suppress);
@@ -241,13 +244,13 @@ final class Dropino extends Bepart
 
     private function multinet_clear_main($cleanup = false)
     {
-        $file = $this->wpcondir.'/.object-cache-network-main.txt';
+        $file = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-main.txt';
         if (@is_file($file)) {
             @unlink($file);
         }
 
         if ($cleanup) {
-            $file = $this->wpcondir.'/.object-cache-network-multi.txt';
+            $file = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-multi.txt';
             if (@is_file($file)) {
                 @unlink($file);
             }
@@ -257,7 +260,7 @@ final class Dropino extends Bepart
     private function multinet_list()
     {
         $list = [];
-        $files = @glob($this->wpcondir.'/.object-cache-network-*.txt', GLOB_MARK | GLOB_NOSORT);
+        $files = @glob(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-*.txt', GLOB_MARK | GLOB_NOSORT);
         if (!empty($files) && \is_array($files)) {
             foreach ($files as $file) {
                 $fx = basename($file);
@@ -320,7 +323,7 @@ final class Dropino extends Bepart
     {
         $network_id = empty($network_id) ? get_current_network_id() : $network_id;
 
-        return sprintf('%s/.object-cache-network-%s.txt', $this->wpcondir, $network_id);
+        return sprintf('%s/.object-cache-network-%s.txt', DOCKET_CACHE_CONTENT_PATH, $network_id);
     }
 
     public function multinet_active($status = false, $network_id = false)
@@ -329,7 +332,7 @@ final class Dropino extends Bepart
             return false;
         }
 
-        $lock_file = $this->wpcondir.'/.object-cache-network-multi.txt';
+        $lock_file = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-multi.txt';
         if (!@is_file($lock_file)) {
             @file_put_contents($lock_file, 1);
         }
@@ -372,5 +375,14 @@ final class Dropino extends Bepart
         $file = $this->multinet_tag();
 
         return @is_file($file);
+    }
+
+    public function is_alternative()
+    {
+        if (0 === strcmp($this->wpcondir, $this->condir)) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -431,7 +431,7 @@ class Filesystem
      */
     public function define_cache_path($cache_path)
     {
-        $cache_path = !empty($cache_path) && @is_dir($cache_path) && '/' !== $cache_path ? rtrim($cache_path, '/\\').'/' : WP_CONTENT_DIR.'/cache/docket-cache/';
+        $cache_path = !empty($cache_path) && @is_dir($cache_path) && '/' !== $cache_path ? rtrim($cache_path, '/\\').'/' : DOCKET_CACHE_CONTENT_PATH.'/cache/docket-cache/';
         if (!$this->is_docketcachedir($cache_path)) {
             $cache_path = rtim($cache_path, '/').'docket-cache/';
         }
@@ -457,7 +457,7 @@ class Filesystem
             return true;
         }
 
-        $flush_lock = WP_CONTENT_DIR.'/.object-cache-flush.txt';
+        $flush_lock = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-flush.txt';
         if ($this->put($flush_lock, time())) {
             @touch($flush_lock, time() + 120);
         }
@@ -496,11 +496,12 @@ class Filesystem
             // hardmax
             $maxfile = 300000;
             $cnt = 0;
+            $slowdown = 0;
 
             foreach ($this->scanfiles($dir) as $object) {
                 $fx = $object->getPathName();
 
-                if (!$object->isFile() || 'file' !== $object->getType() || !$this->is_php($fx)) {
+                if (!$object->isFile() || 'file' !== $object->getType() || !$this->is_php($fx) || 'dump_' === substr($object->getFileName(), 0, 5)) {
                     continue;
                 }
 
@@ -517,15 +518,25 @@ class Filesystem
                 }
 
                 $data = $this->cache_get($object->getPathName());
-                if (false !== $data) {
-                    $bytestotal += \strlen(serialize($data));
-                    ++$filestotal;
+                if (false === $data) {
+                    $this->unlink($fx, true);
+                    continue;
                 }
+
+                $bytestotal += \strlen(serialize($data));
                 unset($data);
 
                 $fsizetotal += $fs;
 
+                ++$filestotal;
                 ++$cnt;
+
+                if ($slowdown > 10) {
+                    $slowdown = 0;
+                    usleep(450);
+                }
+
+                ++$slowdown;
             }
         }
 

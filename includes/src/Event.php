@@ -48,8 +48,8 @@ final class Event
                         'display' => esc_html__('Every 5 Minutes', 'docket-cache'),
                     ],
                     'docketcache_checkversion_schedule' => [
-                        'interval' => 3 * DAY_IN_SECONDS,
-                        'display' => esc_html__('Every 3 Days', 'docket-cache'),
+                        'interval' => 5 * DAY_IN_SECONDS,
+                        'display' => esc_html__('Every 5 Days', 'docket-cache'),
                     ],
                 ];
 
@@ -66,6 +66,17 @@ final class Event
                         wp_clear_scheduled_hook($hx);
                     }
                 }
+
+                // gc action
+                add_filter(
+                    'docketcache/rungc',
+                    function () {
+                        $results = $this->garbage_collector(true);
+
+                        return $results;
+                    },
+                    -10
+                );
 
                 // gc: always enable
                 add_action('docketcache_gc', [$this, 'garbage_collector']);
@@ -113,7 +124,7 @@ final class Event
 
                 // check version
                 if ($this->pt->cf()->is_dctrue('CHECKVERSION') && is_main_site() && is_main_network()) {
-                    // 06102020: reset to 2 days
+                    // 06102020: reset old schedule
                     $check = wp_get_scheduled_event('docketcache_checkversion');
                     if (\is_object($check) && 'docketcache_checkversion_schedule' !== $check->schedule) {
                         wp_clear_scheduled_hook('docketcache_checkversion');
@@ -171,24 +182,29 @@ final class Event
      */
     public function garbage_collector($is_filter = false)
     {
-        $maxfile = $this->pt->get_cache_maxfile();
-        $maxfile = $maxfile - 100;
+        $maxfileo = (int) $this->pt->get_cache_maxfile();
+        $maxfile = $maxfileo - 100;
 
-        $maxttl = $this->pt->get_cache_maxttl();
+        $maxttl = (int) $this->pt->get_cache_maxttl();
         if (!empty($maxttl)) {
             $maxttl = time() - $maxttl;
         }
 
-        $maxsizedisk = $this->pt->get_cache_maxsize_disk();
+        $chkmaxdisk = false;
+        $maxsizedisk = (int) $this->pt->get_cache_maxsize_disk();
         if (!empty($maxsizedisk)) {
             $maxsizedisk = $maxsizedisk - 1048576;
+
+            if ($maxsizedisk > 1048576) {
+                $chkmaxdisk = true;
+            }
         }
 
         $collect = (object) [
             'maxttl' => $maxttl,
             'maxttl_h' => date('Y-m-d H:i:s T', $maxttl),
             'maxttl_c' => 0,
-            'maxfile' => $maxfile,
+            'maxfile' => $maxfileo,
             'maxfile_c' => 0,
             'total' => 0,
             'clean' => 0,
@@ -206,8 +222,9 @@ final class Event
 
         if ($this->pt->is_docketcachedir($this->pt->cache_path)) {
             clearstatcache();
-            $bytestotal = 0;
+            $fsizetotal = 0;
             $cnt = 0;
+            $slowdown = 0;
             foreach ($this->pt->scanfiles($this->pt->cache_path) as $object) {
                 $fx = $object->getPathName();
 
@@ -223,19 +240,30 @@ final class Event
 
                 if ($fm >= $ft && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
                     $this->pt->unlink($fx, true);
-                    --$cnt;
                     ++$collect->clean;
                     continue;
                 }
 
-                $domaxttl = false;
+                if ($cnt >= $maxfile) {
+                    $this->pt->unlink($fx, true);
+
+                    ++$collect->clean;
+                    ++$collect->maxfile_c;
+                    continue;
+                }
+
+                $fsizetotal += $fs;
+                if ($chkmaxdisk && $fsizetotal > $maxsizedisk) {
+                    $this->pt->unlink($fx, true);
+                    ++$collect->clean;
+                    continue;
+                }
 
                 $data = $this->pt->cache_get($fx);
                 if (false !== $data) {
                     if (!empty($data['timeout']) && $this->pt->valid_timestamp($data['timeout']) && $fm >= (int) $data['timeout']) {
-                        $this->pt->unlink($fx, false);
+                        $this->pt->unlink($fx, true);
                         unset($data);
-                        --$cnt;
                         ++$collect->clean;
                         ++$collect->expired;
                         continue;
@@ -243,45 +271,32 @@ final class Event
 
                     if (empty($data['timeout']) && !empty($data['timestamp']) && $this->pt->valid_timestamp($data['timestamp']) && $maxttl > 0) {
                         if ((int) $data['timestamp'] < $maxttl) {
-                            $this->pt->unlink($fx, false);
+                            $this->pt->unlink($fx, true);
                             unset($data);
-                            --$cnt;
                             ++$collect->clean;
                             ++$collect->maxttl_c;
-
-                            $domaxttl = true;
                             continue;
                         }
-                    }
-
-                    $bytestotal += \strlen(serialize($data));
-                    if ((int) $maxsizedisk > 1048576 && $bytestotal > $maxsizedisk) {
-                        $this->pt->unlink($fx, false);
-                        unset($data);
-                        --$cnt;
-                        ++$collect->clean;
                     }
                 }
                 unset($data);
 
-                if (!$domaxttl && $maxttl > 0 && $ft < $maxttl) {
+                if ($maxttl > 0 && $ft < $maxttl) {
                     $this->pt->unlink($fx, true);
-                    --$cnt;
                     ++$collect->clean;
                     ++$collect->maxttl_c;
                     continue;
                 }
 
-                if ($cnt >= $maxfile) {
-                    $this->pt->unlink($fx, true);
-                    --$cnt;
-                    ++$collect->clean;
-                    ++$collect->maxfile_c;
-                    continue;
-                }
-
                 ++$cnt;
                 ++$collect->total;
+
+                if ($slowdown > 10) {
+                    $slowdown = 0;
+                    usleep(450);
+                }
+
+                ++$slowdown;
             }
         }
 

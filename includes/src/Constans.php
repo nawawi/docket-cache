@@ -140,12 +140,13 @@ final class Constans
         // compat
         $this->maybe_define('WP_CONTENT_DIR', ABSPATH.'wp-content', false);
         $this->maybe_define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins', false);
+        $this->maybe_define('DOCKET_CACHE_CONTENT_PATH', WP_CONTENT_DIR, false);
 
         // data dir
-        $this->maybe_define($this->px('DATA_PATH'), WP_CONTENT_DIR.'/docket-cache-data/', false);
+        $this->maybe_define($this->px('DATA_PATH'), DOCKET_CACHE_CONTENT_PATH.'/docket-cache-data/', false);
 
         // cache dir
-        $this->maybe_define($this->px('PATH'), WP_CONTENT_DIR.'/cache/docket-cache/', false);
+        $this->maybe_define($this->px('PATH'), DOCKET_CACHE_CONTENT_PATH.'/cache/docket-cache/', false);
 
         // cache file max size: 3MB, 1MB = 1048576 bytes (binary) = 1000000 bytes (decimal)
         // Only numbers between 1000000 and 10485760 are accepted
@@ -168,7 +169,7 @@ final class Constans
         $this->maybe_define($this->px('LOG_ALL'), (\defined('WP_DEBUG') ? WP_DEBUG : false));
 
         // log file
-        $this->maybe_define($this->px('LOG_FILE'), WP_CONTENT_DIR.'/.object-cache.log');
+        $this->maybe_define($this->px('LOG_FILE'), DOCKET_CACHE_CONTENT_PATH.'/.object-cache.log');
 
         // empty file when cache flushed
         $this->maybe_define($this->px('LOG_FLUSH'), true);
@@ -305,6 +306,9 @@ final class Constans
 
         // cache stats
         $this->maybe_define($this->px('STATS'), true);
+
+        // gc action button
+        $this->maybe_define($this->px('GCACTION'), false);
 
         // check version
         $this->maybe_define($this->px('CHECKVERSION'), true);

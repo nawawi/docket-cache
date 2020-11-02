@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.09.07
+Stable tag: 20.10.01
 License: MIT
 License URI: ./license.txt
 
@@ -16,7 +16,7 @@ The Docket cache is a persistent WordPress Object Cache that is stored as a plai
 
 Rather than using [serialize](https://www.php.net/manual/en/function.serialize.php) and [unserialize](https://www.php.net/manual/en/function.unserialize.php) a PHP object to store into flat files, this plugin stores data by converting the object into plain PHP code which results in faster data retrieval and better performance with Zend OPcache enabled.
 
-Kindly refer to the WordPress documentation on [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
+Kindly refer to the documentation on [Caching In WordPress](https://docs.docketcache.com/resources/caching-in-wordpress).
 
 == Why use this plugin? ==
 When it comes to reliable persistent Object Cache in WordPress, [Redis](https://redis.io/) or [Memcached](https://memcached.org/) comes on top. However, those solutions require knowledge of server and rarely available at low cost or shared hosting servers.
@@ -143,6 +143,18 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.10.01 =
+
+This is Major Release based on previous releases.
+
+- Improved precaching.
+- Improved cache stats.
+- Improved garbage collector.
+- Improved disk I/O and CPU usage.
+- Added new constant DOCKET_CACHE_CONTENT_PATH.
+
+Thank you for using docket cache.
+
 = 20.09.07 =
 
 Fix release.

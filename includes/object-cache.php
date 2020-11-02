@@ -3,7 +3,7 @@
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
  * Plugin URI:          https://wordpress.org/plugins/docket-cache/
- * Version:             20.09.07
+ * Version:             20.10.01
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * Author:              Nawawi Jamili
  * Author URI:          https://docketcache.com
@@ -52,6 +52,13 @@ if (!\defined('WP_PLUGIN_DIR')) {
 }
 
 /*
+ * Determine if DOCKET_CACHE_CONTENT_PATH is exists.
+ */
+if (!\defined('DOCKET_CACHE_CONTENT_PATH')) {
+    \define('DOCKET_CACHE_CONTENT_PATH', WP_CONTENT_DIR);
+}
+
+/*
  * Determine if docket object cache class and functions exists.
  */
 if (!@is_file(WP_PLUGIN_DIR.'/docket-cache/includes/cache.php')) {
@@ -76,9 +83,9 @@ if (!class_exists('Nawawi\\DocketCache\\Plugin') || !class_exists('Nawawi\\Docke
 /*
  * Check if doing flush.
  */
-if (@is_file(WP_CONTENT_DIR.'/.object-cache-flush.txt')) {
-    if (time() > @filemtime(WP_CONTENT_DIR.'/.object-cache-flush.txt')) {
-        @unlink(WP_CONTENT_DIR.'/.object-cache-flush.txt');
+if (@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-flush.txt')) {
+    if (time() > @filemtime(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-flush.txt')) {
+        @unlink(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-flush.txt');
     }
 
     return;
@@ -94,12 +101,12 @@ if (\function_exists('nwdcx_network_ignore') && nwdcx_network_ignore()) {
 /*
  * Check for object-cache-delay.txt file.
  */
-if (@is_file(WP_CONTENT_DIR.'/.object-cache-delay.txt')) {
+if (@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-delay.txt')) {
     if (!\function_exists('add_action')) {
         return;
     }
 
-    if (time() > @filemtime(WP_CONTENT_DIR.'/.object-cache-delay.txt')) {
+    if (time() > @filemtime(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-delay.txt')) {
         if (!\function_exists('nwdcx_halttransient')) {
             // prevent from transient save to db before replace with our dropin
             function nwdcx_halttransient($value, $option, $old_value = '')
@@ -197,7 +204,7 @@ if (@is_file(WP_CONTENT_DIR.'/.object-cache-delay.txt')) {
         add_action(
             'shutdown',
             function () {
-                @rename(WP_CONTENT_DIR.'/.object-cache-delay.txt', WP_CONTENT_DIR.'/.object-cache-after-delay.txt');
+                @rename(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-delay.txt', DOCKET_CACHE_CONTENT_PATH.'/.object-cache-after-delay.txt');
             },
             PHP_INT_MAX
         );

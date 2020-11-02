@@ -38,7 +38,7 @@ final class Canopt extends Bepart
                 $path = rtrim($path, '/').'/docket-cache-data';
             }
         } else {
-            $path = WP_CONTENT_DIR.'/docket-cache-data';
+            $path = DOCKET_CACHE_CONTENT_PATH.'/docket-cache-data';
         }
 
         if (is_multisite()) {
@@ -94,7 +94,8 @@ final class Canopt extends Bepart
             'cronoptmzdb' => esc_html__('Optimize Database Tables', 'docket-cache'),
             'cronbot' => esc_html__('Cronbot Service', 'docket-cache'),
             'stats' => esc_html__('Object Cache Data Stats', 'docket-cache'),
-            'autoupdate' => esc_html__('Auto Update', 'docket-cache'),
+            'gcaction' => esc_html__('Garbage Collector Action Button', 'docket-cache'),
+            'autoupdate' => esc_html__('Docket Cache Auto Update', 'docket-cache'),
             'checkversion' => esc_html__('Critical Version Checking', 'docket-cache'),
             'optwpquery' => esc_html__('Optimize WP Query', 'docket-cache'),
             'pingback' => esc_html__('Remove XML-RPC / Pingbacks', 'docket-cache'),
