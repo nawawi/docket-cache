@@ -116,7 +116,7 @@ if (!\function_exists('nwdcx_optget')) {
 
         $suppress = $wpdb->suppress_errors(true);
 
-        $query = $wpdb->prepare('SELECT `option_value` `'.$wpdb->options.'` WHERE `option_name`=%s ORDER BY option_id ASC LIMIT 1', $key);
+        $query = $wpdb->prepare('SELECT option_value FROM `'.$wpdb->options.'` WHERE option_name=%s ORDER BY option_id ASC LIMIT 1', $key);
         $option = $wpdb->get_var($query);
         $cache[$key] = !empty($option) ? nwdcx_unserialize($option) : false;
 

@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/ghostbirdme/5usd
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.10.01
+Stable tag: 20.10.03
 License: MIT
 License URI: ./license.txt
 
@@ -143,6 +143,16 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.10.03 =
+
+- Fixed nwdcx_optget() -> missing sql syntax.
+
+Thanks to Mark Barnes (@mark8barnes) for reporting this issue.
+
+= 20.10.02 =
+
+- Fixed output buffering issue with page caching.
+
 = 20.10.01 =
 
 This is Major Release based on previous releases.

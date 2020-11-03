@@ -119,7 +119,7 @@ final class Tweaks
         add_filter('x_redirect_by', '__return_false', PHP_INT_MAX);
 
         // only if has page caching
-        if (\defined('WP_CACHE') && WP_CACHE) {
+        /*if (\defined('WP_CACHE') && WP_CACHE) {
             add_action(
                 'after_setup_theme',
                 function () {
@@ -153,7 +153,7 @@ final class Tweaks
                 },
                 PHP_INT_MAX
             );
-        }
+        }*/
     }
 
     public function pingback()
