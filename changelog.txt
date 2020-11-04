@@ -2,6 +2,8 @@
 
 - Fixed nwdcx_optget() -> missing sql syntax.
 
+Thanks to Mark Barnes (@mark8barnes) for reporting this issue.
+
 = v20.10.02 (2020-11-03)
 
 - Fixed output buffering issue with page caching.
