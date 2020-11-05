@@ -9,37 +9,11 @@ The Docket cache is a persistent WordPress Object Cache that is stored as a plai
 
 Rather than using [serialize](https://www.php.net/manual/en/function.serialize.php) and [unserialize](https://www.php.net/manual/en/function.unserialize.php) a PHP object to store into flat files, this plugin stores data by converting the object into plain PHP code which results in faster data retrieval and better performance with Zend OPcache enabled.
 
-Kindly refer to the WordPress documentation on [Object Cache](https://make.wordpress.org/hosting/handbook/handbook/performance/#object-cache).
+Kindly refer to https://wordpress.org/plugins/docket-cache for full-length description.
 
-## Why use this plugin?
-When it comes to reliable persistent Object Cache in WordPress, [Redis](https://redis.io/) or [Memcached](https://memcached.org/) comes on top. However, those solutions require knowledge of server and rarely available at low cost or shared hosting servers
+## Documentation
 
-The only solution is to store the object caches into files. With WordPress, exporting the PHP objects are not easy, most plugin that implements file-based solution will serialize and unserialize the object to store and retrieve the data.
-
-The Docket Cache is better because it converts the object cache into plain PHP code. This solution is faster since WordPress can use the cache directly without running other operation.
-
-## Installation
-
-To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
-
-Please refer to [Installation](https://docs.docketcache.com/installation) documentation for details.
-
-## Configuration Options
-
-The Docket Cache uses constants variable as main configuration methods.
-
-To adjust the plugin behavior, please refer to [Configuration](https://docs.docketcache.com/configuration) documentation for details.
-
-
-## WP-CLI Commands
-
-You can manage this plugin through command line when activated.
-
-To use the WP-CLI commands, please refer to [WP-CLI](https://docs.docketcache.com/wp-cli) documentation for available commands.
-
-## Screenshots
-![Overview](./.wordpress.org/screenshot-1.png) Plugin Overview.
-
+To adjust the plugin behaviour, installation or manage through a command line, please refer to the https://docs.docketcache.com for details.
 
 ## How Versions Work
 
