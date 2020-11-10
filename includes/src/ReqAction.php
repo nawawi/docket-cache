@@ -187,7 +187,7 @@ final class ReqAction
                         break;
                     case 'docket-rungc':
                         $message = 'docket-gcrun-failed';
-                        $result = apply_filters('docketcache/rungc', false);
+                        $result = apply_filters('docketcache/garbage-collector', true);
                         if (!empty($result) && \is_object($result)) {
                             $this->pt->co()->lookup_set('gcrun', (array) $result);
                             $message = 'docket-gcrun';
@@ -384,10 +384,10 @@ final class ReqAction
                 case 'docket-gcrun':
                     $message = esc_html__('Running the garbage collector successful.', 'docket-cache');
                     $msg = $this->pt->co()->lookup_get('gcrun', true);
-                    if (!empty($msg) && \is_array($msg)) {
-                        if ((int) $msg['clean'] > 0) {
+                    if (!empty($msg) && \is_array($msg) && !empty($msg['cache_cleanup'])) {
+                        if ((int) $msg['cache_cleanup'] > 0) {
                             /* translators: %d = cache file */
-                            $message = sprintf(esc_html__('Removed total of %d files', 'docket-cache'), $msg['clean']);
+                            $message = sprintf(esc_html__('Cleanup total of %d cache files', 'docket-cache'), $msg['cache_cleanup']);
                         }
                     }
                     unset($msg, $wmsg);

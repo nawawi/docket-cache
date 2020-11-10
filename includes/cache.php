@@ -669,16 +669,17 @@ class WP_Object_Cache
         }
 
         $expire = $this->fs()->sanitize_second($expire);
+        $maxttl = $this->cache_maxttl;
 
-        if (0 === $expire) {
+        if (0 === $expire && $maxttl < 2419200) {
             if (\in_array($group, ['site-transient', 'transient'])) {
                 if ('site-transient' === $group && \in_array($key, ['update_plugins', 'update_themes', 'update_core'])) {
-                    $expire = 2419200; // 28d
+                    $expire = $maxttl < 2419200 ? 2419200 : $maxttl; // 28d
                 } else {
-                    $expire = 604800; // 7d
+                    $expire = $maxttl < 604800 ? 604800 : $maxttl; // 7d
                 }
-            } elseif (\in_array($group, ['post_meta', 'options'])) {
-                $expire = 1209600; // 14d
+            } elseif (\in_array($group, ['terms', 'posts', 'post_meta', 'options', 'site-options', 'comments'])) {
+                $expire = $maxttl < 1209600 ? 1209600 : $maxttl; // 14d
             }
         }
 
@@ -751,7 +752,7 @@ class WP_Object_Cache
             return false;
         }
 
-        if (!$doserialize && $data_p === $data) {
+        if (!$doserialize && (('string' === $data_type && 0 === strcmp($data_p, $data)) || $data_p === $data)) {
             return true;
         }
 
@@ -925,6 +926,7 @@ class WP_Object_Cache
             $is_timeout = true;
         }
 
+        // incase gc not run
         if (!$is_timeout && !empty($this->cache_maxttl) && !empty($data['timestamp']) && $this->fs()->valid_timestamp($data['timestamp'])) {
             $maxttl = time() - $this->cache_maxttl;
             if ($data['timestamp'] < $maxttl) {
@@ -994,6 +996,7 @@ class WP_Object_Cache
 
         $file = $this->get_file_path($cache_key, $group);
 
+        // jangan gatai tangan usik.
         $timeout = ($expire > 0 ? time() + $expire : 0);
 
         $type = \gettype($data);
@@ -1014,8 +1017,11 @@ class WP_Object_Cache
             }
         }
 
+        // since timeout set to timestamp.
         if (0 === $expire && !empty($key) && @is_file($file) && $this->is_data_uptodate($key, $group, $data)) {
-            $this->dc_log('info', $group.':'.$cache_key, __FUNCTION__.'()->nochanges');
+            if ($this->cf()->is_dctrue('DEV')) {
+                $this->dc_log('info', $group.':'.$cache_key, __FUNCTION__.'()->nochanges');
+            }
 
             return false;
         }
@@ -1025,6 +1031,7 @@ class WP_Object_Cache
 
         if ($this->multisite) {
             // try to avoid error-prone
+            // in rare condition, get_current_network_id not exists.
             try {
                 $meta['network_id'] = get_current_network_id();
             } catch (\Exception $e) {
@@ -1040,8 +1047,13 @@ class WP_Object_Cache
         $meta['data'] = $data;
 
         if (true === $this->dc_code($file, $meta)) {
+            // if 0 let gc handle it by comparing file mtime.
             if ($timeout > 0) {
                 @touch($file, $timeout);
+            }
+
+            if ($this->cf()->is_dctrue('DEV')) {
+                $this->dc_log('info', $group.':'.$cache_key, __FUNCTION__.'()->todisk');
             }
 
             return true;
@@ -1130,7 +1142,9 @@ class WP_Object_Cache
 
         if (!empty($data)) {
             if ($this->is_data_uptodate($hash, $group, $data)) {
-                $this->dc_log('info', $group.':'.$hash, __FUNCTION__.'()->nochanges');
+                if ($this->cf()->is_dctrue('DEV')) {
+                    $this->dc_log('info', $group.':'.$hash, __FUNCTION__.'()->nochanges');
+                }
 
                 return;
             }
@@ -1149,7 +1163,7 @@ class WP_Object_Cache
         }
 
         $dostrip = !empty($_SERVER['QUERY_STRING']);
-        if ($dostrip && !empty($_GET) && !empty($_GET['_wpnonce']) || !empty($_GET['action']) || !empty($_GET['message']) || isset($_GET['doing_wp_cron']) || isset($_GET['_fs_blog_admin'])) {
+        if ($dostrip && !empty($_GET) && isset($_GET['docketcache_ping']) || isset($_GET['doing_wp_cron']) || isset($_GET['_fs_blog_admin']) || !empty($_GET['_wpnonce']) || !empty($_GET['action']) || !empty($_GET['message'])) {
             return;
         }
 
@@ -1209,12 +1223,7 @@ class WP_Object_Cache
 
         if ($this->cf()->is_dcint('MAXTTL', $dcvalue)) {
             if (!empty($dcvalue)) {
-                if ($dcvalue < 86400) {
-                    $dcvalue = 345600;
-                } elseif ($dcvalue > 2419200) {
-                    $dcvalue = 2419200;
-                }
-                $this->cache_maxttl = $dcvalue;
+                $this->cache_maxttl = $this->fs()->sanitize_maxttl($dcvalue);
             }
         }
 
@@ -1250,6 +1259,18 @@ class WP_Object_Cache
         if ($this->cf()->is_dctrue('WPOPTALOAD')) {
             $this->fs()->optimize_alloptions();
         }
+
+        add_filter(
+            'pre_cache_alloptions',
+            function ($alloptions) {
+                if (isset($alloptions['cron'])) {
+                    unset($alloptions['cron']);
+                }
+
+                return $alloptions;
+            },
+            PHP_INT_MAX
+        );
 
         foreach (['added', 'updated', 'deleted'] as $prefix) {
             add_action(
@@ -1297,22 +1318,6 @@ class WP_Object_Cache
                 2
             );
         }
-
-        // cron
-        add_filter(
-            'pre_clear_scheduled_hook',
-            function ($a, $hook, $args) {
-                add_action(
-                    'shutdown',
-                    function () {
-                        $this->delete('alloptions', 'options');
-                    },
-                    PHP_INT_MAX - 1
-                );
-            },
-            PHP_INT_MAX,
-            3
-        );
 
         // filtered groups hooks
         if (\is_array($this->filtered_groups)) {

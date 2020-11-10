@@ -1,11 +1,11 @@
 === Docket Cache - Object Cache Accelerator ===
 Contributors: nawawijamili
 Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance, redis, memcached, speed, multisite, server load, docket
-Donate link: https://www.paypal.me/ghostbirdme/5usd
+Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.10.03
+Stable tag: 20.10.04
 License: MIT
 License URI: ./license.txt
 
@@ -64,7 +64,6 @@ To use the WP-CLI commands, please refer to [WP-CLI](https://docs.docketcache.co
 - [Report issues](https://github.com/nawawi/docket-cache/issues)
 - [Changelog](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt)
 - [Documentation](https://docs.docketcache.com)
-- [Sponsorship](https://docketcache.com/sponsorship)
 
 == Installation ==
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
@@ -143,6 +142,15 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.10.04 =
+
+- Improved CronAgent.
+- Improved CLI.
+- Improved disk I/O and CPU usage.
+- Optimized WP Alloptions.
+
+Thank you for using docket cache.
+
 = 20.10.03 =
 
 - Fixed nwdcx_optget() -> missing sql syntax.
@@ -173,90 +181,6 @@ Fix release.
 - Fixed Precaching, always strip query string doing_wp_cron.
 - Fixed nwdcx_network_multi function, replace with simple query to detect multinetwork condition.
 
-= 20.09.06 =
-
-Fix release.
-
-- Fixed Misc WooCommerce Tweaks, remove checking for woo class exist since we at the first sequence.
-- Fixed Precaching, strip query string, replace preg_replace with strtok.
-- Added Deactivate WooCommerce Admin, Widget, Dashboard Metabox to configuration page instead of bundling with misc tweaks.
-
-= 20.09.05 =
-
-Enhance and Fix release.
-
-- Fixed Suspend WP Options Autoload. Use hook instead of change autoload value in the database. WordPress will treat all key as autoload if none has set to yes.
-- Fixed Drop-in after delay. Remove transient from database if expiry not set and already expired.
-- Added Remove XML-RPC / Pingbacks, WP Header Junk into the configuration instead of bundling with Misc Performance Tweaks.
-- Added Remove WP Emoji, WP Feed, WP Embed options.
-- Added ReqAction class to handle action.
-- Added wp_cache_flush_group.
-- Added try to set SQL_BIG_SELECTS=1 for shared hosting.
-
-= 20.09.04 =
-
-Enhance and Fix release.
-
-- Fixed OPcache Stats, invalid calculation for cache files.
-- Fixed Cronbot, run scheduled event in multisite.
-- Added Optimize WP Query option at configuration page.
-- Added the Check Critical Version description to comply with WordPress policy.
-
-= 20.09.03 =
-
-New features and fix release.
-
-- Added Multi-Network for Multisite.
-- Added Object OPcache, WP OPcache stats.
-- Added lookup_* methods to handle our temp internal data.
-- Added locking file to suspend cache addition when doing flush.
-- Fixed replace update_user_meta with lookup function to makes query-monitor happy.
-- Fixed Admin interface, loading spinner should not display when no action.
-- Fixed CronAgent::run_wpcron(), reset doing_cron if locked.
-- Fixed CronAgent::run_wpcron(), halt if run reach maximum CRONBOT_MAX for site in multisite.
-
-= 20.09.02 =
-
-Enhance and Fix release.
-
-- Cron event, docketcache_optimizedb and docketcache_checkversion only run on main site if multisite.
-- Cron event, checkversion change to every 3 days to avoid excessive process.
-- Cronbot, change Test Ping to use it own action, to avoid conflict with connect/disconnect action.
-- Cronbot, max to 5 sites if multisite, define DOCKET_CACHE_CRONBOT_MAX to change it.
-- CronAgent::send_action, allow capture error if second argument set to pong.
-- Canopt::keys, added description for each key.
-- Cleanup admin interface.
-
-Thanks.
-
-= 20.09.01 =
-
-This is Major Release based on previous releases.
-
-- Improved admin interface structure.
-- Improved admin menu using top-level instead of submenu from settings.
-- Improved Cronbot to support multisite.
-- Added Actions pane at overview page to flush cache/OPcache and enable/disable object cache.
-- Added Auto update options at configuration page.
-- Added Cron event checkversion to check for critical update, define DOCKET_CACHE_CHECKVERSION constant to false to disable it.
-- Fixed CronAgent issue with doing_cron locked on multisite.
-- Fixed Cron event missing watchproc hook on unregister.
-
-Please do "Flush Cache" after/before installing this update. Thanks.
-
-= 20.08.18 =
-
-This is an enhanced version based on previous fix releases.
-
-- Fixed Cache Log -> change to native file_put_contents instead of put() to avoid early unlock result to truncate.
-- Fixed Filesystem::put() -> add blocking option to avoid early unlock.
-- Fixed dc_save() -> invalid conditional for is_data_updated().
-- Fixed skip_stats() -> add checking for ignored groups.
-- Fixed unlink -> add checking is_file to avoid php warning and make query-monitor happy.
-- Fixed Canopt::setlock() -> set file permission if write true.
-- Added DOCKET_CACHE_IGNORED_PRECACHE constant to exclude group:key from precaching.
-- Added DOCKET_CACHE_IGNORED_GROUPKEY constant to exclude group:key from persistent cache.
-- Added CLI command "unlock" to clear all lock files.
 
 
 Kindly refer to [changelog.txt](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt) for previous changes.

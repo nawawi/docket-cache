@@ -418,17 +418,8 @@ final class Plugin extends Bepart
     public function get_cache_maxfile()
     {
         $maxfile = $this->cf()->dcvalue('MAXFILE');
-        if (empty($maxfile) || !\is_int($maxfile)) {
-            $maxfile = 5000;
-        }
 
-        if ($maxfile < 200) {
-            $maxfile = 5000;
-        } elseif ($maxfile > 200000) {
-            $maxfile = 200000;
-        }
-
-        return $maxfile;
+        return $this->sanitize_maxfile($maxfile);
     }
 
     /**
@@ -437,19 +428,8 @@ final class Plugin extends Bepart
     public function get_cache_maxttl()
     {
         $maxttl = $this->cf()->dcvalue('MAXTTL');
-        $maxttl = $this->sanitize_second($maxttl);
 
-        // 86400 = 1d
-        // 172800 = 2d
-        // 345600 = 4d
-        // 2419200 = 28d
-        if ($maxttl < 86400) {
-            $maxttl = 345600;
-        } elseif ($maxttl > 2419200) {
-            $maxttl = 2419200;
-        }
-
-        return $maxttl;
+        return $this->sanitize_maxttl($maxttl);
     }
 
     /**
@@ -458,6 +438,7 @@ final class Plugin extends Bepart
     public function get_cache_maxsize_disk()
     {
         $maxsizedisk = $this->cf()->dcvalue('MAXSIZE_DISK');
+
         if (empty($maxsizedisk) || !\is_int($maxsizedisk)) {
             $maxsizedisk = 524288000; // 500MB
         }

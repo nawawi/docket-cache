@@ -213,28 +213,22 @@ class Command extends WP_CLI_Command
             $this->halt_error(__('Garbage collector not available.', 'docket-cache'));
         }
 
-        $is_debug = \defined('WP_DEBUG') && WP_DEBUG;
-        $pad = $is_debug ? 25 : 10;
+        WP_CLI::line(__('Executing garbage collector. Please wait..', 'docket-cache'));
+
+        $pad = 35;
         $collect = apply_filters('docketcache/garbage-collector', true);
-        $header = [
-            'maxttl' => 'MaxTTL Seconds',
-            'maxttl_h' => 'MaxTTL Human',
-            'maxttl_c' => 'MaxTTL Cleaned',
-            'maxfile' => 'MaxFiles',
-            'maxfile_c' => 'MaxFiles Cleaned',
-            'total' => 'Totals',
-            'clean' => 'Cleaned',
-            'expired' => 'Expired',
-            'ignore' => 'Ignored',
-        ];
-        foreach ($collect as $n => $v) {
-            if (!$is_debug && 'max' === substr($n, 0, 3)) {
-                continue;
-            }
-            $n = $this->title($header[$n], $pad);
-            WP_CLI::line($n.$v);
-        }
-        $this->halt_success(__('Executing garbage collector.', 'docket-cache'));
+
+        WP_CLI::line($this->title(__('Cache MaxTTL', 'docket-cache'), $pad).$collect->cache_maxttl);
+        WP_CLI::line($this->title(__('Cache File Limit', 'docket-cache'), $pad).$collect->cache_maxfile);
+        WP_CLI::line($this->title(__('Cache Disk Limit', 'docket-cache'), $pad).$this->pt->normalize_size($collect->cache_maxdisk));
+        WP_CLI::line($this->title(__('Cleanup Cache MaxTTL', 'docket-cache'), $pad).$collect->cleanup_maxttl);
+        WP_CLI::line($this->title(__('Cleanup Cache File Limit', 'docket-cache'), $pad).$collect->cleanup_maxfile);
+        WP_CLI::line($this->title(__('Cleanup Cache Disk Limit', 'docket-cache'), $pad).$collect->cleanup_maxdisk);
+        WP_CLI::line($this->title(__('Total Cache Cleanup', 'docket-cache'), $pad).$collect->cache_cleanup);
+        WP_CLI::line($this->title(__('Total Cache Ignored', 'docket-cache'), $pad).$collect->cache_ignore);
+        WP_CLI::line($this->title(__('Total Cache File', 'docket-cache'), $pad).$collect->cache_file);
+
+        $this->halt_success(__('Executing garbage collector completed.', 'docket-cache'));
     }
 
     /**
@@ -251,6 +245,6 @@ class Command extends WP_CLI_Command
      */
     public function type()
     {
-        $this->halt_status($this->pt->slug);
+        $this->halt_status($this->pt->slug.' (v'.$this->pt->version().')');
     }
 }

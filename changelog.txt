@@ -1,3 +1,10 @@
+= 20.10.04 (2020-11-11)
+
+- Improved CronAgent.
+- Improved CLI.
+- Improved disk I/O and CPU usage.
+- Optimized WP Alloptions.
+
 = 20.10.03 (2020-11-03)
 
 - Fixed nwdcx_optget() -> missing sql syntax.

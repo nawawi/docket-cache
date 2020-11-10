@@ -494,7 +494,7 @@ class Filesystem
 
         if ($this->is_docketcachedir($dir)) {
             // hardmax
-            $maxfile = 300000;
+            $maxfile = 999000; // 1000000 - 1000;
             $cnt = 0;
             $slowdown = 0;
 
@@ -533,7 +533,7 @@ class Filesystem
 
                 if ($slowdown > 10) {
                     $slowdown = 0;
-                    usleep(450);
+                    usleep(1000);
                 }
 
                 ++$slowdown;
@@ -566,6 +566,7 @@ class Filesystem
         $data = [];
 
         // include when we can read, try to avoid fatal error.
+        // LOCK_SH = shared lock
         if (flock($handle, LOCK_SH)) {
             try {
                 $data = @include $file;
@@ -702,6 +703,46 @@ class Filesystem
         }
 
         return $time;
+    }
+
+    /**
+     * sanitize_maxttl.
+     */
+    public function sanitize_maxttl($seconds)
+    {
+        $seconds = $this->sanitize_second($seconds);
+
+        // 86400 = 1d
+        // 345600 = 4d
+        // 2419200 = 28d
+        if ($seconds < 86400) {
+            $seconds = 345600;
+        } elseif ($seconds > 2419200) {
+            $seconds = 2419200;
+        }
+
+        return $seconds;
+    }
+
+    /**
+     * sanitize_maxfile.
+     */
+    public function sanitize_maxfile($maxfile)
+    {
+        $min = 200;
+        $max = 1000000;
+        $default = 50000;
+        if (empty($maxfile) || !\is_int($maxfile)) {
+            $maxfile = $default;
+        }
+
+        if ($maxfile < $min) {
+            $maxfile = $default;
+        } elseif ($maxfile > $max) {
+            $maxfile = $max;
+        }
+
+        return $maxfile;
     }
 
     /**

@@ -90,6 +90,12 @@ final class CronAgent
         return !empty($_POST['ping']) && !empty($_GET['docketcache_ping']) && !empty($_SERVER['REQUEST_URI']) && false !== strpos($_SERVER['REQUEST_URI'], '/?docketcache_ping=');
     }
 
+    private function maybe_disable_wp_cron()
+    {
+        // signal wp do not run wp-cron
+        $this->pt->cf()->maybe_define('DISABLE_WP_CRON', true);
+    }
+
     private function send_action($action, $is_hello = false)
     {
         $is_quick = $is_hello && 'pong' !== $is_hello ? true : false;
@@ -220,23 +226,6 @@ final class CronAgent
         $this->pt->close_exit(json_encode($response, JSON_UNESCAPED_SLASHES));
     }
 
-    private function get_wpcron_lock()
-    {
-        $value = 0;
-        if (wp_using_ext_object_cache()) {
-            $value = wp_cache_get('doing_cron', 'transient', true);
-        } else {
-            if (nwdcx_wpdb($wpdb)) {
-                $row = $wpdb->get_row("SELECT `option_value` FROM `{$wpdb->options}` WHERE `option_name` = '_transient_doing_cron' LIMIT 1");
-                if (\is_object($row)) {
-                    $value = $row->option_value;
-                }
-            }
-        }
-
-        return $value;
-    }
-
     private function run_wpcron($run_now = false)
     {
         $crons = $this->pt->get_crons($run_now, $cron_event);
@@ -263,22 +252,15 @@ final class CronAgent
         }
 
         $gmt_time = microtime(true);
-        $doing_cron_transient = get_transient('doing_cron');
-        $doing_wp_cron = $doing_cron_transient;
 
-        if ($this->is_pingpong) {
-            $doing_wp_cron = sprintf('%.22F', microtime(true));
-            if (!empty($doing_cron_transient) && ((int) $doing_cron_transient + 60 > $gmt_time)) {
-                // hijack current process
-                $results['wpcron_doing'] = 'Process locked, reset current lock';
-                $doing_wp_cron = $doing_wp_cron + 60;
-            }
-
-            set_transient('doing_cron', $doing_wp_cron, 120);
-        }
+        // overwrite cron lock
+        $doing_wp_cron = sprintf('%.22F', microtime(true));
+        set_transient('doing_cron', $doing_wp_cron, 86400);
 
         $run_event = 0;
         $slowdown = 0;
+        $delay = $this->is_pingpong ? 750 : 200;
+
         foreach ($crons as $timestamp => $cronhooks) {
             if (false === $run_now && ($timestamp > $gmt_time)) {
                 continue;
@@ -286,7 +268,8 @@ final class CronAgent
 
             if ($slowdown > 10) {
                 $slowdown = 0;
-                usleep(200);
+
+                usleep($delay);
             }
 
             ++$slowdown;
@@ -314,21 +297,17 @@ final class CronAgent
                         wp_clear_scheduled_hook($hook);
                         --$run_event;
                     }
-
-                    if ($this->is_pingpong && ($this->get_wpcron_lock() !== $doing_wp_cron)) {
-                        $results['wpcron_return'] = 2;
-                        $results['wpcron_msg'] = 'Timeout, another cron process stole the lock';
-                        $results['wpcron_event'] = $run_event;
-
-                        return $results;
-                    }
                 }
             }
         }
 
-        if ($this->is_pingpong && ($this->get_wpcron_lock() === $doing_wp_cron)) {
-            delete_transient('doing_cron');
-        }
+        unset($cronhooks);
+
+        // lock must below 10 minutes
+        // wp-includes/cron.php -> spawn_cron()
+        // wp-cron.php
+        $lock_wp_cron = microtime(true) + 300;
+        set_transient('doing_cron', $lock_wp_cron, 86400);
 
         $results['wpcron_return'] = 1;
         $results['wpcron_event'] = $run_event;
@@ -347,6 +326,9 @@ final class CronAgent
 
             return;
         }
+
+        // signal wp do not run wp-cron
+        $this->maybe_disable_wp_cron();
 
         $site_url = $this->pt->site_url();
 
@@ -484,6 +466,10 @@ final class CronAgent
                 $timestamp = strtotime('+90 minutes', strtotime($pingdata['timestamp']));
                 if ($timestamp > 0 && time() > $timestamp) {
                     $this->pt->co()->setlock('check_connection', time() + 300);
+
+                    // signal wp do not run wp-cron
+                    $this->maybe_disable_wp_cron();
+
                     $this->send_action('on', true);
                 }
             }

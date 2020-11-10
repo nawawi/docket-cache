@@ -252,6 +252,9 @@ final class Constans
                 'site-transient:update_themes',
                 'site-transient:update_plugins',
                 'site-transient:update_core',
+                'options:uninstall_plugins',
+                'options:active_plugins',
+                'options:cron',
             ]
         );
 

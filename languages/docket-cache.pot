@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Docket Cache plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 20.10.03\n"
+"Project-Id-Version: Docket Cache 20.10.04\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-11-03T14:23:09+00:00\n"
+"POT-Creation-Date: 2020-11-10T16:29:21+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -72,12 +72,12 @@ msgid "Drop-In Wrapper not available."
 msgstr ""
 
 #: includes/admin/actcmd.php:45
-#: includes/src/Plugin.php:1342
+#: includes/src/Plugin.php:1323
 msgid "Disable Object Cache"
 msgstr ""
 
 #: includes/admin/actcmd.php:47
-#: includes/src/Plugin.php:1338
+#: includes/src/Plugin.php:1319
 msgid "Enable Object Cache"
 msgstr ""
 
@@ -485,6 +485,7 @@ msgid "Cache Files Limit"
 msgstr ""
 
 #: includes/admin/overview.php:170
+#: includes/src/Command.php:223
 msgid "Cache Disk Limit"
 msgstr ""
 
@@ -632,8 +633,44 @@ msgstr ""
 msgid "Garbage collector not available."
 msgstr ""
 
-#: includes/src/Command.php:237
-msgid "Executing garbage collector."
+#: includes/src/Command.php:216
+msgid "Executing garbage collector. Please wait.."
+msgstr ""
+
+#: includes/src/Command.php:221
+msgid "Cache MaxTTL"
+msgstr ""
+
+#: includes/src/Command.php:222
+msgid "Cache File Limit"
+msgstr ""
+
+#: includes/src/Command.php:224
+msgid "Cleanup Cache MaxTTL"
+msgstr ""
+
+#: includes/src/Command.php:225
+msgid "Cleanup Cache File Limit"
+msgstr ""
+
+#: includes/src/Command.php:226
+msgid "Cleanup Cache Disk Limit"
+msgstr ""
+
+#: includes/src/Command.php:227
+msgid "Total Cache Cleanup"
+msgstr ""
+
+#: includes/src/Command.php:228
+msgid "Total Cache Ignored"
+msgstr ""
+
+#: includes/src/Command.php:229
+msgid "Total Cache File"
+msgstr ""
+
+#: includes/src/Command.php:231
+msgid "Executing garbage collector completed."
 msgstr ""
 
 #: includes/src/Event.php:40
@@ -804,30 +841,30 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:1165
+#: includes/src/Plugin.php:1146
 msgid "<strong>Docket Cache:</strong> The object-cache.php Drop-In is outdated. Please click \"Re-Install\" to update it now.<p style=\"padding:0;\"><a href=\"%s\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:1169
+#: includes/src/Plugin.php:1150
 msgid "<strong>Docket Cache:</strong> An unknown object-cache.php Drop-In was found. Please click \"Install\" to use Docket Cache.<p style=\"margin-bottom:0;\"><a href=\"%s\" class=\"button button-primary\">Install</a></p>"
 msgstr ""
 
-#: includes/src/Plugin.php:1174
+#: includes/src/Plugin.php:1155
 msgid "The object-cache.php Drop-In has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: version
-#: includes/src/Plugin.php:1300
-#: includes/src/Plugin.php:1314
+#: includes/src/Plugin.php:1281
+#: includes/src/Plugin.php:1295
 msgid "Version %s"
 msgstr ""
 
-#: includes/src/Plugin.php:1332
+#: includes/src/Plugin.php:1313
 msgid "Settings"
 msgstr ""
 
-#: includes/src/Plugin.php:1346
+#: includes/src/Plugin.php:1327
 msgid "Install Drop-In"
 msgstr ""
 
@@ -944,7 +981,7 @@ msgstr ""
 
 #. translators: %d = cache file
 #: includes/src/ReqAction.php:390
-msgid "Removed total of %d files"
+msgid "Cleanup total of %d cache files"
 msgstr ""
 
 #: includes/src/ReqAction.php:396

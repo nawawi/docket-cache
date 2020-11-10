@@ -67,17 +67,6 @@ final class Event
                     }
                 }
 
-                // gc action
-                add_filter(
-                    'docketcache/rungc',
-                    function () {
-                        $results = $this->garbage_collector(true);
-
-                        return $results;
-                    },
-                    -10
-                );
-
                 // gc: always enable
                 add_action('docketcache_gc', [$this, 'garbage_collector']);
                 if (!wp_next_scheduled('docketcache_gc')) {
@@ -180,18 +169,24 @@ final class Event
     /**
      * garbage_collector.
      */
-    public function garbage_collector($is_filter = false)
+    public function garbage_collector($force = false)
     {
         $maxfileo = (int) $this->pt->get_cache_maxfile();
-        $maxfile = $maxfileo - 100;
+        $maxfile = $maxfileo;
 
-        $maxttl = (int) $this->pt->get_cache_maxttl();
+        if ($maxfileo > 10000) {
+            $maxfile = $maxfileo - 1000;
+        }
+
+        $maxttl0 = (int) $this->pt->get_cache_maxttl();
+        $maxttl = $maxttl0;
         if (!empty($maxttl)) {
             $maxttl = time() - $maxttl;
         }
 
         $chkmaxdisk = false;
-        $maxsizedisk = (int) $this->pt->get_cache_maxsize_disk();
+        $maxsizedisk0 = (int) $this->pt->get_cache_maxsize_disk();
+        $maxsizedisk = $maxsizedisk0;
         if (!empty($maxsizedisk)) {
             $maxsizedisk = $maxsizedisk - 1048576;
 
@@ -201,25 +196,24 @@ final class Event
         }
 
         $collect = (object) [
-            'maxttl' => $maxttl,
-            'maxttl_h' => date('Y-m-d H:i:s T', $maxttl),
-            'maxttl_c' => 0,
-            'maxfile' => $maxfileo,
-            'maxfile_c' => 0,
-            'total' => 0,
-            'clean' => 0,
-            'expired' => 0,
-            'ignore' => 0,
+            'cache_maxttl' => $maxttl0,
+            'cache_maxfile' => $maxfileo,
+            'cache_maxdisk' => $maxsizedisk0,
+            'cleanup_maxfile' => 0,
+            'cleanup_maxttl' => 0,
+            'cleanup_maxdisk' => 0,
+            'cache_file' => 0,
+            'cache_cleanup' => 0,
+            'cache_ignore' => 0,
         ];
 
         if ($this->pt->co()->lockproc('garbage_collector', time() + 3600)) {
-            if ($is_filter) {
-                return $collect;
-            }
-
-            return false;
+            return $collect;
         }
 
+        wp_suspend_cache_addition(true);
+
+        $delay = $force ? 450 : 1000;
         if ($this->pt->is_docketcachedir($this->pt->cache_path)) {
             clearstatcache();
             $fsizetotal = 0;
@@ -229,7 +223,7 @@ final class Event
                 $fx = $object->getPathName();
 
                 if (!$object->isFile() || 'file' !== $object->getType() || !$this->pt->is_php($fx)) {
-                    ++$collect->ignore;
+                    ++$collect->cache_ignore;
                     continue;
                 }
 
@@ -240,22 +234,26 @@ final class Event
 
                 if ($fm >= $ft && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
                     $this->pt->unlink($fx, true);
-                    ++$collect->clean;
+                    usleep(100);
                     continue;
                 }
 
                 if ($cnt >= $maxfile) {
                     $this->pt->unlink($fx, true);
 
-                    ++$collect->clean;
-                    ++$collect->maxfile_c;
+                    ++$collect->cleanup_maxfile;
+
+                    usleep(100);
                     continue;
                 }
 
                 $fsizetotal += $fs;
                 if ($chkmaxdisk && $fsizetotal > $maxsizedisk) {
                     $this->pt->unlink($fx, true);
-                    ++$collect->clean;
+
+                    ++$collect->cleanup_maxdisk;
+
+                    usleep(100);
                     continue;
                 }
 
@@ -264,8 +262,10 @@ final class Event
                     if (!empty($data['timeout']) && $this->pt->valid_timestamp($data['timeout']) && $fm >= (int) $data['timeout']) {
                         $this->pt->unlink($fx, true);
                         unset($data);
-                        ++$collect->clean;
-                        ++$collect->expired;
+
+                        ++$collect->cleanup_maxttl;
+
+                        usleep(100);
                         continue;
                     }
 
@@ -273,8 +273,9 @@ final class Event
                         if ((int) $data['timestamp'] < $maxttl) {
                             $this->pt->unlink($fx, true);
                             unset($data);
-                            ++$collect->clean;
-                            ++$collect->maxttl_c;
+                            ++$collect->cleanup_maxttl;
+
+                            usleep(100);
                             continue;
                         }
                     }
@@ -283,31 +284,32 @@ final class Event
 
                 if ($maxttl > 0 && $ft < $maxttl) {
                     $this->pt->unlink($fx, true);
-                    ++$collect->clean;
-                    ++$collect->maxttl_c;
+                    ++$collect->cleanup_maxttl;
+
+                    usleep(100);
                     continue;
                 }
 
                 ++$cnt;
-                ++$collect->total;
+                ++$collect->cache_file;
 
                 if ($slowdown > 10) {
                     $slowdown = 0;
-                    usleep(450);
+                    usleep($delay);
                 }
 
                 ++$slowdown;
             }
+
+            $collect->cache_cleanup = $collect->cleanup_maxttl + $collect->cleanup_maxfile + $collect->cleanup_maxdisk;
         }
+
+        wp_suspend_cache_addition(false);
 
         $this->pt->co()->lockreset('garbage_collector');
         $this->pt->cx()->delay_expire();
 
-        if ($is_filter) {
-            return $collect;
-        }
-
-        return true;
+        return $collect;
     }
 
     /**
