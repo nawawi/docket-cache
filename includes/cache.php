@@ -1267,7 +1267,26 @@ class WP_Object_Cache
                     unset($alloptions['cron']);
                 }
 
+                if (isset($alloptions['litespeed_messages'])) {
+                    unset($alloptions['litespeed_messages']);
+                }
+
+                if (isset($alloptions['litespeed.admin_display.messages'])) {
+                    unset($alloptions['litespeed.admin_display.messages']);
+                }
+
                 return $alloptions;
+            },
+            PHP_INT_MAX
+        );
+
+        // litespeed admin notice
+        add_action(
+            'litespeed_purged_all',
+            function () {
+                $this->delete('alloptions', 'options');
+                $this->delete('litespeed_messages', 'options');
+                $this->delete('litespeed.admin_display.messages', 'options');
             },
             PHP_INT_MAX
         );

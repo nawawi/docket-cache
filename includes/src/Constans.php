@@ -255,6 +255,8 @@ final class Constans
                 'options:uninstall_plugins',
                 'options:active_plugins',
                 'options:cron',
+                'options:litespeed_messages',
+                'options:litespeed.admin_display.messages',
             ]
         );
 

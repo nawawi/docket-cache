@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.10.04
+Stable tag: 20.10.05
 License: MIT
 License URI: ./license.txt
 
@@ -41,6 +41,7 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 - Object Cache + OPcache Stats
 - Cache Log
 - Cronbot Service
+- WP-CLI support
 - Multisite support
 - Multi-Network support
 
@@ -52,18 +53,37 @@ To use Docket Cache requires minimum:
 - WordPress 5.4
 - Zend OPcache
 
-== Configuration Options ==
+== Documentation ==
 
-To adjust the configuration, please refer to [Configuration](https://docs.docketcache.com/configuration) documentation for details.
+To adjust the plugin behaviour, installation or manage through a command line, please refer to the [Documentation](https://docs.docketcache.com) for details.
 
-== WP-CLI Commands ==
+== Sponsor this project ==
 
-To use the WP-CLI commands, please refer to [WP-CLI](https://docs.docketcache.com/wp-cli) documentation for available commands
+There is a lot of room for improvement and features to add, require plenty of person-hours dedicated for testing and development.
+
+[Become our sponsor](https://www.patreon.com/bePatron?u=41796862). All funds will be dedicated to maintenance, development, and marketing of this project.
+
+Thank you for using Docket Cache.
 
 == Development ==
 - [Report issues](https://github.com/nawawi/docket-cache/issues)
 - [Changelog](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt)
-- [Documentation](https://docs.docketcache.com)
+
+== Hosting Provider ==
+
+The Docket Cache has been reported seemly works with these hosting provider:
+
+- [GB Network](https://www.gbnetwork.my/)
+- [Dreamhost](https://docketcache.com/wordpress-hosting/dreamhost)
+- [Bluehost](https://docketcache.com/wordpress-hosting/bluehost)
+- [Exabytes](https://docketcache.com/wordpress-hosting/exabytes)
+- [ServerFreak](https://docketcache.com/wordpress-hosting/serverfreak)
+- [Zenpipe](https://www.zenpipe.com/)
+- [Cun Host](https://cunhost.com/)
+- [KelateBiz](https://kelate.biz/)
+- [JimatHosting](https://jimathosting.com/)
+- [iWHOST](https://www.iwhost.com/)
+- [Hostinger](https://www.hostinger.com/)
 
 == Installation ==
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
@@ -104,6 +124,9 @@ OPcache is a caching engine built into PHP, improves performance by storing prec
 
 Docket Cache converts the object cache into plain PHP code. When read and write cache, it will use OPcache directly which results in faster data retrieval and better performance.
 
+= What is the Cronbot Service in Docket Cache? =
+The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively. This service offered as an alternative option and is not compulsory to use. By default, this service not connected to the [end-point server](https://cronbot.docketcache.com/). You can completely disable it at the configuration page.
+
 = What is a RAM disk in Docket Cache? =
 A RAM disk is a representation of a hard disk using RAM resources, and it can take the form of a hardware device or a virtual disk. 
 
@@ -142,6 +165,10 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.10.05 =
+
+- Fixed Litespeed Cache admin notice "Purged all caches successfully" still shown after dismiss.
+
 = 20.10.04 =
 
 - Improved CronAgent.
