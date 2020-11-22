@@ -213,7 +213,7 @@ class Command extends WP_CLI_Command
             $this->halt_error(__('Garbage collector not available.', 'docket-cache'));
         }
 
-        WP_CLI::line(__('Executing garbage collector. Please wait..', 'docket-cache'));
+        WP_CLI::line(__('Executing the garbage collector. Please wait..', 'docket-cache'));
 
         $pad = 35;
         $collect = apply_filters('docketcache/garbage-collector', true);
@@ -228,7 +228,7 @@ class Command extends WP_CLI_Command
         WP_CLI::line($this->title(__('Total Cache Ignored', 'docket-cache'), $pad).$collect->cache_ignore);
         WP_CLI::line($this->title(__('Total Cache File', 'docket-cache'), $pad).$collect->cache_file);
 
-        $this->halt_success(__('Executing garbage collector completed.', 'docket-cache'));
+        $this->halt_success(__('Executing the garbage collector completed.', 'docket-cache'));
     }
 
     /**

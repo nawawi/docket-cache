@@ -205,6 +205,7 @@ final class Event
             'cache_file' => 0,
             'cache_cleanup' => 0,
             'cache_ignore' => 0,
+            'cleanup_failed' => 0,
         ];
 
         if ($this->pt->co()->lockproc('garbage_collector', time() + 3600)) {
@@ -234,12 +235,21 @@ final class Event
 
                 if ($fm >= $ft && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
                     $this->pt->unlink($fx, true);
+
+                    if ($force && @is_file($fx)) {
+                        ++$collect->cleanup_failed;
+                    }
+
                     usleep(100);
                     continue;
                 }
 
                 if ($cnt >= $maxfile) {
                     $this->pt->unlink($fx, true);
+
+                    if ($force && @is_file($fx)) {
+                        ++$collect->cleanup_failed;
+                    }
 
                     ++$collect->cleanup_maxfile;
 
@@ -251,6 +261,10 @@ final class Event
                 if ($chkmaxdisk && $fsizetotal > $maxsizedisk) {
                     $this->pt->unlink($fx, true);
 
+                    if ($force && @is_file($fx)) {
+                        ++$collect->cleanup_failed;
+                    }
+
                     ++$collect->cleanup_maxdisk;
 
                     usleep(100);
@@ -261,6 +275,11 @@ final class Event
                 if (false !== $data) {
                     if (!empty($data['timeout']) && $this->pt->valid_timestamp($data['timeout']) && $fm >= (int) $data['timeout']) {
                         $this->pt->unlink($fx, true);
+
+                        if ($force && @is_file($fx)) {
+                            ++$collect->cleanup_failed;
+                        }
+
                         unset($data);
 
                         ++$collect->cleanup_maxttl;
@@ -272,6 +291,11 @@ final class Event
                     if (empty($data['timeout']) && !empty($data['timestamp']) && $this->pt->valid_timestamp($data['timestamp']) && $maxttl > 0) {
                         if ((int) $data['timestamp'] < $maxttl) {
                             $this->pt->unlink($fx, true);
+
+                            if ($force && @is_file($fx)) {
+                                ++$collect->cleanup_failed;
+                            }
+
                             unset($data);
                             ++$collect->cleanup_maxttl;
 
@@ -284,6 +308,11 @@ final class Event
 
                 if ($maxttl > 0 && $ft < $maxttl) {
                     $this->pt->unlink($fx, true);
+
+                    if ($force && @is_file($fx)) {
+                        ++$collect->cleanup_failed;
+                    }
+
                     ++$collect->cleanup_maxttl;
 
                     usleep(100);

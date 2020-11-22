@@ -615,6 +615,24 @@ body {
 }
 
 /* /eventlist */
+#docket-cache .gc ul,
+#docket-cache .gc li {
+    font-family: monospace, Consolas, Monaco;
+    unicode-bidi: embed;
+    font-weight: normal;
+    font-size: 11px;
+    margin: 0;
+    padding: 0;
+}
+
+#docket-cache .gc ul {
+    margin-left: 15px;
+}
+
+#docket-cache .gc li span {
+    display: inline-block;
+    min-width: 200px;
+}
 
 #wpfooter #footer-left,
 #wpfooter #footer-upgrade {

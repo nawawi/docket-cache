@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.10.05
+Stable tag: 20.10.06
 License: MIT
 License URI: ./license.txt
 
@@ -63,7 +63,13 @@ There is a lot of room for improvement and features to add, require plenty of pe
 
 [Become our sponsor](https://www.patreon.com/bePatron?u=41796862). All funds will be dedicated to maintenance, development, and marketing of this project.
 
-Thank you for using Docket Cache.
+Thank you for sponsoring Docket Cache.
+
+Sponsored by:
+
+- [DNSVault](https://dnsvault.net)
+- [Cun Host](https://cunhost.com/)
+- [Exnano Creative](https://exnano.io/)
 
 == Development ==
 - [Report issues](https://github.com/nawawi/docket-cache/issues)
@@ -74,16 +80,19 @@ Thank you for using Docket Cache.
 The Docket Cache has been reported seemly works with these hosting provider:
 
 - [GB Network](https://www.gbnetwork.my/)
-- [Dreamhost](https://docketcache.com/wordpress-hosting/dreamhost)
-- [Bluehost](https://docketcache.com/wordpress-hosting/bluehost)
-- [Exabytes](https://docketcache.com/wordpress-hosting/exabytes)
-- [ServerFreak](https://docketcache.com/wordpress-hosting/serverfreak)
 - [Zenpipe](https://www.zenpipe.com/)
-- [Cun Host](https://cunhost.com/)
 - [KelateBiz](https://kelate.biz/)
 - [JimatHosting](https://jimathosting.com/)
 - [iWHOST](https://www.iwhost.com/)
 - [Hostinger](https://www.hostinger.com/)
+
+Affiliated with:
+
+- [Dreamhost](https://docketcache.com/wordpress-hosting/dreamhost)
+- [Bluehost](https://docketcache.com/wordpress-hosting/bluehost)
+- [Exabytes](https://docketcache.com/wordpress-hosting/exabytes)
+- [ServerFreak](https://docketcache.com/wordpress-hosting/serverfreak)
+- [Digitalocean](https://docketcache.com/wordpress-hosting/digitalocean)
 
 == Installation ==
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
@@ -165,6 +174,15 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.10.06 =
+
+- Fixed Filesystem::scanfiles() -> missing regex pattern for dump file.
+- Fixed Filesystem::dump() -> retry to create a file if failed.
+- Fixed WP_Object_Cache::dc_init() -> Flush Litespeed Cache admin notice if exists.
+- Added Filesystem::dc_save() -> limit object size to 1000000.
+- Added Garbage Collector -> action button output results.
+- Added Filesystem::capture_fatal_error() -> attempt to fix any cache file error-prone.
+
 = 20.10.05 =
 
 - Fixed Litespeed Cache admin notice "Purged all caches successfully" still shown after dismiss.

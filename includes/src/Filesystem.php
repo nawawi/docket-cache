@@ -122,13 +122,42 @@ class Filesystem
         $dir = realpath($dir);
         if (false !== $dir && is_dir($dir) && is_readable($dir)) {
             $diriterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \RecursiveDirectoryIterator::KEY_AS_FILENAME | \RecursiveDirectoryIterator::CURRENT_AS_FILEINFO);
-            $object = new \RegexIterator(new \RecursiveIteratorIterator($diriterator), '@^(dump_)?([a-z0-9]+)\-([a-z0-9]+).*\.php$@', \RegexIterator::MATCH, \RegexIterator::USE_KEY);
+            $object = new \RegexIterator(new \RecursiveIteratorIterator($diriterator), '@^(dump_)?([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', \RegexIterator::MATCH, \RegexIterator::USE_KEY);
             $object->setMaxDepth($maxdepth);
 
             return $object;
         }
 
         return [];
+    }
+
+    public function validate_file($filename, &$error = '')
+    {
+        try {
+            $fileo = new \SplFileObject($filename, 'rb');
+        } catch (\Exception $e) {
+            $error = $e->getMessage();
+
+            return false;
+        }
+
+        if ($fileo->flock(LOCK_EX)) {
+            $fileo->seek(PHP_INT_MAX);
+            $lines = $fileo->key();
+            $object = new \LimitIterator($fileo, $lines - 2);
+            foreach ($object as $line) {
+                if (false !== strpos($line, '/*@DOCKET_CACHE_EOF*/')) {
+                    $fileo->flock(LOCK_UN);
+
+                    return true;
+                }
+            }
+            $fileo->flock(LOCK_UN);
+        }
+
+        $fileo = null;
+
+        return false;
     }
 
     /**
@@ -196,13 +225,14 @@ class Filesystem
 
         if (false === $ok) {
             // if failed, try to remove on shutdown instead of truncate
-            add_action(
-                'shutdown',
-                function () use ($file) {
+            // use native shutdown
+            register_shutdown_function(
+                function ($file) {
                     if (@is_file($file)) {
                         @unlink($file);
                     }
-                }
+                },
+                $file
             );
         }
 
@@ -248,18 +278,37 @@ class Filesystem
     /**
      * dump.
      */
-    public function dump($file, $data)
+    public function dump($file, $data, $is_validate = false)
     {
+        static $retry = 0;
         $dir = \dirname($file);
         $tmpfile = $dir.'/'.'dump_'.uniqid().'_'.basename($file);
-        add_action(
-            'shutdown',
-            function () use ($tmpfile) {
+
+        if (@is_file($tmpfile)) {
+            $fm = time() + 120; // 2 minutes
+            if ($fm > @filemtime($tmpfile)) {
+                @unlink($tmpfile);
+
+                return false;
+            }
+
+            if ($retry > 5) {
+                return -1;
+            }
+
+            ++$retry;
+
+            return $this->dump($file, $data);
+        }
+
+        // use native shutdown
+        register_shutdown_function(
+            function ($tmpfile) {
                 if (@is_file($tmpfile)) {
                     @unlink($tmpfile);
                 }
             },
-            PHP_INT_MAX
+            $tmpfile
         );
 
         $this->opcache_flush($file);
@@ -267,6 +316,10 @@ class Filesystem
         $ok = $this->put($tmpfile, $data, 'cb', true);
         if (true === $ok) {
             if (@rename($tmpfile, $file)) {
+                if ($is_validate && !$this->validate_file($file)) {
+                    return false;
+                }
+
                 $this->chmod($file);
 
                 // compile
@@ -550,6 +603,66 @@ class Filesystem
         ];
     }
 
+    public function get_fatal_error_filename($file)
+    {
+        $filename = basename($file);
+        $filename = str_replace($filename, 'fatal-'.$filename, $file);
+
+        return str_replace('.php', '.txt', $filename);
+    }
+
+    public function has_fatal_error_before($file)
+    {
+        $file_fatal = $this->get_fatal_error_filename($file);
+
+        return @is_file($file_fatal);
+    }
+
+    public function validate_fatal_error_file($file)
+    {
+        $file_fatal = $this->get_fatal_error_filename($file);
+        if (!@is_file($file_fatal)) {
+            return;
+        }
+
+        if (!@is_file($file)) {
+            @unlink($file_fatal);
+
+            return;
+        }
+
+        $fm = time() - 3600; // 1h
+        if ($fm > @filemtime($file_fatal) && $this->validate_file($file)) {
+            @unlink($file_fatal);
+
+            return;
+        }
+    }
+
+    public function capture_fatal_error()
+    {
+        register_shutdown_function(
+            function () {
+                $error = error_get_last();
+                if ($error && \in_array($error['type'], [E_ERROR, E_PARSE, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR, E_CORE_ERROR], true)) {
+                    $file_error = $error['file'];
+
+                    if (false !== strpos($file_error, '/docket-cache/') && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', basename($file_error))) {
+                        $file_fatal = $this->get_fatal_error_filename($file_error);
+                        $error['file'] = str_replace(ABSPATH, '/', $file_error);
+
+                        @file_put_contents($file_error, '<?php return false;', LOCK_EX);
+                        if (@file_put_contents($file_fatal, date('Y-m-d H:i:s T').PHP_EOL.$this->export_var($error), LOCK_EX)) {
+                            if ('cli' !== \PHP_SAPI && !wp_doing_ajax()) {
+                                echo '<script>document.body.innerHTML="";window.setTimeout(function() { window.location.assign(window.location.href); }, 750);</script>';
+                            }
+                        }
+                    }
+                }
+            }
+        );
+    }
+
     /**
      * cache_get.
      */
@@ -560,6 +673,10 @@ class Filesystem
         }
 
         if (!$handle = @fopen($file, 'rb')) {
+            return false;
+        }
+
+        if ($this->has_fatal_error_before($file)) {
             return false;
         }
 
@@ -627,6 +744,7 @@ class Filesystem
                 $code .= $ucode;
             }
             $code .= 'return '.$data.';'.PHP_EOL;
+            $code .= '/*@DOCKET_CACHE_EOF*/';
         }
 
         return $code;

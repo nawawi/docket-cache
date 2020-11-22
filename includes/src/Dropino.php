@@ -47,6 +47,8 @@ final class Dropino extends Bepart
      */
     public function exists()
     {
+        clearstatcache();
+
         return @is_file($this->resc()->dst);
     }
 

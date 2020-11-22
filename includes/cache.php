@@ -967,12 +967,19 @@ class WP_Object_Cache
         }
 
         $code = $this->fs()->code_stub($data);
-        $stat = $this->fs()->dump($file, $code);
+        $stat = $this->fs()->dump($file, $code, false); // 3rd param = validate
+
+        if (false === $stat) {
+            return false;
+        }
+
         if (-1 === $stat) {
             $this->dc_log('err', $fname, 'Failed to write');
 
             return false;
         }
+
+        $this->fs()->validate_fatal_error_file($file);
 
         return $stat;
     }
@@ -1045,6 +1052,14 @@ class WP_Object_Cache
         $meta['type'] = $type;
         $meta['timeout'] = $timeout;
         $meta['data'] = $data;
+
+        // array size max to 1M to avoid fatal error in some hosting.
+        $meta_len = \count($meta, true);
+        if ($meta_len >= 1000000) {
+            $this->dc_log('err', $group.':'.$cache_key, 'Object too large: '.$meta_len.'/1000000');
+
+            return false;
+        }
 
         if (true === $this->dc_code($file, $meta)) {
             // if 0 let gc handle it by comparing file mtime.
@@ -1212,6 +1227,9 @@ class WP_Object_Cache
      */
     private function dc_init()
     {
+        // handle error
+        $this->fs()->capture_fatal_error();
+
         if ($this->cf()->is_dcint('MAXSIZE', $dcvalue)) {
             if ($dcvalue >= 1000000) {
                 $this->cache_maxsize = $dcvalue;
@@ -1287,6 +1305,17 @@ class WP_Object_Cache
                 $this->delete('alloptions', 'options');
                 $this->delete('litespeed_messages', 'options');
                 $this->delete('litespeed.admin_display.messages', 'options');
+            },
+            PHP_INT_MAX
+        );
+
+        add_action(
+            'all_admin_notices',
+            function () {
+                if (\function_exists('run_litespeed_cache')) {
+                    $this->delete('litespeed_messages', 'options');
+                    $this->delete('litespeed.admin_display.messages', 'options');
+                }
             },
             PHP_INT_MAX
         );

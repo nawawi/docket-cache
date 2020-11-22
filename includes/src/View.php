@@ -46,12 +46,21 @@ final class View
     /**
      * tail.
      */
-    public function tail($filepath, $limit = 100, $do_last = true)
+    public function tail($filename, $limit = 100, $do_last = true, &$error = '')
     {
         $limit = (int) $limit;
-        $file = new \SplFileObject($filepath);
-        $file->seek(PHP_INT_MAX);
-        $total_lines = $file->key();
+        $object = [];
+
+        try {
+            $fileo = new \SplFileObject($filename, 'rb');
+        } catch (\Exception $e) {
+            $error = $e->getMessage();
+
+            return $object;
+        }
+
+        $fileo->seek(PHP_INT_MAX);
+        $total_lines = $fileo->key();
 
         if ($limit > $total_lines) {
             $limit = $total_lines;
@@ -63,12 +72,11 @@ final class View
             $total_lines = $limit;
         }
 
-        $object = [];
         if ($total_lines > 0) {
             if ($do_last) {
-                $object = new \LimitIterator($file, $total_lines);
+                $object = new \LimitIterator($fileo, $total_lines);
             } else {
-                $object = new \LimitIterator($file, 0, $total_lines);
+                $object = new \LimitIterator($fileo, 0, $total_lines);
             }
         }
 

@@ -382,15 +382,26 @@ final class ReqAction
                     $error = esc_html__('Failed to execute the action request. Please try again.', 'docket-cache');
                     break;
                 case 'docket-gcrun':
-                    $message = esc_html__('Running the garbage collector successful.', 'docket-cache');
+                    $message = esc_html__('Executing the garbage collector successful', 'docket-cache');
                     $msg = $this->pt->co()->lookup_get('gcrun', true);
-                    if (!empty($msg) && \is_array($msg) && !empty($msg['cache_cleanup'])) {
-                        if ((int) $msg['cache_cleanup'] > 0) {
-                            /* translators: %d = cache file */
-                            $message = sprintf(esc_html__('Cleanup total of %d cache files', 'docket-cache'), $msg['cache_cleanup']);
-                        }
+                    if (!empty($msg) && \is_array($msg)) {
+                        $collect = (object) $msg;
+
+                        $gcmsg = '<div class="gc"><ul>';
+                        $gcmsg .= '<li><span>'.esc_html__('Cache MaxTTL', 'docket-cache').'</span>'.$collect->cache_maxttl.'</li>';
+                        $gcmsg .= '<li><span>'.esc_html__('Cache File Limit', 'docket-cache').'</span>'.$collect->cache_maxfile.'</li>';
+                        $gcmsg .= '<li><span>'.esc_html__('Cache Disk Limit', 'docket-cache').'</span>'.$this->pt->normalize_size($collect->cache_maxdisk).'</li>';
+                        $gcmsg .= '<li><span>'.esc_html__('Cleanup Cache MaxTTL', 'docket-cache').'</span>'.$collect->cleanup_maxttl.'</li>';
+                        $gcmsg .= '<li><span>'.esc_html__('Cleanup Cache File Limit', 'docket-cache').'</span>'.$collect->cleanup_maxfile.'</li>';
+                        $gcmsg .= '<li><span>'.esc_html__('Cleanup Cache Disk Limit', 'docket-cache').'</span>'.$collect->cleanup_maxdisk.'</li>';
+                        $gcmsg .= '<li><span>'.esc_html__('Total Cache Cleanup', 'docket-cache').'</span>'.$collect->cache_cleanup.'</li>';
+                        $gcmsg .= '<li><span>'.esc_html__('Total Cache Ignored', 'docket-cache').'</span>'.$collect->cache_ignore.'</li>';
+                        $gcmsg .= '<li><span>'.esc_html__('Total Cache File', 'docket-cache').'</span>'.$collect->cache_file.'</li>';
+                        $gcmsg .= '</ul></div>';
+
+                        $message .= $gcmsg;
                     }
-                    unset($msg, $wmsg);
+                    unset($msg, $wmsg, $gcmsg);
                     break;
                 case 'docket-gcrun-failed':
                     $error = esc_html__('Failed to run the garbage collector.', 'docket-cache');

@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Docket Cache plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 20.10.05\n"
+"Project-Id-Version: Docket Cache 20.10.06\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-11-14T17:32:18+00:00\n"
+"POT-Creation-Date: 2020-11-22T23:10:13+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -94,7 +94,7 @@ msgid "Run Garbage Collector"
 msgstr ""
 
 #: includes/admin/config.php:18
-#: includes/src/View.php:252
+#: includes/src/View.php:260
 msgid "Configuration"
 msgstr ""
 
@@ -106,7 +106,7 @@ msgstr ""
 #: includes/admin/config.php:27
 #: includes/admin/log.php:21
 #: includes/src/Canopt.php:79
-#: includes/src/View.php:250
+#: includes/src/View.php:258
 msgid "Cache Log"
 msgstr ""
 
@@ -142,7 +142,7 @@ msgstr ""
 
 #: includes/admin/config.php:69
 #: includes/admin/log.php:31
-#: includes/src/View.php:400
+#: includes/src/View.php:408
 msgid "Default"
 msgstr ""
 
@@ -257,7 +257,7 @@ msgid "Not Available"
 msgstr ""
 
 #: includes/admin/cronbot.php:30
-#: includes/src/View.php:251
+#: includes/src/View.php:259
 msgid "Cronbot"
 msgstr ""
 
@@ -400,7 +400,7 @@ msgid "Web Proxy"
 msgstr ""
 
 #: includes/admin/overview.php:35
-#: includes/src/View.php:249
+#: includes/src/View.php:257
 msgid "Overview"
 msgstr ""
 
@@ -486,6 +486,7 @@ msgstr ""
 
 #: includes/admin/overview.php:170
 #: includes/src/Command.php:223
+#: includes/src/ReqAction.php:393
 msgid "Cache Disk Limit"
 msgstr ""
 
@@ -634,43 +635,51 @@ msgid "Garbage collector not available."
 msgstr ""
 
 #: includes/src/Command.php:216
-msgid "Executing garbage collector. Please wait.."
+msgid "Executing the garbage collector. Please wait.."
 msgstr ""
 
 #: includes/src/Command.php:221
+#: includes/src/ReqAction.php:391
 msgid "Cache MaxTTL"
 msgstr ""
 
 #: includes/src/Command.php:222
+#: includes/src/ReqAction.php:392
 msgid "Cache File Limit"
 msgstr ""
 
 #: includes/src/Command.php:224
+#: includes/src/ReqAction.php:394
 msgid "Cleanup Cache MaxTTL"
 msgstr ""
 
 #: includes/src/Command.php:225
+#: includes/src/ReqAction.php:395
 msgid "Cleanup Cache File Limit"
 msgstr ""
 
 #: includes/src/Command.php:226
+#: includes/src/ReqAction.php:396
 msgid "Cleanup Cache Disk Limit"
 msgstr ""
 
 #: includes/src/Command.php:227
+#: includes/src/ReqAction.php:397
 msgid "Total Cache Cleanup"
 msgstr ""
 
 #: includes/src/Command.php:228
+#: includes/src/ReqAction.php:398
 msgid "Total Cache Ignored"
 msgstr ""
 
 #: includes/src/Command.php:229
+#: includes/src/ReqAction.php:399
 msgid "Total Cache File"
 msgstr ""
 
 #: includes/src/Command.php:231
-msgid "Executing garbage collector completed."
+msgid "Executing the garbage collector completed."
 msgstr ""
 
 #: includes/src/Event.php:40
@@ -976,22 +985,17 @@ msgid "Failed to execute the action request. Please try again."
 msgstr ""
 
 #: includes/src/ReqAction.php:385
-msgid "Running the garbage collector successful."
+msgid "Executing the garbage collector successful"
 msgstr ""
 
-#. translators: %d = cache file
-#: includes/src/ReqAction.php:390
-msgid "Cleanup total of %d cache files"
-msgstr ""
-
-#: includes/src/ReqAction.php:396
+#: includes/src/ReqAction.php:407
 msgid "Failed to run the garbage collector."
 msgstr ""
 
-#: includes/src/View.php:401
+#: includes/src/View.php:409
 msgid "Enable"
 msgstr ""
 
-#: includes/src/View.php:402
+#: includes/src/View.php:410
 msgid "Disable"
 msgstr ""
