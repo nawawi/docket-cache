@@ -33,8 +33,9 @@ Thank you for sponsoring Docket Cache.
 
 [![Dreamhost](https://docketcache.com/wordpress-hosting/dreamhost/dreamhost-logo.png)](https://docketcache.com/wordpress-hosting/dreamhost/)
 [![Bluehost](https://docketcache.com/wordpress-hosting/bluehost/bluehost-logo.png)](https://docketcache.com/wordpress-hosting/bluehost/)
+[![Exabytes](https://docketcache.com/wordpress-hosting/exabytes/exabytes-logo.png)](https://docketcache.com/wordpress-hosting/exabytes/)
 
-- [Exabytes](https://docketcache.com/wordpress-hosting/exabytes)
+
 - [ServerFreak](https://docketcache.com/wordpress-hosting/serverfreak)
 - [Digitalocean](https://docketcache.com/wordpress-hosting/digitalocean)
 
