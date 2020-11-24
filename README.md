@@ -33,7 +33,7 @@ Thank you for sponsoring Docket Cache.
 
 <br>
 
-**Affiliated with:**
+**Affiliates with:**
 
 [![Dreamhost](https://docketcache.com/wp-content/spx/dreamhost/dreamhost-logo.png)](https://docketcache.com/wp-content/spx/dreamhost/?utm_source=dcgh)
 [![Bluehost](https://docketcache.com/wp-content/spx/bluehost/bluehost-logo.png)](https://docketcache.com/wp-content/spx/bluehost/?utm_source=dcgh)

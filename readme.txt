@@ -67,9 +67,18 @@ Thank you for sponsoring Docket Cache.
 
 Sponsored by:
 
-- [DNSVault](https://dnsvault.net)
-- [Cun Host](https://cunhost.com/)
-- [Exnano Creative](https://exnano.io/)
+- [DNSVault](https://dnsvault.net/?utm_source=dcwporg)
+- [Cun Host](https://cunhost.com/?utm_source=dcwporg)
+- [Exnano Creative](https://exnano.io/?utm_source=dcwporg)
+
+Affiliates with:
+
+- [Dreamhost](https://docketcache.com/wp-content/spx/dreamhost/?utm_source=dcwporg)
+- [Bluehost](https://docketcache.com/wp-content/spx/bluehost/?utm_source=dcwporg)
+- [Exabytes](https://docketcache.com/wp-content/spx/exabytes/?utm_source=dcwporg)
+- [ServerFreak](https://docketcache.com/wp-content/spx/serverfreak/?utm_source=dcwporg)
+- [Digitalocean](https://docketcache.com/wp-content/spx/digitalocean/?utm_source=dcwporg)
+- [KiahStore](https://docketcache.com/wp-content/spx/kiahstore/?utm_source=dcwporg)
 
 == Development ==
 - [Report issues](https://github.com/nawawi/docket-cache/issues)
@@ -86,13 +95,6 @@ The Docket Cache has been reported seemly works with these hosting provider:
 - [iWHOST](https://www.iwhost.com/)
 - [Hostinger](https://www.hostinger.com/)
 
-Affiliated with:
-
-- [Dreamhost](https://docketcache.com/wordpress-hosting/dreamhost)
-- [Bluehost](https://docketcache.com/wordpress-hosting/bluehost)
-- [Exabytes](https://docketcache.com/wordpress-hosting/exabytes)
-- [ServerFreak](https://docketcache.com/wordpress-hosting/serverfreak)
-- [Digitalocean](https://docketcache.com/wordpress-hosting/digitalocean)
 
 == Installation ==
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
