@@ -29,6 +29,15 @@ Thank you for sponsoring Docket Cache.
 [![Cun Host](https://docketcache.com/wp-content/spx/cunhost/cunhost-logo.png)](https://cunhost.com/)
 [![Exnano Creative](https://docketcache.com/wp-content/spx/exnano/exnano-logo.png)](https://exnano.io/)
 
+**Affiliated with:**
+
+[![Dreamhost](https://docketcache.com/wordpress-hosting/dreamhost/dreamhost-logo.png)](https://docketcache.com/wordpress-hosting/dreamhost/)
+[![Bluehost](https://docketcache.com/wordpress-hosting/bluehost/bluehost-logo.png)](https://docketcache.com/wordpress-hosting/bluehost/)
+
+- [Exabytes](https://docketcache.com/wordpress-hosting/exabytes)
+- [ServerFreak](https://docketcache.com/wordpress-hosting/serverfreak)
+- [Digitalocean](https://docketcache.com/wordpress-hosting/digitalocean)
+
 
 ## How Versions Work
 
