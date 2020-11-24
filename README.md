@@ -23,7 +23,7 @@ There is a lot of room for improvement and features to add, require plenty of pe
 
 Thank you for sponsoring Docket Cache.
 
-Sponsored by:
+**Sponsored by:**
 
 [![DNSVault](https://docketcache.com/wp-content/spx/dnsvault/dnsvault-logo.png)](https://dnsvault.net)
 [![Cun Host](https://docketcache.com/wp-content/spx/cunhost/cunhost-logo.png)](https://cunhost.com/)
