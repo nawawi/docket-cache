@@ -24,6 +24,7 @@ There is a lot of room for improvement and features to add, require plenty of pe
 Thank you for sponsoring Docket Cache.
 
 <br>
+
 **Sponsored by:**
 
 [![DNSVault](https://docketcache.com/wp-content/spx/dnsvault/dnsvault-logo.png)](https://dnsvault.net/?utm_source=dcgh)
@@ -31,6 +32,7 @@ Thank you for sponsoring Docket Cache.
 [![Exnano Creative](https://docketcache.com/wp-content/spx/exnano/exnano-logo.png)](https://exnano.io/?utm_source=dcgh)
 
 <br>
+
 **Affiliated with:**
 
 [![Dreamhost](https://docketcache.com/wp-content/spx/dreamhost/dreamhost-logo.png)](https://docketcache.com/wp-content/spx/dreamhost/?utm_source=dcgh)
