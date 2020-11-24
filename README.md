@@ -15,6 +15,19 @@ Kindly refer to https://wordpress.org/plugins/docket-cache for full-length descr
 
 To adjust the plugin behaviour, installation or manage through a command line, please refer to the https://docs.docketcache.com for details.
 
+## Installation
+
+To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
+
+1. In your WordPress admin click **Plugins -> Add New**
+2. Search plugins "Docket Cache" and click Install Now.
+3. Click **Activate** or **Network Activate** in Multisite setups.
+4. Click **Docket Cache** in the left menu to access the admin page.
+
+Please wait around 5 seconds for Docket Cache ready to cache the objects.
+
+Or download directly from [WordPress Plugin Directory](https://wordpress.org/plugins/docket-cache).
+
 ## Sponsor this project
 
 There is a lot of room for improvement and features to add, require plenty of person-hours dedicated for testing and development.
