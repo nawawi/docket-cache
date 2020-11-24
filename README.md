@@ -42,6 +42,8 @@ Thank you for sponsoring Docket Cache.
 [![Digitalocean](https://docketcache.com/wp-content/spx/digitalocean/digitalocean-logo.png)](https://docketcache.com/wp-content/spx/digitalocean/?utm_source=dcgh)
 [![KiahStore](https://docketcache.com/wp-content/spx/kiahstore/kiahstore-logo.png)](https://docketcache.com/wp-content/spx/kiahstore/?utm_source=dcgh)
 
+<br><br>
+
 ## How Versions Work
 
 Versions are as follows: Year.Month.Day
