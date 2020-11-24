@@ -15,6 +15,21 @@ Kindly refer to https://wordpress.org/plugins/docket-cache for full-length descr
 
 To adjust the plugin behaviour, installation or manage through a command line, please refer to the https://docs.docketcache.com for details.
 
+## Sponsor this project
+
+There is a lot of room for improvement and features to add, require plenty of person-hours dedicated for testing and development.
+
+[Become our sponsor](https://www.patreon.com/bePatron?u=41796862). All funds will be dedicated to maintenance, development, and marketing of this project.
+
+Thank you for sponsoring Docket Cache.
+
+Sponsored by:
+
+[![DNSVault](https://docketcache.com/wp-content/spx/dnsvault/dnsvault-logo.png)](https://dnsvault.net)
+[![Cun Host](https://docketcache.com/wp-content/spx/cunhost/cunhost-logo.png)](https://cunhost.com/)
+[![Exnano Creative](https://docketcache.com/wp-content/spx/exnano/exnano-logo.png)](https://exnano.io/)
+
+
 ## How Versions Work
 
 Versions are as follows: Year.Month.Day
