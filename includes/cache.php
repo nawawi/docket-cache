@@ -1227,9 +1227,6 @@ class WP_Object_Cache
      */
     private function dc_init()
     {
-        // handle error
-        $this->fs()->capture_fatal_error();
-
         if ($this->cf()->is_dcint('MAXSIZE', $dcvalue)) {
             if ($dcvalue >= 1000000) {
                 $this->cache_maxsize = $dcvalue;

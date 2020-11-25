@@ -292,7 +292,7 @@ final class CronAgent
                     try {
                         do_action_ref_array($hook, $v['args']);
                         ++$run_event;
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         $results['wpcron_error'][$hook] = $e->getMessage();
                         wp_clear_scheduled_hook($hook);
                         --$run_event;

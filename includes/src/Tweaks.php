@@ -71,7 +71,8 @@ final class Tweaks
 
         // jetpack: enables object caching for the response sent by instagram when querying for instagram image html
         // https://developer.jetpack.com/hooks/instagram_cache_oembed_api_response_body/
-        add_filter('instagram_cache_oembed_api_response_body', '__return_true');
+        // Removed in Jetpack 9.1.0
+        //add_filter('instagram_cache_oembed_api_response_body', '__return_true');
 
         if (nwdcx_consfalse('TWEAKS_WPCOOKIE_DISABLED')) {
             // wp: comment cookie lifetime, default to 30000000 second = 12 months
@@ -117,43 +118,6 @@ final class Tweaks
 
         add_filter('the_generator', '__return_empty_string', PHP_INT_MAX);
         add_filter('x_redirect_by', '__return_false', PHP_INT_MAX);
-
-        // only if has page caching
-        /*if (\defined('WP_CACHE') && WP_CACHE) {
-            add_action(
-                'after_setup_theme',
-                function () {
-                    nwdcx_consdef('doing_buffer_headerjunk', true);
-                    @ob_start(null, 700000);
-                },
-                -PHP_INT_MAX
-            );
-
-            add_action(
-                'wp_head',
-                function () {
-                    if (nwdcx_construe('doing_buffer_headerjunk')) {
-                        $content = @ob_get_clean();
-                        if (empty($content)) {
-                            return;
-                        }
-
-                        if (false !== strpos($content, 'gmpg.org/xfn/11')) {
-                            $regexp = '@<link[^>]+href=(?:\'|")(https?:)?\/\/gmpg.org\/xfn\/11(?:\'|")(?:[^>]+)?>@';
-                            $content = @preg_replace($regexp, '', $content);
-                        }
-
-                        if (false !== strpos($content, 'rel="pingback"')) {
-                            $regexp = '@(<link.*?rel=("|\')pingback("|\').*?href=("|\')(.*?)("|\')(.*?)?\/?>|<link.*?href=("|\')(.*?)("|\').*?rel=("|\')pingback("|\')(.*?)?\/?>)@';
-                            $content = @preg_replace($regexp, '', $content);
-                        }
-
-                        echo $content;
-                    }
-                },
-                PHP_INT_MAX
-            );
-        }*/
     }
 
     public function pingback()

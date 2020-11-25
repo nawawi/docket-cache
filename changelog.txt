@@ -1,3 +1,9 @@
+= 20.10.07 (2020-11-26)
+
+- Fixed Tweaks::misc() -> removed deprecated jetpack hook instagram_cache_oembed_api_response_body.
+- Fixed Filesystem::validate_fatal_error_file() -> update timestamp.
+- Added Filesystem::suspend_cache_file().
+
 = 20.10.06 (2020-11-23)
 
 - Fixed Filesystem::scanfiles() -> missing regex pattern for dump file.

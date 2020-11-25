@@ -135,7 +135,7 @@ class Filesystem
     {
         try {
             $fileo = new \SplFileObject($filename, 'rb');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $error = $e->getMessage();
 
             return false;
@@ -167,7 +167,7 @@ class Filesystem
     {
         try {
             $data = VarExporter::export($data);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $error = $e->getMessage();
             if (false !== strpos($error, 'Cannot export value of type "stdClass"')) {
                 $data = var_export($data, 1);
@@ -631,12 +631,24 @@ class Filesystem
             return;
         }
 
-        $fm = time() - 3600; // 1h
-        if ($fm > @filemtime($file_fatal) && $this->validate_file($file)) {
-            @unlink($file_fatal);
+        $fm = time() - 300; // 5m
+        if ($fm > @filemtime($file_fatal)) {
+            if ($this->validate_file($file)) {
+                @unlink($file_fatal);
 
-            return;
+                return;
+            }
+
+            // update timestamp
+            @touch($file_fatal);
         }
+    }
+
+    private function suspend_cache_file($file, $error)
+    {
+        $file_fatal = $this->get_fatal_error_filename($file);
+
+        return @file_put_contents($file_fatal, date('Y-m-d H:i:s T').PHP_EOL.$error, LOCK_EX);
     }
 
     public function capture_fatal_error()
@@ -652,7 +664,7 @@ class Filesystem
                         $error['file'] = str_replace(ABSPATH, '/', $file_error);
 
                         @file_put_contents($file_error, '<?php return false;', LOCK_EX);
-                        if (@file_put_contents($file_fatal, date('Y-m-d H:i:s T').PHP_EOL.$this->export_var($error), LOCK_EX)) {
+                        if ($this->suspend_cache_file($file_fatal, $this->export_var($error))) {
                             if ('cli' !== \PHP_SAPI && !wp_doing_ajax()) {
                                 echo '<script>document.body.innerHTML="";window.setTimeout(function() { window.location.assign(window.location.href); }, 750);</script>';
                             }
@@ -680,6 +692,9 @@ class Filesystem
             return false;
         }
 
+        // handle error incase not throwable
+        $this->capture_fatal_error();
+
         $data = [];
 
         // include when we can read, try to avoid fatal error.
@@ -687,11 +702,16 @@ class Filesystem
         if (flock($handle, LOCK_SH)) {
             try {
                 $data = @include $file;
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $error = $e->getMessage();
+
+                // cleanup
                 if (false !== strpos($error, 'not found') && @preg_match('@Class.*not found@', $error)) {
                     $this->unlink($file, false);
                 }
+
+                // delay
+                $this->suspend_cache_file($file, $error);
 
                 $this->log('err', 'internalproc-internalfunc', 'cache_get: '.$error);
                 $data = false;

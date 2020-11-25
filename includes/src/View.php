@@ -53,7 +53,7 @@ final class View
 
         try {
             $fileo = new \SplFileObject($filename, 'rb');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $error = $e->getMessage();
 
             return $object;

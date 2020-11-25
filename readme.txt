@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.10.06
+Stable tag: 20.10.07
 License: MIT
 License URI: ./license.txt
 
@@ -73,11 +73,11 @@ Sponsored by:
 
 Affiliates with:
 
-- [Dreamhost](https://docketcache.com/wp-content/spx/dreamhost/?utm_source=dcwporg)
-- [Bluehost](https://docketcache.com/wp-content/spx/bluehost/?utm_source=dcwporg)
-- [Exabytes](https://docketcache.com/wp-content/spx/exabytes/?utm_source=dcwporg)
-- [ServerFreak](https://docketcache.com/wp-content/spx/serverfreak/?utm_source=dcwporg)
-- [Digitalocean](https://docketcache.com/wp-content/spx/digitalocean/?utm_source=dcwporg)
+- [Dreamhost](https://mbsy.co/3cGLwM)
+- [Bluehost](https://www.bluehost.com/track/docketcache/)
+- [Exabytes](https://billing.exabytes.my/mypanel/aff.php?aff=8102792)
+- [ServerFreak](https://secure.web-hosting.net.my/clients/aff.php?aff=4725)
+- [Digitalocean](https://m.do.co/c/6c93db5b1ef6)
 - [KiahStore](https://docketcache.com/wp-content/spx/kiahstore/?utm_source=dcwporg)
 
 == Development ==
@@ -176,6 +176,12 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.10.07 =
+
+- Fixed Tweaks::misc() -> removed deprecated jetpack hook instagram_cache_oembed_api_response_body.
+- Fixed Filesystem::validate_fatal_error_file() -> update timestamp.
+- Added Filesystem::suspend_cache_file().
+
 = 20.10.06 =
 
 - Fixed Filesystem::scanfiles() -> missing regex pattern for dump file.
@@ -184,49 +190,6 @@ Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docke
 - Added Filesystem::dc_save() -> limit object size to 1000000.
 - Added Garbage Collector -> action button output results.
 - Added Filesystem::capture_fatal_error() -> attempt to fix any cache file error-prone.
-
-= 20.10.05 =
-
-- Fixed Litespeed Cache admin notice "Purged all caches successfully" still shown after dismiss.
-
-= 20.10.04 =
-
-- Improved CronAgent.
-- Improved CLI.
-- Improved disk I/O and CPU usage.
-- Optimized WP Alloptions.
-
-Thank you for using docket cache.
-
-= 20.10.03 =
-
-- Fixed nwdcx_optget() -> missing sql syntax.
-
-Thanks to Mark Barnes (@mark8barnes) for reporting this issue.
-
-= 20.10.02 =
-
-- Fixed output buffering issue with page caching.
-
-= 20.10.01 =
-
-This is Major Release based on previous releases.
-
-- Improved precaching.
-- Improved cache stats.
-- Improved garbage collector.
-- Improved disk I/O and CPU usage.
-- Added new constant DOCKET_CACHE_CONTENT_PATH.
-
-Thank you for using docket cache.
-
-= 20.09.07 =
-
-Fix release.
-
-- Fixed Deactivate WooCommerce Widget, prevent error notice _doing_it_wrong for the_widget.
-- Fixed Precaching, always strip query string doing_wp_cron.
-- Fixed nwdcx_network_multi function, replace with simple query to detect multinetwork condition.
 
 
 
