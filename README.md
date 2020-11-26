@@ -40,20 +40,20 @@ Thank you for sponsoring Docket Cache.
 
 **Sponsored by:**
 
-[![DNSVault](https://docketcache.com/wp-content/spx/dnsvault/dnsvault-logo.png)](https://dnsvault.net/?utm_source=dcgh)
-[![Cun Host](https://docketcache.com/wp-content/spx/cunhost/cunhost-logo.png)](https://cunhost.com/?utm_source=dcgh)
-[![Exnano Creative](https://docketcache.com/wp-content/spx/exnano/exnano-logo.png)](https://exnano.io/?utm_source=dcgh)
+[![DNSVault](https://docketcache.com/wp-content/spx/dnsvault/dnsvault-logo.png)](https://dnsvault.net/?utm_source=dcgh) 
+[![Cun Host](https://docketcache.com/wp-content/spx/cunhost/cunhost-logo.png)](https://cunhost.com/?utm_source=dcgh) 
+[![Exnano Creative](https://docketcache.com/wp-content/spx/exnano/exnano-logo.png)](https://exnano.io/?utm_source=dcgh) 
 
 <br>
 
 **Affiliates with:**
 
-[![Dreamhost](https://docketcache.com/wp-content/spx/dreamhost/dreamhost-logo.png)](https://docketcache.com/wp-content/spx/dreamhost/?utm_source=dcgh)
-[![Bluehost](https://docketcache.com/wp-content/spx/bluehost/bluehost-logo.png)](https://docketcache.com/wp-content/spx/bluehost/?utm_source=dcgh)
+[![Dreamhost](https://docketcache.com/wp-content/spx/dreamhost/dreamhost-logo.png)](https://docketcache.com/wp-content/spx/dreamhost/?utm_source=dcgh) 
+[![Bluehost](https://docketcache.com/wp-content/spx/bluehost/bluehost-logo.png)](https://docketcache.com/wp-content/spx/bluehost/?utm_source=dcgh) 
 [![Exabytes](https://docketcache.com/wp-content/spx/exabytes/exabytes-logo.png)](https://docketcache.com/wp-content/spx/exabytes/?utm_source=dcgh)    
-[![ServerFreak](https://docketcache.com/wp-content/spx/serverfreak/serverfreak-logo.png)](https://docketcache.com/wp-content/spx/serverfreak/?utm_source=dcgh)
-[![Digitalocean](https://docketcache.com/wp-content/spx/digitalocean/digitalocean-logo.png)](https://docketcache.com/wp-content/spx/digitalocean/?utm_source=dcgh)
-[![KiahStore](https://docketcache.com/wp-content/spx/kiahstore/kiahstore-logo.png)](https://docketcache.com/wp-content/spx/kiahstore/?utm_source=dcgh)
+[![ServerFreak](https://docketcache.com/wp-content/spx/serverfreak/serverfreak-logo.png)](https://docketcache.com/wp-content/spx/serverfreak/?utm_source=dcgh) 
+[![Digitalocean](https://docketcache.com/wp-content/spx/digitalocean/digitalocean-logo.png)](https://docketcache.com/wp-content/spx/digitalocean/?utm_source=dcgh) 
+[![KiahStore](https://docketcache.com/wp-content/spx/kiahstore/kiahstore-logo.png)](https://docketcache.com/wp-content/spx/kiahstore/?utm_source=dcgh) 
 
 <br><br>
 
