@@ -1,3 +1,8 @@
+= 20.10.08 (2020-11-28)
+
+- Fixed WP_Object_Cache::dc_save() -> cache meta data type, change string to array if original data serialized.
+- Fixed WP_Object_Cache::dc_save() -> wrong logic causes a random delay if array size more than 1MB.
+
 = 20.10.07 (2020-11-26)
 
 - Fixed Tweaks::misc() -> removed deprecated jetpack hook instagram_cache_oembed_api_response_body.

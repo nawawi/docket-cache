@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.10.07
+Stable tag: 20.10.08
 License: MIT
 License URI: ./license.txt
 
@@ -57,9 +57,13 @@ To use Docket Cache requires minimum:
 
 To adjust the plugin behaviour, installation or manage through a command line, please refer to the [Documentation](https://docs.docketcache.com) for details.
 
+== Development ==
+- [Report issues](https://github.com/nawawi/docket-cache/issues)
+- [Changelog](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt)
+
 == Sponsor this project ==
 
-There is a lot of room for improvement and features to add, require plenty of person-hours dedicated for testing and development.
+There is a lot of room for improvement and features to add, require plenty of person-hours dedicated to testing and development.
 
 [Become our sponsor](https://www.patreon.com/bePatron?u=41796862). All funds will be dedicated to maintenance, development, and marketing of this project.
 
@@ -79,10 +83,6 @@ Affiliates with:
 - [ServerFreak](https://secure.web-hosting.net.my/clients/aff.php?aff=4725)
 - [Digitalocean](https://m.do.co/c/6c93db5b1ef6)
 - [KiahStore](https://docketcache.com/wp-content/spx/kiahstore/?utm_source=dcwporg)
-
-== Development ==
-- [Report issues](https://github.com/nawawi/docket-cache/issues)
-- [Changelog](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt)
 
 == Hosting Provider ==
 
@@ -176,6 +176,11 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.10.08 =
+
+- Fixed WP_Object_Cache::dc_save() -> cache meta data type, change string to array if original data serialized.
+- Fixed WP_Object_Cache::dc_save() -> wrong logic causes a random delay if array size more than 1MB.
+
 = 20.10.07 =
 
 - Fixed Tweaks::misc() -> removed deprecated jetpack hook instagram_cache_oembed_api_response_body.

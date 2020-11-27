@@ -668,7 +668,7 @@ class WP_Object_Cache
             $expire = 0;
         }
 
-        $expire = $this->fs()->sanitize_second($expire);
+        $expire = $this->fs()->sanitize_timestamp($expire);
         $maxttl = $this->cache_maxttl;
 
         if (0 === $expire && $maxttl < 2419200) {
@@ -959,6 +959,7 @@ class WP_Object_Cache
             return false;
         }
 
+        // jangan gatai tangan usik. same with strlen(serialize($arr))
         $len = \strlen($data);
         if ($len >= $this->cache_maxsize) {
             $this->dc_log('err', $fname, 'Data too large: '.$len.'/'.$this->cache_maxsize);
@@ -979,6 +980,7 @@ class WP_Object_Cache
             return false;
         }
 
+        // remove lock
         $this->fs()->validate_fatal_error_file($file);
 
         return $stat;
@@ -1038,28 +1040,22 @@ class WP_Object_Cache
 
         if ($this->multisite) {
             // try to avoid error-prone
-            // in rare condition, get_current_network_id not exists.
+            // in rare condition, get_current_network_id dependencies not load properly.
             try {
                 $meta['network_id'] = get_current_network_id();
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $meta['network_id'] = 0;
             }
         }
 
+        $final_type = \gettype($data);
+
         $meta['site_id'] = get_current_blog_id();
         $meta['group'] = $group;
         $meta['key'] = $cache_key;
-        $meta['type'] = $type;
+        $meta['type'] = $final_type;
         $meta['timeout'] = $timeout;
         $meta['data'] = $data;
-
-        // array size max to 1M to avoid fatal error in some hosting.
-        $meta_len = \count($meta, true);
-        if ($meta_len >= 1000000) {
-            $this->dc_log('err', $group.':'.$cache_key, 'Object too large: '.$meta_len.'/1000000');
-
-            return false;
-        }
 
         if (true === $this->dc_code($file, $meta)) {
             // if 0 let gc handle it by comparing file mtime.

@@ -631,7 +631,7 @@ class Filesystem
             return;
         }
 
-        $fm = time() - 300; // 5m
+        $fm = time() - 10; // 10s
         if ($fm > @filemtime($file_fatal)) {
             if ($this->validate_file($file)) {
                 @unlink($file_fatal);
@@ -644,11 +644,20 @@ class Filesystem
         }
     }
 
-    private function suspend_cache_file($file, $error)
+    private function suspend_cache_file($file, $error, $seconds = 0)
     {
+        $seconds = (int) $seconds;
         $file_fatal = $this->get_fatal_error_filename($file);
 
-        return @file_put_contents($file_fatal, date('Y-m-d H:i:s T').PHP_EOL.$error, LOCK_EX);
+        if (@file_put_contents($file_fatal, date('Y-m-d H:i:s T').PHP_EOL.$error, LOCK_EX)) {
+            if ($seconds > 0) {
+                @touch($file, time() + $seconds);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function capture_fatal_error()
@@ -663,8 +672,11 @@ class Filesystem
                         $file_fatal = $this->get_fatal_error_filename($file_error);
                         $error['file'] = str_replace(ABSPATH, '/', $file_error);
 
-                        @file_put_contents($file_error, '<?php return false;', LOCK_EX);
-                        if ($this->suspend_cache_file($file_fatal, $this->export_var($error))) {
+                        $this->unlink($file_error, false);
+
+                        // 300s = 5m delay
+                        if ($this->suspend_cache_file($file_fatal, $this->export_var($error), 300)) {
+                            // refresh page if possible
                             if ('cli' !== \PHP_SAPI && !wp_doing_ajax()) {
                                 echo '<script>document.body.innerHTML="";window.setTimeout(function() { window.location.assign(window.location.href); }, 750);</script>';
                             }
@@ -692,9 +704,10 @@ class Filesystem
             return false;
         }
 
-        // handle error incase not throwable
+        // capture none throwable
         $this->capture_fatal_error();
 
+        // cache data
         $data = [];
 
         // include when we can read, try to avoid fatal error.
@@ -704,11 +717,6 @@ class Filesystem
                 $data = @include $file;
             } catch (\Throwable $e) {
                 $error = $e->getMessage();
-
-                // cleanup
-                if (false !== strpos($error, 'not found') && @preg_match('@Class.*not found@', $error)) {
-                    $this->unlink($file, false);
-                }
 
                 // delay
                 $this->suspend_cache_file($file, $error);
@@ -826,9 +834,9 @@ class Filesystem
     }
 
     /**
-     * sanitize_second.
+     * sanitize_timestamp.
      */
-    public function sanitize_second($time)
+    public function sanitize_timestamp($time)
     {
         $time = (int) $time;
         if ($time < 0) {
@@ -848,7 +856,7 @@ class Filesystem
      */
     public function sanitize_maxttl($seconds)
     {
-        $seconds = $this->sanitize_second($seconds);
+        $seconds = $this->sanitize_timestamp($seconds);
 
         // 86400 = 1d
         // 345600 = 4d
@@ -888,7 +896,7 @@ class Filesystem
      */
     public function valid_timestamp($timestamp)
     {
-        $timestamp = $this->sanitize_second($timestamp);
+        $timestamp = $this->sanitize_timestamp($timestamp);
 
         return $timestamp > 0;
     }

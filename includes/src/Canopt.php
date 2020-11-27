@@ -116,7 +116,7 @@ final class Canopt extends Bepart
         return array_keys($data);
     }
 
-    private function read_config($file = '', $force = false)
+    private function read_config($file = '', $force = false, &$error = '')
     {
         $file = empty($file) ? $this->file : $file;
         $config = [];
@@ -126,7 +126,11 @@ final class Canopt extends Bepart
                 $this->opcache_flush($file);
             }
 
-            $config = @include $file;
+            try {
+                $config = @include $file;
+            } catch (\Throwable $e) {
+                $error = $e->getMessage();
+            }
         }
 
         return $config;
@@ -241,7 +245,7 @@ final class Canopt extends Bepart
             foreach ($files as $file) {
                 if (@is_file($file) && @is_writable($file)) {
                     if (\defined('DocketCache_CLI') && DocketCache_CLI) {
-                        fwrite(STDOUT, basename($file).PHP_EOL);
+                        @fwrite(STDOUT, basename($file).PHP_EOL);
                     }
                     @unlink($file);
                 }
