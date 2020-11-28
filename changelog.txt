@@ -1,3 +1,10 @@
+= 20.10.09 (2020-11-28)
+
+- Fixed Filesystem::suspend_cache_file() -> use dump to avoid long locking.
+- Fixed Filesystem::cache_get() -> catch Throwable, only filter cache file to avoid long locking.
+- Fixed Filesystem::dump() -> remove retry, immediately return false if failed.
+- Fixed Filesystem() -> only use register_shutdown_function to capture fatal error, other than that use wp shutdown hook.
+
 = 20.10.08 (2020-11-28)
 
 - Fixed WP_Object_Cache::dc_save() -> cache meta data type, change string to array if original data serialized.

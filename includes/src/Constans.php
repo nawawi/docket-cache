@@ -338,5 +338,10 @@ final class Constans
 
         // wp feed
         $this->maybe_define($this->px('WPFEED'), false);
+
+        // @private
+        // capture fatal error none throwable
+        // set true for debugging only
+        $this->maybe_define($this->px('CAPTURE_FATALERROR'), false);
     }
 }

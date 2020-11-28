@@ -50,8 +50,8 @@ Thank you for sponsoring Docket Cache.
 
 [![Dreamhost](https://docketcache.com/wp-content/spx/dreamhost/dreamhost-logo.png)](https://docketcache.com/wp-content/spx/dreamhost/?utm_source=dcgh) 
 [![Bluehost](https://docketcache.com/wp-content/spx/bluehost/bluehost-logo.png)](https://docketcache.com/wp-content/spx/bluehost/?utm_source=dcgh) 
-[![Exabytes](https://docketcache.com/wp-content/spx/exabytes/exabytes-logo.png)](https://docketcache.com/wp-content/spx/exabytes/?utm_source=dcgh)    
-[![LiteSpeed](https://docketcache.com/wp-content/spx/litespeed/litespeed-logo.png)](https://docketcache.com/wp-content/spx/litespeed/?utm_source=dcgh) 
+[![LiteSpeed](https://docketcache.com/wp-content/spx/litespeed/litespeed-logo.png)](https://docketcache.com/wp-content/spx/litespeed/?utm_source=dcgh)    
+[![Pikoseeds](https://docketcache.com/wp-content/spx/pikoseed/pikoseed-logo.png?a=1)](https://docketcache.com/wp-content/spx/pikoseed/?utm_source=dcgh) 
 [![Digitalocean](https://docketcache.com/wp-content/spx/digitalocean/digitalocean-logo.png)](https://docketcache.com/wp-content/spx/digitalocean/?utm_source=dcgh) 
 [![KiahStore](https://docketcache.com/wp-content/spx/kiahstore/kiahstore-logo.png)](https://docketcache.com/wp-content/spx/kiahstore/?utm_source=dcgh) 
 

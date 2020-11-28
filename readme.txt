@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.10.08
+Stable tag: 20.10.09
 License: MIT
 License URI: ./license.txt
 
@@ -79,8 +79,8 @@ Affiliates with:
 
 - [Dreamhost](https://mbsy.co/3cGLwM)
 - [Bluehost](https://www.bluehost.com/track/docketcache/)
-- [Exabytes](https://billing.exabytes.my/mypanel/aff.php?aff=8102792)
-- [ServerFreak](https://secure.web-hosting.net.my/clients/aff.php?aff=4725)
+- [LiteSpeed](https://store.litespeedtech.com/store/aff.php?aff=1260&promo=wpaccel)
+- [Pikoseeds](https://docketcache.com/wp-content/spx/pikoseed/?utm_source=dcwporg)
 - [Digitalocean](https://m.do.co/c/6c93db5b1ef6)
 - [KiahStore](https://docketcache.com/wp-content/spx/kiahstore/?utm_source=dcwporg)
 
@@ -94,6 +94,8 @@ The Docket Cache has been reported seemly works with these hosting provider:
 - [JimatHosting](https://jimathosting.com/)
 - [iWHOST](https://www.iwhost.com/)
 - [Hostinger](https://www.hostinger.com/)
+- [Exabytes](https://billing.exabytes.my/mypanel/aff.php?aff=8102792)
+- [ServerFreak](https://secure.web-hosting.net.my/clients/aff.php?aff=4725)
 
 
 == Installation ==
@@ -176,6 +178,15 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.10.09 =
+
+Hotfix release.
+
+- Fixed Filesystem::suspend_cache_file() -> use dump to avoid long locking.
+- Fixed Filesystem::cache_get() -> catch Throwable, only filter cache file to avoid long locking.
+- Fixed Filesystem::dump() -> remove retry, immediately return false if failed.
+- Fixed Filesystem() -> only use register_shutdown_function to capture fatal error, other than that use wp shutdown hook.
+
 = 20.10.08 =
 
 - Fixed WP_Object_Cache::dc_save() -> cache meta data type, change string to array if original data serialized.

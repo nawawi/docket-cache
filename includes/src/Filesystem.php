@@ -224,15 +224,17 @@ class Filesystem
         clearstatcache();
 
         if (false === $ok) {
+            // jangan gatai tangan usik.
+            // jangan guna register_shutdown_function.
             // if failed, try to remove on shutdown instead of truncate
-            // use native shutdown
-            register_shutdown_function(
-                function ($file) {
+            add_action(
+                'shutdown',
+                function () use ($file) {
                     if (@is_file($file)) {
                         @unlink($file);
                     }
                 },
-                $file
+                PHP_INT_MAX - 1
             );
         }
 
@@ -280,35 +282,19 @@ class Filesystem
      */
     public function dump($file, $data, $is_validate = false)
     {
-        static $retry = 0;
         $dir = \dirname($file);
         $tmpfile = $dir.'/'.'dump_'.uniqid().'_'.basename($file);
 
-        if (@is_file($tmpfile)) {
-            $fm = time() + 120; // 2 minutes
-            if ($fm > @filemtime($tmpfile)) {
-                @unlink($tmpfile);
-
-                return false;
-            }
-
-            if ($retry > 5) {
-                return -1;
-            }
-
-            ++$retry;
-
-            return $this->dump($file, $data);
-        }
-
-        // use native shutdown
-        register_shutdown_function(
-            function ($tmpfile) {
+        // jangan gatai tangan usik.
+        // rename failed
+        add_action(
+            'shutdown',
+            function () use ($tmpfile) {
                 if (@is_file($tmpfile)) {
                     @unlink($tmpfile);
                 }
             },
-            $tmpfile
+            PHP_INT_MAX
         );
 
         $this->opcache_flush($file);
@@ -605,10 +591,8 @@ class Filesystem
 
     public function get_fatal_error_filename($file)
     {
-        $filename = basename($file);
-        $filename = str_replace($filename, 'fatal-'.$filename, $file);
-
-        return str_replace('.php', '.txt', $filename);
+        // sesimple yang mungkin.
+        return $file.'-error.txt';
     }
 
     public function has_fatal_error_before($file)
@@ -649,10 +633,13 @@ class Filesystem
         $seconds = (int) $seconds;
         $file_fatal = $this->get_fatal_error_filename($file);
 
-        if (@file_put_contents($file_fatal, date('Y-m-d H:i:s T').PHP_EOL.$error, LOCK_EX)) {
+        $errmsg = date('Y-m-d H:i:s T').PHP_EOL.$error;
+        if ($this->dump($file_fatal, $errmsg)) {
             if ($seconds > 0) {
                 @touch($file, time() + $seconds);
             }
+
+            $this->dump(\dirname($file_fatal).'/last-error.txt', $errmsg);
 
             return true;
         }
@@ -660,7 +647,12 @@ class Filesystem
         return false;
     }
 
-    public function capture_fatal_error()
+    public function is_cache_file($file)
+    {
+        return false !== strpos($file, '/docket-cache/') && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', basename($file));
+    }
+
+    private function capture_fatal_error()
     {
         register_shutdown_function(
             function () {
@@ -668,14 +660,12 @@ class Filesystem
                 if ($error && \in_array($error['type'], [E_ERROR, E_PARSE, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR, E_CORE_ERROR], true)) {
                     $file_error = $error['file'];
 
-                    if (false !== strpos($file_error, '/docket-cache/') && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', basename($file_error))) {
-                        $file_fatal = $this->get_fatal_error_filename($file_error);
-                        $error['file'] = str_replace(ABSPATH, '/', $file_error);
+                    if ($this->is_cache_file($file_error)) {
+                        $this->dump($file_error, '<?php return false;');
 
-                        $this->unlink($file_error, false);
-
+                        $error['file'] = basename($error['file']);
                         // 300s = 5m delay
-                        if ($this->suspend_cache_file($file_fatal, $this->export_var($error), 300)) {
+                        if ($this->suspend_cache_file($file_error, $this->export_var($error), 300)) {
                             // refresh page if possible
                             if ('cli' !== \PHP_SAPI && !wp_doing_ajax()) {
                                 echo '<script>document.body.innerHTML="";window.setTimeout(function() { window.location.assign(window.location.href); }, 750);</script>';
@@ -705,7 +695,9 @@ class Filesystem
         }
 
         // capture none throwable
-        $this->capture_fatal_error();
+        if (nwdcx_construe('CAPTURE_FATALERROR')) {
+            $this->capture_fatal_error();
+        }
 
         // cache data
         $data = [];
@@ -718,8 +710,13 @@ class Filesystem
             } catch (\Throwable $e) {
                 $error = $e->getMessage();
 
-                // delay
-                $this->suspend_cache_file($file, $error);
+                $file_error = $e->getFile();
+                if ($this->is_cache_file($file_error)) {
+                    $errmsg = 'E: '.$error.PHP_EOL;
+                    $errmsg .= 'L: '.$e->getLine().PHP_EOL;
+                    $errmsg .= 'F: '.basename($file_error).PHP_EOL;
+                    $this->suspend_cache_file($file, $errmsg);
+                }
 
                 $this->log('err', 'internalproc-internalfunc', 'cache_get: '.$error);
                 $data = false;
