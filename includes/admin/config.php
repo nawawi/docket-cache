@@ -17,49 +17,49 @@ namespace Nawawi\DocketCache;
         <div class="row-left">
             <?php $this->tab_title(esc_html__('Configuration', 'docket-cache')); ?>
             <table class="form-table form-table-selection">
-                <tr>
+                <tr id="cronbot">
                     <th><?php esc_html_e('Cronbot Service', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('cronbot'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="log">
                     <th class="border-b"><?php esc_html_e('Cache Log', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('log'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="advpost">
                     <th><?php esc_html_e('Advanced Post Caching', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('advcpost'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="precache">
                     <th><?php esc_html_e('Object Cache Precaching', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('precache'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="mocache">
                     <th class="border-b"><?php esc_html_e('WordPress Translation Caching', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('mocache'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="optwpquery">
                     <th><?php esc_html_e('Optimize WP Query', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('optwpquery'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="optermcount">
                     <th><?php esc_html_e('Optimize Term Count Queries', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('optermcount'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="cronoptmzdb">
                     <th><?php esc_html_e('Optimize Database Tables', 'docket-cache'); ?></th>
                     <td>
                         <?php
@@ -76,109 +76,121 @@ namespace Nawawi\DocketCache;
                             ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="wpoptaload">
                     <th class="border-b"><?php esc_html_e('Suspend WP Options Autoload', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpoptaload'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="postmissedschedule">
                     <th><?php esc_html_e('Post Missed Schedule Tweaks', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('postmissedschedule'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="misc_tweaks">
                     <th><?php esc_html_e('Misc Performance Tweaks', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('misc_tweaks'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="wootweaks">
                     <th><?php esc_html_e('Misc WooCommerce Tweaks', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wootweaks'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="wooadminoff">
                     <th><?php esc_html_e('Deactivate WooCommerce Admin', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wooadminoff'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="woowidgetoff">
                     <th><?php esc_html_e('Deactivate WooCommerce Widget', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('woowidgetoff'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="woowpdashboardoff">
                     <th class="border-b"><?php esc_html_e('Deactivate WooCommerce WP Dashboard', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('woowpdashboardoff'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="pingback">
                     <th><?php esc_html_e('Remove XML-RPC / Pingbacks', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('pingback'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="headerjunk">
                     <th><?php esc_html_e('Remove WP Header Junk', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('headerjunk'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="wpemoji">
                     <th><?php esc_html_e('Remove WP Emoji', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpemoji'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="wpfeed">
                     <th><?php esc_html_e('Remove WP Feed', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpfeed'); ?>
                     </td>
                 </tr>
-                <tr>
-                    <th class="border-b"><?php esc_html_e('Remove WP Embed', 'docket-cache'); ?></th>
+                <tr id="wpembed">
+                    <th><?php esc_html_e('Remove WP Embed', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpembed'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="wplazyload">
+                    <th><?php esc_html_e('Remove WP Lazy Load', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('wplazyload'); ?>
+                    </td>
+                </tr>
+                <tr id="wpsitemap">
+                    <th class="border-b"><?php esc_html_e('Remove WP Sitemap', 'docket-cache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('wpsitemap'); ?>
+                    </td>
+                </tr>
+                <tr id="preload">
                     <th><?php esc_html_e('Admin Page Cache Preloading', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('preload'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="pageloader">
                     <th><?php esc_html_e('Admin Page Loader', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('pageloader'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="stats">
                     <th><?php esc_html_e('Object Cache Data Stats', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('stats'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="gcaction">
                     <th class="border-b"><?php esc_html_e('Garbage Collector Action Button', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('gcaction'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="autoupdate">
                     <th><?php esc_html_e('Docket Cache Auto Update', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('autoupdate'); ?>
                     </td>
                 </tr>
-                <tr>
+                <tr id="checkversion">
                     <th><?php esc_html_e('Check Critical Version', 'docket-cache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('checkversion'); ?>

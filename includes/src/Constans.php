@@ -165,7 +165,7 @@ final class Constans
         // log on/off
         $this->maybe_define($this->px('LOG'), false);
 
-        // private: log on/off
+        // log all on/off
         $this->maybe_define($this->px('LOG_ALL'), (\defined('WP_DEBUG') ? WP_DEBUG : false));
 
         // log file
@@ -243,6 +243,12 @@ final class Constans
         // cache ignored group:key
         $this->maybe_define($this->px('IGNORED_GROUPKEY'), []);
 
+        // precache
+        $this->maybe_define($this->px('PRECACHE'), true);
+
+        // precache maxfile: < 1, false, null = unlimited
+        $this->maybe_define($this->px('PRECACHE_MAXFILE'), 0);
+
         // @private
         // cache ignored precache
         $this->maybe_define(
@@ -297,9 +303,6 @@ final class Constans
         // preload
         $this->maybe_define($this->px('PRELOAD'), false);
 
-        // precache
-        $this->maybe_define($this->px('PRECACHE'), true);
-
         // page loader
         $this->maybe_define($this->px('PAGELOADER'), true);
 
@@ -338,6 +341,12 @@ final class Constans
 
         // wp feed
         $this->maybe_define($this->px('WPFEED'), false);
+
+        // wp lazyload
+        $this->maybe_define($this->px('WPLAZYLOAD'), false);
+
+        // wp sitemap
+        $this->maybe_define($this->px('WPSITEMAP'), false);
 
         // @private
         // capture fatal error none throwable

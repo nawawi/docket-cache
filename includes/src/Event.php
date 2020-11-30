@@ -178,6 +178,13 @@ final class Event
             $maxfile = $maxfileo - 1000;
         }
 
+        $maxfileo_pre = (int) $this->pt->get_precache_maxfile();
+        $maxfile_pre = $maxfileo_pre;
+
+        if ($maxfileo_pre > 10000) {
+            $maxfile_pre = $maxfileo_pre - 1000;
+        }
+
         $maxttl0 = (int) $this->pt->get_cache_maxttl();
         $maxttl = $maxttl0;
         if (!empty($maxttl)) {
@@ -200,6 +207,7 @@ final class Event
             'cache_maxfile' => $maxfileo,
             'cache_maxdisk' => $maxsizedisk0,
             'cleanup_maxfile' => 0,
+            'cleanup_precache_maxfile' => 0,
             'cleanup_maxttl' => 0,
             'cleanup_maxdisk' => 0,
             'cache_file' => 0,
@@ -214,11 +222,12 @@ final class Event
 
         wp_suspend_cache_addition(true);
 
-        $delay = $force ? 450 : 1000;
+        $delay = $force ? 650 : 1000;
         if ($this->pt->is_docketcachedir($this->pt->cache_path)) {
             clearstatcache();
             $fsizetotal = 0;
             $cnt = 0;
+            $pcnt = 0;
             $slowdown = 0;
             foreach ($this->pt->scanfiles($this->pt->cache_path) as $object) {
                 $fx = $object->getPathName();
@@ -242,6 +251,24 @@ final class Event
 
                     usleep(100);
                     continue;
+                }
+
+                // 032e9f2c5b60- = docketcache-precache-
+                if ($maxfile_pre > 0 && '032e9f2c5b60-' === substr($fn, 0, 13)) {
+                    ++$pcnt;
+
+                    if ($pcnt > $maxfile_pre) {
+                        $this->pt->unlink($fx, true);
+
+                        if ($force && @is_file($fx)) {
+                            ++$collect->cleanup_failed;
+                        }
+
+                        ++$collect->cleanup_precache_maxfile;
+
+                        usleep(100);
+                        continue;
+                    }
                 }
 
                 if ($cnt >= $maxfile) {
@@ -330,7 +357,7 @@ final class Event
                 ++$slowdown;
             }
 
-            $collect->cache_cleanup = $collect->cleanup_maxttl + $collect->cleanup_maxfile + $collect->cleanup_maxdisk;
+            $collect->cache_cleanup = $collect->cleanup_maxttl + $collect->cleanup_maxfile + $collect->cleanup_maxdisk + $collect->cleanup_precache_maxfile;
         }
 
         wp_suspend_cache_addition(false);

@@ -42,6 +42,10 @@ $log = $this->parse_log_query();
                         ?>
                     </td>
                 </tr>
+                <tr class="form-table-selection">
+                    <th><?php esc_html_e('Log All', 'docket-cache'); ?></th>
+                    <td><?php echo $this->config_select_bool('log_all', 'dcdefault', 'log', 1); ?></td>
+                </tr>
                 <tr>
                     <th><?php esc_html_e('Log File', 'docket-cache'); ?></th>
                     <td>

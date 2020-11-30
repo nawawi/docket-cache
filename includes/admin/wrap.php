@@ -53,3 +53,7 @@ elseif ($this->do_flush) :
 elseif ($this->do_fetch) :
     echo $this->pt->code_worker('fetch');
 endif;
+
+if (($this->tab_current('config') || $this->tab_current('log')) && !empty($_GET['nx'])) :
+    echo $this->code_focus();
+endif;

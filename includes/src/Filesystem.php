@@ -191,6 +191,23 @@ class Filesystem
     }
 
     /**
+     * shutdown_cleanup.
+     */
+    public function shutdown_cleanup($file, $seq = 10)
+    {
+        // dont use register_shutdown_function to avoid issue with page cache plugin
+        add_action(
+            'shutdown',
+            function () use ($file) {
+                if (@is_file($file)) {
+                    @unlink($file);
+                }
+            },
+            $seq
+        );
+    }
+
+    /**
      * unlink.
      */
     public function unlink($file, $is_delete = false, $is_block = false)
@@ -206,7 +223,7 @@ class Filesystem
         if ($handle) {
             $lock = $is_block ? LOCK_EX : LOCK_EX | LOCK_NB;
             if (@flock($handle, $lock)) {
-                $ok = @ftruncate($handle, 0);
+                $ok = @ftruncate($handle, 0); // true, false
                 @flock($handle, LOCK_UN);
             }
             @fclose($handle);
@@ -223,19 +240,12 @@ class Filesystem
 
         clearstatcache();
 
+        // cleanup if ftruncate() failed
         if (false === $ok) {
-            // jangan gatai tangan usik.
-            // jangan guna register_shutdown_function.
-            // if failed, try to remove on shutdown instead of truncate
-            add_action(
-                'shutdown',
-                function () use ($file) {
-                    if (@is_file($file)) {
-                        @unlink($file);
-                    }
-                },
-                PHP_INT_MAX - 1
-            );
+            if (@is_file($file) && !@unlink($file)) {
+                // try cleanup at shutdown
+                $this->shutdown_cleanup($file);
+            }
         }
 
         // always true
@@ -266,7 +276,7 @@ class Filesystem
         clearstatcache();
 
         if (false === $ok) {
-            $this->unlink($file, false);
+            $this->unlink($file, true);
 
             return -1;
         }
@@ -285,17 +295,8 @@ class Filesystem
         $dir = \dirname($file);
         $tmpfile = $dir.'/'.'dump_'.uniqid().'_'.basename($file);
 
-        // jangan gatai tangan usik.
-        // rename failed
-        add_action(
-            'shutdown',
-            function () use ($tmpfile) {
-                if (@is_file($tmpfile)) {
-                    @unlink($tmpfile);
-                }
-            },
-            PHP_INT_MAX
-        );
+        // cleanup at shutdown
+        $this->shutdown_cleanup($tmpfile, PHP_INT_MAX);
 
         $this->opcache_flush($file);
 
@@ -318,7 +319,12 @@ class Filesystem
             $ok = false;
         }
 
-        // maybe -1, true, false
+        // cleanup if not bool true
+        if (@is_file($tmpfile)) {
+            @unlink($tmpfile);
+        }
+
+        // maybe -1, >= 1, false: return from put()
         return $ok;
     }
 
@@ -870,11 +876,10 @@ class Filesystem
     /**
      * sanitize_maxfile.
      */
-    public function sanitize_maxfile($maxfile)
+    public function sanitize_maxfile($maxfile, $default = 50000)
     {
         $min = 200;
         $max = 1000000;
-        $default = 50000;
         if (empty($maxfile) || !\is_int($maxfile)) {
             $maxfile = $default;
         }

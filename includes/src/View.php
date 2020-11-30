@@ -268,56 +268,9 @@ final class View
             unset($lists['cronbot']);
         }
 
-        $icon = 'iVBORw0KGgoAAAANSUhEUgAAAG8AAAAfCAYAAADp55OhAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz';
-        $icon .= 'AAAOywAADssB4+WgAQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAlJSURB';
-        $icon .= 'VGiB7ZtpkFTVFcd/53X3655BxSWJSkxMADfUiD0NowSVqVKrYgVcoHsmQTHlgoZFqUQSg1kgJsYY';
-        $icon .= 'tXQKsdypQmRmWiDikrhEUQkVnO4eUcAVk5SKQjA6jg7dr3veyYf72nkMPUvPQL7Y/6qu6XfPueec';
-        $icon .= 'e89y77t9RxggWuPhY0SYDHqiCKKII6oRwFEIiCC4vCGWPhZtzm8cqNwKBg/pjyGTCJ6uYs1CdZuo';
-        $icon .= 'PvI2hXWJJF09+RQk3RAab6mcp8pRqvJALJl7fN+YXQH04bzWqZGRVsBdJLApq07jhCS7Bio0NZMQ';
-        $icon .= 'H4cuE5FJqvwulnRe3TvmVuBHSeelEpE6EfcKtZw5sRXsHKzwzXH2y4rdiPBYTbOzavBmVlAKezgv';
-        $icon .= 'Ux+aocrYT3fkf1a3loKCCOhgFShIW8K+zkWysZbczUMzt4JekW4InpZJhHab4EzCnpqaah87VNmp';
-        $icon .= 'uH1tJmH/YKhyKuiGVfySqg+PwrVmte/IX+tn6Mw6T0mQNa3x8FlDUVSTdP6oSF06HqoZipwKuvGF';
-        $icon .= '80R1USHvzKlbS8HPMHENHaLcZ4km04nQ5YNVJKA5zV0NskAXduutYPCwADLx4BmKvFy7mo9KMQXC';
-        $icon .= 'zmLgNUSOTNeHbhvs5E9IsgthdXqz3TAEmyvwYJwg1uyO6tzi3phOWsbnqKwC3SrKK5kt9orUZKoH';
-        $icon .= 'ozA6xnlIhGmV7Bs6rEzcHuOKvlu3lGyqIVTbFg+NLTWxwUhuCSoz3QPzywTrHqmyV62Pc3C5CmUh';
-        $icon .= 'riLrM5sjk/bKCL7EsBAmi+ifAYa35192LflJZou9M52wH07Vhy7beEHVEWCyT1SStIcujrZkn1HR';
-        $icon .= 'BRFCK1MXVB9etlZhNdI1eS+P5UsHS+GErV2F9QBH/YVcTbMzQ5WbBJ0oyphC0F2RSdgbUnH7Whd9';
-        $icon .= 'WlQuSc0kFGvOZ7osmSuBwsMvNVR9oxylsebcVkUO3TdD2gP7AfOBuv+TvqFgFnDGQJktgJ5nlbGk';
-        $icon .= 'c6OIXAFyFgGd7RaC5wnymSB3AGPlE/uGVJzh45qdTepyacB1HxpEBua19+O524EW7/MH4Gtlyt5N';
-        $icon .= 'D3AYcP4g+i6GftfmscALwOvAg8CMQegp4qvAeQNlthTcUoSTm51HCDCdLpYHQoXxNcnc4ppk7nSx';
-        $icon .= 'gqNF5QMR+9lMfXiJZWGh7jwJFlZtOJ9DBm6ntm+Yzv69EDOYSV8C5IC1QMRHDwC9BcvBwEGYSRev';
-        $icon .= '/+p+jNkf4+CeqAWq+ug3AhNg84EaTJYf56NHgJG9yBjm01kMkLXe32qgVGWygSPxgt6y+jj6qlnh';
-        $icon .= 'vKIBp05VZ2cS9s8Bok2d26LJ3K3RFieGyEqFm1XkKhW9Lxiyl7fECfQxWB+kM7irelgvxA+A7d5g';
-        $icon .= 'FgJPAsXTmWnAP4FHgNeAqG9gTcA7wL+BTR6vH18HHOBfHj/AnzDB8ijwNMaREWApMApYhnHQ9BJ2';
-        $icon .= 'zgHuBDYAnwO3Ae0erQZ4z7PpTeA7vn4LvPFtAV71bCjiFGAjJpMv8rVf6MlZ5o3tmH6367EV7Gzf';
-        $icon .= 'kT9H4SuZ+vCSonMENNqU/VtN0jlHVe8QpR4kOkrsG/qTaaDVharOzwfGywuYwR8K3Ap8FxgPXOEN';
-        $icon .= 'RoAfA0FMiR0BZDHR7cdc4EZMNjjA94CTMdkyDmgDrvFoS4H/APcCdwN/L2HXyUCr73mtJx/gbc/m';
-        $icon .= '8Z7MC732U4EfAt/GlMlUDzurvX4xYLbXNgL4jdd2OvAroDGo9J8p5tTFmZ+ptxtGir0sNdm5LPYo';
-        $icon .= 'nUX6uGT+JYWz04nwXIGbWhtCTeOa8m2ZeHgKoqdEW5wFPWWKyIG1y+noT7eHLBD2Bv4U8K7X/oJH';
-        $icon .= 'OwI4C7geM/EOJuscn4wG4CPgeLqXijpP7h3e8+GYEudiHPEp8KynoxSqe+jwYyTQiCnhQWC9134m';
-        $icon .= 'cA8mMACuAkb7+j0H7AK20r1UnOLZ9HvvOQBMsAAGWuqizU4TXfxWqkM3/GM6B/hpAhpryTUierWl';
-        $icon .= '1pWZhuoRWXLrXJXtpQ62VQmW8WvF8cAbGP6e1cLy2pXdN0DvYMpWEeuANYD/7FYxJS/pfRoxGexH';
-        $icon .= 'qA+73gRO6oV2J2YtPAG4pIdOv50dmIwvwn88WQwyBd7y2dkETLKAV0cTnNiHgbshttJ5XYfn59v5';
-        $icon .= 'yPhSu0Udnr8f5dhoU+e2CUn+2zEsdxcBfuTnScfDowX9cIAqTwUuB5ZjovdMzFoEJtsCwPvAX4Gf';
-        $icon .= 'YqK8CrNj9R+mvwdc57VN8tqeB04EXgSeAT7GlOQi2oGjPZnTMEHkxz2YYDjSe57i2QAm497BZM+l';
-        $icon .= 'vj5Pes+HYOZvlq9Pb9jg2bHRs/MtoI50vX1cOhG6tZ/OA8ZL8WGHpRJ2Esyv8ZlE6PZMwl7aOjUy';
-        $icon .= 'ssiTSoSvSSUifb13PYMpcTswa8rZPtoUzIZjC/AK3RuBEHAfsNP73IUpiQdh1p9fe3x3Ax9iAgLg';
-        $icon .= 'Foxj38RkgF/XuZjA2Ak8AXyzhK1XAp9hNiDFSQa4GlN2P8AEzft0v0bM88a3HbMMFHed64FtmGxe';
-        $icon .= 'hCmt8zzaDI+2BbNhmyUAmYTdklXn4nKuOpSC98NrsxW07nTdrg51rcOD4dyz+ax9riUaibbk79eF';
-        $icon .= 'WJkt9sPRMc40WVj6NWWAOAiTKT0xDFN6cmXICmMypL0EzcIERl/yhmFeE7b3aD8Aswvd484PJpur';
-        $icon .= 'MQ4eKALAgRjHEzRt7uKw2HPBuakMQbsh01A9It1VWCJK60lHZ5/f3THOQ8Vvba+FLhShZYiOg9KO';
-        $icon .= 'AzNZ5SJH785x+6D5dZbS25djCv3QS6ELun/5+WLNSifsBzXgzCvnzkoqznCscC2qtSJ6CC7LapL5';
-        $icon .= 'dG/86+NUhbEfjCadaUO5WlFBD7ROjYxM19tNz00qZuPehYKk6sP3pupD0f65Kygb6Ybgaan60C37';
-        $icon .= 'QnYqYf+icodl72LP22Px0EUqRD/dkZ/f80rEYKAg6YT9S5DOWEtunwTGlxUlT/Uz8eAZKtYsUWdO';
-        $icon .= 'NPnFSUDZWDeF/auq7EZc1tQknf4OhysoE73emG5riHyry3UXAa876txW7o1p+SQ8E9HTAgWuH7vS';
-        $icon .= '2bxXrK1gN/T7vwqpeHCiiDUb9EMlsKZjR/bFUuVUF2K1bQ7WumKdC4xS5IFxLbkn9onVFQADcF4R';
-        $icon .= '6Xh4NBbfF9WxKlgoeREiqmQRc/4nyuYu4fFxzc6mfWdyBUX8DxR1MjzQEuhgAAAAAElFTkSuQmCC';
-
-        //$icon = plugin_dir_url($this->pt->file).'/includes/admin/header.svg?'.time();
         $option = '';
         $html = '<nav class="nav-tab-wrapper">';
-        $html .= '<div id="dclogo" style="background: url(data:image/png;base64,'.$icon.') no-repeat left;"></div>';
-        //$html .= '<div id="dclogo" style="background: url('.$icon.') no-repeat left;background-size: 130px 31px;"></div>';
+        $html .= '<div id="dclogo" style="background: url('.Resc::iconnav().') no-repeat left;"></div>';
         foreach ($lists as $id => $text) {
             $link = $this->tab_query($id);
             $active = $this->tab_active($id);
@@ -404,10 +357,17 @@ final class View
         return $output;
     }
 
-    private function config_select_bool($name, $default = 'dcdefault')
+    private function config_select_bool($name, $default = 'dcdefault', $idx = 'config', $quiet = false)
     {
         if ('dcdefault' === $default) {
             $default = $this->vcf()->dcvalue(strtoupper($name));
+        }
+
+        $args = [];
+        $args['idx'] = $idx;
+
+        if ($quiet) {
+            $args['quiet'] = 1;
         }
 
         $default = $default ? 'enable' : 'disable';
@@ -418,7 +378,7 @@ final class View
             'disable' => __('Disable', 'docket-cache'),
         ] as $n => $v) {
             $action = $n.'-'.$name;
-            $url = $this->pt->action_query($action, ['idx' => 'config']);
+            $url = $this->pt->action_query($action, $args);
             $selected = $n === $default ? ' selected' : '';
             $html .= '<option value="'.$n.'" data-action-link="'.$url.'"'.$selected.'>'.$v.'</option>';
         }
@@ -488,5 +448,20 @@ final class View
         $inst->prepare_items();
 
         return $inst;
+    }
+
+    private function code_focus()
+    {
+        if (empty($_GET['nx'])) {
+            return;
+        }
+
+        $nx = sanitize_text_field($_GET['nx']);
+        $code = '<script id="docket-cache-focus">'.PHP_EOL;
+        $code .= 'var fx = document.getElementById("'.$nx.'");'.PHP_EOL;
+        $code .= 'fx.scrollIntoView({block:"center"});'.PHP_EOL;
+        $code .= '</script>';
+
+        return $code;
     }
 }

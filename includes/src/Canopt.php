@@ -78,6 +78,7 @@ final class Canopt extends Bepart
         $data = [
             'log' => esc_html__('Cache Log', 'docket-cache'),
             'log_time' => esc_html__('Log Timestamp', 'docket-cache'),
+            'log_all' => esc_html__('Log All', 'docket-cache'),
             'preload' => esc_html__('Admin Page Cache Preloading', 'docket-cache'),
             'advcpost' => esc_html__('Advanced Post Caching', 'docket-cache'),
             'optermcount' => esc_html__('Optimize Term Count Queries', 'docket-cache'),
@@ -103,6 +104,8 @@ final class Canopt extends Bepart
             'wpemoji' => esc_html__('Remove WP Emoji', 'docket-cache'),
             'wpembed' => esc_html__('Remove WP Embed', 'docket-cache'),
             'wpfeed' => esc_html__('Remove WP Feed', 'docket-cache'),
+            'wplazyload' => esc_html__('Remove WP Lazy Load', 'docket-cache'),
+            'wpsitemap' => esc_html__('Remove WP Sitemap', 'docket-cache'),
         ];
 
         if (false !== $key) {

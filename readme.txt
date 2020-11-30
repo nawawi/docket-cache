@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.10.09
+Stable tag: 20.10.12
 License: MIT
 License URI: ./license.txt
 
@@ -71,32 +71,27 @@ Thank you for sponsoring Docket Cache.
 
 Sponsored by:
 
-- [DNSVault](https://dnsvault.net/?utm_source=dcwporg)
-- [Cun Host](https://cunhost.com/?utm_source=dcwporg)
-- [Exnano Creative](https://exnano.io/?utm_source=dcwporg)
+- [DNSVault](https://dnsvault.net/?utm_source=docketcachewporg)
+- [Cun Host](https://cunhost.com/?utm_source=docketcachewporg)
+- [Exnano Creative](https://exnano.io/?utm_source=docketcachewporg)
 
 Affiliates with:
 
 - [Dreamhost](https://mbsy.co/3cGLwM)
-- [Bluehost](https://www.bluehost.com/track/docketcache/)
 - [LiteSpeed](https://store.litespeedtech.com/store/aff.php?aff=1260&promo=wpaccel)
-- [Pikoseeds](https://docketcache.com/wp-content/spx/pikoseed/?utm_source=dcwporg)
+- [Bluehost](https://www.bluehost.com/track/docketcache/)
+- [Onlinenic](https://onlinenic.com/en/Home/cloudReferral.html?usercode=87783819348ea6021e9df91d9bfd4981)
 - [Digitalocean](https://m.do.co/c/6c93db5b1ef6)
-- [KiahStore](https://docketcache.com/wp-content/spx/kiahstore/?utm_source=dcwporg)
-
-== Hosting Provider ==
+- [KiahStore](https://docketcache.com/wp-content/spx/kiahstore/?utm_source=docketcachewporg)
+- [Pikoseeds](https://docketcache.com/wp-content/spx/pikoseed/?utm_source=docketcachewporg)
 
 The Docket Cache has been reported seemly works with these hosting provider:
 
-- [GB Network](https://www.gbnetwork.my/)
-- [Zenpipe](https://www.zenpipe.com/)
-- [KelateBiz](https://kelate.biz/)
-- [JimatHosting](https://jimathosting.com/)
-- [iWHOST](https://www.iwhost.com/)
-- [Hostinger](https://www.hostinger.com/)
-- [Exabytes](https://billing.exabytes.my/mypanel/aff.php?aff=8102792)
+- [GB Network](https://www.gbnetwork.my/?utm_source=docketcachewporg)
+- [Zenpipe](https://www.zenpipe.com/?utm_source=docketcachewporg)
+- [KelateBiz](https://kelate.biz/?utm_source=docketcachewporg)
 - [ServerFreak](https://secure.web-hosting.net.my/clients/aff.php?aff=4725)
-
+- [Exabytes](https://billing.exabytes.my/mypanel/aff.php?aff=8102792)
 
 == Installation ==
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
@@ -178,6 +173,19 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.10.12 =
+
+- Fixed File cleanup -> use shutdown hook instead of register_shutdown_function to avoid issue with *some* page cache plugin.
+- Added DOCKET_CACHE_PRECACHE_MAXFILE constant to limit precache file.
+
+= 20.10.10 =
+
+- Fixed Max Cache Size -> validate sizeof object instead of exported data.
+- Fixed Filesystem -> use php shutdown at dump and unlink methods.
+- Added Resc class -> handle base64 icons and image.
+- Added Configuration -> option to remove WP Lazy Load and WP Sitemap.
+- Added Configuration -> scroll at option position after select to change configuration.
+
 = 20.10.09 =
 
 Hotfix release.

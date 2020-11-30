@@ -959,14 +959,6 @@ class WP_Object_Cache
             return false;
         }
 
-        // jangan gatai tangan usik. same with strlen(serialize($arr))
-        $len = \strlen($data);
-        if ($len >= $this->cache_maxsize) {
-            $this->dc_log('err', $fname, 'Data too large: '.$len.'/'.$this->cache_maxsize);
-
-            return false;
-        }
-
         $code = $this->fs()->code_stub($data);
         $stat = $this->fs()->dump($file, $code, false); // 3rd param = validate
 
@@ -1026,11 +1018,20 @@ class WP_Object_Cache
             }
         }
 
+        $fname = $group.':'.$cache_key;
+
         // since timeout set to timestamp.
         if (0 === $expire && !empty($key) && @is_file($file) && $this->is_data_uptodate($key, $group, $data)) {
             if ($this->cf()->is_dctrue('DEV')) {
-                $this->dc_log('info', $group.':'.$cache_key, __FUNCTION__.'()->nochanges');
+                $this->dc_log('info', $fname, __FUNCTION__.'()->nochanges');
             }
+
+            return false;
+        }
+
+        $len = \strlen(serialize($data));
+        if ($len >= $this->cache_maxsize) {
+            $this->dc_log('err', $fname, 'Object too large: '.$len.'/'.$this->cache_maxsize);
 
             return false;
         }

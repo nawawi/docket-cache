@@ -529,4 +529,27 @@ final class Tweaks
             );
         }
     }
+
+    public function wplazyload()
+    {
+        add_action(
+            'init',
+            function () {
+                add_filter('wp_lazy_loading_enabled', '__return_false');
+            },
+            PHP_INT_MAX
+        );
+    }
+
+    public function wpsitemap()
+    {
+        add_action(
+            'init',
+            function () {
+                add_filter('wp_sitemaps_enabled', '__return_false');
+                remove_filter('robots_txt', ['WP_Sitemaps', 'add_robots']);
+            },
+            -PHP_INT_MAX
+        );
+    }
 }

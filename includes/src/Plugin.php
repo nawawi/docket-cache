@@ -451,6 +451,20 @@ final class Plugin extends Bepart
     }
 
     /**
+     * get_precache_maxfile.
+     */
+    public function get_precache_maxfile()
+    {
+        $maxfile = $this->cf()->dcvalue('PRECACHE_MAXFILE');
+
+        if ($this->cf()->is_dcfalse('PRECACHE') || empty($maxfile) || (int) $maxfile < 1) {
+            return 0;
+        }
+
+        return $this->sanitize_maxfile($maxfile, 5000);
+    }
+
+    /**
      * get_cache_stats.
      */
     public function get_cache_stats($force = false)
@@ -999,60 +1013,6 @@ final class Plugin extends Bepart
             function () {
                 $cap = is_multisite() ? 'manage_network_options' : 'manage_options';
                 $order = is_multisite() ? '25.1' : '80.1';
-                $icon = 'PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxz';
-                $icon .= 'dmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxu';
-                $icon .= 'czpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6';
-                $icon .= 'Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0';
-                $icon .= 'cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAw';
-                $icon .= 'L3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQv';
-                $icon .= 'RFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2Fw';
-                $icon .= 'ZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgd2lkdGg9IjEyOCIKICAgaGVpZ2h0PSIxMjgi';
-                $icon .= 'CiAgIHZpZXdCb3g9IjAgMCAxMjggMTI4IgogICB2ZXJzaW9uPSIxLjEiCiAgIGlkPSJzdmcxMSIK';
-                $icon .= 'ICAgc29kaXBvZGk6ZG9jbmFtZT0iZG9ja2V0LWNhY2hlLWxvZ28tY3V0LnN2ZyIKICAgaW5rc2Nh';
-                $icon .= 'cGU6dmVyc2lvbj0iMS4wLjEgKDNiYzJlODEzZjUsIDIwMjAtMDktMDcpIj4KICA8bWV0YWRhdGEK';
-                $icon .= 'ICAgICBpZD0ibWV0YWRhdGExNSI+CiAgICA8cmRmOlJERj4KICAgICAgPGNjOldvcmsKICAgICAg';
-                $icon .= 'ICAgcmRmOmFib3V0PSIiPgogICAgICAgIDxkYzpmb3JtYXQ+aW1hZ2Uvc3ZnK3htbDwvZGM6Zm9y';
-                $icon .= 'bWF0PgogICAgICAgIDxkYzp0eXBlCiAgICAgICAgICAgcmRmOnJlc291cmNlPSJodHRwOi8vcHVy';
-                $icon .= 'bC5vcmcvZGMvZGNtaXR5cGUvU3RpbGxJbWFnZSIgLz4KICAgICAgICA8ZGM6dGl0bGU+PC9kYzp0';
-                $icon .= 'aXRsZT4KICAgICAgPC9jYzpXb3JrPgogICAgPC9yZGY6UkRGPgogIDwvbWV0YWRhdGE+CiAgPHNv';
-                $icon .= 'ZGlwb2RpOm5hbWVkdmlldwogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xv';
-                $icon .= 'cj0iIzY2NjY2NiIKICAgICBib3JkZXJvcGFjaXR5PSIxIgogICAgIG9iamVjdHRvbGVyYW5jZT0i';
-                $icon .= 'MTAiCiAgICAgZ3JpZHRvbGVyYW5jZT0iMTAiCiAgICAgZ3VpZGV0b2xlcmFuY2U9IjEwIgogICAg';
-                $icon .= 'IGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwIgogICAgIGlua3NjYXBlOnBhZ2VzaGFkb3c9IjIiCiAg';
-                $icon .= 'ICAgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIxOTIwIgogICAgIGlua3NjYXBlOndpbmRvdy1oZWln';
-                $icon .= 'aHQ9IjEwMDEiCiAgICAgaWQ9Im5hbWVkdmlldzEzIgogICAgIHNob3dncmlkPSJmYWxzZSIKICAg';
-                $icon .= 'ICBpbmtzY2FwZTp6b29tPSI2LjQ4NDM3NSIKICAgICBpbmtzY2FwZTpjeD0iNDUuMzM5NzU5Igog';
-                $icon .= 'ICAgIGlua3NjYXBlOmN5PSI1Ny44MzEzMjUiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9Ii05Igog';
-                $icon .= 'ICAgIGlua3NjYXBlOndpbmRvdy15PSItOSIKICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVk';
-                $icon .= 'PSIxIgogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9ImRvY2tldC1jYWNoZS1sb2dvIiAvPgog';
-                $icon .= 'IDxkZWZzCiAgICAgaWQ9ImRlZnM1Ij4KICAgIDxjbGlwUGF0aAogICAgICAgaWQ9ImNsaXAtZG9j';
-                $icon .= 'a2V0LWNhY2hlLWxvZ28iPgogICAgICA8cmVjdAogICAgICAgICB3aWR0aD0iMTI4IgogICAgICAg';
-                $icon .= 'ICBoZWlnaHQ9IjEyOCIKICAgICAgICAgaWQ9InJlY3QyIiAvPgogICAgPC9jbGlwUGF0aD4KICA8';
-                $icon .= 'L2RlZnM+CiAgPGcKICAgICBpZD0iZG9ja2V0LWNhY2hlLWxvZ28iCiAgICAgY2xpcC1wYXRoPSJ1';
-                $icon .= 'cmwoI2NsaXAtZG9ja2V0LWNhY2hlLWxvZ28pIj4KICAgIDxyZWN0CiAgICAgICBzdHlsZT0iZmls';
-                $icon .= 'bDojMDAwMGZmO2ZpbGwtcnVsZTpldmVub2RkIgogICAgICAgaWQ9InJlY3Q5NCIKICAgICAgIHdp';
-                $icon .= 'ZHRoPSIzNC42OTg3OTUiCiAgICAgICBoZWlnaHQ9IjI3LjYwNDgxOCIKICAgICAgIHg9Ii01NS4w';
-                $icon .= 'NTU0MiIKICAgICAgIHk9Ii0yLjAwNDgxOTQiIC8+CiAgICA8cGF0aAogICAgICAgaWQ9IkVsbGlw';
-                $icon .= 'c2VfMSIKICAgICAgIHN0eWxlPSJmaWxsOiNiYWJhYmEiCiAgICAgICBkPSJNIDYzLjcwMzEyNSwx';
-                $icon .= 'LjcyMTM4NDVlLTQgQSA2NCw2NCAwIDAgMCAzLjM1MDYwMjVlLTcsNjQuMDAwMTcyIDY0LDY0IDAg';
-                $icon .= 'MCAwIDY0LDEyOC4wMDAxOCA2NCw2NCAwIDAgMCAxMjgsNjQuMDAwMTcyIDY0LDY0IDAgMCAwIDY0';
-                $icon .= 'LDEuNzIxMzg0NWUtNCBhIDY0LDY0IDAgMCAwIC0wLjI5Njg3NSwwIHogTSAzMy44NTc0MjIsMjAu';
-                $icon .= 'MjczNjEgYyAwLDAgNTEuMTA0MzEyLDM5LjgyOTQ5OCA1NS4xOTUzMDIsNTYuMTg3NSBhIDE2LjQ3';
-                $icon .= 'OCwxNi40NzggMCAwIDEgMC43NjU2Myw0LjI5ODgyOCBjIDAuNDI2LDUuMjg0IC0zLjQ1MDM3LDE1';
-                $icon .= 'LjYzNTU5NSAtMTcuMzU5MzcsMTcuNjgzNTk1IC0yLjQ4MSwwLjUzOTAwNCAtOS4zODA4NTksMCAt';
-                $icon .= 'OS4zODA4NTksMCAwLDAgOC41MTgxMDksLTEuMjg4ODMgMTEuNTM3MTA2LC0yLjc5ODgzIDMuMDE5';
-                $icon .= 'MDAzLC0xLjUxIDEyLjE3NjE3MywtNS44ODc1OCAxMi4wNzYxNzMsLTE0LjAxNzU3OCAtMC4yMTUs';
-                $icon .= 'LTMuMjM0IDAuMjE2MTEsLTkuOTIxMzc1IC0zMS44Mzc4ODgsLTIyLjIzNDM3NSAtMTEuMDY1LC00';
-                $icon .= 'LjI1IC0yOC4zMjgxMjUsLTkuMTQ0NTMxIC0yOC4zMjgxMjUsLTkuMTQ0NTMxIDAsMCAzMy44NTg0';
-                $icon .= 'MDYsMjcuMzg4ODEyIDM1LjY5MTQwNiwzMi4xMzI4MTIgLTkuMTY2LC00Ljc0IC00OS40OTIxODgs';
-                $icon .= 'LTM5LjE0MDYyNSAtNDkuNDkyMTg4LC0zOS4xNDA2MjUgYSAzNDYuNywzNDYuNyAwIDAgMSAzOC4y';
-                $icon .= 'NzM0MzgsMTEuMTExMzI4IHogbSA5LjE2MjEwOSwxMS4zMTgzNTkgMTIuMjEwOTM4LDI0LjMxODM1';
-                $icon .= 'OSBjIDkuMTUzLDMuNDkyIDE4LjE1NTA5Miw3LjYwMTE3MiAyNS4xMjEwOTUsMTIuMjAxMTcyIC0z';
-                $icon .= 'LjAzMywtNC4yMTkgLTEzLjE4NDAzMywtMTYuOTc1NTMxIC0zNy4zMzIwMzMsLTM2LjUxOTUzMSB6';
-                $icon .= 'IG0gNTcuNjg3NDk5LDM4LjkyMTg3NSA5LjYwMTU2LDE5Ljk0OTIxOSAtOS41NDI5NywtMy45OTAy';
-                $icon .= 'MzUgLTExLjY5OTIyNiw1LjA2NjQwNSAxMS42NDA2MzYsLTcuNzYzNjcgNS4zOTI1OCwyLjgwMDc4';
-                $icon .= 'MSAtNi40MTQwNjYsLTEzLjA0Njg3NSAtOC40NjY4LDIuOTg0Mzc1IHoiIC8+CiAgPC9nPgo8L3N2';
-                $icon .= 'Zz4K';
 
                 add_menu_page(
                     'Docket Cache',
@@ -1062,7 +1022,7 @@ final class Plugin extends Bepart
                     function () {
                         ( new View($this) )->index();
                     },
-                    'data:image/svg+xml;base64,'.$icon,
+                    Resc::iconmenu(),
                     $order
                 );
 
@@ -1586,6 +1546,14 @@ final class Plugin extends Bepart
 
             if ($this->cf()->is_dctrue('WPEMBED')) {
                 $tweaks->wpembed();
+            }
+
+            if ($this->cf()->is_dctrue('WPLAZYLOAD')) {
+                $tweaks->wplazyload();
+            }
+
+            if ($this->cf()->is_dctrue('WPSITEMAP')) {
+                $tweaks->wpsitemap();
             }
 
             if ($this->cf()->is_dctrue('POSTMISSEDSCHEDULE')) {
