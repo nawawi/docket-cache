@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.5
 Requires PHP: 7.2.5
-Stable tag: 20.10.12
+Stable tag: 20.10.15
 License: MIT
 License URI: ./license.txt
 
@@ -149,7 +149,7 @@ $ sudo mount -t tmpfs -o size=500m tmpfs ./cache/docket-cache`
 
 To mount the cache path automatically on boot, you need to update your /etc/fstab file.
 
-Kindly refer to the articles below about RAM disk:
+Please refer to the articles below about RAM disk:
 
 1. [How to Easily Create RAM Disk](https://www.linuxbabe.com/command-line/create-ramdisk-linux)
 2. [What Is /dev/shm And Its Practical Usage](https://www.cyberciti.biz/tips/what-is-devshm-and-its-practical-usage.html)
@@ -170,9 +170,21 @@ Yes and No. You can pair using it with page caching plugin, but not with the obj
 Yes, you can. It can boost more your WordPress performance since there is no network connection need to makes and no worry about memory burst, cache-key conflict and error-prone caused by the improper settings.
 
 == Upgrade Notice ==
-Kindly do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
+Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.10.15 =
+
+- Fixed Drop-in outdated notice.
+
+= 20.10.14 =
+
+- Fixed for previous update, wrong tag for release.
+
+= 20.10.13 =
+
+- Improved on Admin Interface.
+
 = 20.10.12 =
 
 - Fixed File cleanup -> use shutdown hook instead of register_shutdown_function to avoid issue with *some* page cache plugin.

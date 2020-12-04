@@ -30,7 +30,7 @@ Or download directly from [WordPress Plugin Directory](https://wordpress.org/plu
 
 ## Sponsor this project
 
-There is a lot of room for improvement and features to add, require plenty of person-hours dedicated for testing and development.
+There is a lot of room for improvement and features to add, require plenty of person-hours dedicated to testing and development.
 
 [Become our sponsor](https://www.patreon.com/bePatron?u=41796862). All funds will be dedicated to maintenance, development, and marketing of this project.
 

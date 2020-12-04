@@ -12,7 +12,7 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 ?>
-<?php $this->tab_title('Resources', false); ?>
+<?php $this->tab_title(esc_html__('Resources', 'docket-cache')); ?>
 <div class="postbox">
     <div class="inside">
         <div>

@@ -394,4 +394,27 @@ class Bepart extends Filesystem
 
         return $crons;
     }
+
+    public function is_subpage($index)
+    {
+        $subpage = [
+            'config' => 1,
+            'log' => 1,
+            'cronbot' => 1,
+        ];
+
+        return \array_key_exists($index, $subpage);
+    }
+
+    public function get_subpage()
+    {
+        if (!empty($_GET['page']) && 'docket-cache-' === substr($_GET['page'], 0, 13)) {
+            $index = substr($_GET['page'], 13);
+            if (!empty($index) && $this->is_subpage($index)) {
+                return $index;
+            }
+        }
+
+        return false;
+    }
 }

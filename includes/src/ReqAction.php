@@ -24,7 +24,7 @@ final class ReqAction
     public function register()
     {
         add_action(
-            'load-'.$this->pt->screen,
+            'load-'.$this->pt->get_screen(),
             function () {
                 $this->parse_action();
                 $this->screen_notice();
@@ -55,7 +55,7 @@ final class ReqAction
             $args['idx'] = sanitize_text_field($_GET['idx']);
         }
 
-        $query = add_query_arg($args, $this->pt->page);
+        $query = add_query_arg($args, $this->pt->get_page());
         wp_safe_redirect(network_admin_url($query));
     }
 
@@ -232,11 +232,11 @@ final class ReqAction
                 $param = $_GET;
                 $option_name = '';
                 $option_value = '';
-                $message = $this->run_action($action, $param, $option_name, $option_value);
+                $this->pt->notice = $this->run_action($action, $param, $option_name, $option_value);
 
-                if (!empty($message)) {
+                if (!empty($this->pt->notice)) {
                     $args = [
-                        'message' => $message,
+                        'message' => $this->pt->notice,
                     ];
 
                     if (!empty($_GET['idx'])) {
@@ -255,7 +255,7 @@ final class ReqAction
                         }
                     }
 
-                    $query = add_query_arg($args, $this->pt->page);
+                    $query = add_query_arg($args, $this->pt->get_page());
                     wp_safe_redirect(network_admin_url($query));
                     exit;
                 }
@@ -270,6 +270,8 @@ final class ReqAction
         if (isset($_GET['message'])) {
             $token = sanitize_text_field($_GET['message']);
             $this->pt->token = $token;
+
+            $this->pt->notice = '';
 
             $option_name = esc_html__('Option', 'docket-cache');
             if (!empty($_GET['nx'])) {
@@ -289,77 +291,77 @@ final class ReqAction
 
             switch ($token) {
                 case 'docket-occache-enabled':
-                    $message = esc_html__('Object cache enabled.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Object cache enabled.', 'docket-cache');
                     break;
                 case 'docket-occache-enabled-failed':
-                    $error = esc_html__('Object cache could not be enabled.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Object cache could not be enabled.', 'docket-cache');
                     break;
                 case 'docket-occache-disabled':
-                    $message = esc_html__('Object cache disabled.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Object cache disabled.', 'docket-cache');
                     break;
                 case 'docket-occache-disabled-failed':
-                    $error = esc_html__('Object cache could not be disabled.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Object cache could not be disabled.', 'docket-cache');
                     break;
                 case 'docket-occache-flushed':
-                    $message = esc_html__('Object cache was flushed.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Object cache was flushed.', 'docket-cache');
                     break;
                 case 'docket-occache-flushed-failed':
-                    $error = esc_html__('Object cache could not be flushed.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Object cache could not be flushed.', 'docket-cache');
                     break;
                 case 'docket-dropino-updated':
-                    $message = esc_html__('Updated object cache Drop-In and enabled Docket object cache.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Updated object cache Drop-In and enabled Docket object cache.', 'docket-cache');
                     break;
                 case 'docket-dropino-updated-failed':
-                    $error = esc_html__('Object cache Drop-In could not be updated.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Object cache Drop-In could not be updated.', 'docket-cache');
                     break;
                 case 'docket-log-flushed':
-                    $message = esc_html__('Cache log was flushed.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Cache log was flushed.', 'docket-cache');
                     break;
                 case 'docket-log-flushed-failed':
-                    $error = esc_html__('Cache log could not be flushed.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Cache log could not be flushed.', 'docket-cache');
                     break;
                 case 'docket-file-flushed':
-                    $message = esc_html__('Cache file was flushed.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Cache file was flushed.', 'docket-cache');
                     break;
                 case 'docket-file-flushed-failed':
-                    $error = esc_html__('Cache file could not be flushed.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Cache file could not be flushed.', 'docket-cache');
                     break;
                 case 'docket-opcache-flushed':
-                    $message = esc_html__('OPcache was flushed.', 'docket-cache');
+                    $this->pt->notice = esc_html__('OPcache was flushed.', 'docket-cache');
                     $this->pt->flush_opcache();
                     break;
                 case 'docket-opcache-flushed-failed':
-                    $error = esc_html__('OPcache could not be flushed.', 'docket-cache');
+                    $this->pt->notice = esc_html__('OPcache could not be flushed.', 'docket-cache');
                     break;
                 case 'docket-cronbot-connect':
-                    $message = esc_html__('Cronbot connected.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Cronbot connected.', 'docket-cache');
                     break;
                 case 'docket-cronbot-connect-failed':
                     $msg = $this->pt->co()->lookup_get('cronboterror', true);
                     $errmsg = !empty($msg) ? ': '.$msg : '.';
                     /* translators: %s = error message */
-                    $error = sprintf(esc_html__('Cronbot failed to connect%s', 'docket-cache'), $errmsg);
+                    $this->pt->notice = sprintf(esc_html__('Cronbot failed to connect%s', 'docket-cache'), $errmsg);
                     unset($msg, $errmsg);
                     break;
                 case 'docket-cronbot-disconnect':
-                    $message = esc_html__('Cronbot disconnected.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Cronbot disconnected.', 'docket-cache');
                     break;
                 case 'docket-cronbot-disconnect-failed':
-                    $error = esc_html__('Cronbot failed to disconnect.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Cronbot failed to disconnect.', 'docket-cache');
                     break;
                 case 'docket-cronbot-pong':
                     $endpoint = parse_url($this->pt->cronbot_endpoint, PHP_URL_HOST);
                     $errmsg = $this->pt->co()->lookup_get('cronboterror', true);
                     if (!empty($errmsg)) {
                         /* translators: %1$s: cronbot endpoint, %2$s = error message */
-                        $error = sprintf(esc_html__('Pong from %1$s: %2$s.', 'docket-cache'), $endpoint, $errmsg);
+                        $this->pt->notice = sprintf(esc_html__('Pong from %1$s: %2$s.', 'docket-cache'), $endpoint, $errmsg);
                     } else {
                         /* translators: %s: cronbot endpoint */
-                        $message = sprintf(esc_html__('Pong from %s : connected.', 'docket-cache'), $endpoint);
+                        $this->pt->notice = sprintf(esc_html__('Pong from %s : connected.', 'docket-cache'), $endpoint);
                     }
                     break;
                 case 'docket-cronbot-runevent':
-                    $message = esc_html__('Running cron successful.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Running cron successful.', 'docket-cache');
                     $msg = $this->pt->co()->lookup_get('cronbotrun', true);
                     if (!empty($msg) && \is_array($msg)) {
                         $wmsg = '';
@@ -368,15 +370,15 @@ final class ReqAction
                         }
 
                         if ($msg['wpcron_return'] > 1 && !empty($wmsg)) {
-                            $error = $message;
+                            $this->pt->notice = $this->pt->notice;
                         }
 
-                        if (empty($error)) {
+                        if (empty($this->pt->notice)) {
                             if (!empty($wmsg) && empty($msg['wpcron_event'])) {
-                                $message = $wmsg;
+                                $this->pt->notice = $wmsg;
                             } else {
                                 /* translators: %d = cron event */
-                                $message = sprintf(esc_html__('Executed a total of %d cron events', 'docket-cache'), $msg['wpcron_event']);
+                                $this->pt->notice = sprintf(esc_html__('Executed a total of %d cron events', 'docket-cache'), $msg['wpcron_event']);
                             }
                         }
                     }
@@ -384,46 +386,46 @@ final class ReqAction
 
                     break;
                 case 'docket-cronbot-runevent-failed':
-                    $error = esc_html__('Failed to run cron.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Failed to run cron.', 'docket-cache');
                     break;
                 case 'docket-cronbot-selectsite':
-                    $message = '';
+                    $this->pt->notice = '';
                     break;
                 case 'docket-option-enable':
                     /* translators: %s = option name */
-                    $message = sprintf(esc_html__('%s enabled.', 'docket-cache'), $option_name);
+                    $this->pt->notice = sprintf(esc_html__('%s enabled.', 'docket-cache'), $option_name);
                     break;
                 case 'docket-option-disable':
                     /* translators: %s = option name */
-                    $message = sprintf(esc_html__('%s disabled.', 'docket-cache'), $option_name);
+                    $this->pt->notice = sprintf(esc_html__('%s disabled.', 'docket-cache'), $option_name);
                     break;
                 case 'docket-option-save':
                     if (!empty($option_value)) {
                         if ('default' === $option_value) {
-                            $message = sprintf(esc_html__('%s resets to default.', 'docket-cache'), $option_name);
+                            $this->pt->notice = sprintf(esc_html__('%s resets to default.', 'docket-cache'), $option_name);
                         } else {
                             /* translators: %1$s = option name, %2$s = option_value */
-                            $message = sprintf(esc_html__('%1$s set to %2$s.', 'docket-cache'), $option_name, $option_value);
+                            $this->pt->notice = sprintf(esc_html__('%1$s set to %2$s.', 'docket-cache'), $option_name, $option_value);
                         }
                     } else {
                         /* translators: %s = option name */
-                        $message = sprintf(esc_html__('%s updated.', 'docket-cache'), $option_name);
+                        $this->pt->notice = sprintf(esc_html__('%s updated.', 'docket-cache'), $option_name);
                     }
                     break;
                 case 'docket-option-default':
                     /* translators: %s = option name */
-                    $message = sprintf(esc_html__('%s resets to default.', 'docket-cache'), $option_name);
+                    $this->pt->notice = sprintf(esc_html__('%s resets to default.', 'docket-cache'), $option_name);
                     break;
                 case 'docket-option-failed':
                     /* translators: %s = option name */
-                    $error = sprintf(esc_html__('Failed to update option %s.', 'docket-cache'), $option_name);
+                    $this->pt->notice = sprintf(esc_html__('Failed to update option %s.', 'docket-cache'), $option_name);
                     break;
                 case 'docket-action-failed':
                     /* translators: %s = option name */
-                    $error = esc_html__('Failed to execute the action request. Please try again.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Failed to execute the action request. Please try again.', 'docket-cache');
                     break;
                 case 'docket-gcrun':
-                    $message = esc_html__('Executing the garbage collector successful', 'docket-cache');
+                    $this->pt->notice = esc_html__('Executing the garbage collector successful', 'docket-cache');
                     $msg = $this->pt->co()->lookup_get('gcrun', true);
                     if (!empty($msg) && \is_array($msg)) {
                         $collect = (object) $msg;
@@ -434,26 +436,24 @@ final class ReqAction
                         $gcmsg .= '<li><span>'.esc_html__('Cache Disk Limit', 'docket-cache').'</span>'.$this->pt->normalize_size($collect->cache_maxdisk).'</li>';
                         $gcmsg .= '<li><span>'.esc_html__('Cleanup Cache MaxTTL', 'docket-cache').'</span>'.$collect->cleanup_maxttl.'</li>';
                         $gcmsg .= '<li><span>'.esc_html__('Cleanup Cache File Limit', 'docket-cache').'</span>'.$collect->cleanup_maxfile.'</li>';
-                        $gcmsg .= '<li><span>'.esc_html__('Cleanup Cache Precache Limit', 'docket-cache').'</span>'.$collect->cleanup_precache_maxfile.'</li>';
                         $gcmsg .= '<li><span>'.esc_html__('Cleanup Cache Disk Limit', 'docket-cache').'</span>'.$collect->cleanup_maxdisk.'</li>';
+
+                        if ($this->pt->get_precache_maxfile() > 0) {
+                            $gcmsg .= '<li><span>'.esc_html__('Cleanup Precache Limit', 'docket-cache').'</span>'.$collect->cleanup_precache_maxfile.'</li>';
+                        }
+
                         $gcmsg .= '<li><span>'.esc_html__('Total Cache Cleanup', 'docket-cache').'</span>'.$collect->cache_cleanup.'</li>';
                         $gcmsg .= '<li><span>'.esc_html__('Total Cache Ignored', 'docket-cache').'</span>'.$collect->cache_ignore.'</li>';
                         $gcmsg .= '<li><span>'.esc_html__('Total Cache File', 'docket-cache').'</span>'.$collect->cache_file.'</li>';
                         $gcmsg .= '</ul></div>';
 
-                        $message .= $gcmsg;
+                        $this->pt->notice .= $gcmsg;
                     }
                     unset($msg, $wmsg, $gcmsg);
                     break;
                 case 'docket-gcrun-failed':
-                    $error = esc_html__('Failed to run the garbage collector.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Failed to run the garbage collector.', 'docket-cache');
                     break;
-            }
-
-            if (!empty($message) || !empty($error)) {
-                $msg = !empty($message) ? $message : (!empty($error) ? $error : '');
-                $type = !empty($message) ? 'updated' : 'error';
-                add_settings_error(is_multisite() ? 'general' : '', $this->pt->slug, $msg, $type);
             }
         }
     }

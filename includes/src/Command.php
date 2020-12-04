@@ -223,8 +223,12 @@ class Command extends WP_CLI_Command
         WP_CLI::line($this->title(__('Cache Disk Limit', 'docket-cache'), $pad).$this->pt->normalize_size($collect->cache_maxdisk));
         WP_CLI::line($this->title(__('Cleanup Cache MaxTTL', 'docket-cache'), $pad).$collect->cleanup_maxttl);
         WP_CLI::line($this->title(__('Cleanup Cache File Limit', 'docket-cache'), $pad).$collect->cleanup_maxfile);
-        WP_CLI::line($this->title(__('Cleanup Cache Precache Limit', 'docket-cache'), $pad).$collect->cleanup_precache_maxfile);
         WP_CLI::line($this->title(__('Cleanup Cache Disk Limit', 'docket-cache'), $pad).$collect->cleanup_maxdisk);
+
+        if ($this->pt->get_precache_maxfile() > 0) {
+            WP_CLI::line($this->title(__('Cleanup Precache Limit', 'docket-cache'), $pad).$collect->cleanup_precache_maxfile);
+        }
+
         WP_CLI::line($this->title(__('Total Cache Cleanup', 'docket-cache'), $pad).$collect->cache_cleanup);
         WP_CLI::line($this->title(__('Total Cache Ignored', 'docket-cache'), $pad).$collect->cache_ignore);
         WP_CLI::line($this->title(__('Total Cache File', 'docket-cache'), $pad).$collect->cache_file);

@@ -349,7 +349,7 @@ final class Constans
         $this->maybe_define($this->px('WPSITEMAP'), false);
 
         // @private
-        // capture fatal error none throwable
+        // capture fatal error rarely incase non-throwable
         // set true for debugging only
         $this->maybe_define($this->px('CAPTURE_FATALERROR'), false);
     }

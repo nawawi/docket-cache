@@ -126,6 +126,19 @@ if (!\function_exists('nwdcx_optget')) {
     }
 }
 
+if (!\function_exists('nwdcx_ignoreabort')) {
+    function nwdcx_ignoreabort()
+    {
+        // we dont want any error/warn/notice
+        if (\function_exists('ignore_user_abort')) {
+            try {
+                ignore_user_abort(true);
+            } catch (Throwable $e) {
+            }
+        }
+    }
+}
+
 if (!\function_exists('nwdcx_constfx')) {
     function nwdcx_constfx($name, $is_strip = false)
     {

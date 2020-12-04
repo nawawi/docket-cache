@@ -205,7 +205,7 @@ body {
 }
 
 #docket-cache .form-table-selection th {
-    min-width: 300px;
+    min-width: 350px;
 }
 
 #docket-cache .form-table-selection select {
@@ -238,16 +238,6 @@ body {
     font-size: 13px;
 }
 
-#docket-cache-spinner {
-    float: none;
-    width: auto;
-    height: auto;
-    padding: 10px 0 10px 50px;
-    background-position: 20px 0;
-    margin: 0;
-    display: none;
-}
-
 #docket-cache-overlay {
     position: fixed;
     display: none;
@@ -260,6 +250,41 @@ body {
     background-color: transparent;
     z-index: 999999;
     cursor: pointer;
+}
+
+#docket-cache-overlay div.text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 24px;
+    font-family: monospace, Consolas, Monaco;
+    unicode-bidi: embed;
+    font-weight: normal;
+    color: white;
+    background: #111111;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    padding: 26px;
+    border-radius: 6px;
+    opacity: .6;
+    min-width: 200px;
+    text-align: center;
+    display: none;
+}
+
+/* small */
+@media only screen and (max-width:782px) {
+    #docket-cache-overlay div.text {
+        font-size: 18px;
+    }
+}
+
+#docket-cache-overlay div.text img {
+    display: inline-block;
+    border: 0;
+    margin: 0;
+    width: 20px;
+    height: 20px;
 }
 
 #docket-cache .noborder {
@@ -353,11 +378,6 @@ body {
 
 /* /flex */
 
-#docket-cache .tab-content {
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
 #docket-cache #dclogo {
     width: 130px;
     height: 31px;
@@ -367,6 +387,32 @@ body {
 
 /* desktop */
 @media only screen and (min-width: 782px) {
+
+    /* nav fixed */
+    #docket-cache .nav-tab-wrapper {
+        position: fixed;
+        background: #f5f5f5;
+        width: 100%;
+        z-index: 99;
+        padding-top: 20px;
+        margin-top: -10px;
+    }
+
+    #docket-cache .section {
+        padding-top: 48px;
+    }
+
+    #docket-cache .tab-content {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    #docket-cache #dclogo {
+        margin-left: 5px;
+    }
+
+    /* /nav fixed */
+
     #docket-cache .nav-tab {
         min-width: 100px;
         text-align: center;
@@ -388,6 +434,12 @@ body {
     #docket-cache p.submit .button,
     #docket-cache .eventlist .box-left .button {
         margin-right: 6px;
+    }
+}
+
+@media only screen and (min-width: 1440px) {
+    #docket-cache .nav-tab-wrapper {
+        width: 1440px;
     }
 }
 
@@ -570,6 +622,7 @@ body {
     text-align: center;
 }
 
+/* small */
 @media only screen and (max-width: 782px) {
 
     #docket-cache .eventlist .box-left,
@@ -625,6 +678,7 @@ body {
     padding: 0;
 }
 
+/* gc */
 #docket-cache .gc ul {
     margin-left: 15px;
 }
@@ -634,6 +688,90 @@ body {
     min-width: 200px;
 }
 
+/* tooltip */
+#docket-cache [data-tooltip] {
+    position: relative;
+    cursor: pointer;
+    line-height: 18px;
+    outline-style: none;
+    box-shadow: none;
+    border-color: transparent;
+    float: right;
+    bottom: -1px;
+}
+
+#docket-cache [data-tooltip] span.dashicons {
+    color: #5e5e5e;
+    font-size: 18px;
+}
+
+#docket-cache [data-tooltip]:before,
+#docket-cache [data-tooltip]:after {
+    visibility: hidden;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=0);
+    opacity: 0;
+    pointer-events: none;
+}
+
+#docket-cache [data-tooltip]:before {
+    position: absolute;
+    bottom: 150%;
+    left: 50%;
+    margin-bottom: 5px;
+    margin-left: -130px;
+    padding: 12px;
+    width: 250px;
+    z-index: 100;
+    border-radius: 3px;
+    background-color: #000;
+    background-color: hsla(0, 0%, 20%, 0.95);
+    color: #FFF;
+    content: attr(data-tooltip);
+    text-align: left;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+#docket-cache [data-tooltip]:after {
+    position: absolute;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -5px;
+    width: 0;
+    border-top: 5px solid #000;
+    border-top: 5px solid hsla(0, 0%, 20%, 0.9);
+    border-right: 5px solid transparent;
+    border-left: 5px solid transparent;
+    content: " ";
+    font-size: 0;
+    line-height: 0;
+}
+
+#docket-cache [data-tooltip]:hover:before,
+#docket-cache [data-tooltip]:hover:after,
+#docket-cache [data-tooltip]:focus:before,
+#docket-cache [data-tooltip]:focus:after {
+    visibility: visible;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+    filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=100);
+    opacity: 1;
+}
+
+/* small */
+@media only screen and (max-width:782px) {
+    #docket-cache [data-tooltip] {
+        float: left;
+    }
+
+    #docket-cache [data-tooltip]:before {
+        margin-left: -10px;
+    }
+}
+
+/* wp */
 #wpfooter #footer-left,
 #wpfooter #footer-upgrade {
     font-size: 11px !important;

@@ -588,7 +588,7 @@ class Filesystem
         clearstatcache();
 
         return [
-            'time' => time(),
+            'timestamp' => time(),
             'size' => $bytestotal,
             'filesize' => $fsizetotal,
             'files' => $filestotal,
@@ -700,7 +700,7 @@ class Filesystem
             return false;
         }
 
-        // capture none throwable
+        // capture non-throwable
         if (nwdcx_construe('CAPTURE_FATALERROR')) {
             $this->capture_fatal_error();
         }

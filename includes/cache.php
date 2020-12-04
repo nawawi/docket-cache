@@ -756,6 +756,7 @@ class WP_Object_Cache
             return true;
         }
 
+        // @note 2122: use md5, serialize can be large.
         if ($doserialize && @md5(@serialize($data_p)) === @md5(@serialize($data))) {
             return true;
         }

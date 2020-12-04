@@ -103,7 +103,7 @@ $log = $this->parse_log_query();
 
             <p class="submit">
                 <?php if (!$log->output_empty && !$this->has_vcache()) : ?>
-                <select id="order">
+                <select id="order" data-id="logopt">
                     <?php
                     foreach ([
                         'first' => __('FIRST', 'docket-cache'),
@@ -114,7 +114,7 @@ $log = $this->parse_log_query();
                     }
                     ?>
                 </select>
-                <select id="line">
+                <select id="line" data-id="logopt">
                     <?php
                     foreach (['10', '50', '100', '300', '500'] as $line) {
                         $selected = ((int) $line === $log->default_line ? ' selected' : '');
@@ -122,7 +122,7 @@ $log = $this->parse_log_query();
                     }
                     ?>
                 </select>
-                <select id="sort">
+                <select id="sort" data-id="logopt">
                     <?php
                     foreach ([
                         'asc' => __('ASCENDING', 'docket-cache'),

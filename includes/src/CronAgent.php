@@ -259,7 +259,7 @@ final class CronAgent
 
         $run_event = 0;
         $slowdown = 0;
-        $delay = $this->is_pingpong ? 750 : 200;
+        $delay = $this->is_pingpong ? 850 : 200;
 
         foreach ($crons as $timestamp => $cronhooks) {
             if (false === $run_now && ($timestamp > $gmt_time)) {
@@ -383,6 +383,10 @@ final class CronAgent
         $maxcan = (int) $this->pt->cf()->dcvalue('CRONBOT_MAX');
         $maxcan = $maxcan < 1 ? 5 : $maxcan;
         $halt = false;
+
+        // finish it if user connection closed
+        nwdcx_ignoreabort();
+
         foreach ($sites as $num => $site) {
             if ($halt) {
                 break;

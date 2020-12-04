@@ -1,3 +1,8 @@
+= v20.10.15 (2020-12-05)
+
+- Improved on Admin Interface.
+- Fixed Drop-in outdated notice.
+
 = v20.10.12 (2020-11-30)
 
 - Fixed File cleanup -> use shutdown hook instead of register_shutdown_function to avoid issue with *some* page cache plugin.

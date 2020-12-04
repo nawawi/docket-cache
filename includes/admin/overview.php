@@ -32,7 +32,7 @@ $has_stats = $this->vcf()->is_dctrue('STATS');
 <div class="section overview">
     <div class="flex-container">
         <div class="row-left">
-            <?php $this->tab_title(esc_html__('Overview', 'docket-cache'), false); ?>
+            <?php $this->tab_title(esc_html__('Overview', 'docket-cache')); ?>
             <table class="form-table">
                 <tr>
                     <th><?php esc_html_e('Web Server', 'docket-cache'); ?></th>
@@ -189,7 +189,7 @@ $has_stats = $this->vcf()->is_dctrue('STATS');
             </table>
         </div>
         <div class="row-right">
-            <?php $this->page('actcmd'); ?>
+            <?php $this->render('actcmd'); ?>
         </div>
     </div>
 </div>

@@ -152,6 +152,10 @@ final class Dropino extends Bepart
      */
     public function install($delay = false)
     {
+        if (nwdcx_construe('DISABLED')) {
+            return false;
+        }
+
         $src = $this->resc()->src;
         $dst = $this->resc()->dst;
 
@@ -178,6 +182,10 @@ final class Dropino extends Bepart
      */
     public function uninstall($delay = false)
     {
+        if (nwdcx_construe('DISABLED')) {
+            return false;
+        }
+
         $file = $this->resc()->dst;
 
         $this->undelay();

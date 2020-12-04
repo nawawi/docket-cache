@@ -123,4 +123,32 @@ final class Resc
 
         return 'data:image/png;base64,'.$icon;
     }
+
+    public static function spinner()
+    {
+        $icon = 'R0lGODlhEAAQAPIAAAAAAP///zw8PHx8fP///wAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh';
+        $icon .= '/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADGwi6MjRiSenI';
+        $icon .= 'm9hqPOvljAOBZGmeaKqubOu6CQAh+QQJCgAAACwAAAAAEAAQAAADHAi63A5ikCEek2TalftWmPZF';
+        $icon .= 'U/WdaKqubOu+bwIAIfkECQoAAAAsAAAAABAAEAAAAxwIutz+UIlBhoiKkorB/p3GYVN1dWiqrmzr';
+        $icon .= 'vmkCACH5BAkKAAAALAAAAAAQABAAAAMbCLrc/jDKycQgQ8xL8OzgBg6ThWlUqq5s604JACH5BAkK';
+        $icon .= 'AAAALAAAAAAQABAAAAMbCLrc/jDKSautYpAhpibbBI7eOEzZ1l1s6yoJACH5BAkKAAAALAAAAAAQ';
+        $icon .= 'ABAAAAMaCLrc/jDKSau9OOspBhnC5BHfRJ7iOXAe2CQAIfkECQoAAAAsAAAAABAAEAAAAxoIutz+';
+        $icon .= 'MMpJ6xSDDDEz0dMnduJwZZulrmzbJAAh+QQJCgAAACwAAAAAEAAQAAADGwi63P4wRjHIEBJUYjP/';
+        $icon .= '2dZJlIVlaKqubOuyCQAh+QQJCgAAACwAAAAAEAAQAAADHAi63A5ikCEek2TalftWmPZFU/WdaKqu';
+        $icon .= 'bOu+bwIAOwAAAAAAAAAAAA==';
+
+        return 'data:image/gif;base64,'.$icon;
+    }
+
+    public static function boxmsg($msg, $type = 'info')
+    {
+        if (!empty($msg) && !empty($type)) {
+            $html = '<div id="docket-cache-notice" class="notice notice-'.$type.' is-dismissible"> ';
+            $html .= '<p><strong>'.$msg.'</strong></p>';
+            $html .= '<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>';
+            $html .= '</div>';
+
+            return $html;
+        }
+    }
 }

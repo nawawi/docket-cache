@@ -55,7 +55,7 @@ endif;
                 <?php endif; ?>
             </p>
 
-            <?php $this->tab_title(esc_html__('Cron Events', 'docket-cache'), false); ?>
+            <?php $this->tab_title(esc_html__('Cron Events', 'docket-cache')); ?>
             <?php
                 $sites = $this->pt->get_network_sites();
             if (is_multisite() && !empty($sites) && \is_array($sites) && \count($sites) > 1) :
@@ -96,7 +96,7 @@ endif;
 
                 <?php if ($total_page > 1 || !empty($_GET['s'])) : ?>
                 <div class="box-right">
-                    <form id="events-filter" method="get" action="<?php echo $this->pt->page; ?>">
+                    <form id="events-filter" method="get" action="<?php echo $this->pt->get_page(); ?>">
                         <input type="hidden" name="page" value="docket-cache">
                         <input type="hidden" name="idx" value="cronbot">
                         <?php $event_list->search_box(__('Filter Hook Names', 'docket-cache'), 'eventlist-event'); ?>

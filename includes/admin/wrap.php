@@ -35,16 +35,19 @@ if (1 === $this->info->status_code && isset($this->pt->token)) {
 }
 ?>
 <div class="wrap" id="docket-cache">
-    <h1 class="screen-reader-text">Docket Cache</h1>
     <?php $this->tab_nav(); ?>
-
     <div class="tab-content">
         <?php
             $this->tab_content();
         ?>
     </div>
+    <h1 class="screen-reader-text">
+        <!-- notice message -->
+    </h1>
 </div>
-<div id="docket-cache-overlay"></div>
+<div id="docket-cache-overlay" style="display: none;">
+    <div id="wait-spinner" class="text" style="display: none;"><?php esc_html_e('Please wait..', 'docket-cache'); ?><img src="<?php echo Resc::spinner(); ?>"></div>
+</div>
 <?php
 if ($this->do_preload) :
     echo $this->pt->code_worker(['flush', 'preload']);

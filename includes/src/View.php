@@ -176,7 +176,15 @@ final class View
         return false;
     }
 
-    private function page($index)
+    private function parse_subpage()
+    {
+        $index = $this->pt->get_subpage();
+        if (!empty($index) && empty($_GET['idx'])) {
+            $_GET['idx'] = $index;
+        }
+    }
+
+    private function render($index)
     {
         $this->info = (object) $this->pt->get_info();
         $file = $this->pt->path.'/includes/admin/'.$index.'.php';
@@ -194,21 +202,24 @@ final class View
             exit('<div class="wrap"><p>[ '.date('Y-m-d H:i:s').' ] Redirect to /'.$this->pt->page.'</p></div>');
         }
 
+        $this->parse_subpage();
+
         $this->do_preload = false;
         $this->do_flush = false;
         $this->do_fetch = false;
-        $this->page('wrap');
+        $this->render('wrap');
         $this->pt->cx()->delay_expire();
     }
 
-    private function tab_title($title, $add_loader = true, $css = '')
+    private function tab_title($title)
     {
-        echo '<h2 class="title'.(!empty($css) ? ' '.$css : '').'">'.$title.($add_loader ? '<span id="docket-cache-spinner" class="spinner is-active"></span>' : '').'</h2>';
+        echo '<h2 class="title">'.$title.'</h2>';
+        $this->action_notice();
     }
 
     private function tab_content()
     {
-        $this->page($this->is_index());
+        $this->render($this->is_index());
     }
 
     private function tab_query($index, $args_extra = [])
@@ -220,7 +231,12 @@ final class View
             $args_extra
         );
 
-        return network_admin_url(add_query_arg($args, $this->pt->page));
+        $page = $this->pt->page;
+        if (!empty($args['idx']) && $this->pt->is_subpage($args['idx'])) {
+            $page = $page.'-'.$args['idx'];
+        }
+
+        return network_admin_url(add_query_arg($args, $page));
     }
 
     private function is_index()
@@ -459,9 +475,64 @@ final class View
         $nx = sanitize_text_field($_GET['nx']);
         $code = '<script id="docket-cache-focus">'.PHP_EOL;
         $code .= 'var fx = document.getElementById("'.$nx.'");'.PHP_EOL;
-        $code .= 'fx.scrollIntoView({block:"center"});'.PHP_EOL;
+        $code .= 'if ( fx ) { fx.scrollIntoView({block:"center", behavior:"smooth"}); }'.PHP_EOL;
         $code .= '</script>';
 
         return $code;
+    }
+
+    private function tooltip($id)
+    {
+        $info = [
+            'cronbot' => esc_html__('The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively.', 'docket-cache'),
+            'cronbot_sping' => esc_html__('sss', 'docket-cache'),
+            'cronbot_lping' => esc_html__('sss', 'docket-cache'),
+            'cronbot_nping' => esc_html__('sss', 'docket-cache'),
+            'log' => esc_html__('The cache log intends to provide information on how the cache works. For performance and security concerns, disable it if no longer needed.', 'docket-cache'),
+            'log_topt' => esc_html__('sss', 'docket-cache'),
+            'log_aopt' => esc_html__('sss', 'docket-cache'),
+            'log_fopt' => esc_html__('sss', 'docket-cache'),
+            'log_sopt' => esc_html__('sss', 'docket-cache'),
+            'advcpost' => esc_html__('Cache WordPress Post Queries which results in faster data retrieval and reduced database workload.', 'docket-cache'),
+            'precache' => esc_html__('Increase cache performance by early loading cached objects based on the current URL.', 'docket-cache'),
+            'mocache' => esc_html__('Improve the performance of the WordPress Translation function.', 'docket-cache'),
+            'optwpquery' => esc_html__('Docket Cache will attempt to optimize WordPress core query when this option enabled.', 'docket-cache'),
+            'optermcount' => esc_html__('Improve the performance of Word Term Count Update.', 'docket-cache'),
+            'cronoptmzdb' => esc_html__('Docket Cache will optimize WordPress database tables using SQL optimizing syntax at scheduled times.', 'docket-cache'),
+            'wpoptaload' => esc_html__('Reduce the size of Options Autoload by excluding non-WordPress Option from autoloading.', 'docket-cache'),
+            'postmissedschedule' => esc_html__('Fix the WordPress Missed Schedule Error after scheduling a future blog post.', 'docket-cache'),
+            'misc_tweaks' => esc_html__('Miscellaneous WordPress Tweaks. Including performance, security dan user experience.', 'docket-cache'),
+            'wootweaks' => esc_html__('Miscellaneous WooCommerce Tweaks. Including performance, security dan user experience.', 'docket-cache'),
+            'wooadminoff' => esc_html__('Deactivate WooCommerce Admin feature.', 'docket-cache'),
+            'woowidgetoff' => esc_html__('Deactivate WooCommerce Widget feature.', 'docket-cache'),
+            'woowpdashboardoff' => esc_html__('Remove the WooCommerce meta box in the WordPress Dashboard.', 'docket-cache'),
+            'pingback' => esc_html__('Remove the WordPress XML-RPC and Pingbacks related features.', 'docket-cache'),
+            'headerjunk' => esc_html__('Remove WordPress features related to HTML header such as meta generators and feed links to reduce the page size.', 'docket-cache'),
+            'wpemoji' => esc_html__('Remove the WordPress Emoji feature.', 'docket-cache'),
+            'wpfeed' => esc_html__('Remove the WordPress Feed feature.', 'docket-cache'),
+            'wpembed' => esc_html__('Remove the WordPress Embed feature.', 'docket-cache'),
+            'wplazyload' => esc_html__('Remove the WordPress Lazy Load feature.', 'docket-cache'),
+            'wpsitemap' => esc_html__('Remove the WordPress Auto-generate Sitemap feature.', 'docket-cache'),
+            'preload' => esc_html__('Preload Cache Object by fetching administrator-related pages.', 'docket-cache'),
+            'pageloader' => esc_html__('Display page loader when loading administrator pages.', 'docket-cache'),
+            'stats' => esc_html__('Display Object Cache stats at Overview page.', 'docket-cache'),
+            'gcaction' => esc_html__('Enable the Garbage Collector action button on the Overview page.', 'docket-cache'),
+            'autoupdate' => esc_html__('Enable automatic plugin updates for Docket Cache.', 'docket-cache'),
+            'checkversion' => esc_html__('Allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid error-prone.', 'docket-cache'),
+        ];
+
+        $text = isset($info[$id]) ? $info[$id] : esc_html__('No info available', 'docket-cache');
+
+        return '<span tabindex="0" data-tooltip="'.$text.'"><span class="dashicons dashicons-editor-help"></span></span>';
+    }
+
+    private function action_notice()
+    {
+        static $done = false;
+        if (!$done && !empty($this->pt->notice) && !empty($this->pt->token)) {
+            $type = 'failed' === substr($this->pt->token, -6) ? 'error' : 'success';
+            echo Resc::boxmsg($this->pt->notice, $type);
+            $done = true;
+        }
     }
 }

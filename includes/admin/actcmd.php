@@ -14,7 +14,7 @@ namespace Nawawi\DocketCache;
 $ocdisabled = 2 === $this->info->status_code ? ' onclick="return false;" disabled' : '';
 $opdisabled = 2 === $this->info->opcache_code || 0 === $this->info->opcache_code ? ' onclick="return false;" disabled' : '';
 ?>
-<?php $this->tab_title('Actions', true); ?>
+<?php $this->tab_title(esc_html__('Actions', 'docket-cache')); ?>
 <div class="qact">
     <div class="cmd">
         <h4><?php esc_html_e('Object Cache Files', 'docket-cache'); ?></h4>

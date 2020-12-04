@@ -57,6 +57,13 @@ final class Plugin extends Bepart
     public $token;
 
     /**
+     * Plugin action notice.
+     *
+     * @var string
+     */
+    public $notice;
+
+    /**
      * Plugin screen name.
      *
      * @var string
@@ -774,6 +781,9 @@ final class Plugin extends Bepart
      */
     private function register_init()
     {
+        // unofficial constant: possible to disable nag notices
+        !\defined('DISABLE_NAG_NOTICES') && \define('DISABLE_NAG_NOTICES', true);
+
         $this->page = 'admin.php?page='.$this->slug;
         $this->screen = 'toplevel_page_docket-cache';
         $this->cache_path = $this->define_cache_path($this->cf()->dcvalue('PATH'));
@@ -790,6 +800,9 @@ final class Plugin extends Bepart
             $this->api_endpoint = 'http://api.docketcache.local';
             $this->cronbot_endpoint = 'http://cronbot.docketcache.local';
         }
+
+        $this->token = '';
+        $this->notice = '';
     }
 
     /**
@@ -898,23 +911,25 @@ final class Plugin extends Bepart
         add_action(
             'plugins_loaded',
             function () {
-                if (!headers_sent() && $this->cf()->is_dctrue('LOG')
-                    && !empty($_SERVER['REQUEST_URI']) && false !== strpos($_SERVER['REQUEST_URI'], '?page=docket-cache&idx=log&dl=0')
-                    && preg_match('@log\&dl=\d+$@', $_SERVER['REQUEST_URI'])) {
-                    $file = $this->cf()->dcvalue('LOG_FILE');
+                if (!headers_sent() && $this->cf()->is_dctrue('LOG') && !empty($_SERVER['REQUEST_URI'])) {
+                    $req = $_SERVER['REQUEST_URI'];
+                    if ((false !== strpos($req, '?page=docket-cache&idx=log&dl=0') || false !== strpos($req, '?page=docket-cache-log&idx=log&dl=0'))
+                        && preg_match('@log\&dl=\d+$@', $req)) {
+                        $file = $this->cf()->dcvalue('LOG_FILE');
 
-                    if (is_multisite()) {
-                        $file = nwdcx_network_filepath($file);
-                    }
+                        if (is_multisite()) {
+                            $file = nwdcx_network_filepath($file);
+                        }
 
-                    @header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
-                    @header('Content-Type: text/plain; charset=UTF-8');
-                    if (@is_file($file)) {
-                        @readfile($file);
+                        @header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
+                        @header('Content-Type: text/plain; charset=UTF-8');
+                        if (@is_file($file)) {
+                            @readfile($file);
+                            exit;
+                        }
+                        echo 'No data available';
                         exit;
                     }
-                    echo 'No data available';
-                    exit;
                 }
             },
             0
@@ -982,12 +997,39 @@ final class Plugin extends Bepart
             $args_extra
         );
 
-        $query = add_query_arg($args, $this->page);
+        $page = $this->page;
+        if (!empty($args['idx']) && $this->is_subpage($args['idx'])) {
+            $page = $page.'-'.$args['idx'];
+        }
+
+        $query = add_query_arg($args, $page);
 
         return wp_nonce_url(network_admin_url($query), $key);
     }
 
-    public function our_screen()
+    public function get_screen()
+    {
+        $screen = $this->screen;
+        $index = $this->get_subpage();
+        if (!empty($index)) {
+            $screen = $this->slug.'_page_'.$this->slug.'-'.$index;
+        }
+
+        return $screen;
+    }
+
+    public function get_page()
+    {
+        $page = $this->page;
+        $index = $this->get_subpage();
+        if (!empty($index)) {
+            $page = $page.'-'.$index;
+        }
+
+        return $page;
+    }
+
+    public function our_screen(&$current_screen = '')
     {
         $current_screen = get_current_screen()->id;
         if (substr($current_screen, 0, \strlen($this->screen)) === $this->screen) {
@@ -1026,10 +1068,10 @@ final class Plugin extends Bepart
                     $order
                 );
 
-                /*add_submenu_page(
+                add_submenu_page(
                     $this->slug,
-                    'Settings',
-                    'Settings',
+                    'Overview',
+                    'Overview',
                     $cap,
                     $this->slug,
                     function () {
@@ -1037,16 +1079,42 @@ final class Plugin extends Bepart
                     }
                 );
 
+                if ($this->cf()->is_dctrue('LOG')) {
+                    add_submenu_page(
+                        $this->slug,
+                        'Docket Cache',
+                        'Cache Log',
+                        $cap,
+                        $this->slug.'-log',
+                        function () {
+                            ( new View($this) )->index();
+                        }
+                    );
+                }
+
+                if ($this->cf()->is_dctrue('CRONBOT')) {
+                    add_submenu_page(
+                        $this->slug,
+                        'Docket Cache',
+                        'Cronbot',
+                        $cap,
+                        $this->slug.'-cronbot',
+                        function () {
+                            ( new View($this) )->index();
+                        }
+                    );
+                }
+
                 add_submenu_page(
                     $this->slug,
                     'Docket Cache',
-                    'Advanced',
+                    'Configuration',
                     $cap,
-                    $this->slug.'-advanced',
+                    $this->slug.'-config',
                     function () {
                         ( new View($this) )->index();
                     }
-                );*/
+                );
             }
         );
 
@@ -1102,26 +1170,31 @@ final class Plugin extends Bepart
                     return;
                 }
 
+                if (!$this->our_screen() && false === strpos($_SERVER['REQUEST_URI'], '/plugins.php') && false === strpos($_SERVER['REQUEST_URI'], '/update-core.php')) {
+                    return;
+                }
+
                 if ($this->cx()->exists()) {
                     $url = $this->action_query('update-dropino');
 
+                    $title = !$this->our_screen() ? '<strong>Docket Cache:</strong> ' : '';
                     if ($this->cx()->validate()) {
                         if ($this->cx()->is_outdated() && !$this->cx()->install(true)) {
                             /* translators: %s: url */
-                            $message = sprintf(__('<strong>Docket Cache:</strong> The object-cache.php Drop-In is outdated. Please click "Re-Install" to update it now.<p style="padding:0;"><a href="%s" class="button button-primary">Re-Install</a>', 'docket-cache'), $url);
+                            $message = $title.sprintf(__('The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now.<p style="margin-bottom:0;padding:0;"><a href="%s" class="button button-primary" style="margin-top:10px;margin-bottom:0;">Re-Install</a></p>', 'docket-cache'), $url);
                         }
                     } else {
                         /* translators: %s: url */
-                        $message = sprintf(__('<strong>Docket Cache:</strong> An unknown object-cache.php Drop-In was found. Please click "Install" to use Docket Cache.<p style="margin-bottom:0;"><a href="%s" class="button button-primary">Install</a></p>', 'docket-cache'), $url);
+                        $message = $title.sprintf(__('An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use Docket Cache.<p style="margin-bottom:0;"><a href="%s" class="button button-primary" style="margin-top:10px;margin-bottom:0;">Install</a></p>', 'docket-cache'), $url);
                     }
                 }
 
                 if (2 === $this->get_status() && $this->our_screen()) {
-                    $message = esc_html__('The object-cache.php Drop-In has been disabled at runtime.', 'docket-cache');
+                    $message = esc_html__('The Object Cache feature has been disabled at runtime.', 'docket-cache');
                 }
 
                 if (isset($message)) {
-                    echo '<div id="docket-notice" class="notice notice-warning">';
+                    echo '<div id="docket-cache-notice" class="notice notice-warning">';
                     echo '<p>'.$message.'</p>';
                     echo '</div>';
                 }
@@ -1145,6 +1218,7 @@ final class Plugin extends Bepart
                         'debug' => $is_debug ? 'true' : 'false',
                     ]
                 );
+
                 if ($hook === $this->screen || $this->our_screen()) {
                     wp_enqueue_style($this->slug.'-core', $plugin_url.'includes/admin/docket.css', null, $version);
                     wp_enqueue_script($this->slug.'-core', $plugin_url.'includes/admin/docket.js', ['jquery'], $version, true);

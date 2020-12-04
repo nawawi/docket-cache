@@ -10,6 +10,12 @@
     $( document )
         .ready(
             function() {
+                var uh = window.location.href;
+
+                if ( uh.match( /admin\.php\?page=docket-cache/ ) === null ) {
+                    return;
+                }
+
                 $selector = $( document )
                     .find( 'div#docket-cache' );
                 $selector.find( 'a#refresh' )
@@ -40,25 +46,7 @@
                         }
                     );
 
-                $selector.find( 'select#sort' )
-                    .on(
-                        'change',
-                        function() {
-                            $selector.find( 'a#refresh' )
-                                .trigger( 'click' );
-                        }
-                    );
-
-                $selector.find( 'select#order' )
-                    .on(
-                        'change',
-                        function() {
-                            $selector.find( 'a#refresh' )
-                                .trigger( 'click' );
-                        }
-                    );
-
-                $selector.find( 'select#line' )
+                $selector.find( 'select[data-id=logopt]' )
                     .on(
                         'change',
                         function() {
@@ -78,14 +66,15 @@
                             'beforeunload',
                             function() {
                                 window.dospinner = false;
-                                $( document )
-                                    .find( '#docket-cache-overlay' )
-                                    .css( 'display', 'block' );
+                                var $overlay = $( document )
+                                    .find( '#docket-cache-overlay' );
+                                $overlay.css( 'display', 'block' );
+
                                 setTimeout(
                                     function() {
-                                        $( document )
-                                            .find( '#docket-cache-spinner' )
-                                            .css( 'display', 'inline-block' );
+                                        $overlay.css( 'background-color', 'rgba(0,0,0,0.5)' );
+                                        $overlay.find( '#wait-spinner' )
+                                            .css( 'display', 'block' );
                                     },
                                     750
                                 );
@@ -209,27 +198,34 @@
                             .removeClass( 'hide' );
                     }
                 };
-                $selector.find( '.log' )
-                    .find( 'textarea#log' )
-                    .on(
-                        "click",
-                        function( e ) {
-                            var $self = $( this );
-                            var sp = $self
-                                .scrollTop()
-                            var lh = $self
-                                .css( "line-height" );
-                            lh = parseInt( lh.substring( 0, lh.length - 2 ) );
 
-                            var line = Math.floor( ( e.offsetY + sp ) / lh );
-                            var arr = $self
-                                .val()
-                                .split( "\n" );
-                            var row = arr[ line ];
-                            view_row( row );
-                            highlight_row( this, line );
-                        }
-                    );
+                var select_row = function() {
+                    $selector.find( '.log' )
+                        .find( 'textarea#log' )
+                        .on(
+                            "click",
+                            function( e ) {
+                                var $self = $( this );
+                                var sp = $self
+                                    .scrollTop()
+                                var lh = $self
+                                    .css( "line-height" );
+                                lh = parseInt( lh.substring( 0, lh.length - 2 ) );
+
+                                var line = Math.floor( ( e.offsetY + sp ) / lh );
+                                var arr = $self
+                                    .val()
+                                    .split( "\n" );
+                                var row = arr[ line ];
+                                view_row( row );
+                                highlight_row( this, line );
+                            }
+                        );
+                };
+
+                if ( uh.match( /idx=log&vcache=/ ) === null ) {
+                    select_row();
+                }
             }
         );
 } )( jQuery );
