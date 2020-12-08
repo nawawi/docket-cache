@@ -771,6 +771,11 @@ body {
     }
 }
 
+/* notice */
+#docket-cache div.notice:not(#docket-cache-notice):not(#setting-error-docket-cache) {
+    display: none;
+}
+
 /* wp */
 #wpfooter #footer-left,
 #wpfooter #footer-upgrade {

@@ -143,6 +143,15 @@ final class Event
     }
 
     /**
+     * reset,.
+     */
+    public function reset()
+    {
+        $this->unregister();
+        $this->register();
+    }
+
+    /**
      * monitor.
      */
     public function watchproc()

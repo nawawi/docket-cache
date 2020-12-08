@@ -64,6 +64,17 @@ class Command extends WP_CLI_Command
         return $text;
     }
 
+    private function dropino_runtime_status()
+    {
+        $info = (object) $this->pt->get_info();
+        if (2 === $info->status_code) {
+            WP_CLI::line($this->title('Cache Status').$this->status_color($info->status_code, $info->status_text));
+            unset($info);
+            WP_CLI::halt(1);
+        }
+        unset($info);
+    }
+
     /**
      * Display the Docket Cache status.
      *
@@ -81,6 +92,9 @@ class Command extends WP_CLI_Command
         if ($this->pt->cf()->is_dctrue('STATS')) {
             WP_CLI::line($this->title('Cache Size').$info->cache_size);
         }
+
+        unset($info);
+
         WP_CLI::halt($halt);
     }
 
@@ -92,17 +106,18 @@ class Command extends WP_CLI_Command
      *
      * ## EXAMPLES
      *
-     *  wp cache enable
+     *  wp cache dropin:enable
      */
-    public function enable()
+    public function dropino_enable()
     {
+        $this->dropino_runtime_status();
+
         if ($this->pt->cx()->exists()) {
             if ($this->pt->cx()->validate()) {
-                WP_CLI::line(__('Docket object cache already enabled.', 'docket-cache'));
-                WP_CLI::halt(0);
+                $this->halt_success(__('Docket object cache already enabled.', 'docket-cache'));
             }
 
-            $this->halt_error(__('An unknown object cache Drop-In was found. To use Docket object cache, run: wp cache update.', 'docket-cache'));
+            $this->halt_error(__('An unknown object cache Drop-In was found. To use Docket object cache, run: wp cache dropin:update.', 'docket-cache'));
         }
 
         if ($this->pt->cx()->install()) {
@@ -120,16 +135,18 @@ class Command extends WP_CLI_Command
      *
      * ## EXAMPLES
      *
-     *  wp cache disable
+     *  wp cache dropin:disable
      */
-    public function disable()
+    public function dropino_disable()
     {
+        $this->dropino_runtime_status();
+
         if (!$this->pt->cx()->exists()) {
             $this->halt_error(__('No object cache Drop-In found.', 'docket-cache'));
         }
 
         if (!$this->pt->cx()->validate()) {
-            $this->halt_error(__('An unknown object cache Drop-In was found. To use Docket run: wp cache update.', 'docket-cache'));
+            $this->halt_error(__('An unknown object cache Drop-In was found. To use Docket run: wp cache dropin:update.', 'docket-cache'));
         }
 
         if ($this->pt->cx()->uninstall()) {
@@ -148,10 +165,12 @@ class Command extends WP_CLI_Command
      *
      *  wp cache update
      *
-     * @subcommand update
+     * @subcommand dropin:update
      */
-    public function update_dropino()
+    public function dropino_update()
     {
+        $this->dropino_runtime_status();
+
         if ($this->pt->cx()->install()) {
             $this->halt_success(__('Updated object cache Drop-In and enabled Docket object cache.', 'docket-cache'));
         }
@@ -175,6 +194,8 @@ class Command extends WP_CLI_Command
             $this->halt_error(__('Object cache could not be flushed.', 'docket-cache'));
         }
 
+        WP_CLI::line(__('Flushing cache. Please wait..', 'docket-cache'));
+        sleep(1);
         $this->pt->cx()->undelay();
         $this->halt_success(__('The cache was flushed.', 'docket-cache'));
     }
@@ -186,41 +207,128 @@ class Command extends WP_CLI_Command
      *
      * ## EXAMPLES
      *
-     *  wp cache clearlock
+     *  wp cache reset:lock
      *
-     * @subcommand flush
+     * @subcommand reset:lock
      */
-    public function clearlock()
+    public function reset_lock()
     {
         $this->pt->co()->clear_lock();
-        $this->halt_success(__('The lock file flushed.', 'docket-cache'));
+        $this->halt_success(__('The lock has been removed.', 'docket-cache'));
     }
 
     /**
-     * Run the Docket Cache garbage collector (GC).
+     * Reset the Docket Cache cron event.
+     *
+     * Reset cron event.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache reset:cron
+     *
+     * @subcommand reset:cron
+     */
+    public function reset_cron()
+    {
+        WP_CLI::line(__('Resetting cron event. Please wait..', 'docket-cache'));
+        ( new Event($this->pt) )->reset();
+        sleep(1);
+        WP_CLI::runcommand('cron event list');
+        $this->halt_success(__('Cron event has been reset.', 'docket-cache'));
+    }
+
+    /**
+     * Flushes the precaching files.
+     *
+     * Remove the precaching files.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache flush:precache
+     *
+     * @subcommand flush:precache
+     */
+    public function flush_precache()
+    {
+        if (!\function_exists('wp_cache_flush_group')) {
+            $this->halt_error(__('Precache could not be flushed.', 'docket-cache'));
+        }
+
+        WP_CLI::line(__('Flushing precache. Please wait..', 'docket-cache'));
+        sleep(1);
+        wp_cache_flush_group('docketcache-precache');
+        $this->halt_success(__('The precache was flushed.', 'docket-cache'));
+    }
+
+    /**
+     * Runs all cron event.
+     *
+     * Runs all cron event.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache run:cron
+     *
+     * @subcommand run:cron
+     */
+    public function run_cron()
+    {
+        WP_CLI::line(__('Executing the cron event. Please wait..', 'docket-cache'));
+        sleep(1);
+        WP_CLI::runcommand('cron event run --all');
+    }
+
+    /**
+     * Runs the Docket Cache cache stats.
+     *
+     * Collect cache stats data.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache run:stats
+     *
+     * @subcommand run:stats
+     */
+    public function run_stats()
+    {
+        WP_CLI::line(__('Executing the cache stats. Please wait..', 'docket-cache'));
+        sleep(1);
+        $pad = 15;
+        $stats = $this->pt->get_cache_stats(true);
+        WP_CLI::line($this->title(__('Object size', 'docket-cache'), $pad).$this->pt->normalize_size($stats->size));
+        WP_CLI::line($this->title(__('File size', 'docket-cache'), $pad).$this->pt->normalize_size($stats->filesize));
+        WP_CLI::line($this->title(__('Total file', 'docket-cache'), $pad).$stats->files);
+        $this->halt_success(__('Executing the cache stats completed.', 'docket-cache'));
+    }
+
+    /**
+     * Runs the Docket Cache garbage collector (GC).
      *
      * Remove empty and older files, and execute various actions.
      *
      * ## EXAMPLES
      *
-     *  wp cache gc
+     *  wp cache run:gc
      *
-     * @subcommand gc
+     * @subcommand run:gc
      */
-    public function rungc()
+    public function run_gc()
     {
         if (!has_filter('docketcache/garbage-collector')) {
             $this->halt_error(__('Garbage collector not available.', 'docket-cache'));
         }
 
         WP_CLI::line(__('Executing the garbage collector. Please wait..', 'docket-cache'));
+        sleep(1);
 
         $pad = 35;
         $collect = apply_filters('docketcache/garbage-collector', true);
 
+        WP_CLI::line(str_repeat('-', $pad).':'.str_repeat('-', 10));
         WP_CLI::line($this->title(__('Cache MaxTTL', 'docket-cache'), $pad).$collect->cache_maxttl);
         WP_CLI::line($this->title(__('Cache File Limit', 'docket-cache'), $pad).$collect->cache_maxfile);
         WP_CLI::line($this->title(__('Cache Disk Limit', 'docket-cache'), $pad).$this->pt->normalize_size($collect->cache_maxdisk));
+        WP_CLI::line(str_repeat('-', $pad).':'.str_repeat('-', 10));
         WP_CLI::line($this->title(__('Cleanup Cache MaxTTL', 'docket-cache'), $pad).$collect->cleanup_maxttl);
         WP_CLI::line($this->title(__('Cleanup Cache File Limit', 'docket-cache'), $pad).$collect->cleanup_maxfile);
         WP_CLI::line($this->title(__('Cleanup Cache Disk Limit', 'docket-cache'), $pad).$collect->cleanup_maxdisk);
@@ -229,10 +337,11 @@ class Command extends WP_CLI_Command
             WP_CLI::line($this->title(__('Cleanup Precache Limit', 'docket-cache'), $pad).$collect->cleanup_precache_maxfile);
         }
 
+        WP_CLI::line(str_repeat('-', $pad).':'.str_repeat('-', 10));
         WP_CLI::line($this->title(__('Total Cache Cleanup', 'docket-cache'), $pad).$collect->cache_cleanup);
         WP_CLI::line($this->title(__('Total Cache Ignored', 'docket-cache'), $pad).$collect->cache_ignore);
         WP_CLI::line($this->title(__('Total Cache File', 'docket-cache'), $pad).$collect->cache_file);
-
+        WP_CLI::line(str_repeat('-', $pad).':'.str_repeat('-', 10));
         $this->halt_success(__('Executing the garbage collector completed.', 'docket-cache'));
     }
 

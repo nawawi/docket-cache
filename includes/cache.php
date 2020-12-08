@@ -882,6 +882,7 @@ class WP_Object_Cache
     public function dc_remove_group($group)
     {
         $match = $this->item_hash($group).'-';
+        $total = 0;
         if ($this->fs()->is_docketcachedir($this->cache_path)) {
             foreach ($this->fs()->scanfiles($this->cache_path) as $object) {
                 $fx = $object->getPathName();
@@ -893,12 +894,13 @@ class WP_Object_Cache
                 if ($match === substr($fn, 0, \strlen($match))) {
                     $this->fs()->unlink($fx, false);
                     $this->dc_log('flush', $this->get_item_hash($fx), $group.':*');
+                    ++$total;
                 }
             }
         }
         unset($this->cache[$group]);
 
-        return true;
+        return $total;
     }
 
     /**

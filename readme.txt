@@ -3,9 +3,9 @@ Contributors: nawawijamili
 Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance, redis, memcached, speed, multisite, server load, docket
 Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
-Tested up to: 5.5
+Tested up to: 5.6
 Requires PHP: 7.2.5
-Stable tag: 20.10.15
+Stable tag: 20.11.02
 License: MIT
 License URI: ./license.txt
 
@@ -173,60 +173,14 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
-= 20.10.15 =
+= 20.11.02 =
 
-- Fixed Drop-in outdated notice.
+- Fixed PostCache::setup_hooks() -> removed deprecated jetpack hook instagram_cache_oembed_api_response_body.
 
-= 20.10.14 =
+= 20.11.01 =
 
-- Fixed for previous update, wrong tag for release.
-
-= 20.10.13 =
-
-- Improved on Admin Interface.
-
-= 20.10.12 =
-
-- Fixed File cleanup -> use shutdown hook instead of register_shutdown_function to avoid issue with *some* page cache plugin.
-- Added DOCKET_CACHE_PRECACHE_MAXFILE constant to limit precache file.
-
-= 20.10.10 =
-
-- Fixed Max Cache Size -> validate sizeof object instead of exported data.
-- Fixed Filesystem -> use php shutdown at dump and unlink methods.
-- Added Resc class -> handle base64 icons and image.
-- Added Configuration -> option to remove WP Lazy Load and WP Sitemap.
-- Added Configuration -> scroll at option position after select to change configuration.
-
-= 20.10.09 =
-
-Hotfix release.
-
-- Fixed Filesystem::suspend_cache_file() -> use dump to avoid long locking.
-- Fixed Filesystem::cache_get() -> catch Throwable, only filter cache file to avoid long locking.
-- Fixed Filesystem::dump() -> remove retry, immediately return false if failed.
-- Fixed Filesystem() -> only use register_shutdown_function to capture fatal error, other than that use wp shutdown hook.
-
-= 20.10.08 =
-
-- Fixed WP_Object_Cache::dc_save() -> cache meta data type, change string to array if original data serialized.
-- Fixed WP_Object_Cache::dc_save() -> wrong logic causes a random delay if array size more than 1MB.
-
-= 20.10.07 =
-
-- Fixed Tweaks::misc() -> removed deprecated jetpack hook instagram_cache_oembed_api_response_body.
-- Fixed Filesystem::validate_fatal_error_file() -> update timestamp.
-- Added Filesystem::suspend_cache_file().
-
-= 20.10.06 =
-
-- Fixed Filesystem::scanfiles() -> missing regex pattern for dump file.
-- Fixed Filesystem::dump() -> retry to create a file if failed.
-- Fixed WP_Object_Cache::dc_init() -> Flush Litespeed Cache admin notice if exists.
-- Added Filesystem::dc_save() -> limit object size to 1000000.
-- Added Garbage Collector -> action button output results.
-- Added Filesystem::capture_fatal_error() -> attempt to fix any cache file error-prone.
-
+- Added WP-CLI command -> run:gc, run:stats, run:cron, reset:lock, reset:cron, dropin:enable, dropin:disable, dropin:update, flush:precache
+- Fixed Admin Interface -> only show our own notice.
 
 
 Kindly refer to [changelog.txt](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt) for previous changes.

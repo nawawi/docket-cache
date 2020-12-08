@@ -523,13 +523,14 @@ final class Plugin extends Bepart
         return rtrim($site_url, '/\\');
     }
 
-    public function site_url($current = false)
+    public function site_url($current = false, $is_home = false)
     {
-        $site_url = get_option('siteurl');
+        $option = $is_home ? 'home' : 'siteurl';
+        $site_url = get_option($option);
         if (!$current && is_multisite()) {
             $blog_id = get_main_site_id();
             switch_to_blog($blog_id);
-            $site_url = get_option('siteurl');
+            $site_url = get_option($option);
             restore_current_blog();
         }
 
@@ -1701,14 +1702,19 @@ final class Plugin extends Bepart
         if ($this->cf()->is_dctrue('WPCLI') && $this->cf()->is_false('DocketCache_CLI')) {
             \define('DocketCache_CLI', true);
             $cli = new Command($this);
-            \WP_CLI::add_command('cache update', [$cli, 'update_dropino']);
-            \WP_CLI::add_command('cache enable', [$cli, 'enable']);
-            \WP_CLI::add_command('cache disable', [$cli, 'disable']);
+
+            \WP_CLI::add_command('cache dropin:update', [$cli, 'dropino_update']);
+            \WP_CLI::add_command('cache dropin:enable', [$cli, 'dropino_enable']);
+            \WP_CLI::add_command('cache dropin:disable', [$cli, 'dropino_disable']);
+            \WP_CLI::add_command('cache run:gc', [$cli, 'run_gc']);
+            \WP_CLI::add_command('cache run:cron', [$cli, 'run_cron']);
+            \WP_CLI::add_command('cache run:stats', [$cli, 'run_stats']);
+            \WP_CLI::add_command('cache reset:lock', [$cli, 'reset_lock']);
+            \WP_CLI::add_command('cache reset:cron', [$cli, 'reset_cron']);
+            \WP_CLI::add_command('cache flush:precache', [$cli, 'flush_precache']);
+            \WP_CLI::add_command('cache flush', [$cli, 'flush_cache']);
             \WP_CLI::add_command('cache status', [$cli, 'status']);
             \WP_CLI::add_command('cache type', [$cli, 'type']);
-            \WP_CLI::add_command('cache flush', [$cli, 'flush_cache']);
-            \WP_CLI::add_command('cache gc', [$cli, 'rungc']);
-            \WP_CLI::add_command('cache unlock', [$cli, 'clearlock']);
         }
     }
 

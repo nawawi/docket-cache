@@ -62,7 +62,8 @@ class PostCache
         add_action('clean_term_cache', [$this, 'flush_cache']);
         add_action('clean_post_cache', [$this, 'flush_cache']);
 
-        add_filter('instagram_cache_oembed_api_response_body', '__return_true');
+        // Removed in Jetpack 9.1.0
+        //add_filter('instagram_cache_oembed_api_response_body', '__return_true');
 
         add_filter(
             'dashboard_recent_posts_query_args',

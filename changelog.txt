@@ -1,3 +1,12 @@
+= v20.11.02 (2020-12-09)
+
+- Fixed PostCache::setup_hooks() -> removed deprecated jetpack hook instagram_cache_oembed_api_response_body.
+
+= v20.11.01 (2020-12-08)
+
+- Added WP-CLI command -> run:gc, run:stats, run:cron, reset:lock, reset:cron, dropin:enable, dropin:disable, dropin:update, flush:precache
+- Fixed Admin Interface -> only show our own notice.
+
 = v20.10.15 (2020-12-05)
 
 - Improved on Admin Interface.

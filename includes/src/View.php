@@ -485,14 +485,7 @@ final class View
     {
         $info = [
             'cronbot' => esc_html__('The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively.', 'docket-cache'),
-            'cronbot_sping' => esc_html__('sss', 'docket-cache'),
-            'cronbot_lping' => esc_html__('sss', 'docket-cache'),
-            'cronbot_nping' => esc_html__('sss', 'docket-cache'),
             'log' => esc_html__('The cache log intends to provide information on how the cache works. For performance and security concerns, disable it if no longer needed.', 'docket-cache'),
-            'log_topt' => esc_html__('sss', 'docket-cache'),
-            'log_aopt' => esc_html__('sss', 'docket-cache'),
-            'log_fopt' => esc_html__('sss', 'docket-cache'),
-            'log_sopt' => esc_html__('sss', 'docket-cache'),
             'advcpost' => esc_html__('Cache WordPress Post Queries which results in faster data retrieval and reduced database workload.', 'docket-cache'),
             'precache' => esc_html__('Increase cache performance by early loading cached objects based on the current URL.', 'docket-cache'),
             'mocache' => esc_html__('Improve the performance of the WordPress Translation function.', 'docket-cache'),

@@ -123,7 +123,7 @@ final class CronAgent
                 'status' => $action,
             ],
             'headers' => [
-                'REFERER' => $this->pt->site_url(true),
+                'REFERER' => $this->pt->site_url(true, true),
                 'DOCKETID' => $site_id,
             ],
         ];
@@ -268,7 +268,6 @@ final class CronAgent
 
             if ($slowdown > 10) {
                 $slowdown = 0;
-
                 usleep($delay);
             }
 
@@ -301,7 +300,7 @@ final class CronAgent
             }
         }
 
-        unset($cronhooks);
+        unset($crons, $cronhooks, $hook, $keys);
 
         // lock must below 10 minutes
         // wp-includes/cron.php -> spawn_cron()
@@ -423,9 +422,10 @@ final class CronAgent
             }
             ++$maxrun;
 
-            // slow down cpu
             usleep(100);
         }
+
+        unset($sites);
 
         $cache[$uip] = $response;
 
@@ -478,5 +478,7 @@ final class CronAgent
                 }
             }
         }
+
+        unset($crondata);
     }
 }
