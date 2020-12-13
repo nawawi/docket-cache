@@ -474,8 +474,16 @@ final class View
 
         $nx = sanitize_text_field($_GET['nx']);
         $code = '<script id="docket-cache-focus">'.PHP_EOL;
-        $code .= 'var fx = document.getElementById("'.$nx.'");'.PHP_EOL;
-        $code .= 'if ( fx ) { fx.scrollIntoView({block:"center", behavior:"smooth"}); }'.PHP_EOL;
+        $code .= '(function($) {';
+        $code .= '$(document).ready(function() {';
+        $code .= 'var fx = $(document).find("tr#'.$nx.'");';
+        $code .= 'if ( fx ) {';
+        $code .= 'fx[0].scrollIntoView({block:"center", behavior:"smooth"});';
+        $code .= 'fx.addClass("notice-focus");';
+        $code .= 'setTimeout(function() { fx.removeClass("notice-focus"); }, 3000);';
+        $code .= '}';
+        $code .= '});';
+        $code .= '})(jQuery);'.PHP_EOL;
         $code .= '</script>';
 
         return $code;
@@ -506,6 +514,7 @@ final class View
             'wpembed' => esc_html__('Remove the WordPress Embed feature.', 'docket-cache'),
             'wplazyload' => esc_html__('Remove the WordPress Lazy Load feature.', 'docket-cache'),
             'wpsitemap' => esc_html__('Remove the WordPress Auto-generate Sitemap feature.', 'docket-cache'),
+            'wpapppassword' => esc_html__('Remove the WordPress Application Passwords feature.', 'docket-cache'),
             'preload' => esc_html__('Preload Cache Object by fetching administrator-related pages.', 'docket-cache'),
             'pageloader' => esc_html__('Display page loader when loading administrator pages.', 'docket-cache'),
             'stats' => esc_html__('Display Object Cache stats at Overview page.', 'docket-cache'),

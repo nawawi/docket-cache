@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Docket Cache plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 20.11.02\n"
+"Project-Id-Version: Docket Cache 20.11.03\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-12-08T16:32:05+00:00\n"
+"POT-Creation-Date: 2020-12-13T18:17:42+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -76,12 +76,12 @@ msgid "Drop-In Wrapper not available."
 msgstr ""
 
 #: includes/admin/actcmd.php:45
-#: includes/src/Plugin.php:1363
+#: includes/src/Plugin.php:1361
 msgid "Disable Object Cache"
 msgstr ""
 
 #: includes/admin/actcmd.php:47
-#: includes/src/Plugin.php:1359
+#: includes/src/Plugin.php:1357
 msgid "Enable Object Cache"
 msgstr ""
 
@@ -237,31 +237,36 @@ msgid "Remove WP Sitemap"
 msgstr ""
 
 #: includes/admin/config.php:172
+#: includes/src/Canopt.php:109
+msgid "Remove WP Application Passwords"
+msgstr ""
+
+#: includes/admin/config.php:178
 #: includes/src/Canopt.php:82
 msgid "Admin Page Cache Preloading"
 msgstr ""
 
-#: includes/admin/config.php:178
+#: includes/admin/config.php:184
 #: includes/src/Canopt.php:93
 msgid "Admin Page Loader"
 msgstr ""
 
-#: includes/admin/config.php:184
+#: includes/admin/config.php:190
 #: includes/src/Canopt.php:97
 msgid "Object Cache Data Stats"
 msgstr ""
 
-#: includes/admin/config.php:190
+#: includes/admin/config.php:196
 #: includes/src/Canopt.php:98
 msgid "Garbage Collector Action Button"
 msgstr ""
 
-#: includes/admin/config.php:196
+#: includes/admin/config.php:202
 #: includes/src/Canopt.php:99
 msgid "Docket Cache Auto Update"
 msgstr ""
 
-#: includes/admin/config.php:202
+#: includes/admin/config.php:208
 msgid "Check Critical Version"
 msgstr ""
 
@@ -931,12 +936,12 @@ msgstr[1] ""
 
 #. translators: %s: url
 #: includes/src/Plugin.php:1185
-msgid "The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now.<p style=\"margin-bottom:0;padding:0;\"><a href=\"%s\" class=\"button button-primary\" style=\"margin-top:10px;margin-bottom:0;\">Re-Install</a></p>"
+msgid "The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href=\"%s\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %s: url
 #: includes/src/Plugin.php:1189
-msgid "An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use Docket Cache.<p style=\"margin-bottom:0;\"><a href=\"%s\" class=\"button button-primary\" style=\"margin-top:10px;margin-bottom:0;\">Install</a></p>"
+msgid "An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use Docket Cache. <br><br><a href=\"%s\" class=\"button button-primary\">Install</a>"
 msgstr ""
 
 #: includes/src/Plugin.php:1194
@@ -944,16 +949,16 @@ msgid "The Object Cache feature has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: version
-#: includes/src/Plugin.php:1321
-#: includes/src/Plugin.php:1335
+#: includes/src/Plugin.php:1319
+#: includes/src/Plugin.php:1333
 msgid "Version %s"
 msgstr ""
 
-#: includes/src/Plugin.php:1353
+#: includes/src/Plugin.php:1351
 msgid "Settings"
 msgstr ""
 
-#: includes/src/Plugin.php:1367
+#: includes/src/Plugin.php:1365
 msgid "Install Drop-In"
 msgstr ""
 
@@ -1086,118 +1091,122 @@ msgstr ""
 msgid "Disable"
 msgstr ""
 
-#: includes/src/View.php:487
+#: includes/src/View.php:495
 msgid "The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively."
 msgstr ""
 
-#: includes/src/View.php:488
+#: includes/src/View.php:496
 msgid "The cache log intends to provide information on how the cache works. For performance and security concerns, disable it if no longer needed."
 msgstr ""
 
-#: includes/src/View.php:489
+#: includes/src/View.php:497
 msgid "Cache WordPress Post Queries which results in faster data retrieval and reduced database workload."
 msgstr ""
 
-#: includes/src/View.php:490
+#: includes/src/View.php:498
 msgid "Increase cache performance by early loading cached objects based on the current URL."
 msgstr ""
 
-#: includes/src/View.php:491
+#: includes/src/View.php:499
 msgid "Improve the performance of the WordPress Translation function."
 msgstr ""
 
-#: includes/src/View.php:492
+#: includes/src/View.php:500
 msgid "Docket Cache will attempt to optimize WordPress core query when this option enabled."
 msgstr ""
 
-#: includes/src/View.php:493
+#: includes/src/View.php:501
 msgid "Improve the performance of Word Term Count Update."
 msgstr ""
 
-#: includes/src/View.php:494
+#: includes/src/View.php:502
 msgid "Docket Cache will optimize WordPress database tables using SQL optimizing syntax at scheduled times."
 msgstr ""
 
-#: includes/src/View.php:495
+#: includes/src/View.php:503
 msgid "Reduce the size of Options Autoload by excluding non-WordPress Option from autoloading."
 msgstr ""
 
-#: includes/src/View.php:496
+#: includes/src/View.php:504
 msgid "Fix the WordPress Missed Schedule Error after scheduling a future blog post."
 msgstr ""
 
-#: includes/src/View.php:497
+#: includes/src/View.php:505
 msgid "Miscellaneous WordPress Tweaks. Including performance, security dan user experience."
 msgstr ""
 
-#: includes/src/View.php:498
+#: includes/src/View.php:506
 msgid "Miscellaneous WooCommerce Tweaks. Including performance, security dan user experience."
 msgstr ""
 
-#: includes/src/View.php:499
+#: includes/src/View.php:507
 msgid "Deactivate WooCommerce Admin feature."
 msgstr ""
 
-#: includes/src/View.php:500
+#: includes/src/View.php:508
 msgid "Deactivate WooCommerce Widget feature."
 msgstr ""
 
-#: includes/src/View.php:501
+#: includes/src/View.php:509
 msgid "Remove the WooCommerce meta box in the WordPress Dashboard."
 msgstr ""
 
-#: includes/src/View.php:502
+#: includes/src/View.php:510
 msgid "Remove the WordPress XML-RPC and Pingbacks related features."
 msgstr ""
 
-#: includes/src/View.php:503
+#: includes/src/View.php:511
 msgid "Remove WordPress features related to HTML header such as meta generators and feed links to reduce the page size."
 msgstr ""
 
-#: includes/src/View.php:504
+#: includes/src/View.php:512
 msgid "Remove the WordPress Emoji feature."
 msgstr ""
 
-#: includes/src/View.php:505
+#: includes/src/View.php:513
 msgid "Remove the WordPress Feed feature."
 msgstr ""
 
-#: includes/src/View.php:506
+#: includes/src/View.php:514
 msgid "Remove the WordPress Embed feature."
 msgstr ""
 
-#: includes/src/View.php:507
+#: includes/src/View.php:515
 msgid "Remove the WordPress Lazy Load feature."
 msgstr ""
 
-#: includes/src/View.php:508
+#: includes/src/View.php:516
 msgid "Remove the WordPress Auto-generate Sitemap feature."
 msgstr ""
 
-#: includes/src/View.php:509
+#: includes/src/View.php:517
+msgid "Remove the WordPress Application Passwords feature."
+msgstr ""
+
+#: includes/src/View.php:518
 msgid "Preload Cache Object by fetching administrator-related pages."
 msgstr ""
 
-#: includes/src/View.php:510
+#: includes/src/View.php:519
 msgid "Display page loader when loading administrator pages."
 msgstr ""
 
-#: includes/src/View.php:511
+#: includes/src/View.php:520
 msgid "Display Object Cache stats at Overview page."
 msgstr ""
 
-#: includes/src/View.php:512
+#: includes/src/View.php:521
 msgid "Enable the Garbage Collector action button on the Overview page."
 msgstr ""
 
-#: includes/src/View.php:513
+#: includes/src/View.php:522
 msgid "Enable automatic plugin updates for Docket Cache."
 msgstr ""
 
-#: includes/src/View.php:514
+#: includes/src/View.php:523
 msgid "Allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid error-prone."
 msgstr ""
 
-#: includes/src/View.php:517
+#: includes/src/View.php:526
 msgid "No info available"
 msgstr ""

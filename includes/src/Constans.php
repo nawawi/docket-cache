@@ -225,7 +225,8 @@ final class Constans
 
         // @private
         // cache ignored keys
-        $this->maybe_define($this->px('IGNORED_KEYS'), []);
+        // @note: dnh_dismissed_notices -> https://github.com/julien731/WP-Dismissible-Notices-Handler
+        $this->maybe_define($this->px('IGNORED_KEYS'), ['dnh_dismissed_notices']);
 
         // @private
         // this option private for right now
@@ -347,6 +348,9 @@ final class Constans
 
         // wp sitemap
         $this->maybe_define($this->px('WPSITEMAP'), false);
+
+        // wp application password: wp >= 5.6
+        $this->maybe_define($this->px('WPAPPPASSWORD'), false);
 
         // @private
         // capture fatal error rarely incase non-throwable

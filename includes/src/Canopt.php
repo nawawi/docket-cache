@@ -106,6 +106,7 @@ final class Canopt extends Bepart
             'wpfeed' => esc_html__('Remove WP Feed', 'docket-cache'),
             'wplazyload' => esc_html__('Remove WP Lazy Load', 'docket-cache'),
             'wpsitemap' => esc_html__('Remove WP Sitemap', 'docket-cache'),
+            'wpapppassword' => esc_html__('Remove WP Application Passwords', 'docket-cache'),
         ];
 
         if (false !== $key) {

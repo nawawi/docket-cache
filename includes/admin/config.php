@@ -163,9 +163,15 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="wpsitemap">
-                    <th class="border-b"><?php echo esc_html__('Remove WP Sitemap', 'docket-cache').$this->tooltip('wpsitemap'); ?></th>
+                    <th><?php echo esc_html__('Remove WP Sitemap', 'docket-cache').$this->tooltip('wpsitemap'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpsitemap'); ?>
+                    </td>
+                </tr>
+                <tr id="wpapppassword">
+                    <th class="border-b"><?php echo esc_html__('Remove WP Application Passwords', 'docket-cache').$this->tooltip('wpapppassword'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('wpapppassword'); ?>
                     </td>
                 </tr>
                 <tr id="preload">

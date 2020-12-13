@@ -776,7 +776,15 @@ body {
     display: none;
 }
 
+#docket-cache .notice-focus select {
+    background: #ddd;
+}
+
 /* wp */
+#wpfooter {
+    max-width: 1440px;
+}
+
 #wpfooter #footer-left,
 #wpfooter #footer-upgrade {
     font-size: 11px !important;

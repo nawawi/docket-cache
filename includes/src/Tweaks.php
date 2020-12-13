@@ -552,4 +552,9 @@ final class Tweaks
             -PHP_INT_MAX
         );
     }
+
+    public function wpapppassword()
+    {
+        add_filter('wp_is_application_passwords_available', '__return_false', PHP_INT_MAX);
+    }
 }

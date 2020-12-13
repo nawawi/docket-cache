@@ -1,3 +1,9 @@
+= v20.11.03 (2020-12-14)
+
+- Fixed Admin Interface -> action notice can't dismiss.
+- Fixed Admin Notice -> exclude Dismissible Notices Handler dnh_dismissed_notices option from cache.
+- Added Configuration -> remove the WordPress Application Passwords feature.
+
 = v20.11.02 (2020-12-09)
 
 - Fixed PostCache::setup_hooks() -> removed deprecated jetpack hook instagram_cache_oembed_api_response_body.

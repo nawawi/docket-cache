@@ -12,12 +12,27 @@
             function() {
                 var uh = window.location.href;
 
-                if ( uh.match( /admin\.php\?page=docket-cache/ ) === null ) {
+                if ( uh && uh.match( /admin\.php\?page=docket-cache/ ) === null ) {
                     return;
                 }
 
                 $selector = $( document )
                     .find( 'div#docket-cache' );
+
+                $selector.find( 'div.is-dismissible' )
+                    .find( 'button.notice-dismiss' )
+                    .on(
+                        'click',
+                        function() {
+                            $( this )
+                                .parent()
+                                .remove();
+
+                            $selector.find( '.notice-focus' )
+                                .removeClass( 'notice-focus' );
+                        }
+                    );
+
                 $selector.find( 'a#refresh' )
                     .on(
                         'click',

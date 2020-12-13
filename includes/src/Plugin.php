@@ -1182,11 +1182,11 @@ final class Plugin extends Bepart
                     if ($this->cx()->validate()) {
                         if ($this->cx()->is_outdated() && !$this->cx()->install(true)) {
                             /* translators: %s: url */
-                            $message = $title.sprintf(__('The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now.<p style="margin-bottom:0;padding:0;"><a href="%s" class="button button-primary" style="margin-top:10px;margin-bottom:0;">Re-Install</a></p>', 'docket-cache'), $url);
+                            $message = $title.sprintf(__('The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href="%s" class="button button-primary">Re-Install</a>', 'docket-cache'), $url);
                         }
                     } else {
                         /* translators: %s: url */
-                        $message = $title.sprintf(__('An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use Docket Cache.<p style="margin-bottom:0;"><a href="%s" class="button button-primary" style="margin-top:10px;margin-bottom:0;">Install</a></p>', 'docket-cache'), $url);
+                        $message = $title.sprintf(__('An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use Docket Cache. <br><br><a href="%s" class="button button-primary">Install</a>', 'docket-cache'), $url);
                     }
                 }
 
@@ -1195,9 +1195,7 @@ final class Plugin extends Bepart
                 }
 
                 if (isset($message)) {
-                    echo '<div id="docket-cache-notice" class="notice notice-warning">';
-                    echo '<p>'.$message.'</p>';
-                    echo '</div>';
+                    echo Resc::boxmsg($message, 'warning', false);
                 }
             }
         );
@@ -1629,6 +1627,10 @@ final class Plugin extends Bepart
 
             if ($this->cf()->is_dctrue('WPSITEMAP')) {
                 $tweaks->wpsitemap();
+            }
+
+            if ($this->cf()->is_dctrue('WPAPPPASSWORD')) {
+                $tweaks->wpapppassword();
             }
 
             if ($this->cf()->is_dctrue('POSTMISSEDSCHEDULE')) {

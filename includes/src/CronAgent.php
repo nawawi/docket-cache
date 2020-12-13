@@ -296,6 +296,8 @@ final class CronAgent
                         wp_clear_scheduled_hook($hook);
                         --$run_event;
                     }
+
+                    usleep(100);
                 }
             }
         }
@@ -340,7 +342,8 @@ final class CronAgent
             }
         }
 
-        if (!@preg_match('@compatible;\s+cronbot/[0-9\.]+;\s+docket\-cache/[0-9\.]+;\s+@', $this->pt->get_user_agent())) {
+        $uagent = $this->pt->get_user_agent();
+        if (false === strpos($uagent, 'docket-cache/') || !@preg_match('@compatible;\s+cronbot/[0-9\.]+;\s+docket\-cache/[0-9\.]+;\s+@', $uagent)) {
             $this->close_ping('Invalid version');
 
             return;

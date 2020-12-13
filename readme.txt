@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.6
 Requires PHP: 7.2.5
-Stable tag: 20.11.02
+Stable tag: 20.11.03
 License: MIT
 License URI: ./license.txt
 
@@ -173,6 +173,12 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.11.03 =
+
+- Fixed Admin Interface -> action notice can't dismiss.
+- Fixed Admin Notice -> exclude Dismissible Notices Handler dnh_dismissed_notices option from cache.
+- Added Configuration -> remove the WordPress Application Passwords feature.
+
 = 20.11.02 =
 
 - Fixed PostCache::setup_hooks() -> removed deprecated jetpack hook instagram_cache_oembed_api_response_body.

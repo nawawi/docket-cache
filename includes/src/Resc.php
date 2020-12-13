@@ -140,12 +140,14 @@ final class Resc
         return 'data:image/gif;base64,'.$icon;
     }
 
-    public static function boxmsg($msg, $type = 'info')
+    public static function boxmsg($msg, $type = 'info', $is_dismiss = true)
     {
         if (!empty($msg) && !empty($type)) {
-            $html = '<div id="docket-cache-notice" class="notice notice-'.$type.' is-dismissible"> ';
+            $html = '<div id="docket-cache-notice" class="notice notice-'.$type.($is_dismiss ? ' is-dismissible' : '').'"> ';
             $html .= '<p><strong>'.$msg.'</strong></p>';
-            $html .= '<button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>';
+            if ($is_dismiss) {
+                $html .= '<button type="button" class="notice-dismiss"></button>';
+            }
             $html .= '</div>';
 
             return $html;
