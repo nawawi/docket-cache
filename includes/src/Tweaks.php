@@ -319,6 +319,46 @@ final class Tweaks
         );
     }
 
+    public function woocommerce_cart_fragments_remove()
+    {
+        add_action(
+            'wp_enqueue_scripts',
+            function () {
+                $id = 'wc-cart-fragments';
+                $wp_scripts = $GLOBALS['wp_scripts'];
+                $src = $wp_scripts->registered[$id]->src;
+                $wp_scripts->registered[$id]->src = null;
+
+                $code = '(function() {';
+                $code .= 'var checkhash = function() {';
+                $code .= 'var n = "woocommerce_cart_hash";';
+                $code .= 'var h = document.cookie.match("(^|;) ?" + n + "=([^;]*)(;|$)");';
+                $code .= 'return h ? h[2] : null;';
+                $code .= '};';
+                $code .= 'var checkscript = function() {';
+                $code .= 'var src = "'.$src.'";';
+                $code .= 'var id = "docket-cache-wccartfragment";';
+                $code .= 'if ( null !== document.getElementById(id) ) {';
+                $code .= 'return false;';
+                $code .= 'if ( checkhash() ) {';
+                $code .= 'var script = document.createElement("script");';
+                $code .= 'script.id = id;';
+                $code .= 'script.src = src;';
+                $code .= 'script.async = true;';
+                $code .= 'document.head.appendChild(script);';
+                $code .= '';
+                $code .= '}';
+                $code .= '}';
+                $code .= '};';
+                $code .= 'checkscript();';
+                $code .= 'document.addEventListener("click", function(){setTimeout(checkscript,1000);});';
+                $code .= '})();';
+                wp_add_inline_script('jquery', $code);
+            },
+            999
+        );
+    }
+
     public function post_missed_schedule()
     {
         if (!nwdcx_wpdb($wpdb)) {

@@ -21,7 +21,7 @@ $opdisabled = 2 === $this->info->opcache_code || 0 === $this->info->opcache_code
         <p>
             <?php esc_html_e('Remove all cache files.', 'docket-cache'); ?>
         </p>
-        <a href="<?php echo $this->pt->action_query('flush-occache'); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Flush Cache', 'docket-cache'); ?></a>
+        <a href="<?php echo $this->pt->action_query('flush-occache'); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Flush Object Cache', 'docket-cache'); ?></a>
         <hr>
 
         <h4><?php esc_html_e('Zend OPcache', 'docket-cache'); ?></h4>

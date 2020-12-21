@@ -45,7 +45,7 @@ final class CronAgent
         );
 
         add_filter(
-            'docketcache/cronbot-active',
+            'docketcache/filter/active/cronbot',
             function ($status) {
                 $status = $status ? 'on' : 'off';
 
@@ -55,15 +55,15 @@ final class CronAgent
         );
 
         add_filter(
-            'docketcache/cronbot-pong',
-            function ($status) {
+            'docketcache/filter/check/cronbot',
+            function () {
                 return $this->send_action('on', 'pong');
             },
             PHP_INT_MAX
         );
 
         add_filter(
-            'docketcache/cronbot-runevent',
+            'docketcache/filter/runevent/cronbot',
             function ($runnow) {
                 $is_switch = $this->pt->switch_cron_site();
 
@@ -103,7 +103,9 @@ final class CronAgent
 
         $uip = $this->pt->get_user_ip();
 
+        static $stmp = 0;
         static $cache = [];
+
         if (isset($cache[$uip])) {
             return $cache[$uip];
         }
@@ -128,7 +130,10 @@ final class CronAgent
             ],
         ];
 
-        $stmp = time() + 120;
+        if (0 === $stmp) {
+            $stmp = time() + 120;
+        }
+
         $cronbot_endpoint = $this->pt->cronbot_endpoint.'/checkstatus?v='.$stmp;
         $results = Crawler::post($cronbot_endpoint, $args);
 
@@ -220,6 +225,7 @@ final class CronAgent
             ARRAY_FILTER_USE_KEY
         );
 
+        $output['selfcheck'] = time();
         $this->pt->co()->save_part($output, 'pings');
 
         $this->pt->json_header();
@@ -387,7 +393,9 @@ final class CronAgent
         $halt = false;
 
         // finish it if user connection closed
-        nwdcx_ignoreabort();
+        if (\function_exists('ignore_user_abort')) {
+            ignore_user_abort(true);
+        }
 
         foreach ($sites as $num => $site) {
             if ($halt) {
@@ -438,6 +446,12 @@ final class CronAgent
 
     private function check_connection()
     {
+        static $done = false;
+
+        if ($done) {
+            return;
+        }
+
         if (\function_exists('wp_is_maintenance_mode') && wp_is_maintenance_mode()) {
             return;
         }
@@ -469,15 +483,23 @@ final class CronAgent
             if (empty($pingdata)) {
                 return;
             }
-            if (\is_array($pingdata) && !empty($pingdata['timestamp'])) {
-                $timestamp = strtotime('+90 minutes', strtotime($pingdata['timestamp']));
-                if ($timestamp > 0 && time() > $timestamp) {
-                    $this->pt->co()->setlock('check_connection', time() + 300);
+            if (\is_array($pingdata) && !empty($pingdata['selfcheck'])) {
+                $selfcheck = $pingdata['selfcheck'];
+                if (0 === $this->pt->sanitize_timestamp($selfcheck)) {
+                    return;
+                }
 
+                $locktime = time() + 300; // 5min
+                if (($selfcheck > 0 && time() > $selfcheck) && $this->pt->co()->setlock('check_connection', $locktime)) {
                     // signal wp do not run wp-cron
                     $this->maybe_disable_wp_cron();
 
                     $this->send_action('on', true);
+
+                    $pingdata['selfcheck'] = time() + 5400; // 90min
+                    $this->pt->co()->save_part($pingdata, 'pings');
+
+                    $done = true;
                 }
             }
         }

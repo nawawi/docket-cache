@@ -1,3 +1,14 @@
+= v20.11.04 (2020-12-21)
+
+- Fixed Admin Interface -> filter others admin notice using hook.
+- Fixed Event -> rare condition checkversion cronagent process lock timestamp no effect.
+- Fixed Event -> invalid remove event.
+- Fixed Actions -> when disable object cache, it will stay disabled until enable it back.
+- Fixed Notice -> only show compability notice at plugins, updates page and our overview page.
+- Added Constans() -> option to reload config at dc* methods.
+- Added Configuration -> deactivate WooCommerce Cart Fragments.
+- Added nwdcx_cleanuptransient -> makes it reuseable for Event::delete_expired_transients_db().
+
 = v20.11.03 (2020-12-14)
 
 - Fixed Admin Interface -> action notice can't dismiss.

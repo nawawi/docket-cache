@@ -19,14 +19,31 @@
                 $selector = $( document )
                     .find( 'div#docket-cache' );
 
+                $selector.find( 'div.notice' )
+                    .show( {
+                        duration: 100
+                    } );
+
                 $selector.find( 'div.is-dismissible' )
                     .find( 'button.notice-dismiss' )
                     .on(
-                        'click',
-                        function() {
-                            $( this )
-                                .parent()
-                                .remove();
+                        'click.dc-dismiss-notice',
+                        function( e ) {
+                            e.preventDefault();
+                            var $el = $( this )
+                                .parent();
+                            $el.fadeTo(
+                                100,
+                                0,
+                                function() {
+                                    $el.slideUp(
+                                        100,
+                                        function() {
+                                            $el.remove();
+                                        }
+                                    );
+                                }
+                            );
 
                             $selector.find( '.notice-focus' )
                                 .removeClass( 'notice-focus' );
@@ -35,7 +52,7 @@
 
                 $selector.find( 'a#refresh' )
                     .on(
-                        'click',
+                        'click.dc-refresh',
                         function( e ) {
                             e.preventDefault();
                             var $self = $( this );
@@ -63,7 +80,7 @@
 
                 $selector.find( 'select[data-id=logopt]' )
                     .on(
-                        'change',
+                        'change.dc-refresh',
                         function() {
                             $selector.find( 'a#refresh' )
                                 .trigger( 'click' );
@@ -78,7 +95,7 @@
 
                     $( window )
                         .on(
-                            'beforeunload',
+                            'beforeunload.dc-loader',
                             function() {
                                 window.dospinner = false;
                                 var $overlay = $( document )
@@ -99,7 +116,7 @@
 
                 $selector.find( 'a.btx-spinner' )
                     .on(
-                        'click',
+                        'click.dc-btspinner',
                         function() {
                             if ( $( this )
                                 .attr( 'disabled' ) ) {
@@ -113,7 +130,7 @@
                 var $psubmit = $selector.find( 'p.submit' );
                 $psubmit.find( 'a.button' )
                     .on(
-                        'click',
+                        'click.dc-submit',
                         function() {
                             window.dospinner = true;
                             spinner();
@@ -122,7 +139,7 @@
 
                 $psubmit.find( 'select' )
                     .on(
-                        'change',
+                        'change.dc-select',
                         function() {
                             window.dospinner = true;
                             spinner();
@@ -132,7 +149,7 @@
                 $selector.find( '.form-table-selection' )
                     .find( 'select.config-select' )
                     .on(
-                        'change',
+                        'change.dc-select-config',
                         function() {
                             spinner();
                             var $self = $( this );
@@ -146,7 +163,7 @@
                 $selector.find( '.nav-tab-wrapper' )
                     .find( 'select.nav-select' )
                     .on(
-                        'change',
+                        'change.dc-select-nav',
                         function() {
                             var $self = $( this );
                             var link = $self.children( 'option:selected' )
@@ -218,7 +235,7 @@
                     $selector.find( '.log' )
                         .find( 'textarea#log' )
                         .on(
-                            "click",
+                            "click.dc-log",
                             function( e ) {
                                 var $self = $( this );
                                 var sp = $self

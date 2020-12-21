@@ -63,23 +63,33 @@ final class Constans
         return \defined($name) && $value === \constant($name);
     }
 
-    public function is_dctrue($name)
+    public function is_dctrue($name, $reload = false)
     {
         $key = $this->px($name);
+        if ($reload) {
+            $this->maybe_define($key, false, true);
+        }
 
         return $this->is_true($key);
     }
 
-    public function is_dcfalse($name)
+    public function is_dcfalse($name, $reload = false)
     {
         $key = $this->px($name);
+        if ($reload) {
+            $this->maybe_define($key, false, true);
+        }
 
         return $this->is_false($key);
     }
 
-    public function is_dcarray($name, &$value = '')
+    public function is_dcarray($name, &$value = '', $reload = false)
     {
         $key = $this->px($name);
+        if ($reload) {
+            $this->maybe_define($key, false, true);
+        }
+
         $value = '';
         if ($this->is_array($key)) {
             $value = $this->value($key);
@@ -90,9 +100,13 @@ final class Constans
         return false;
     }
 
-    public function is_dcint($name, &$value = '')
+    public function is_dcint($name, &$value = '', $reload = false)
     {
         $key = $this->px($name);
+        if ($reload) {
+            $this->maybe_define($key, false, true);
+        }
+
         $value = '';
         if ($this->is_int($key)) {
             $value = $this->value($key);
@@ -103,9 +117,12 @@ final class Constans
         return false;
     }
 
-    public function dcvalue($name)
+    public function dcvalue($name, $reload = false)
     {
         $key = $this->px($name);
+        if ($reload) {
+            $this->maybe_define($key, '', true);
+        }
 
         return $this->value($key);
     }
@@ -281,6 +298,9 @@ final class Constans
 
         // woocommerce widget
         $this->maybe_define($this->px('WOOWIDGETOFF'), false);
+
+        // woocommerce cart fragments
+        $this->maybe_define($this->px('WOOCARTFRAGSOFF'), false);
 
         // post missed schedule
         $this->maybe_define($this->px('POSTMISSEDSCHEDULE'), false);

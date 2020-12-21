@@ -17,6 +17,11 @@ namespace Nawawi\DocketCache;
         <div class="row-left">
             <?php $this->tab_title(esc_html__('Configuration', 'docket-cache')); ?>
             <table class="form-table form-table-selection">
+                <tr>
+                    <td colspan="2" class="stitle">
+                        <?php esc_html_e('Feature Options', 'docket-cache'); ?>
+                    </td>
+                </tr>
                 <tr id="cronbot">
                     <th>
                         <?php
@@ -37,6 +42,11 @@ namespace Nawawi\DocketCache;
                         <?php echo $this->config_select_bool('log'); ?>
                     </td>
                 </tr>
+                <tr>
+                    <td colspan="2" class="stitle">
+                        <?php esc_html_e('Cache Options', 'docket-cache'); ?>
+                    </td>
+                </tr>
                 <tr id="advpost">
                     <th><?php echo esc_html__('Advanced Post Caching', 'docket-cache').$this->tooltip('advcpost'); ?></th>
                     <td>
@@ -50,9 +60,20 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="mocache">
-                    <th class="border-b"><?php echo esc_html__('WordPress Translation Caching', 'docket-cache').$this->tooltip('mocache'); ?></th>
+                    <th><?php echo esc_html__('WordPress Translation Caching', 'docket-cache').$this->tooltip('mocache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('mocache'); ?>
+                    </td>
+                </tr>
+                <tr id="preload">
+                    <th class="border-b"><?php echo esc_html__('Admin Object Cache Preloading', 'docket-cache').$this->tooltip('preload'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('preload'); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="stitle">
+                        <?php esc_html_e('Optimisations', 'docket-cache'); ?>
                     </td>
                 </tr>
                 <tr id="optwpquery">
@@ -85,7 +106,7 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="wpoptaload">
-                    <th class="border-b"><?php echo esc_html__('Suspend WP Options Autoload', 'docket-cache').$this->tooltip('wpoptaload'); ?></th>
+                    <th><?php echo esc_html__('Suspend WP Options Autoload', 'docket-cache').$this->tooltip('wpoptaload'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpoptaload'); ?>
                     </td>
@@ -97,9 +118,14 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="misc_tweaks">
-                    <th><?php echo esc_html__('Misc Performance Tweaks', 'docket-cache').$this->tooltip('misc_tweaks'); ?></th>
+                    <th class="border-b"><?php echo esc_html__('Misc Performance Tweaks', 'docket-cache').$this->tooltip('misc_tweaks'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('misc_tweaks'); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="stitle">
+                        <?php esc_html_e('Woo Tweaks', 'docket-cache'); ?>
                     </td>
                 </tr>
                 <tr id="wootweaks">
@@ -121,9 +147,20 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="woowpdashboardoff">
-                    <th class="border-b"><?php echo esc_html__('Deactivate WooCommerce WP Dashboard', 'docket-cache').$this->tooltip('woowpdashboardoff'); ?></th>
+                    <th><?php echo esc_html__('Deactivate WooCommerce WP Dashboard', 'docket-cache').$this->tooltip('woowpdashboardoff'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('woowpdashboardoff'); ?>
+                    </td>
+                </tr>
+                <tr id="woocartfragsoff">
+                    <th class="border-b"><?php echo esc_html__('Deactivate WooCommerce Cart Fragments', 'docket-cache').$this->tooltip('woocartfragsoff'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('woocartfragsoff'); ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="stitle">
+                        <?php esc_html_e('WP Tweaks', 'docket-cache'); ?>
                     </td>
                 </tr>
                 <tr id="pingback">
@@ -174,10 +211,9 @@ namespace Nawawi\DocketCache;
                         <?php echo $this->config_select_bool('wpapppassword'); ?>
                     </td>
                 </tr>
-                <tr id="preload">
-                    <th><?php echo esc_html__('Admin Page Cache Preloading', 'docket-cache').$this->tooltip('preload'); ?></th>
-                    <td>
-                        <?php echo $this->config_select_bool('preload'); ?>
+                <tr>
+                    <td colspan="2" class="stitle">
+                        <?php esc_html_e('Admin Interface', 'docket-cache'); ?>
                     </td>
                 </tr>
                 <tr id="pageloader">
@@ -198,8 +234,13 @@ namespace Nawawi\DocketCache;
                         <?php echo $this->config_select_bool('gcaction'); ?>
                     </td>
                 </tr>
+                <tr>
+                    <td colspan="2" class="stitle">
+                        <?php esc_html_e('Plugin Options', 'docket-cache'); ?>
+                    </td>
+                </tr>
                 <tr id="autoupdate">
-                    <th><?php echo esc_html__('Docket Cache Auto Update', 'docket-cache').$this->tooltip('autoupdate'); ?></th>
+                    <th><?php echo esc_html__('Docket Cache Auto-Updates', 'docket-cache').$this->tooltip('autoupdate'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('autoupdate'); ?>
                     </td>

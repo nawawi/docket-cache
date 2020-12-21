@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.6
 Requires PHP: 7.2.5
-Stable tag: 20.11.03
+Stable tag: 20.11.04
 License: MIT
 License URI: ./license.txt
 
@@ -74,6 +74,7 @@ Sponsored by:
 - [DNSVault](https://dnsvault.net/?utm_source=docketcachewporg)
 - [Cun Host](https://cunhost.com/?utm_source=docketcachewporg)
 - [Exnano Creative](https://exnano.io/?utm_source=docketcachewporg)
+- [Jimat Hosting](https://jimathosting.com/?utm_source=docketcachewporg)
 
 Affiliates with:
 
@@ -173,6 +174,17 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.11.04 =
+
+- Fixed Admin Interface -> filter others admin notice using hook.
+- Fixed Event -> rare condition checkversion cronagent process lock timestamp no effect.
+- Fixed Event -> invalid remove event.
+- Fixed Actions -> when disable object cache, it will stay disabled until enable it back.
+- Fixed Notice -> only show compability notice at plugins, updates page and our overview page.
+- Added Constans() -> option to reload config at dc* methods.
+- Added Configuration -> deactivate WooCommerce Cart Fragments.
+- Added nwdcx_cleanuptransient -> makes it reuseable for Event::delete_expired_transients_db().
+
 = 20.11.03 =
 
 - Fixed Admin Interface -> action notice can't dismiss.

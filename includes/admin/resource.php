@@ -39,6 +39,7 @@ namespace Nawawi\DocketCache;
                 <strong><?php esc_html_e('CHECK VERSION', 'docket-cache'); ?></strong><br class="break">
                 <?php esc_html_e('The Check Critical Version allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid error-prone.', 'docket-cache'); ?>
             </p>
+            <?php if (!apply_filters('docketcache/filter/view/nosponsor', false)) : ?>
             <hr>
             <p>
                 <strong><?php esc_html_e('FEEDBACK', 'docket-cache'); ?></strong><br class="break">
@@ -51,6 +52,8 @@ namespace Nawawi\DocketCache;
                 <?php esc_html_e('Become our sponsor to funding further development of this project.', 'docket-cache'); ?>
                 <a href="https://www.patreon.com/bePatron?u=41796862" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Become Sponsor', 'docket-cache'); ?></a>
             </p>
+            <?php endif; ?>
+            <?php do_action('docketcache/action/view/resources'); ?>
         </div>
     </div>
 </div>

@@ -332,6 +332,10 @@ final class Plugin extends Bepart
         }
 
         if ($this->cx()->validate() && $this->cx()->multinet_me()) {
+            if ($this->cf()->is_dctrue('OBJECTCACHEOFF', true)) {
+                $this->co()->save('objectcacheoff', 'default');
+            }
+
             return 1;
         }
 
@@ -565,7 +569,11 @@ final class Plugin extends Bepart
         $this->co()->clear_part('cachestats');
         $this->cx()->delay();
 
-        delete_expired_transients(true);
+        if (\function_exists('nwdcx_cleanuptransient')) {
+            nwdcx_cleanuptransient();
+        } elseif (\function_exists('delete_expired_transients')) {
+            delete_expired_transients(true);
+        }
 
         $ret = $this->cachedir_flush($this->cache_path, $cleanup);
         if (false === $ret) {
@@ -580,7 +588,7 @@ final class Plugin extends Bepart
     /**
      * flush_fcache.
      */
-    public function flush_fcache()
+    public function flush_fcache(&$file = '')
     {
         if (!empty($_GET['idxv'])) {
             $fx = sanitize_text_field($_GET['idxv']);
@@ -742,9 +750,14 @@ final class Plugin extends Bepart
         $this->flush_log();
         $this->suspend_wp_options_autoload(false);
 
-        // clear all network if available
-        if ($is_uninstall && is_multisite()) {
-            $this->cx()->multinet_clear($this->cache_path, $this->cf()->dcvalue('LOG_FILE'));
+        if ($is_uninstall) {
+            // reset on/off button
+            $this->co()->save('objectcacheoff', 'default');
+
+            // clear all network if available
+            if (is_multisite()) {
+                $this->cx()->multinet_clear($this->cache_path, $this->cf()->dcvalue('LOG_FILE'));
+            }
         }
     }
 
@@ -772,7 +785,11 @@ final class Plugin extends Bepart
     {
         $this->flush_cache();
         $this->suspend_wp_options_autoload(null);
-        $this->cx()->install(true);
+
+        if ($this->cf()->is_dcfalse('OBJECTCACHEOFF', true)) {
+            $this->cx()->install(true);
+        }
+
         $this->unregister_cronjob();
         $this->wearechampion();
     }
@@ -814,9 +831,11 @@ final class Plugin extends Bepart
         add_action(
             'shutdown',
             function () {
-                $this->cx()->install(true);
-                if (is_multisite()) {
-                    $this->cx()->multinet_install($this->hook);
+                if ($this->cf()->is_dcfalse('OBJECTCACHEOFF', true)) {
+                    $this->cx()->install(true);
+                    if (is_multisite()) {
+                        $this->cx()->multinet_install($this->hook);
+                    }
                 }
 
                 // put last
@@ -826,9 +845,19 @@ final class Plugin extends Bepart
         );
     }
 
-    // @TODO: flush cache for checkversion
+    /**
+     * critical_version.
+     */
     private function critical_version()
     {
+        $checkdata = $this->co()->get_part('checkversion', true);
+        if (!empty($checkdata) && \is_array($checkdata) && !empty($checkdata['doversion'])) {
+            $current_version = $this->plugin_meta($this->file)['Version'];
+            if (0 === strcmp($checkdata['doversion'], $current_version)) {
+                $this->flush_cache(true);
+            }
+        }
+
         return true;
     }
 
@@ -1008,6 +1037,33 @@ final class Plugin extends Bepart
         return wp_nonce_url(network_admin_url($query), $key);
     }
 
+    public function is_subpage($index)
+    {
+        if ('mods' === substr($index, 0, 4)) {
+            return true;
+        }
+
+        $subpage = [
+            'config' => 1,
+            'log' => 1,
+            'cronbot' => 1,
+        ];
+
+        return \array_key_exists($index, $subpage);
+    }
+
+    public function get_subpage()
+    {
+        if (!empty($_GET['page']) && 'docket-cache-' === substr($_GET['page'], 0, 13)) {
+            $index = substr($_GET['page'], 13);
+            if (!empty($index) && $this->is_subpage($index)) {
+                return $index;
+            }
+        }
+
+        return false;
+    }
+
     public function get_screen()
     {
         $screen = $this->screen;
@@ -1056,66 +1112,67 @@ final class Plugin extends Bepart
             function () {
                 $cap = is_multisite() ? 'manage_network_options' : 'manage_options';
                 $order = is_multisite() ? '25.1' : '80.1';
+                $view = new View($this);
 
                 add_menu_page(
                     'Docket Cache',
                     'Docket Cache',
                     $cap,
                     $this->slug,
-                    function () {
-                        ( new View($this) )->index();
-                    },
+                    [$view, 'index'],
                     Resc::iconmenu(),
                     $order
                 );
 
+                $title = esc_html__('Overview', 'docket-cache');
                 add_submenu_page(
                     $this->slug,
-                    'Overview',
-                    'Overview',
+                    $title,
+                    $title,
                     $cap,
                     $this->slug,
-                    function () {
-                        ( new View($this) )->index();
-                    }
+                    [$view, 'index'],
+                    1
                 );
 
                 if ($this->cf()->is_dctrue('LOG')) {
+                    $title = esc_html__('Cache Log', 'docket-cache');
                     add_submenu_page(
                         $this->slug,
-                        'Docket Cache',
-                        'Cache Log',
+                        $title,
+                        $title,
                         $cap,
                         $this->slug.'-log',
-                        function () {
-                            ( new View($this) )->index();
-                        }
+                        [$view, 'index'],
+                        2
                     );
                 }
 
                 if ($this->cf()->is_dctrue('CRONBOT')) {
+                    $title = esc_html__('Cronbot', 'docket-cache');
                     add_submenu_page(
                         $this->slug,
-                        'Docket Cache',
-                        'Cronbot',
+                        $title,
+                        $title,
                         $cap,
                         $this->slug.'-cronbot',
-                        function () {
-                            ( new View($this) )->index();
-                        }
+                        [$view, 'index'],
+                        3
                     );
                 }
 
+                $title = esc_html__('Configuration', 'docket-cache');
                 add_submenu_page(
                     $this->slug,
-                    'Docket Cache',
-                    'Configuration',
+                    $title,
+                    $title,
                     $cap,
                     $this->slug.'-config',
-                    function () {
-                        ( new View($this) )->index();
-                    }
+                    [$view, 'index'],
+                    PHP_INT_MAX
                 );
+
+                do_action('docketcache/view/submenu', $this->slug, $cap, $view);
             }
         );
 
@@ -1165,39 +1222,50 @@ final class Plugin extends Bepart
         );
 
         add_action(
-            'all_admin_notices',
+            'in_admin_header',
             function () {
-                if (!current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options')) {
-                    return;
+                if ($this->our_screen()) {
+                    remove_all_actions('admin_notices');
+                    remove_all_actions('all_admin_notices');
                 }
 
-                if (!$this->our_screen() && false === strpos($_SERVER['REQUEST_URI'], '/plugins.php') && false === strpos($_SERVER['REQUEST_URI'], '/update-core.php')) {
-                    return;
-                }
-
-                if ($this->cx()->exists()) {
-                    $url = $this->action_query('update-dropino');
-
-                    $title = !$this->our_screen() ? '<strong>Docket Cache:</strong> ' : '';
-                    if ($this->cx()->validate()) {
-                        if ($this->cx()->is_outdated() && !$this->cx()->install(true)) {
-                            /* translators: %s: url */
-                            $message = $title.sprintf(__('The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href="%s" class="button button-primary">Re-Install</a>', 'docket-cache'), $url);
+                add_action(
+                    'all_admin_notices',
+                    function () {
+                        if (!current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options')) {
+                            return;
                         }
-                    } else {
-                        /* translators: %s: url */
-                        $message = $title.sprintf(__('An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use Docket Cache. <br><br><a href="%s" class="button button-primary">Install</a>', 'docket-cache'), $url);
+
+                        if (!$this->our_screen() && false === strpos($_SERVER['REQUEST_URI'], '/plugins.php') && false === strpos($_SERVER['REQUEST_URI'], '/update-core.php')) {
+                            return;
+                        }
+
+                        if ($this->cx()->exists()) {
+                            $url = $this->action_query('update-dropino');
+                            $urld = $this->action_query('dismiss-dropino');
+
+                            if ($this->cx()->validate()) {
+                                if ($this->cx()->is_outdated() && !$this->cx()->install(true)) {
+                                    /* translators: %s: url */
+                                    $message = sprintf(__('The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href="%s" class="button button-primary">Re-Install</a>', 'docket-cache'), $url);
+                                }
+                            } else {
+                                /* translators: %1$s: url install, %2$s = url dismiss */
+                                $message = $this->cf()->is_dctrue('OBJECTCACHEOFF', true) ? '' : sprintf(__('An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use Docket Cache. <br><br><a href="%1$s" class="button button-primary">Install</a>&nbsp;<a href="%2$s" class="button button-primary">Dismiss This Notice</a>', 'docket-cache'), $url, $urld);
+                            }
+                        }
+
+                        if (2 === $this->get_status() && $this->our_screen()) {
+                            $message = esc_html__('The Object Cache feature has been disabled at runtime.', 'docket-cache');
+                        }
+
+                        if (isset($message)) {
+                            echo Resc::boxmsg($message, 'warning', false, false);
+                        }
                     }
-                }
-
-                if (2 === $this->get_status() && $this->our_screen()) {
-                    $message = esc_html__('The Object Cache feature has been disabled at runtime.', 'docket-cache');
-                }
-
-                if (isset($message)) {
-                    echo Resc::boxmsg($message, 'warning', false);
-                }
-            }
+                );
+            },
+            PHP_INT_MAX
         );
 
         add_action(
@@ -1257,7 +1325,7 @@ final class Plugin extends Bepart
                     if ('preload' === $type) {
                         $this->send_json_continue($this->slug.':worker: pong '.$type);
                         $this->cx()->undelay();
-                        do_action('docketcache/preload');
+                        do_action('docketcache/action/preload/objectcache');
                         exit;
                     }
 
@@ -1268,7 +1336,7 @@ final class Plugin extends Bepart
                     }
 
                     if ('countcachesize' === $type) {
-                        do_action('docketcache/countcachesize');
+                        do_action('docketcache/action/countcachesize');
                         $info = (object) $this->get_info();
 
                         $cache_stats = 1 === $info->status_code && !empty($info->status_text_stats) ? $info->status_text_stats : $info->status_text;
@@ -1299,9 +1367,12 @@ final class Plugin extends Bepart
 
                 if ('flush' === $type) {
                     $this->send_json_continue($this->slug.':worker: pong '.$type);
-                    if (\function_exists('delete_expired_transients')) {
+                    if (\function_exists('nwdcx_cleanuptransient')) {
+                        nwdcx_cleanuptransient();
+                    } elseif (\function_exists('delete_expired_transients')) {
                         delete_expired_transients(true);
                     }
+
                     exit;
                 }
 
@@ -1317,6 +1388,7 @@ final class Plugin extends Bepart
                     $meta = $this->plugin_meta($this->file);
                     /* translators: %s: version */
                     $text = $meta['Name'].' '.sprintf(__('Version %s', 'docket-cache'), $meta['Version']);
+                    $text = apply_filters('docketcache/filter/footerversion', $text);
                 }
 
                 return $text;
@@ -1348,11 +1420,11 @@ final class Plugin extends Bepart
                     sprintf(
                         '<a href="%s">%s</a>',
                         network_admin_url($this->page),
-                        __('Settings', 'docket-cache')
+                        __('Overview', 'docket-cache')
                     )
                 );
 
-                switch ($this->get_status()) {
+                /*switch ($this->get_status()) {
                     case 0:
                         $text = esc_html__('Enable Object Cache', 'docket-cache');
                         $action = 'enable-occache';
@@ -1364,16 +1436,16 @@ final class Plugin extends Bepart
                     default:
                         $text = esc_html__('Install Drop-In', 'docket-cache');
                         $action = 'update-dropino';
-                }
+                }*/
 
-                $links[] = sprintf('<a href="%s">%s</a>', $this->action_query($action), $text);
+                //$links[] = sprintf('<a href="%s">%s</a>', $this->action_query($action), $text);
 
                 return $links;
             }
         );
 
         add_action(
-            'docketcache/save-option',
+            'docketcache/action/saveoption',
             function ($name, $value, $status = true) {
                 switch ($name) {
                     case 'log':
@@ -1410,7 +1482,7 @@ final class Plugin extends Bepart
                             'shutdown',
                             function () use ($action) {
                                 if (!$action) {
-                                    apply_filters('docketcache/cronbot-active', $action);
+                                    apply_filters('docketcache/filter/active/cronbot', $action);
                                 }
                             },
                             PHP_INT_MAX
@@ -1423,7 +1495,7 @@ final class Plugin extends Bepart
         );
 
         add_action(
-            'docketcache/preload',
+            'docketcache/action/preload/objectcache',
             function () {
                 if ($this->cf()->is_dctrue('WPCLI')) {
                     return;
@@ -1529,7 +1601,7 @@ final class Plugin extends Bepart
         );
 
         add_action(
-            'docketcache/countcachesize',
+            'docketcache/action/countcachesize',
             function () {
                 $cache_stats = $this->co()->save_part('cachestats');
                 if (!empty($cache_stats)) {
@@ -1549,7 +1621,7 @@ final class Plugin extends Bepart
         );
 
         add_action(
-            'docketcache/suspend_wp_options_autoload',
+            'docketcache/action/wpoptaload',
             function () {
                 if ($this->co()->lockproc('doing_suspend_wp_options_autoload', time() + 3600)) {
                     return;
@@ -1595,6 +1667,10 @@ final class Plugin extends Bepart
 
             if ($this->cf()->is_dctrue('WOOWIDGETOFF')) {
                 $tweaks->woocommerce_widget_remove();
+            }
+
+            if ($this->cf()->is_dctrue('WOOCARTFRAGSOFF')) {
+                $tweaks->woocommerce_cart_fragments_remove();
             }
 
             if ($this->cf()->is_dctrue('MISC_TWEAKS')) {
@@ -1646,8 +1722,8 @@ final class Plugin extends Bepart
             }
         }
 
-        // only if our dropin
-        if ($this->cx()->validate()) {
+        // only if dropin exists
+        if (wp_using_ext_object_cache()) {
             // wp_cache: advanced cache post
             if ($this->cf()->is_dctrue('ADVCPOST') && class_exists('Nawawi\\DocketCache\\PostCache')) {
                 ( new PostCache() )->register();
@@ -1717,6 +1793,8 @@ final class Plugin extends Bepart
             \WP_CLI::add_command('cache flush', [$cli, 'flush_cache']);
             \WP_CLI::add_command('cache status', [$cli, 'status']);
             \WP_CLI::add_command('cache type', [$cli, 'type']);
+
+            nwdcx_runaction('docketcache/init/cli', $this, $cli);
         }
     }
 
@@ -1730,5 +1808,7 @@ final class Plugin extends Bepart
         $this->register_tweaks();
         $this->register_cronjob();
         $this->register_cli();
+
+        nwdcx_runaction('docketcache/init', $this);
     }
 }

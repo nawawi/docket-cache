@@ -3,7 +3,7 @@
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
  * Plugin URI:          https://wordpress.org/plugins/docket-cache/
- * Version:             20.11.03
+ * Version:             20.11.04
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * Author:              Nawawi Jamili
  * Author URI:          https://docketcache.com
@@ -130,72 +130,10 @@ if (@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-delay.txt')) {
             );
         }
 
-        if (!\function_exists('nwdcx_cleanuptransient')) {
-            function nwdcx_cleanuptransient()
-            {
-                if (!nwdcx_wpdb($wpdb)) {
-                    return false;
-                }
-
-                $suppress = $wpdb->suppress_errors(true);
-
-                $collect = [];
-
-                $results = $wpdb->get_results('SELECT `option_id`,`option_name`,`option_value` FROM `'.$wpdb->options.'` WHERE `option_name` LIKE "_transient_%" OR `option_name` LIKE "_site_transient_%" ORDER BY `option_id` ASC LIMIT 1000', ARRAY_A);
-                if (!empty($results) && \is_array($results)) {
-                    while ($row = @array_shift($results)) {
-                        $id = $row['option_id'];
-                        $collect[$id] = $id;
-
-                        if (false !== strpos($row['option_name'], '_transient_timeout_') && (int) $row['option_value'] > time()) {
-                            unset($collect[$id]);
-                        }
-                    }
-
-                    if (!empty($collect)) {
-                        foreach ($collect as $id) {
-                            if ((int) $id > 0) {
-                                $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_id`='{$id}'");
-                            }
-                        }
-                    }
-                }
-
-                $collect = [];
-
-                if (is_multisite() && isset($wpdb->sitemeta)) {
-                    $results = $wpdb->get_results('SELECT `meta_id`,`meta_key`,`meta_value` FROM `'.$wpdb->sitemeta.'` WHERE `meta_key` LIKE "_site_transient_%" ORDER BY `meta_id` ASC LIMIT 1000', ARRAY_A);
-                    if (!empty($results) && \is_array($results)) {
-                        while ($row = @array_shift($results)) {
-                            $id = $row['meta_id'];
-                            $collect[$id] = $id;
-
-                            if (false !== strpos($row['meta_key'], '_site_transient_timeout_') && (int) $row['meta_value'] > time()) {
-                                unset($collect[$id]);
-                            }
-                        }
-
-                        if (!empty($collect)) {
-                            foreach ($collect as $id) {
-                                if ((int) $id > 0) {
-                                    $wpdb->query("DELETE FROM `{$wpdb->sitemeta}` WHERE `meta_id`='{$id}'");
-                                }
-                            }
-                        }
-                    }
-                }
-
-                unset($collect, $results);
-                $wpdb->suppress_errors($suppress);
-
-                return true;
-            }
-
+        if (\function_exists('nwdcx_cleanuptransient')) {
             add_action(
                 'shutdown',
-                function () {
-                    nwdcx_cleanuptransient();
-                },
+                'nwdcx_cleanuptransient',
                 PHP_INT_MAX - 1
             );
         }

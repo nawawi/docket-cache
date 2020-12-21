@@ -90,6 +90,7 @@ final class Canopt extends Bepart
             'wooadminoff' => esc_html__('Deactivate WooCommerce Admin', 'docket-cache'),
             'woowidgetoff' => esc_html__('Deactivate WooCommerce Widget', 'docket-cache'),
             'woowpdashboardoff' => esc_html__('Deactivate WooCommerce WP Dashboard', 'docket-cache'),
+            'woocartfragsoff' => esc_html__('Deactivate WooCommerce Cart Fragments', 'docket-cache'),
             'pageloader' => esc_html__('Admin Page Loader', 'docket-cache'),
             'wpoptaload' => esc_html__('Suspend WP Options Autoload', 'docket-cache'),
             'cronoptmzdb' => esc_html__('Optimize Database Tables', 'docket-cache'),
@@ -107,7 +108,10 @@ final class Canopt extends Bepart
             'wplazyload' => esc_html__('Remove WP Lazy Load', 'docket-cache'),
             'wpsitemap' => esc_html__('Remove WP Sitemap', 'docket-cache'),
             'wpapppassword' => esc_html__('Remove WP Application Passwords', 'docket-cache'),
+            'objectcacheoff' => esc_html__('Suspend Object Cache', 'docket-cache'),
         ];
+
+        $data = apply_filters('docketcache/filter/optionkeys', $data);
 
         if (false !== $key) {
             if (!empty($data[$key])) {
@@ -205,7 +209,7 @@ final class Canopt extends Bepart
         }
 
         $ret = $this->put_config($config);
-        do_action('docketcache/save-option', $name, $value, $ret);
+        do_action('docketcache/action/saveoption', $name, $value, $ret);
 
         return $ret;
     }
@@ -280,12 +284,7 @@ final class Canopt extends Bepart
             return false;
         }
 
-        $do_chmod = !@is_file($file);
-        if (@file_put_contents($file, $value, LOCK_EX)) {
-            if ($do_chmod) {
-                $this->chmod($file);
-            }
-
+        if (true === $this->dump($file, $value)) {
             return true;
         }
 

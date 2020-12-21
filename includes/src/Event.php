@@ -29,7 +29,7 @@ final class Event
     public function register()
     {
         // global
-        add_filter('docketcache/garbage-collector', [$this, 'garbage_collector']);
+        add_filter('docketcache/filter/garbagecollector', [$this, 'garbage_collector']);
 
         add_filter(
             'cron_schedules',
@@ -48,8 +48,8 @@ final class Event
                         'display' => esc_html__('Every 5 Minutes', 'docket-cache'),
                     ],
                     'docketcache_checkversion_schedule' => [
-                        'interval' => 5 * DAY_IN_SECONDS,
-                        'display' => esc_html__('Every 5 Days', 'docket-cache'),
+                        'interval' => 10 * DAY_IN_SECONDS,
+                        'display' => esc_html__('Every 10 Days', 'docket-cache'),
                     ],
                 ];
 
@@ -96,7 +96,7 @@ final class Event
                     }
 
                     if (empty($recurrence)) {
-                        wp_clear_scheduled_hook('docketcache_checkversion');
+                        wp_clear_scheduled_hook('docketcache_optimizedb');
                     } else {
                         $this->is_optimizedb = true;
                         add_action('docketcache_optimizedb', [$this, 'optimizedb']);
@@ -112,16 +112,18 @@ final class Event
                 }
 
                 // check version
-                if ($this->pt->cf()->is_dctrue('CHECKVERSION') && is_main_site() && is_main_network()) {
+                if ($this->pt->cf()->is_dctrue('CHECKVERSION')) {
                     // 06102020: reset old schedule
                     $check = wp_get_scheduled_event('docketcache_checkversion');
                     if (\is_object($check) && 'docketcache_checkversion_schedule' !== $check->schedule) {
                         wp_clear_scheduled_hook('docketcache_checkversion');
                     }
 
-                    add_action('docketcache_checkversion', [$this, 'checkversion']);
-                    if (!wp_next_scheduled('docketcache_checkversion')) {
-                        wp_schedule_event(time(), 'docketcache_checkversion_schedule', 'docketcache_checkversion');
+                    if (is_main_site() && is_main_network()) {
+                        add_action('docketcache_checkversion', [$this, 'checkversion']);
+                        if (!wp_next_scheduled('docketcache_checkversion')) {
+                            wp_schedule_event(time(), 'docketcache_checkversion_schedule', 'docketcache_checkversion');
+                        }
                     }
                 } else {
                     if (wp_get_schedule('docketcache_checkversion')) {
@@ -165,11 +167,11 @@ final class Event
         }
 
         $this->clear_unknown_cron();
-        if (has_action('docketcache/suspend_wp_options_autoload')) {
-            do_action('docketcache/suspend_wp_options_autoload');
+        if (has_action('docketcache/action/wpoptaload')) {
+            do_action('docketcache/action/wpoptaload');
         }
 
-        $this->pt->get_cache_stats();
+        $this->pt->get_cache_stats(true);
         $this->pt->co()->lockreset('watchproc');
 
         return true;
@@ -404,6 +406,7 @@ final class Event
                     $wpdb->query('OPTIMIZE TABLE `'.$tbl.'`');
                 }
             }
+            unset($tables);
         }
 
         $wpdb->suppress_errors($suppress);
@@ -424,7 +427,11 @@ final class Event
             return false;
         }
 
-        delete_expired_transients(true);
+        if (\function_exists('nwdcx_cleanuptransient')) {
+            nwdcx_cleanuptransient();
+        } elseif (\function_exists('delete_expired_transients')) {
+            delete_expired_transients(true);
+        }
 
         return true;
     }
@@ -466,6 +473,18 @@ final class Event
             return false;
         }
 
+        $checkdata = $this->pt->co()->get_part($part, true);
+        if (!empty($checkdata) && \is_array($checkdata) && !empty($checkdata['selfcheck'])) {
+            $selfcheck = $checkdata['selfcheck'];
+            if (0 === $this->pt->sanitize_timestamp($selfcheck)) {
+                return false;
+            }
+
+            if ($selfcheck > 0 && $selfcheck > time()) {
+                return false;
+            }
+        }
+
         $main_site_url = $this->pt->site_url();
         $site_url = $this->pt->site_url(true);
         $stmp = time() + 120;
@@ -494,6 +513,7 @@ final class Event
                 'headers' => $args['headers'],
                 'content' => $args['body'],
             ],
+            'selfcheck' => time() + 86400,
         ];
 
         if (is_wp_error($results)) {

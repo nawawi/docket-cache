@@ -188,6 +188,9 @@ final class View
     {
         $this->info = (object) $this->pt->get_info();
         $file = $this->pt->path.'/includes/admin/'.$index.'.php';
+
+        $file = apply_filters('docketcache/filter/view/render', $file, $index);
+
         if (@is_file($file)) {
             include_once $file;
         }
@@ -248,6 +251,11 @@ final class View
                     $idx = 'config';
                 }
                 break;
+            case 'cronbot':
+                if (!$this->cronbot_enable) {
+                    $idx = 'config';
+                }
+                break;
         }
 
         return $idx;
@@ -269,20 +277,20 @@ final class View
 
     private function tab_nav()
     {
-        $lists = [
-             'overview' => esc_html__('Overview', 'docket-cache'),
-             'log' => esc_html__('Cache Log', 'docket-cache'),
-             'cronbot' => esc_html__('Cronbot', 'docket-cache'),
-             'config' => esc_html__('Configuration', 'docket-cache'),
-         ];
+        $lists = [];
+        $lists['overview'] = esc_html__('Overview', 'docket-cache');
 
-        if (!$this->log_enable) {
-            unset($lists['log']);
+        if ($this->log_enable) {
+            $lists['log'] = esc_html__('Cache Log', 'docket-cache');
         }
 
-        if (!$this->cronbot_enable) {
-            unset($lists['cronbot']);
+        if ($this->cronbot_enable) {
+            $lists['cronbot'] = esc_html__('Cronbot', 'docket-cache');
         }
+
+        $lists['config'] = esc_html__('Configuration', 'docket-cache');
+
+        $lists = apply_filters('docketcache/filter/view/tabnav', $lists);
 
         $option = '';
         $html = '<nav class="nav-tab-wrapper">';
@@ -290,7 +298,7 @@ final class View
         foreach ($lists as $id => $text) {
             $link = $this->tab_query($id);
             $active = $this->tab_active($id);
-            $html .= '<a href="'.$link.'" class="nav-tab'.$active.'">'.$text.'</a>';
+            $html .= '<a href="'.$link.'" class="nav-tab'.$active.'" title="'.$text.'">'.$text.'</a>';
 
             $selected = $this->tab_current($id) ? ' selected' : '';
             $option .= '<option value="'.$id.'" data-action-link="'.$link.'"'.$selected.'>'.$text.'</option>';
@@ -376,7 +384,7 @@ final class View
     private function config_select_bool($name, $default = 'dcdefault', $idx = 'config', $quiet = false)
     {
         if ('dcdefault' === $default) {
-            $default = $this->vcf()->dcvalue(strtoupper($name));
+            $default = $this->vcf()->dcvalue(strtoupper($name), true);
         }
 
         $args = [];
@@ -477,10 +485,12 @@ final class View
         $code .= '(function($) {';
         $code .= '$(document).ready(function() {';
         $code .= 'var fx = $(document).find("tr#'.$nx.'");';
-        $code .= 'if ( fx ) {';
+        $code .= 'if ( fx && fx[0]) {';
         $code .= 'fx[0].scrollIntoView({block:"center", behavior:"smooth"});';
+        $code .= 'if ( $(document).find("div").hasClass("notice") ) {';
         $code .= 'fx.addClass("notice-focus");';
         $code .= 'setTimeout(function() { fx.removeClass("notice-focus"); }, 3000);';
+        $code .= '}';
         $code .= '}';
         $code .= '});';
         $code .= '})(jQuery);'.PHP_EOL;
@@ -507,6 +517,7 @@ final class View
             'wooadminoff' => esc_html__('Deactivate WooCommerce Admin feature.', 'docket-cache'),
             'woowidgetoff' => esc_html__('Deactivate WooCommerce Widget feature.', 'docket-cache'),
             'woowpdashboardoff' => esc_html__('Remove the WooCommerce meta box in the WordPress Dashboard.', 'docket-cache'),
+            'woocartfragsoff' => esc_html__('Remove the WooCommerce Cart Fragments.', 'docket-cache'),
             'pingback' => esc_html__('Remove the WordPress XML-RPC and Pingbacks related features.', 'docket-cache'),
             'headerjunk' => esc_html__('Remove WordPress features related to HTML header such as meta generators and feed links to reduce the page size.', 'docket-cache'),
             'wpemoji' => esc_html__('Remove the WordPress Emoji feature.', 'docket-cache'),
@@ -515,13 +526,15 @@ final class View
             'wplazyload' => esc_html__('Remove the WordPress Lazy Load feature.', 'docket-cache'),
             'wpsitemap' => esc_html__('Remove the WordPress Auto-generate Sitemap feature.', 'docket-cache'),
             'wpapppassword' => esc_html__('Remove the WordPress Application Passwords feature.', 'docket-cache'),
-            'preload' => esc_html__('Preload Cache Object by fetching administrator-related pages.', 'docket-cache'),
+            'preload' => esc_html__('Preload Object Cache by fetching administrator-related pages.', 'docket-cache'),
             'pageloader' => esc_html__('Display page loader when loading administrator pages.', 'docket-cache'),
             'stats' => esc_html__('Display Object Cache stats at Overview page.', 'docket-cache'),
             'gcaction' => esc_html__('Enable the Garbage Collector action button on the Overview page.', 'docket-cache'),
             'autoupdate' => esc_html__('Enable automatic plugin updates for Docket Cache.', 'docket-cache'),
             'checkversion' => esc_html__('Allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid error-prone.', 'docket-cache'),
         ];
+
+        $info = apply_filters('docketcache/filter/view/tooltips', $info);
 
         $text = isset($info[$id]) ? $info[$id] : esc_html__('No info available', 'docket-cache');
 

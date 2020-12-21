@@ -71,6 +71,8 @@ final class Resc
         $icon .= 'MSAtNi40MTQwNjYsLTEzLjA0Njg3NSAtOC40NjY4LDIuOTg0Mzc1IHoiIC8+CiAgPC9nPgo8L3N2';
         $icon .= 'Zz4K';
 
+        $icon = apply_filters('docketcache/filter/resc/iconmenu', $icon);
+
         return 'data:image/svg+xml;base64,'.$icon;
     }
 
@@ -121,7 +123,9 @@ final class Resc
         $icon .= '2bxXrK1gN/T7vwqpeHCiiDUb9EMlsKZjR/bFUuVUF2K1bQ7WumKdC4xS5IFxLbkn9onVFQADcF4R';
         $icon .= '6Xh4NBbfF9WxKlgoeREiqmQRc/4nyuYu4fFxzc6mfWdyBUX8DxR1MjzQEuhgAAAAAElFTkSuQmCC';
 
-        return 'data:image/png;base64,'.$icon;
+        $data = 'data:image/png;base64,'.$icon;
+
+        return apply_filters('docketcache/filter/resc/iconnav', $data);
     }
 
     public static function spinner()
@@ -137,18 +141,26 @@ final class Resc
         $icon .= '2dZJlIVlaKqubOuyCQAh+QQJCgAAACwAAAAAEAAQAAADHAi63A5ikCEek2TalftWmPZFU/WdaKqu';
         $icon .= 'bOu+bwIAOwAAAAAAAAAAAA==';
 
+        $icon = apply_filters('docketcache/filter/resc/spinner', $icon);
+
         return 'data:image/gif;base64,'.$icon;
     }
 
-    public static function boxmsg($msg, $type = 'info', $is_dismiss = true)
+    public static function boxmsg($msg, $type = 'info', $is_dismiss = true, $is_bold = true)
     {
         if (!empty($msg) && !empty($type)) {
-            $html = '<div id="docket-cache-notice" class="notice notice-'.$type.($is_dismiss ? ' is-dismissible' : '').'"> ';
-            $html .= '<p><strong>'.$msg.'</strong></p>';
+            $html = '<div id="docket-cache-notice" style="display:none;" class="notice notice-'.$type.($is_dismiss ? ' is-dismissible' : '').'"> ';
+            if ($is_bold) {
+                $html .= '<p><strong>'.$msg.'</strong></p>';
+            } else {
+                $html .= '<p>'.$msg.'</p>';
+            }
             if ($is_dismiss) {
                 $html .= '<button type="button" class="notice-dismiss"></button>';
             }
             $html .= '</div>';
+
+            $html = apply_filters('docketcache/filter/resc/boxmsg', $html, $msg, $type, $is_dismiss);
 
             return $html;
         }

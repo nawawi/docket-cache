@@ -314,7 +314,7 @@ class Command extends WP_CLI_Command
      */
     public function run_gc()
     {
-        if (!has_filter('docketcache/garbage-collector')) {
+        if (!has_filter('docketcache/filter/garbagecollector')) {
             $this->halt_error(__('Garbage collector not available.', 'docket-cache'));
         }
 
@@ -322,7 +322,7 @@ class Command extends WP_CLI_Command
         sleep(1);
 
         $pad = 35;
-        $collect = apply_filters('docketcache/garbage-collector', true);
+        $collect = apply_filters('docketcache/filter/garbagecollector', true);
 
         WP_CLI::line(str_repeat('-', $pad).':'.str_repeat('-', 10));
         WP_CLI::line($this->title(__('Cache MaxTTL', 'docket-cache'), $pad).$collect->cache_maxttl);

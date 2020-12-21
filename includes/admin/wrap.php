@@ -41,7 +41,7 @@ if (1 === $this->info->status_code && isset($this->pt->token)) {
             $this->tab_content();
         ?>
     </div>
-    <h1 class="screen-reader-text">
+    <h1 style="display:none;">
         <!-- notice message -->
     </h1>
 </div>

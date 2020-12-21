@@ -41,7 +41,7 @@ final class ReqAction
 
         if (!empty($phpver) && version_compare(PHP_VERSION, $phpver, '<')) {
             /* translators: %s: php version */
-            add_settings_error(is_multisite() ? 'general' : '', $this->pt->slug, sprintf(__('This plugin requires PHP %s or greater.', 'docket-cache'), $phpver));
+            echo Resc::boxmsg(sprintf(__('This plugin requires PHP %s or greater.', 'docket-cache'), $phpver), 'error', false, false);
         }
     }
 
@@ -69,6 +69,7 @@ final class ReqAction
              'docket-disable-occache',
              'docket-flush-occache',
              'docket-update-dropino',
+             'docket-dismiss-dropino',
              'docket-flush-oclog',
              'docket-flush-ocfile',
              'docket-flush-opcache',
@@ -80,6 +81,8 @@ final class ReqAction
              'docket-selectsite-cronbot',
              'docket-rungc',
          ];
+
+        $keys = apply_filters('docketcache/filter/reqaction/token', $keys);
 
         foreach ($this->pt->co()->keys() as $key) {
             $keys[] = 'docket-default-'.$key;
@@ -94,85 +97,100 @@ final class ReqAction
     private function run_action($action, $param, &$option_name = '', &$option_value = '')
     {
         $response = '';
+
+        $action_filter = apply_filters('docketcache/filter/reqaction/runaction', $action, $param, $option_name, $option_value);
+        if (!empty($action_filter) && \is_object($action_filter)) {
+            $response = $action_filter->response;
+            $option_name = $action_filter->option_name;
+            $option_value = $action_filter->option_value;
+        }
+
         switch ($action) {
             case 'docket-flush-occache':
                 $result = $this->pt->flush_cache();
                 $response = $result ? 'docket-occache-flushed' : 'docket-occache-flushed-failed';
-                do_action('docketcache/flush-cache', $result);
+                do_action('docketcache/action/flush/objectcache', $result);
                 break;
             case 'docket-enable-occache':
                 $result = $this->pt->cx()->install(true);
                 $response = $result ? 'docket-occache-enabled' : 'docket-occache-enabled-failed';
-                do_action('docketcache/object-cache-enable', $result);
+                do_action('docketcache/action/enable/objectcache', $result);
                 break;
 
             case 'docket-disable-occache':
                 $result = $this->pt->cx()->uninstall();
                 $response = $result ? 'docket-occache-disabled' : 'docket-occache-disabled-failed';
-                do_action('docketcache/object-cache-disable', $result);
+                do_action('docketcache/action/disable/objectcache', $result);
                 break;
 
             case 'docket-update-dropino':
                 $result = $this->pt->cx()->install(true);
                 $response = $result ? 'docket-dropino-updated' : 'docket-dropino-updated-failed';
-                do_action('docketcache/object-cache-install', $result);
+                do_action('docketcache/action/update/objectcache', $result);
+                break;
+
+            case 'docket-dismiss-dropino':
+                $result = $this->pt->co()->save('objectcacheoff', 'enable');
+                $response = $result ? 'docket-occache-disabled' : 'docket-occache-disabled-failed';
+                do_action('docketcache/action/dismiss/objectcache', $result);
                 break;
 
             case 'docket-flush-oclog':
                 $result = $this->pt->flush_log();
                 $response = $result ? 'docket-log-flushed' : 'docket-log-flushed-failed';
-                do_action('docketcache/flush-log', $result);
+                do_action('docketcache/action/flush/log/objectcache', $result);
                 break;
 
             case 'docket-flush-ocfile':
-                $result = $this->pt->flush_fcache();
+                $result = $this->pt->flush_fcache($filename);
                 $response = $result ? 'docket-file-flushed' : 'docket-file-flushed-failed';
-                do_action('docketcache/flush-fcache', $result);
+                do_action('docketcache/action/flush/file/objectcache', $result, $filename);
                 break;
             case 'docket-flush-opcache':
                 $result = $this->pt->flush_opcache();
                 $response = $result ? 'docket-opcache-flushed' : 'docket-opcache-flushed-failed';
-                do_action('docketcache/flush-opcache', $result);
+                do_action('docketcache/action/flush/opcache', $result);
                 break;
             case 'docket-connect-cronbot':
-                $result = apply_filters('docketcache/cronbot-active', true);
+                $result = apply_filters('docketcache/filter/active/cronbot', true);
                 $response = $result ? 'docket-cronbot-connect' : 'docket-cronbot-connect-failed';
-                do_action('docketcache/connect-cronbot', $result);
+                do_action('docketcache/action/connect/cronbot', $result);
                 break;
             case 'docket-disconnect-cronbot':
-                $result = apply_filters('docketcache/cronbot-active', false);
+                $result = apply_filters('docketcache/filter/active/cronbot', false);
                 $response = $result ? 'docket-cronbot-disconnect' : 'docket-cronbot-disconnect-failed';
-                do_action('docketcache/disconnect-cronbot', $result);
+                do_action('docketcache/action/disconnect/cronbot', $result);
                 break;
             case 'docket-pong-cronbot':
-                $result = apply_filters('docketcache/cronbot-pong', false);
+                $result = apply_filters('docketcache/filter/check/cronbot', false);
                 $response = 'docket-cronbot-pong';
-                do_action('docketcache/pong-cronbot', $result);
+                do_action('docketcache/action/pong/cronbot', $result);
                 break;
             case 'docket-runevent-cronbot':
                 $response = 'docket-cronbot-runevent-failed';
-                $result = apply_filters('docketcache/cronbot-runevent', false);
+                $result = apply_filters('docketcache/filter/runevent/cronbot', false);
                 if (false !== $result) {
                     $this->pt->co()->lookup_set('cronbotrun', $result);
                     $response = 'docket-cronbot-runevent';
                 }
 
-                do_action('docketcache/runevent-cronbot', $result);
+                do_action('docketcache/action/runevent/cronbot', $result);
                 break;
             case 'docket-runeventnow-cronbot':
                 $response = 'docket-cronbot-runevent-failed';
-                $result = apply_filters('docketcache/cronbot-runevent', true);
+                $result = apply_filters('docketcache/filter/runevent/cronbot', true);
                 if (false !== $result) {
                     $this->pt->co()->lookup_set('cronbotrun', $result);
                     $response = 'docket-cronbot-runevent';
                 }
 
-                do_action('docketcache/runeventnow-cronbot', $result);
+                do_action('docketcache/action/runeventnow/cronbot', $result);
                 break;
             case 'docket-selectsite-cronbot':
                 if (isset($param['nv'])) {
                     $nv = sanitize_text_field($param['nv']);
                     if (!is_numeric($nv)) {
+                        do_action('docketcache/action/switchsite', false, $nv);
                         break;
                     }
 
@@ -187,15 +205,21 @@ final class ReqAction
                     if ($is_switch) {
                         restore_current_blog();
                     }
+
+                    do_action('docketcache/action/switchsite', true, $nv);
                 }
                 break;
             case 'docket-rungc':
+                $ok = false;
                 $response = 'docket-gcrun-failed';
-                $result = apply_filters('docketcache/garbage-collector', true);
+                $result = apply_filters('docketcache/filter/garbagecollector', true);
                 if (!empty($result) && \is_object($result)) {
                     $this->pt->co()->lookup_set('gcrun', (array) $result);
                     $response = 'docket-gcrun';
+                    $ok = true;
                 }
+
+                do_action('docketcache/action/garbagecollector', $ok, $result);
                 break;
         }
 
@@ -204,14 +228,28 @@ final class ReqAction
             $nx = $mm[2];
             if (\in_array($nx, $this->pt->co()->keys())) {
                 $option_name = $nx;
+                $ok = false;
                 if ('save' === $nk && isset($param['nv'])) {
                     $nv = sanitize_text_field($param['nv']);
-                    $response = $this->pt->co()->save($nx, $nv) ? 'docket-option-save' : 'docket-option-failed';
+                    $ok = $this->pt->co()->save($nx, $nv);
+                    $response = $ok ? 'docket-option-save' : 'docket-option-failed';
                     $option_value = $nv;
                 } else {
                     $okmsg = 'default' === $nk ? 'docket-option-default' : 'docket-option-'.$nk;
-                    $response = $this->pt->co()->save($nx, $nk) ? $okmsg : 'docket-option-failed';
+                    $ok = $this->pt->co()->save($nx, $nk);
+                    $response = $ok ? $okmsg : 'docket-option-failed';
                 }
+
+                do_action(
+                    'docketcache/action/option',
+                    $ok,
+                    [
+                        'key' => $nx,
+                        'value' => $nv,
+                        'name' => $nk,
+                        'action' => $action,
+                    ]
+                );
             }
         }
 
@@ -232,11 +270,11 @@ final class ReqAction
                 $param = $_GET;
                 $option_name = '';
                 $option_value = '';
-                $this->pt->notice = $this->run_action($action, $param, $option_name, $option_value);
+                $response = $this->run_action($action, $param, $option_name, $option_value);
 
-                if (!empty($this->pt->notice)) {
+                if (!empty($response)) {
                     $args = [
-                        'message' => $this->pt->notice,
+                        'message' => $response,
                     ];
 
                     if (!empty($_GET['idx'])) {
@@ -289,15 +327,24 @@ final class ReqAction
                 }
             }
 
+            $notice_filter = apply_filters('docketcache/filter/reqaction/screennotice', $token, $option_name, $option_value);
+            if (!empty($notice_filter) && \is_object($notice_filter)) {
+                $this->pt->notice = $notice_filter->token;
+
+                return;
+            }
+
             switch ($token) {
                 case 'docket-occache-enabled':
                     $this->pt->notice = esc_html__('Object cache enabled.', 'docket-cache');
+                    $this->pt->co()->save('objectcacheoff', 'default');
                     break;
                 case 'docket-occache-enabled-failed':
                     $this->pt->notice = esc_html__('Object cache could not be enabled.', 'docket-cache');
                     break;
                 case 'docket-occache-disabled':
                     $this->pt->notice = esc_html__('Object cache disabled.', 'docket-cache');
+                    $this->pt->co()->save('objectcacheoff', 'enable');
                     break;
                 case 'docket-occache-disabled-failed':
                     $this->pt->notice = esc_html__('Object cache could not be disabled.', 'docket-cache');
