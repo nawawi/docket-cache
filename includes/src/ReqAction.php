@@ -229,6 +229,7 @@ final class ReqAction
             if (\in_array($nx, $this->pt->co()->keys())) {
                 $option_name = $nx;
                 $ok = false;
+                $nv = '';
                 if ('save' === $nk && isset($param['nv'])) {
                     $nv = sanitize_text_field($param['nv']);
                     $ok = $this->pt->co()->save($nx, $nv);

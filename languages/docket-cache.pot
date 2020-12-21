@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-12-21T02:13:15+00:00\n"
+"POT-Creation-Date: 2020-12-21T13:26:49+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -544,7 +544,7 @@ msgstr ""
 
 #: includes/admin/overview.php:170
 #: includes/src/Command.php:330
-#: includes/src/ReqAction.php:483
+#: includes/src/ReqAction.php:484
 msgid "Cache Disk Limit"
 msgstr ""
 
@@ -658,12 +658,12 @@ msgid "An unknown object cache Drop-In was found. To use Docket object cache, ru
 msgstr ""
 
 #: includes/src/Command.php:124
-#: includes/src/ReqAction.php:339
+#: includes/src/ReqAction.php:340
 msgid "Object cache enabled."
 msgstr ""
 
 #: includes/src/Command.php:127
-#: includes/src/ReqAction.php:343
+#: includes/src/ReqAction.php:344
 msgid "Object cache could not be enabled."
 msgstr ""
 
@@ -676,27 +676,27 @@ msgid "An unknown object cache Drop-In was found. To use Docket run: wp cache dr
 msgstr ""
 
 #: includes/src/Command.php:153
-#: includes/src/ReqAction.php:346
+#: includes/src/ReqAction.php:347
 msgid "Object cache disabled."
 msgstr ""
 
 #: includes/src/Command.php:156
-#: includes/src/ReqAction.php:350
+#: includes/src/ReqAction.php:351
 msgid "Object cache could not be disabled."
 msgstr ""
 
 #: includes/src/Command.php:175
-#: includes/src/ReqAction.php:359
+#: includes/src/ReqAction.php:360
 msgid "Updated object cache Drop-In and enabled Docket object cache."
 msgstr ""
 
 #: includes/src/Command.php:177
-#: includes/src/ReqAction.php:362
+#: includes/src/ReqAction.php:363
 msgid "Object cache Drop-In could not be updated."
 msgstr ""
 
 #: includes/src/Command.php:194
-#: includes/src/ReqAction.php:356
+#: includes/src/ReqAction.php:357
 msgid "Object cache could not be flushed."
 msgstr ""
 
@@ -765,47 +765,47 @@ msgid "Executing the garbage collector. Please wait.."
 msgstr ""
 
 #: includes/src/Command.php:328
-#: includes/src/ReqAction.php:481
+#: includes/src/ReqAction.php:482
 msgid "Cache MaxTTL"
 msgstr ""
 
 #: includes/src/Command.php:329
-#: includes/src/ReqAction.php:482
+#: includes/src/ReqAction.php:483
 msgid "Cache File Limit"
 msgstr ""
 
 #: includes/src/Command.php:332
-#: includes/src/ReqAction.php:484
+#: includes/src/ReqAction.php:485
 msgid "Cleanup Cache MaxTTL"
 msgstr ""
 
 #: includes/src/Command.php:333
-#: includes/src/ReqAction.php:485
+#: includes/src/ReqAction.php:486
 msgid "Cleanup Cache File Limit"
 msgstr ""
 
 #: includes/src/Command.php:334
-#: includes/src/ReqAction.php:486
+#: includes/src/ReqAction.php:487
 msgid "Cleanup Cache Disk Limit"
 msgstr ""
 
 #: includes/src/Command.php:337
-#: includes/src/ReqAction.php:489
+#: includes/src/ReqAction.php:490
 msgid "Cleanup Precache Limit"
 msgstr ""
 
 #: includes/src/Command.php:341
-#: includes/src/ReqAction.php:492
+#: includes/src/ReqAction.php:493
 msgid "Total Cache Cleanup"
 msgstr ""
 
 #: includes/src/Command.php:342
-#: includes/src/ReqAction.php:493
+#: includes/src/ReqAction.php:494
 msgid "Total Cache Ignored"
 msgstr ""
 
 #: includes/src/Command.php:343
-#: includes/src/ReqAction.php:494
+#: includes/src/ReqAction.php:495
 msgid "Total Cache File"
 msgstr ""
 
@@ -1005,119 +1005,119 @@ msgstr ""
 msgid "This plugin requires PHP %s or greater."
 msgstr ""
 
-#: includes/src/ReqAction.php:314
+#: includes/src/ReqAction.php:315
 msgid "Option"
 msgstr ""
 
-#: includes/src/ReqAction.php:353
+#: includes/src/ReqAction.php:354
 msgid "Object cache was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:365
+#: includes/src/ReqAction.php:366
 msgid "Cache log was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:368
+#: includes/src/ReqAction.php:369
 msgid "Cache log could not be flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:371
+#: includes/src/ReqAction.php:372
 msgid "Cache file was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:374
+#: includes/src/ReqAction.php:375
 msgid "Cache file could not be flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:377
+#: includes/src/ReqAction.php:378
 msgid "OPcache was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:381
+#: includes/src/ReqAction.php:382
 msgid "OPcache could not be flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:384
+#: includes/src/ReqAction.php:385
 msgid "Cronbot connected."
 msgstr ""
 
 #. translators: %s = error message
-#: includes/src/ReqAction.php:390
+#: includes/src/ReqAction.php:391
 msgid "Cronbot failed to connect%s"
 msgstr ""
 
-#: includes/src/ReqAction.php:394
+#: includes/src/ReqAction.php:395
 msgid "Cronbot disconnected."
 msgstr ""
 
-#: includes/src/ReqAction.php:397
+#: includes/src/ReqAction.php:398
 msgid "Cronbot failed to disconnect."
 msgstr ""
 
 #. translators: %1$s: cronbot endpoint, %2$s = error message
-#: includes/src/ReqAction.php:404
+#: includes/src/ReqAction.php:405
 msgid "Pong from %1$s: %2$s."
 msgstr ""
 
 #. translators: %s: cronbot endpoint
-#: includes/src/ReqAction.php:407
+#: includes/src/ReqAction.php:408
 msgid "Pong from %s : connected."
 msgstr ""
 
-#: includes/src/ReqAction.php:411
+#: includes/src/ReqAction.php:412
 msgid "Running cron successful."
 msgstr ""
 
 #. translators: %d = cron event
-#: includes/src/ReqAction.php:428
+#: includes/src/ReqAction.php:429
 msgid "Executed a total of %d cron events"
 msgstr ""
 
-#: includes/src/ReqAction.php:436
+#: includes/src/ReqAction.php:437
 msgid "Failed to run cron."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:443
+#: includes/src/ReqAction.php:444
 msgid "%s enabled."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:447
+#: includes/src/ReqAction.php:448
 msgid "%s disabled."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:452
-#: includes/src/ReqAction.php:464
+#: includes/src/ReqAction.php:453
+#: includes/src/ReqAction.php:465
 msgid "%s resets to default."
 msgstr ""
 
 #. translators: %1$s = option name, %2$s = option_value
-#: includes/src/ReqAction.php:455
+#: includes/src/ReqAction.php:456
 msgid "%1$s set to %2$s."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:459
+#: includes/src/ReqAction.php:460
 msgid "%s updated."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:468
+#: includes/src/ReqAction.php:469
 msgid "Failed to update option %s."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:472
+#: includes/src/ReqAction.php:473
 msgid "Failed to execute the action request. Please try again."
 msgstr ""
 
-#: includes/src/ReqAction.php:475
+#: includes/src/ReqAction.php:476
 msgid "Executing the garbage collector successful"
 msgstr ""
 
-#: includes/src/ReqAction.php:502
+#: includes/src/ReqAction.php:503
 msgid "Failed to run the garbage collector."
 msgstr ""
 
