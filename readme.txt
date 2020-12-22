@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.6
 Requires PHP: 7.2.5
-Stable tag: 20.11.04
+Stable tag: 20.11.05
 License: MIT
 License URI: ./license.txt
 
@@ -174,6 +174,12 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.11.05 =
+
+- Fixed CronAgent::check_connection() -> close_ping() -> Invalid selfcheck delay. Set to 90 minutes instead of now.
+- Fixed Auto-updates -> wp >= 5.5 can't enable/disable auto-updates for docket cache at plugins page. Now, it works vise-versa.
+- Fixed ReqAction -> Error notice undefined variable nv.
+
 = 20.11.04 =
 
 - Fixed Admin Interface -> filter others admin notice using hook.

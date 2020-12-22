@@ -225,7 +225,7 @@ final class CronAgent
             ARRAY_FILTER_USE_KEY
         );
 
-        $output['selfcheck'] = time();
+        $output['selfcheck'] = time() + 5400; // 90min
         $this->pt->co()->save_part($output, 'pings');
 
         $this->pt->json_header();

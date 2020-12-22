@@ -792,6 +792,10 @@ final class Plugin extends Bepart
 
         $this->unregister_cronjob();
         $this->wearechampion();
+
+        if ($this->cf()->is_dctrue('AUTOUPDATE', true)) {
+            $this->plugin_autoupdates(true);
+        }
     }
 
     /**
@@ -824,6 +828,23 @@ final class Plugin extends Bepart
     }
 
     /**
+     * critical_version.
+     */
+    private function critical_version()
+    {
+        $checkdata = $this->co()->get_part('checkversion', true);
+        if (!empty($checkdata) && \is_array($checkdata) && !empty($checkdata['doversion'])) {
+            $current_version = $this->plugin_meta($this->file)['Version'];
+            if (0 === strcmp($checkdata['doversion'], $current_version)) {
+                $this->flush_cache(true);
+            }
+        }
+        unset($checkdata);
+
+        return true;
+    }
+
+    /**
      * plugin_upgrade.
      */
     private function plugin_upgrade()
@@ -846,19 +867,27 @@ final class Plugin extends Bepart
     }
 
     /**
-     * critical_version.
+     * plugin_autoupdates.
      */
-    private function critical_version()
+    private function plugin_autoupdates($enable = true)
     {
-        $checkdata = $this->co()->get_part('checkversion', true);
-        if (!empty($checkdata) && \is_array($checkdata) && !empty($checkdata['doversion'])) {
-            $current_version = $this->plugin_meta($this->file)['Version'];
-            if (0 === strcmp($checkdata['doversion'], $current_version)) {
-                $this->flush_cache(true);
+        $options = (array) get_site_option('auto_update_plugins', []);
+        if ($enable) {
+            $options[] = $this->hook;
+            $options = array_unique($options);
+        } else {
+            $opt = [];
+            foreach ($options as $name) {
+                if ($this->hook === $name) {
+                    continue;
+                }
+                $opt[] = $name;
             }
+            $options = $opt;
+            unset($opt);
         }
-
-        return true;
+        update_site_option('auto_update_plugins', $options);
+        unset($options);
     }
 
     /**
@@ -973,14 +1002,11 @@ final class Plugin extends Bepart
 
                     if (!$done) {
                         $done = true;
-
                         $suppress = $wpdb->suppress_errors(true);
-
                         $ok = $wpdb->get_var('SELECT @@SESSION.SQL_BIG_SELECTS LIMIT 1');
                         if (empty($ok)) {
                             $wpdb->query('SET SESSION SQL_BIG_SELECTS=1');
                         }
-
                         $wpdb->suppress_errors($suppress);
                     }
                 }
@@ -988,18 +1014,44 @@ final class Plugin extends Bepart
             -PHP_INT_MAX
         );
 
-        if ($this->cf()->is_dctrue('AUTOUPDATE')) {
-            add_filter(
-                'auto_update_plugin',
-                function ($update, $item) {
-                    if ('docket-cache' === $item->slug) {
-                        return true;
+        if (version_compare($GLOBALS['wp_version'], '5.5', '<')) {
+            if ($this->cf()->is_dctrue('AUTOUPDATE')) {
+                add_filter(
+                    'auto_update_plugin',
+                    function ($update, $item) {
+                        if ('docket-cache' === $item->slug) {
+                            return true;
+                        }
+
+                        return $update;
+                    },
+                    PHP_INT_MAX,
+                    2
+                );
+            }
+        } else {
+            add_action(
+                'shutdown',
+                function () {
+                    if (!wp_doing_ajax()) {
+                        return;
                     }
 
-                    return $update;
-                },
-                PHP_INT_MAX,
-                2
+                    if (!current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options')) {
+                        return;
+                    }
+
+                    if ((!empty($_POST['action']) && 'toggle-auto-updates' === $_POST['action']) && (!empty($_POST['asset']) && $this->hook === $_POST['asset'])) {
+                        $state = sanitize_text_field($_POST['state']);
+                        switch ($state) {
+                            case 'enable':
+                            case 'disable':
+                                $this->co()->save('autoupdate', $state);
+                                break;
+                        }
+                        unset($options);
+                    }
+                }
             );
         }
 
@@ -1247,11 +1299,11 @@ final class Plugin extends Bepart
                             if ($this->cx()->validate()) {
                                 if ($this->cx()->is_outdated() && !$this->cx()->install(true)) {
                                     /* translators: %s: url */
-                                    $message = sprintf(__('The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href="%s" class="button button-primary">Re-Install</a>', 'docket-cache'), $url);
+                                    $message = sprintf(__('The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href="%s" style="min-width:100px;text-align:center;font-wight:bold;" class="button button-primary">Re-Install</a>', 'docket-cache'), $url);
                                 }
                             } else {
                                 /* translators: %1$s: url install, %2$s = url dismiss */
-                                $message = $this->cf()->is_dctrue('OBJECTCACHEOFF', true) ? '' : sprintf(__('An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use Docket Cache. <br><br><a href="%1$s" class="button button-primary">Install</a>&nbsp;<a href="%2$s" class="button button-primary">Dismiss This Notice</a>', 'docket-cache'), $url, $urld);
+                                $message = $this->cf()->is_dctrue('OBJECTCACHEOFF', true) ? '' : sprintf(__('An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use <strong>Docket Cache</strong>. <br><br><a href="%1$s" style="min-width:100px;text-align:center;font-weight:bold;" class="button button-primary button-small">Install</a>&nbsp;<a href="%2$s" style="min-width:100px;text-align:center;font-weight:bold;" class="button button-secondary button-small">Dismiss</a>', 'docket-cache'), $url, $urld);
                             }
                         }
 
@@ -1260,7 +1312,7 @@ final class Plugin extends Bepart
                         }
 
                         if (isset($message)) {
-                            echo Resc::boxmsg($message, 'warning', false, false);
+                            echo Resc::boxmsg($message, 'warning', false, false, false);
                         }
                     }
                 );
@@ -1487,6 +1539,10 @@ final class Plugin extends Bepart
                             },
                             PHP_INT_MAX
                         );
+                        break;
+                    case 'autoupdate':
+                        $action = 'enable' === $value ? true : false;
+                        $this->plugin_autoupdates($action);
                         break;
                 }
             },

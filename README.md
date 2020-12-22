@@ -1,7 +1,7 @@
 # ![Docket Cache](./.wordpress.org/icon-128x128.png) Docket Cache
 [![WP compatibility](https://plugintests.com/plugins/wporg/docket-cache/wp-badge.svg)](https://plugintests.com/plugins/wporg/docket-cache/latest) [![PHP compatibility](https://plugintests.com/plugins/wporg/docket-cache/php-badge.svg)](https://plugintests.com/plugins/wporg/docket-cache/latest)
 
-A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
+Supercharge your website using a persistent object cache, accelerates caching with OPcache backend.
 
 ## Description
 

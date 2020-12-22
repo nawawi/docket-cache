@@ -146,10 +146,14 @@ final class Resc
         return 'data:image/gif;base64,'.$icon;
     }
 
-    public static function boxmsg($msg, $type = 'info', $is_dismiss = true, $is_bold = true)
+    public static function boxmsg($msg, $type = 'info', $is_dismiss = true, $is_bold = true, $is_hide = true)
     {
         if (!empty($msg) && !empty($type)) {
-            $html = '<div id="docket-cache-notice" style="display:none;" class="notice notice-'.$type.($is_dismiss ? ' is-dismissible' : '').'"> ';
+            $html = '<div id="docket-cache-notice"';
+            if ($is_hide) {
+                $html .= ' style="display:none;" ';
+            }
+            $html .= 'class="notice notice-'.$type.($is_dismiss ? ' is-dismissible' : '').'"> ';
             if ($is_bold) {
                 $html .= '<p><strong>'.$msg.'</strong></p>';
             } else {
