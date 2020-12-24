@@ -246,7 +246,7 @@ final class Dropino extends Bepart
         }
 
         if (null !== $network_id) {
-            @file_put_contents(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-main.txt', $network_id, FILE_EX);
+            @file_put_contents(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-main.txt', $network_id, LOCK_EX);
         }
 
         $wpdb->suppress_errors($suppress);
@@ -344,7 +344,7 @@ final class Dropino extends Bepart
 
         $lock_file = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-multi.txt';
         if (!@is_file($lock_file)) {
-            @file_put_contents($lock_file, 1);
+            @file_put_contents($lock_file, 1, LOCK_EX);
         }
 
         if (empty($network_id)) {

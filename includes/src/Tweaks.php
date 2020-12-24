@@ -355,7 +355,7 @@ final class Tweaks
                 $code .= '})();';
                 wp_add_inline_script('jquery', $code);
             },
-            999
+            PHP_INT_MAX
         );
     }
 

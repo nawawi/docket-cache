@@ -23,7 +23,7 @@ final class CronAgent
         $this->is_pingpong = false;
 
         // warn issue: a non-numeric value encountered
-        $this->pt->cf()->maybe_define('WP_CRON_LOCK_TIMEOUT', MINUTE_IN_SECONDS);
+        !\defined('WP_CRON_LOCK_TIMEOUT') && \define('WP_CRON_LOCK_TIMEOUT', MINUTE_IN_SECONDS);
     }
 
     public function register()
@@ -494,6 +494,8 @@ final class CronAgent
                     // signal wp do not run wp-cron
                     $this->maybe_disable_wp_cron();
 
+                    // go background if possible
+                    $this->pt->fastcgi_close();
                     $this->send_action('on', true);
 
                     $pingdata['selfcheck'] = time() + 5400; // 90min

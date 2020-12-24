@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.6
 Requires PHP: 7.2.5
-Stable tag: 20.11.05
+Stable tag: 20.11.06
 License: MIT
 License URI: ./license.txt
 
@@ -174,10 +174,20 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.11.06 =
+
+- Fixed Plugin::get_opcache_status() -> Missing match pattern.
+- Fixed Plugin::register_plugin_hooks() -> Redundant loading, change plugin_loaded to plugins_loaded.
+- Fixed Filesystem::opcache_compile() -> Change filemtime early to 60 seconds. Opcache won't compile if file newer than runtime.
+- Fixed WP_Object_Cache::dc_save() -> Remove change filemtime. Cache expiration now handles by timeout key.
+- Fixed Event::garbage_collector() -> Filemtime comparison with maxttl only applies to cache file without timeout or 0.
+- Fixed Event::register() -> Redundant loading, change plugin_loaded to plugins_loaded.
+- Fixed Dropino::multinet_install() -> Wrong flags for file_put_contents.
+
 = 20.11.05 =
 
-- Fixed CronAgent::check_connection() -> close_ping() -> Invalid selfcheck delay. Set to 90 minutes instead of now.
-- Fixed Auto-updates -> wp >= 5.5 can't enable/disable auto-updates for docket cache at plugins page. Now, it works vise-versa.
+- Fixed CronAgent::check_connection() -> close_ping() -> Invalid selfcheck delay. Set to 90 minutes instead of current time.
+- Fixed Auto-updates -> wp >= 5.5 can't enable/disable auto-updates for docket cache at plugins page. Now, it should works vise-versa.
 - Fixed ReqAction -> Error notice undefined variable nv.
 
 = 20.11.04 =

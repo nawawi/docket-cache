@@ -58,7 +58,7 @@ final class Event
         );
 
         add_action(
-            'plugin_loaded',
+            'plugins_loaded',
             function () {
                 // 19092020: standardize. rename hooks
                 foreach (['docket_cache_gc', 'docket_cache_optimizedb', 'docket_cache_monitor'] as $hx) {
@@ -241,17 +241,23 @@ final class Event
             $pcnt = 0;
             $slowdown = 0;
             foreach ($this->pt->scanfiles($this->pt->cache_path) as $object) {
-                $fx = $object->getPathName();
+                try {
+                    $fx = $object->getPathName();
 
-                if (!$object->isFile() || 'file' !== $object->getType() || !$this->pt->is_php($fx)) {
-                    ++$collect->cache_ignore;
+                    if (!$object->isFile() || 'file' !== $object->getType() || !$this->pt->is_php($fx)) {
+                        ++$collect->cache_ignore;
+                        continue;
+                    }
+
+                    $fn = $object->getFileName();
+                    $fs = $object->getSize();
+                    $fm = time() + 300;
+                    $ft = filemtime($fx);
+                } catch (\Throwable $e) {
+                    // rare condition on some hosting
+                    $GLOBALS['docketcache_last_error'][__METHOD__] = $e->getMessage();
                     continue;
                 }
-
-                $fn = $object->getFileName();
-                $fs = $object->getSize();
-                $fm = time() + 300;
-                $ft = filemtime($fx);
 
                 if ($fm >= $ft && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
                     $this->pt->unlink($fx, true);
@@ -310,24 +316,27 @@ final class Event
                 }
 
                 $data = $this->pt->cache_get($fx);
+                $is_timeout = false;
                 if (false !== $data) {
-                    if (!empty($data['timeout']) && $this->pt->valid_timestamp($data['timeout']) && $fm >= (int) $data['timeout']) {
-                        $this->pt->unlink($fx, true);
+                    $is_timeout = !empty($data['timeout']) && $this->pt->valid_timestamp($data['timeout']) ? true : false;
 
-                        if ($force && @is_file($fx)) {
-                            ++$collect->cleanup_failed;
+                    if ($is_timeout) {
+                        if ($fm >= (int) $data['timeout']) {
+                            $this->pt->unlink($fx, true);
+
+                            if ($force && @is_file($fx)) {
+                                ++$collect->cleanup_failed;
+                            }
+
+                            unset($data);
+
+                            ++$collect->cleanup_maxttl;
+
+                            usleep(100);
+                            continue;
                         }
-
-                        unset($data);
-
-                        ++$collect->cleanup_maxttl;
-
-                        usleep(100);
-                        continue;
-                    }
-
-                    if (empty($data['timeout']) && !empty($data['timestamp']) && $this->pt->valid_timestamp($data['timestamp']) && $maxttl > 0) {
-                        if ((int) $data['timestamp'] < $maxttl) {
+                    } else {
+                        if (!empty($data['timestamp']) && $this->pt->valid_timestamp($data['timestamp']) && $maxttl > $data['timestamp']) {
                             $this->pt->unlink($fx, true);
 
                             if ($force && @is_file($fx)) {
@@ -344,7 +353,8 @@ final class Event
                 }
                 unset($data);
 
-                if ($maxttl > 0 && $ft < $maxttl) {
+                // no timeout data or 0
+                if (false === $is_timeout && $maxttl > 0 && $maxttl > $ft) {
                     $this->pt->unlink($fx, true);
 
                     if ($force && @is_file($fx)) {

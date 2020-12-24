@@ -671,6 +671,7 @@ class WP_Object_Cache
         $expire = $this->fs()->sanitize_timestamp($expire);
         $maxttl = $this->cache_maxttl;
 
+        // if 0 let gc handle it by comparing file mtime.
         if (0 === $expire && $maxttl < 2419200) {
             if (\in_array($group, ['site-transient', 'transient'])) {
                 if ('site-transient' === $group && \in_array($key, ['update_plugins', 'update_themes', 'update_core'])) {
@@ -994,9 +995,7 @@ class WP_Object_Cache
             return false;
         }
 
-        if (!@is_file($this->cache_path.'index.php')) {
-            @$this->fs()->put($this->cache_path.'index.php', $this->fs()->code_stub(time()));
-        }
+        @$this->fs()->placeholder($this->cache_path);
 
         $file = $this->get_file_path($cache_key, $group);
 
@@ -1058,15 +1057,14 @@ class WP_Object_Cache
         $meta['group'] = $group;
         $meta['key'] = $cache_key;
         $meta['type'] = $final_type;
+
+        // if 0 let gc handle it by comparing file mtime
+        // and maxttl constants.
         $meta['timeout'] = $timeout;
+
         $meta['data'] = $data;
 
         if (true === $this->dc_code($file, $meta)) {
-            // if 0 let gc handle it by comparing file mtime.
-            if ($timeout > 0) {
-                @touch($file, $timeout);
-            }
-
             if ($this->cf()->is_dctrue('DEV')) {
                 $this->dc_log('info', $group.':'.$cache_key, __FUNCTION__.'()->todisk');
             }
@@ -1216,6 +1214,7 @@ class WP_Object_Cache
         add_action(
             'shutdown',
             function () use ($req_key) {
+                $this->fs()->fastcgi_close();
                 $this->dc_precache_set($req_key);
             },
             PHP_INT_MAX
@@ -1327,6 +1326,7 @@ class WP_Object_Cache
                             add_action(
                                 'shutdown',
                                 function () {
+                                    $this->fs()->fastcgi_close();
                                     $this->delete('alloptions', 'options');
                                 },
                                 PHP_INT_MAX - 1
@@ -1346,6 +1346,7 @@ class WP_Object_Cache
                         add_action(
                             'shutdown',
                             function () {
+                                $this->fs()->fastcgi_close();
                                 $this->delete(get_current_network_id().':active_sitewide_plugins', 'site-options');
                             },
                             PHP_INT_MAX - 1
@@ -1354,6 +1355,7 @@ class WP_Object_Cache
                     add_action(
                         'shutdown',
                         function () {
+                            $this->fs()->fastcgi_close();
                             $this->delete('uninstall_plugins', 'options');
                         },
                         PHP_INT_MAX - 1
@@ -1464,6 +1466,7 @@ class WP_Object_Cache
                 function () {
                     if ($this->add_signature && !$this->is_user_logged_in()) {
                         echo "\n<!-- Performance optimized by Docket Cache: https://wordpress.org/plugins/docket-cache -->\n";
+                        $this->fs()->fastcgi_close();
                     }
                 },
                 PHP_INT_MAX

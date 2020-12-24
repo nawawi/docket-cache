@@ -1,3 +1,13 @@
+= v20.11.06 (2020-12-25)
+
+- Fixed Plugin::get_opcache_status() -> Missing match pattern.
+- Fixed Plugin::register_plugin_hooks() -> Redundant loading, change plugin_loaded to plugins_loaded.
+- Fixed Filesystem::opcache_compile() -> Change filemtime early to 60 seconds. Opcache won't compile if file newer than runtime.
+- Fixed WP_Object_Cache::dc_save() -> Remove change filemtime. Cache expiration now handles by timeout key.
+- Fixed Event::garbage_collector() -> Filemtime comparison with maxttl only applies to cache file without timeout or 0.
+- Fixed Event::register() -> Redundant loading, change plugin_loaded to plugins_loaded.
+- Fixed Dropino::multinet_install() -> Wrong flags for file_put_contents.
+
 = v20.11.05 (2020-12-23)
 
 - Fixed CronAgent::check_connection() -> close_ping() -> Invalid selfcheck delay. Set to 90 minutes instead of current time.

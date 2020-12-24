@@ -192,7 +192,7 @@ if (!\function_exists('nwdcx_runaction')) {
     function nwdcx_runaction(...$args)
     {
         add_action(
-            'plugin_loaded',
+            'plugins_loaded',
             function () use ($args) {
                 \call_user_func_array('do_action', $args);
             }

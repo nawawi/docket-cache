@@ -388,7 +388,13 @@ final class Plugin extends Bepart
 
                 if (!empty($data['scripts']) && \is_array($data['scripts'])) {
                     foreach ($data['scripts'] as $script => $arr) {
-                        if ($this->is_docketcachedir(\dirname($script)) && preg_match('@^([a-z0-9]+)\-([a-z0-9]+).*\.php$@', basename($script))) {
+                        $cpath = $arr['full_path'];
+                        if (!@is_file($cpath)) {
+                            continue;
+                        }
+                        $cfile = basename($cpath);
+                        $cdir = \dirname($cpath);
+                        if (false !== strpos($script, $this->cache_path) && $this->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', $cfile)) {
                             ++$dcfiles;
                             if (isset($arr['memory_consumption'])) {
                                 $dcbytes += $arr['memory_consumption'];
@@ -725,6 +731,7 @@ final class Plugin extends Bepart
         add_action(
             'shutdown',
             function () {
+                $this->fastcgi_close();
                 $active_plugins = (array) get_option('active_plugins', []);
                 if (!empty($active_plugins) && \is_array($active_plugins) && isset($active_plugins[0]) && \in_array($this->hook, $active_plugins) && $this->hook !== $active_plugins[0]) {
                     unset($active_plugins[array_search($this->hook, $active_plugins)]);
@@ -803,6 +810,9 @@ final class Plugin extends Bepart
      */
     private function register_init()
     {
+        // save last error
+        $GLOBALS['docketcache_last_error'] = [];
+
         // unofficial constant: possible to disable nag notices
         !\defined('DISABLE_NAG_NOTICES') && \define('DISABLE_NAG_NOTICES', true);
 
@@ -852,6 +862,8 @@ final class Plugin extends Bepart
         add_action(
             'shutdown',
             function () {
+                $this->fastcgi_close();
+
                 if ($this->cf()->is_dcfalse('OBJECTCACHEOFF', true)) {
                     $this->cx()->install(true);
                     if (is_multisite()) {
@@ -984,31 +996,20 @@ final class Plugin extends Bepart
                         @header('Content-Type: text/plain; charset=UTF-8');
                         if (@is_file($file)) {
                             @readfile($file);
-                            exit;
+                            $this->close_exit();
                         }
-                        echo 'No data available';
-                        exit;
+
+                        $this->close_exit(__('No data available', 'docket-cache'));
                     }
                 }
-            },
-            0
-        );
 
-        add_action(
-            'plugin_loaded',
-            function () {
                 if (nwdcx_wpdb($wpdb)) {
-                    static $done = false;
-
-                    if (!$done) {
-                        $done = true;
-                        $suppress = $wpdb->suppress_errors(true);
-                        $ok = $wpdb->get_var('SELECT @@SESSION.SQL_BIG_SELECTS LIMIT 1');
-                        if (empty($ok)) {
-                            $wpdb->query('SET SESSION SQL_BIG_SELECTS=1');
-                        }
-                        $wpdb->suppress_errors($suppress);
+                    $suppress = $wpdb->suppress_errors(true);
+                    $ok = $wpdb->get_var('SELECT @@SESSION.SQL_BIG_SELECTS LIMIT 1');
+                    if (empty($ok)) {
+                        $wpdb->query('SET SESSION SQL_BIG_SELECTS=1');
                     }
+                    $wpdb->suppress_errors($suppress);
                 }
             },
             -PHP_INT_MAX
@@ -1046,12 +1047,14 @@ final class Plugin extends Bepart
                         switch ($state) {
                             case 'enable':
                             case 'disable':
+                                $this->fastcgi_close();
                                 $this->co()->save('autoupdate', $state);
                                 break;
                         }
                         unset($options);
                     }
-                }
+                },
+                PHP_INT_MAX
             );
         }
 
@@ -1354,11 +1357,18 @@ final class Plugin extends Bepart
         add_action(
             'wp_logout',
             function () {
-                $user = wp_get_current_user();
-                if (\is_object($user) && isset($user->ID)) {
-                    wp_cache_delete($user->ID, 'user_meta');
-                    $this->delete_cron_siteid($user->ID);
-                }
+                add_action(
+                    'shutdown',
+                    function () {
+                        $this->fastcgi_close();
+                        $user = wp_get_current_user();
+                        if (\is_object($user) && isset($user->ID)) {
+                            wp_cache_delete($user->ID, 'user_meta');
+                            $this->delete_cron_siteid($user->ID);
+                        }
+                    },
+                    PHP_INT_MAX
+                );
             },
             PHP_INT_MAX
         );
@@ -1515,6 +1525,8 @@ final class Plugin extends Bepart
                         add_action(
                             'shutdown',
                             function () {
+                                $this->fastcgi_close();
+
                                 wp_cache_delete('alloptions', 'options');
                                 if (\function_exists('wp_cache_flush_group')) {
                                     wp_cache_flush_group('options');
@@ -1534,6 +1546,8 @@ final class Plugin extends Bepart
                             'shutdown',
                             function () use ($action) {
                                 if (!$action) {
+                                    $this->fastcgi_close();
+
                                     apply_filters('docketcache/filter/active/cronbot', $action);
                                 }
                             },

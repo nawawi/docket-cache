@@ -15,16 +15,6 @@ namespace Nawawi\DocketCache;
 class Bepart extends Filesystem
 {
     /**
-     * fastcgi_close.
-     */
-    public function fastcgi_close()
-    {
-        if (\function_exists('fastcgi_finish_request')) {
-            @fastcgi_finish_request();
-        }
-    }
-
-    /**
      * close_exit.
      */
     public function close_exit($msg = '')

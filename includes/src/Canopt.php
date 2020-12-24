@@ -124,7 +124,7 @@ final class Canopt extends Bepart
         return array_keys($data);
     }
 
-    private function read_config($file = '', $force = false, &$error = '')
+    private function read_config($file = '', $force = false)
     {
         $file = empty($file) ? $this->file : $file;
         $config = [];
@@ -137,7 +137,7 @@ final class Canopt extends Bepart
             try {
                 $config = @include $file;
             } catch (\Throwable $e) {
-                $error = $e->getMessage();
+                $GLOBALS['docketcache_last_error'][__METHOD__] = $e->getMessage();
             }
         }
 
