@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.6
 Requires PHP: 7.2.5
-Stable tag: 20.11.06
+Stable tag: 20.12.01
 License: MIT
 License URI: ./license.txt
 
@@ -174,6 +174,15 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.12.01 =
+
+- Fixed Event::register() -> cron_schedules, merge if not exists.
+- Fixed ReqAction::screen_notice() -> missing cronbot executed events message.
+- Fixed WP_Hook -> use PHP_INT_MIN instead of -PHP_INT_MAX for earlier sequence.
+- Added WP_Object_Cache::dc_close() -> save precache after shutdown hooks.
+- Added WP_Object_Cache::dc_precache_load -> replace dc_precache_get().
+- Added Filesystem::close_buffer() -> close fastcgi request if no output buffer.
+
 = 20.11.06 =
 
 - Fixed Plugin::get_opcache_status() -> Missing match pattern.

@@ -33,7 +33,7 @@ final class CronAgent
             function () {
                 $this->receive_ping();
             },
-            -PHP_INT_MAX
+            PHP_INT_MIN
         );
 
         add_action(

@@ -34,27 +34,38 @@ final class Event
         add_filter(
             'cron_schedules',
             function ($schedules) {
-                $schedules = [
-                    'halfhour' => [
-                        'interval' => 30 * MINUTE_IN_SECONDS,
-                        'display' => esc_html__('Every 30 Minutes', 'docket-cache'),
-                    ],
-                    'monthly' => [
+                $schedules['halfhour'] = [
+                    'interval' => 30 * MINUTE_IN_SECONDS,
+                    'display' => esc_html__('Every 30 Minutes', 'docket-cache'),
+                ];
+
+                if (empty($schedules['hourly'])) {
+                    $schedules['hourly'] = [
+                        'interval' => HOUR_IN_SECONDS,
+                        'display' => esc_html__('Once Hourly', 'docket-cache'),
+                    ];
+                }
+
+                if (empty($schedules['monthly'])) {
+                    $schedules['monthly'] = [
                         'interval' => MONTH_IN_SECONDS,
                         'display' => esc_html__('Once Monthly', 'docket-cache'),
-                    ],
-                    'docketcache_gc_schedule' => [
-                        'interval' => 5 * MINUTE_IN_SECONDS,
-                        'display' => esc_html__('Every 5 Minutes', 'docket-cache'),
-                    ],
-                    'docketcache_checkversion_schedule' => [
-                        'interval' => 10 * DAY_IN_SECONDS,
-                        'display' => esc_html__('Every 10 Days', 'docket-cache'),
-                    ],
+                    ];
+                }
+
+                $schedules['docketcache_gc_schedule'] = [
+                    'interval' => 5 * MINUTE_IN_SECONDS,
+                    'display' => esc_html__('Every 5 Minutes', 'docket-cache'),
+                ];
+
+                $schedules['docketcache_checkversion_schedule'] = [
+                    'interval' => 10 * DAY_IN_SECONDS,
+                    'display' => esc_html__('Every 10 Days', 'docket-cache'),
                 ];
 
                 return $schedules;
-            }
+            },
+            PHP_INT_MAX
         );
 
         add_action(

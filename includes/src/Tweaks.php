@@ -81,7 +81,7 @@ final class Tweaks
                 function () {
                     return 12 * HOUR_IN_SECONDS;
                 },
-                -PHP_INT_MAX
+                PHP_INT_MIN
             );
 
             // wp: protected post, expire when browser close
@@ -90,7 +90,7 @@ final class Tweaks
                 function () {
                     return 0;
                 },
-                -PHP_INT_MAX
+                PHP_INT_MIN
             );
         }
     }
@@ -589,7 +589,7 @@ final class Tweaks
                 add_filter('wp_sitemaps_enabled', '__return_false');
                 remove_filter('robots_txt', ['WP_Sitemaps', 'add_robots']);
             },
-            -PHP_INT_MAX
+            PHP_INT_MIN
         );
     }
 

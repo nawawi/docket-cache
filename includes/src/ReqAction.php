@@ -411,6 +411,7 @@ final class ReqAction
                 case 'docket-cronbot-runevent':
                     $this->pt->notice = esc_html__('Running cron successful.', 'docket-cache');
                     $msg = $this->pt->co()->lookup_get('cronbotrun', true);
+
                     if (!empty($msg) && \is_array($msg)) {
                         $wmsg = '';
                         if (!empty($msg['wpcron_msg'])) {
@@ -418,10 +419,9 @@ final class ReqAction
                         }
 
                         if ($msg['wpcron_return'] > 1 && !empty($wmsg)) {
-                            $this->pt->notice = $this->pt->notice;
-                        }
-
-                        if (empty($this->pt->notice)) {
+                            $this->pt->notice = $wmsg;
+                            $this->pt->token = $this->pt->token.'-failed';
+                        } else {
                             if (!empty($wmsg) && empty($msg['wpcron_event'])) {
                                 $this->pt->notice = $wmsg;
                             } else {

@@ -1038,7 +1038,7 @@ class Filesystem
 
                 return $alloptions;
             },
-            -PHP_INT_MAX
+            PHP_INT_MIN
         );
     }
 
@@ -1049,6 +1049,16 @@ class Filesystem
     {
         if (\function_exists('fastcgi_finish_request')) {
             @fastcgi_finish_request();
+        }
+    }
+
+    /**
+     * close_buffer.
+     */
+    public function close_buffer()
+    {
+        if (!ob_get_level()) {
+            $this->fastcgi_close();
         }
     }
 }

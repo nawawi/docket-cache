@@ -90,8 +90,26 @@ endif;
             <div class="eventlist">
 
                 <div class="box-left">
-                    <a href="<?php echo $this->pt->action_query('runevent-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary button-large btx-spinner"><?php esc_html_e('Run Scheduled Event', 'docket-cache'); ?></a>
-                    <a href="<?php echo $this->pt->action_query('runeventnow-cronbot', ['idx' => 'cronbot']); ?>" class="button button-secondary  button-large btx-spinner"><?php esc_html_e('Run All Now', 'docket-cache'); ?></a>
+                    <a href="
+                    <?php
+                    echo $this->pt->action_query(
+                        'runevent-cronbot',
+                        [
+                            'idx' => 'cronbot',
+                        ]
+                    );
+                    ?>
+                    " class="button button-secondary button-large btx-spinner"><?php esc_html_e('Run Scheduled Event', 'docket-cache'); ?></a>
+                    <a href="
+                    <?php
+                    echo $this->pt->action_query(
+                        'runeventnow-cronbot',
+                        [
+                            'idx' => 'cronbot',
+                        ]
+                    );
+                    ?>
+                    " class="button button-secondary  button-large btx-spinner"><?php esc_html_e('Run All Now', 'docket-cache'); ?></a>
                 </div>
 
                 <?php if ($total_page > 1 || !empty($_GET['s'])) : ?>

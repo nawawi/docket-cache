@@ -140,6 +140,13 @@ class WP_Object_Cache
     private $is_precache = false;
 
     /**
+     * Precache key.
+     *
+     * @var string
+     */
+    private $precache_hashkey = '';
+
+    /**
      * Sets up object properties.
      */
     public function __construct()
@@ -1096,9 +1103,9 @@ class WP_Object_Cache
     }
 
     /**
-     * dc_precache_get.
+     * dc_precache_load.
      */
-    private function dc_precache_get($hash)
+    private function dc_precache_load($hash)
     {
         static $cached = [];
         $group = 'docketcache-precache';
@@ -1207,18 +1214,17 @@ class WP_Object_Cache
             return;
         }
 
-        $req_key = $this->item_hash($req_host.$req_uri);
+        $this->precache_hashkey = $this->item_hash($req_host.$req_uri);
 
-        $this->dc_precache_get($req_key);
+        $this->dc_precache_load($this->precache_hashkey);
+    }
 
-        add_action(
-            'shutdown',
-            function () use ($req_key) {
-                $this->fs()->fastcgi_close();
-                $this->dc_precache_set($req_key);
-            },
-            PHP_INT_MAX
-        );
+    public function dc_close()
+    {
+        $this->fs()->close_buffer();
+        if ($this->is_precache && !empty($this->precache_hashkey)) {
+            $this->dc_precache_set($this->precache_hashkey);
+        }
     }
 
     /**
@@ -1326,7 +1332,7 @@ class WP_Object_Cache
                             add_action(
                                 'shutdown',
                                 function () {
-                                    $this->fs()->fastcgi_close();
+                                    $this->fs()->close_buffer();
                                     $this->delete('alloptions', 'options');
                                 },
                                 PHP_INT_MAX - 1
@@ -1346,7 +1352,7 @@ class WP_Object_Cache
                         add_action(
                             'shutdown',
                             function () {
-                                $this->fs()->fastcgi_close();
+                                $this->fs()->close_buffer();
                                 $this->delete(get_current_network_id().':active_sitewide_plugins', 'site-options');
                             },
                             PHP_INT_MAX - 1
@@ -1355,7 +1361,7 @@ class WP_Object_Cache
                     add_action(
                         'shutdown',
                         function () {
-                            $this->fs()->fastcgi_close();
+                            $this->fs()->close_buffer();
                             $this->delete('uninstall_plugins', 'options');
                         },
                         PHP_INT_MAX - 1
@@ -1373,7 +1379,7 @@ class WP_Object_Cache
                 function ($post_id, $post, $update) {
                     $this->flush_filtered_groups('save_post', [$post_id, $post, $update]);
                 },
-                -PHP_INT_MAX,
+                PHP_INT_MIN,
                 3
             );
 
@@ -1382,7 +1388,7 @@ class WP_Object_Cache
                 function ($post_id, $post) {
                     $this->flush_filtered_groups('edit_post', [$post_id, $post]);
                 },
-                -PHP_INT_MAX,
+                PHP_INT_MIN,
                 2
             );
 
@@ -1391,7 +1397,7 @@ class WP_Object_Cache
                 function ($post_id) {
                     $this->flush_filtered_groups('delete_post', [$post_id]);
                 },
-                -PHP_INT_MAX
+                PHP_INT_MIN
             );
         }
 
@@ -1407,7 +1413,7 @@ class WP_Object_Cache
                         $args['order'] = 'ASC';
                     }
                 },
-                -PHP_INT_MAX
+                PHP_INT_MIN
             );
 
             add_action(
@@ -1421,7 +1427,7 @@ class WP_Object_Cache
                         $args['order'] = 'ASC';
                     }
                 },
-                -PHP_INT_MAX
+                PHP_INT_MIN
             );
 
             add_action(
@@ -1432,7 +1438,7 @@ class WP_Object_Cache
                         $wpq->query_vars['nwdcx_count_total'] = true;
                     }
                 },
-                -PHP_INT_MAX
+                PHP_INT_MIN
             );
 
             add_action(
@@ -1444,7 +1450,7 @@ class WP_Object_Cache
                         $wpq->total_users = $wpdb->get_var($sql);
                     }
                 },
-                -PHP_INT_MAX
+                PHP_INT_MIN
             );
         }
 
@@ -1458,15 +1464,15 @@ class WP_Object_Cache
                         $this->add_signature = true;
                     }
                 },
-                -PHP_INT_MAX
+                PHP_INT_MIN
             );
 
             add_action(
                 'shutdown',
                 function () {
                     if ($this->add_signature && !$this->is_user_logged_in()) {
-                        echo "\n<!-- Performance optimized by Docket Cache: https://wordpress.org/plugins/docket-cache -->\n";
-                        $this->fs()->fastcgi_close();
+                        echo apply_filters('docketcache/filter/signature/htmlfooter', "\n<!-- Performance optimized by Docket Cache: https://wordpress.org/plugins/docket-cache -->\n");
+                        $this->fs()->close_buffer();
                     }
                 },
                 PHP_INT_MAX
@@ -1516,6 +1522,10 @@ function wp_cache_add($key, $data, $group = '', $expire = 0)
  */
 function wp_cache_close()
 {
+    global $wp_object_cache;
+
+    $wp_object_cache->dc_close();
+
     return true;
 }
 

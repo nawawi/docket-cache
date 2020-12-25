@@ -731,7 +731,7 @@ final class Plugin extends Bepart
         add_action(
             'shutdown',
             function () {
-                $this->fastcgi_close();
+                $this->close_buffer();
                 $active_plugins = (array) get_option('active_plugins', []);
                 if (!empty($active_plugins) && \is_array($active_plugins) && isset($active_plugins[0]) && \in_array($this->hook, $active_plugins) && $this->hook !== $active_plugins[0]) {
                     unset($active_plugins[array_search($this->hook, $active_plugins)]);
@@ -862,7 +862,7 @@ final class Plugin extends Bepart
         add_action(
             'shutdown',
             function () {
-                $this->fastcgi_close();
+                $this->close_buffer();
 
                 if ($this->cf()->is_dcfalse('OBJECTCACHEOFF', true)) {
                     $this->cx()->install(true);
@@ -1012,7 +1012,7 @@ final class Plugin extends Bepart
                     $wpdb->suppress_errors($suppress);
                 }
             },
-            -PHP_INT_MAX
+            PHP_INT_MIN
         );
 
         if (version_compare($GLOBALS['wp_version'], '5.5', '<')) {
@@ -1047,7 +1047,7 @@ final class Plugin extends Bepart
                         switch ($state) {
                             case 'enable':
                             case 'disable':
-                                $this->fastcgi_close();
+                                $this->close_buffer();
                                 $this->co()->save('autoupdate', $state);
                                 break;
                         }
@@ -1081,6 +1081,9 @@ final class Plugin extends Bepart
             ],
             $args_extra
         );
+
+        // last
+        $args['st'] = time();
 
         $page = $this->page;
         if (!empty($args['idx']) && $this->is_subpage($args['idx'])) {
@@ -1360,7 +1363,7 @@ final class Plugin extends Bepart
                 add_action(
                     'shutdown',
                     function () {
-                        $this->fastcgi_close();
+                        $this->close_buffer();
                         $user = wp_get_current_user();
                         if (\is_object($user) && isset($user->ID)) {
                             wp_cache_delete($user->ID, 'user_meta');
@@ -1525,7 +1528,7 @@ final class Plugin extends Bepart
                         add_action(
                             'shutdown',
                             function () {
-                                $this->fastcgi_close();
+                                $this->close_buffer();
 
                                 wp_cache_delete('alloptions', 'options');
                                 if (\function_exists('wp_cache_flush_group')) {
@@ -1546,7 +1549,7 @@ final class Plugin extends Bepart
                             'shutdown',
                             function () use ($action) {
                                 if (!$action) {
-                                    $this->fastcgi_close();
+                                    $this->close_buffer();
 
                                     apply_filters('docketcache/filter/active/cronbot', $action);
                                 }
