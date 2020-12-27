@@ -200,6 +200,16 @@ if (!\function_exists('nwdcx_runaction')) {
     }
 }
 
+if (!\function_exists('nwdcx_throwable')) {
+    function nwdcx_throwable($name, $error)
+    {
+        if (!isset($GLOBALS['docketcache_throwable'])) {
+            $GLOBALS['docketcache_throwable'] = [];
+        }
+        $GLOBALS['docketcache_throwable'][$name] = print_r($error, 1);
+    }
+}
+
 if (!\function_exists('nwdcx_constfx')) {
     function nwdcx_constfx($name, $is_strip = false)
     {

@@ -532,6 +532,7 @@ final class View
             'gcaction' => esc_html__('Enable the Garbage Collector action button on the Overview page.', 'docket-cache'),
             'autoupdate' => esc_html__('Enable automatic plugin updates for Docket Cache.', 'docket-cache'),
             'checkversion' => esc_html__('Allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid error-prone.', 'docket-cache'),
+            'opcshutdown' => esc_html__('Flush OPcache when deactivate / uninstall', 'docket-cache'),
         ];
 
         $info = apply_filters('docketcache/filter/view/tooltips', $info);

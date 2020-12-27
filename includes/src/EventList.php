@@ -46,7 +46,7 @@ class EventList extends \WP_List_Table
         uasort(
             $schedules,
             function (array $a, array $b) {
-                return  $a['interval'] - $b['interval'];
+                return $a['interval'] - $b['interval'];
             }
         );
 
@@ -334,14 +334,14 @@ class EventList extends \WP_List_Table
     public function get_columns()
     {
         /* translators: %s: UTC offset */
-        $next_run_text = sprintf(__('Next Schedule (%s)', 'docket-cache'), $this->get_utc_offset());
+        $next_run_text = sprintf(esc_html__('Next Schedule (%s)', 'docket-cache'), $this->get_utc_offset());
 
         return [
-            'eventlist_hook' => __('Hook', 'docket-cache'),
-            'eventlist_args' => __('Arguments', 'docket-cache'),
+            'eventlist_hook' => esc_html__('Hook', 'docket-cache'),
+            'eventlist_args' => esc_html__('Arguments', 'docket-cache'),
             'eventlist_next' => $next_run_text,
-            'eventlist_actions' => __('Action', 'docket-cache'),
-            'eventlist_recurrence' => __('Recurrence', 'docket-cache'),
+            'eventlist_actions' => esc_html__('Action', 'docket-cache'),
+            'eventlist_recurrence' => esc_html__('Recurrence', 'docket-cache'),
          ];
     }
 

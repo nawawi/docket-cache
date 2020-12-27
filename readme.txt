@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.6
 Requires PHP: 7.2.5
-Stable tag: 20.12.01
+Stable tag: 20.12.02
 License: MIT
 License URI: ./license.txt
 
@@ -83,8 +83,7 @@ Affiliates with:
 - [Bluehost](https://www.bluehost.com/track/docketcache/)
 - [Onlinenic](https://onlinenic.com/en/Home/cloudReferral.html?usercode=87783819348ea6021e9df91d9bfd4981)
 - [Digitalocean](https://m.do.co/c/6c93db5b1ef6)
-- [KiahStore](https://docketcache.com/wp-content/spx/kiahstore/?utm_source=docketcachewporg)
-- [Pikoseeds](https://docketcache.com/wp-content/spx/pikoseed/?utm_source=docketcachewporg)
+- [WPJohnny](https://wpjohnny.com?ref=1)
 
 The Docket Cache has been reported seemly works with these hosting provider:
 
@@ -174,6 +173,13 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.12.02 =
+
+- Fixed Filesystem::cache_size() -> getsize stat failed.
+- Fixed Overview -> Object/WP OPcache Stats data empty called from worker.
+- Fixed Plugin::active() -> Randomly slow.
+- Added Configuration -> Flush OPcache On Deactivation.
+
 = 20.12.01 =
 
 - Fixed Event::register() -> cron_schedules, merge if not exists.

@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Docket Cache plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 20.12.01\n"
+"Project-Id-Version: Docket Cache 20.12.02\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-12-25T17:09:29+00:00\n"
+"POT-Creation-Date: 2020-12-27T17:31:41+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -96,7 +96,7 @@ msgid "Run Garbage Collector"
 msgstr ""
 
 #: includes/admin/config.php:18
-#: includes/src/Plugin.php:1222
+#: includes/src/Plugin.php:1211
 #: includes/src/View.php:291
 msgid "Configuration"
 msgstr ""
@@ -113,7 +113,7 @@ msgstr ""
 #: includes/admin/config.php:38
 #: includes/admin/log.php:21
 #: includes/src/Canopt.php:79
-#: includes/src/Plugin.php:1197
+#: includes/src/Plugin.php:1186
 #: includes/src/View.php:284
 msgid "Cache Log"
 msgstr ""
@@ -301,13 +301,22 @@ msgstr ""
 msgid "Check Critical Version"
 msgstr ""
 
+#: includes/admin/config.php:255
+#: includes/src/Canopt.php:112
+msgid "Flush OPcache On Deactivation"
+msgstr ""
+
 #: includes/admin/cronbot.php:19
 #: includes/src/Plugin.php:169
+#: includes/src/Plugin.php:1398
+#: includes/src/Plugin.php:1399
+#: includes/src/Plugin.php:1406
+#: includes/src/Plugin.php:1408
 msgid "Not Available"
 msgstr ""
 
 #: includes/admin/cronbot.php:30
-#: includes/src/Plugin.php:1210
+#: includes/src/Plugin.php:1199
 #: includes/src/View.php:288
 msgid "Cronbot"
 msgstr ""
@@ -348,19 +357,19 @@ msgstr ""
 msgid "Cron Events"
 msgstr ""
 
-#: includes/admin/cronbot.php:65
-msgid "Scheduled Cron for Site"
+#: includes/admin/cronbot.php:61
+msgid "Cron Events For Site"
 msgstr ""
 
-#: includes/admin/cronbot.php:102
+#: includes/admin/cronbot.php:109
 msgid "Run Scheduled Event"
 msgstr ""
 
-#: includes/admin/cronbot.php:112
+#: includes/admin/cronbot.php:119
 msgid "Run All Now"
 msgstr ""
 
-#: includes/admin/cronbot.php:120
+#: includes/admin/cronbot.php:127
 msgid "Filter Hook Names"
 msgstr ""
 
@@ -456,8 +465,8 @@ msgid "Web Proxy"
 msgstr ""
 
 #: includes/admin/overview.php:35
-#: includes/src/Plugin.php:1185
-#: includes/src/Plugin.php:1488
+#: includes/src/Plugin.php:1174
+#: includes/src/Plugin.php:1477
 #: includes/src/View.php:281
 msgid "Overview"
 msgstr ""
@@ -984,27 +993,27 @@ msgid_plural "of %s Networks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/src/Plugin.php:1002
+#: includes/src/Plugin.php:991
 msgid "No data available"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:1308
+#: includes/src/Plugin.php:1297
 msgid "The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href=\"%s\" style=\"min-width:100px;text-align:center;font-wight:bold;\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %1$s: url install, %2$s = url dismiss
-#: includes/src/Plugin.php:1312
+#: includes/src/Plugin.php:1301
 msgid "An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use <strong>Docket Cache</strong>. <br><br><a href=\"%1$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-primary button-small\">Install</a>&nbsp;<a href=\"%2$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-secondary button-small\">Dismiss</a>"
 msgstr ""
 
-#: includes/src/Plugin.php:1317
+#: includes/src/Plugin.php:1306
 msgid "The Object Cache feature has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: version
-#: includes/src/Plugin.php:1455
-#: includes/src/Plugin.php:1470
+#: includes/src/Plugin.php:1444
+#: includes/src/Plugin.php:1459
 msgid "Version %s"
 msgstr ""
 
@@ -1257,6 +1266,10 @@ msgstr ""
 msgid "Allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid error-prone."
 msgstr ""
 
-#: includes/src/View.php:539
+#: includes/src/View.php:535
+msgid "Flush OPcache when deactivate / uninstall"
+msgstr ""
+
+#: includes/src/View.php:540
 msgid "No info available"
 msgstr ""

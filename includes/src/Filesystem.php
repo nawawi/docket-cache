@@ -17,6 +17,26 @@ use Nawawi\DocketCache\Exporter\VarExporter;
 class Filesystem
 {
     /**
+     * fastcgi_close.
+     */
+    public function fastcgi_close()
+    {
+        if (\function_exists('fastcgi_finish_request')) {
+            @fastcgi_finish_request();
+        }
+    }
+
+    /**
+     * close_buffer.
+     */
+    public function close_buffer()
+    {
+        if (!@ob_get_level()) {
+            $this->fastcgi_close();
+        }
+    }
+
+    /**
      * is_docketcachedir.
      */
     public function is_docketcachedir($dir)
@@ -131,12 +151,15 @@ class Filesystem
         return [];
     }
 
+    /**
+     * validate_file.
+     */
     public function validate_file($filename)
     {
         try {
             $fileo = new \SplFileObject($filename, 'rb');
         } catch (\Throwable $e) {
-            $GLOBALS['docketcache_last_error'][__METHOD__] = $e->getMessage();
+            nwdcx_throwable(__METHOD__, $e);
 
             return false;
         }
@@ -168,8 +191,8 @@ class Filesystem
         try {
             $data = VarExporter::export($data);
         } catch (\Throwable $e) {
+            nwdcx_throwable(__METHOD__, $e);
             $error = $e->getMessage();
-            $GLOBALS['docketcache_last_error'][__METHOD__] = $error;
 
             if (false !== strpos($error, 'Cannot export value of type "stdClass"')) {
                 $data = var_export($data, 1);
@@ -370,7 +393,7 @@ class Filesystem
             return @ini_get('opcache.enable') && \function_exists('opcache_reset');
         } catch (\Throwable $e) {
             // rare condition on some hosting
-            $GLOBALS['docketcache_last_error'][__METHOD__] = $e->getMessage();
+            nwdcx_throwable(__METHOD__, $e);
         }
 
         return false;
@@ -432,7 +455,7 @@ class Filesystem
             try {
                 return @opcache_compile_file($file);
             } catch (\Throwable $e) {
-                $GLOBALS['docketcache_last_error'][__METHOD__] = $e->getMessage();
+                nwdcx_throwable(__METHOD__, $e);
             }
         }
 
@@ -442,7 +465,7 @@ class Filesystem
     /**
      * opcache_reset.
      */
-    public function opcache_reset($dir)
+    public function opcache_reset()
     {
         if (!$this->is_opcache_enable()) {
             return false;
@@ -453,18 +476,6 @@ class Filesystem
                 return false;
             }
 
-            $dir = realpath($dir);
-            if (false !== $dir && @is_dir($dir) && @is_writable($dir) && $this->is_docketcachedir($dir)) {
-                foreach ($this->scanfiles($dir) as $object) {
-                    $fx = $object->getPathName();
-                    if (!$object->isFile() || 'file' !== $object->getType() || !$this->is_php($fx)) {
-                        continue;
-                    }
-
-                    $this->opcache_flush($fx);
-                }
-            }
-
             $opcache_status = opcache_get_status();
             if (!empty($opcache_status) && \is_array($opcache_status) && !empty($opcache_status['scripts'])) {
                 foreach ($opcache_status['scripts'] as $key => $data) {
@@ -473,13 +484,28 @@ class Filesystem
                 }
             }
         } catch (\Throwable $e) {
-            $GLOBALS['docketcache_last_error'][__METHOD__] = $e->getMessage();
+            nwdcx_throwable(__METHOD__, $e);
 
             return false;
         }
 
         // always true
         return true;
+    }
+
+    /**
+     * opcache_cleanup.
+     */
+    public function opcache_cleanup()
+    {
+        add_action(
+            'shutdown',
+            function () {
+                $this->close_buffer();
+                $this->opcache_reset();
+            },
+            PHP_INT_MAX
+        );
     }
 
     /**
@@ -559,10 +585,16 @@ class Filesystem
             $slowdown = 0;
 
             foreach ($this->scanfiles($dir) as $object) {
-                $fx = $object->getPathName();
-                $fs = $object->getSize();
+                try {
+                    $fx = $object->getPathName();
+                    $fs = $object->getSize();
 
-                if (!$object->isFile() || 'file' !== $object->getType() || !$this->is_php($fx) || 'dump_' === substr($object->getFileName(), 0, 5)) {
+                    if (!$object->isFile() || 'file' !== $object->getType() || !$this->is_php($fx) || 'dump_' === substr($object->getFileName(), 0, 5)) {
+                        continue;
+                    }
+                } catch (\Throwable $e) {
+                    // rare condition on some hosting
+                    nwdcx_throwable(__METHOD__, $e);
                     continue;
                 }
 
@@ -576,7 +608,7 @@ class Filesystem
                     continue;
                 }
 
-                $data = $this->cache_get($object->getPathName());
+                $data = $this->cache_get($fx);
                 if (false === $data) {
                     $this->unlink($fx, true);
                     continue;
@@ -1040,25 +1072,5 @@ class Filesystem
             },
             PHP_INT_MIN
         );
-    }
-
-    /**
-     * fastcgi_close.
-     */
-    public function fastcgi_close()
-    {
-        if (\function_exists('fastcgi_finish_request')) {
-            @fastcgi_finish_request();
-        }
-    }
-
-    /**
-     * close_buffer.
-     */
-    public function close_buffer()
-    {
-        if (!ob_get_level()) {
-            $this->fastcgi_close();
-        }
     }
 }

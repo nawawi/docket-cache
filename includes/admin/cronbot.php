@@ -56,13 +56,14 @@ endif;
             </p>
 
             <?php $this->tab_title(esc_html__('Cron Events', 'docket-cache')); ?>
-            <?php
+            <table class="form-table">
+                <?php
+                $title = esc_html__('Cron Events For Site', 'docket-cache');
                 $sites = $this->pt->get_network_sites();
-            if (is_multisite() && !empty($sites) && \is_array($sites) && \count($sites) > 1) :
-                ?>
-            <table class="form-table form-table-selection noborder-b">
-                <tr>
-                    <th><?php esc_html_e('Scheduled Cron for Site', 'docket-cache'); ?></th>
+                if (is_multisite() && !empty($sites) && \is_array($sites) && \count($sites) > 1) :
+                    ?>
+                <tr class="form-table-selection">
+                    <th><?php echo $title; ?></th>
                     <td><select id="siteid" class="config-select">
                             <?php
                             $cronbot_siteid = $this->pt->get_cron_siteid();
@@ -70,7 +71,7 @@ endif;
                             foreach ($sites as $site) {
                                 $site_id = $site['id'];
                                 $site_url = $site['url'];
-                                $v = '['.$site_id.'] '.$site_url;
+                                $v = '['.$site_id.'] '.nwdcx_noscheme($site_url);
                                 $url = $this->pt->action_query(
                                     'selectsite-cronbot',
                                     [
@@ -83,10 +84,16 @@ endif;
                             }
                             ?>
                         </select>
+                        <small>[SiteId] Hostname</small>
                     </td>
                 </tr>
+                <?php else : ?>
+                <tr>
+                    <th><?php echo $title; ?></th>
+                    <td><?php echo nwdcx_noscheme(home_url()); ?></td>
+                </tr>
+                <?php endif; ?>
             </table>
-            <?php endif; ?>
             <div class="eventlist">
 
                 <div class="box-left">

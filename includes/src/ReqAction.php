@@ -147,7 +147,7 @@ final class ReqAction
                 do_action('docketcache/action/flush/file/objectcache', $result, $filename);
                 break;
             case 'docket-flush-opcache':
-                $result = $this->pt->flush_opcache();
+                $result = $this->pt->opcache_reset();
                 $response = $result ? 'docket-opcache-flushed' : 'docket-opcache-flushed-failed';
                 do_action('docketcache/action/flush/opcache', $result);
                 break;
@@ -376,7 +376,7 @@ final class ReqAction
                     break;
                 case 'docket-opcache-flushed':
                     $this->pt->notice = esc_html__('OPcache was flushed.', 'docket-cache');
-                    $this->pt->flush_opcache();
+                    $this->pt->opcache_reset();
                     break;
                 case 'docket-opcache-flushed-failed':
                     $this->pt->notice = esc_html__('OPcache could not be flushed.', 'docket-cache');

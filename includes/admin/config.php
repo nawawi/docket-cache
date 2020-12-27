@@ -251,6 +251,12 @@ namespace Nawawi\DocketCache;
                         <?php echo $this->config_select_bool('checkversion'); ?>
                     </td>
                 </tr>
+                <tr id="opcshutdown">
+                    <th><?php echo esc_html__('Flush OPcache On Deactivation', 'docket-cache').$this->tooltip('opcshutdown'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('opcshutdown'); ?>
+                    </td>
+                </tr>
             </table>
         </div>
         <div class="row-right">

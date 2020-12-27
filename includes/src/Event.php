@@ -266,7 +266,7 @@ final class Event
                     $ft = filemtime($fx);
                 } catch (\Throwable $e) {
                     // rare condition on some hosting
-                    $GLOBALS['docketcache_last_error'][__METHOD__] = $e->getMessage();
+                    nwdcx_throwable(__METHOD__, $e);
                     continue;
                 }
 

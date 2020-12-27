@@ -109,6 +109,7 @@ final class Canopt extends Bepart
             'wpsitemap' => esc_html__('Remove WP Sitemap', 'docket-cache'),
             'wpapppassword' => esc_html__('Remove WP Application Passwords', 'docket-cache'),
             'objectcacheoff' => esc_html__('Suspend Object Cache', 'docket-cache'),
+            'opcshutdown' => esc_html__('Flush OPcache On Deactivation', 'docket-cache'),
         ];
 
         $data = apply_filters('docketcache/filter/optionkeys', $data);
@@ -137,7 +138,7 @@ final class Canopt extends Bepart
             try {
                 $config = @include $file;
             } catch (\Throwable $e) {
-                $GLOBALS['docketcache_last_error'][__METHOD__] = $e->getMessage();
+                nwdcx_throwable(__METHOD__, $e);
             }
         }
 

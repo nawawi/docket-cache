@@ -345,6 +345,9 @@ final class Constans
         // auto update
         $this->maybe_define($this->px('AUTOUPDATE'), true);
 
+        // flush opcache when deactivate
+        $this->maybe_define($this->px('OPCSHUTDOWN'), false);
+
         // optimize post query
         $this->maybe_define($this->px('OPTWPQUERY'), true);
 

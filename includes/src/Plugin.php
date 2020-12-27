@@ -575,11 +575,7 @@ final class Plugin extends Bepart
         $this->co()->clear_part('cachestats');
         $this->cx()->delay();
 
-        if (\function_exists('nwdcx_cleanuptransient')) {
-            nwdcx_cleanuptransient();
-        } elseif (\function_exists('delete_expired_transients')) {
-            delete_expired_transients(true);
-        }
+        delete_expired_transients(true);
 
         $ret = $this->cachedir_flush($this->cache_path, $cleanup);
         if (false === $ret) {
@@ -607,14 +603,6 @@ final class Plugin extends Bepart
         }
 
         return true;
-    }
-
-    /**
-     * flush_opcache.
-     */
-    public function flush_opcache()
-    {
-        return $this->opcache_reset($this->cache_path);
     }
 
     /**
@@ -724,7 +712,7 @@ final class Plugin extends Bepart
     }
 
     /**
-     * pushup.
+     * wearechampion.
      */
     public function wearechampion()
     {
@@ -765,6 +753,10 @@ final class Plugin extends Bepart
             if (is_multisite()) {
                 $this->cx()->multinet_clear($this->cache_path, $this->cf()->dcvalue('LOG_FILE'));
             }
+        }
+
+        if ($this->cf()->is_dctrue('OPCSHUTDOWN', true)) {
+            $this->opcache_cleanup();
         }
     }
 
@@ -810,9 +802,6 @@ final class Plugin extends Bepart
      */
     private function register_init()
     {
-        // save last error
-        $GLOBALS['docketcache_last_error'] = [];
-
         // unofficial constant: possible to disable nag notices
         !\defined('DISABLE_NAG_NOTICES') && \define('DISABLE_NAG_NOTICES', true);
 
@@ -1406,17 +1395,17 @@ final class Plugin extends Bepart
 
                         $cache_stats = 1 === $info->status_code && !empty($info->status_text_stats) ? $info->status_text_stats : $info->status_text;
                         $opcache_stats = 1 === $info->opcache_code && !empty($info->opcache_text_stats) ? $info->opcache_text_stats : $info->opcache_text;
-                        $opcache_dc_stats = $info->opcache_dc_stats;
-                        $opcache_wp_stats = $info->opcache_wp_stats;
+                        $opcache_dc_stats = !empty($info->opcache_dc_stats) ? $info->opcache_dc_stats : esc_html__('Not Available', 'docket-cache');
+                        $opcache_wp_stats = !empty($info->opcache_wp_stats) ? $info->opcache_wp_stats : esc_html__('Not Available', 'docket-cache');
 
                         $response = [];
                         $response = ['success' => true];
                         $response['data'] = $this->slug.':worker: pong '.$type;
 
                         $stats = [];
-                        $stats['obc'] = $cache_stats;
+                        $stats['obc'] = '0B' !== substr($cache_stats, 0, 2) ? $cache_stats : esc_html__('Not Available', 'docket-cache');
                         $stats['opc'] = $opcache_stats;
-                        $stats['obcs'] = $info->status_text_stats;
+                        $stats['obcs'] = '0B' !== substr($info->status_text_stats, 0, 2) ? $info->status_text_stats : esc_html__('Not Available', 'docket-cache');
                         $stats['opcs'] = $info->opcache_text_stats;
                         $stats['opcdc'] = $opcache_dc_stats;
                         $stats['opcwp'] = $opcache_wp_stats;
