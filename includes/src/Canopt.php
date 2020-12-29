@@ -109,7 +109,8 @@ final class Canopt extends Bepart
             'wpsitemap' => esc_html__('Remove WP Sitemap', 'docket-cache'),
             'wpapppassword' => esc_html__('Remove WP Application Passwords', 'docket-cache'),
             'objectcacheoff' => esc_html__('Suspend Object Cache', 'docket-cache'),
-            'opcshutdown' => esc_html__('Flush OPcache On Deactivation', 'docket-cache'),
+            'opcshutdown' => esc_html__('Flush OPcache During Deactivation', 'docket-cache'),
+            'limithttprequest' => esc_html__('Limit WP-Admin HTTP requests', 'docket-cache'),
         ];
 
         $data = apply_filters('docketcache/filter/optionkeys', $data);
@@ -162,7 +163,7 @@ final class Canopt extends Bepart
         return $this->dump($file, $code);
     }
 
-    private function cleanup($config)
+    private function config_cleanup($config)
     {
         if (!empty($config) && \is_array($config)) {
             $keys = $this->keys();
@@ -197,7 +198,7 @@ final class Canopt extends Bepart
         $this->placeholder($this->path);
 
         $config = $this->read_config();
-        $config = $this->cleanup($config);
+        $config = $this->config_cleanup($config);
 
         if (\in_array($name, $this->keys())) {
             $nx = nwdcx_constfx($name);

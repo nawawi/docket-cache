@@ -533,6 +533,7 @@ final class View
             'autoupdate' => esc_html__('Enable automatic plugin updates for Docket Cache.', 'docket-cache'),
             'checkversion' => esc_html__('Allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid error-prone.', 'docket-cache'),
             'opcshutdown' => esc_html__('Flush OPcache when deactivate / uninstall', 'docket-cache'),
+            'limithttprequest' => esc_html__('Limit HTTP requests in WP Admin.', 'docket-cache'),
         ];
 
         $info = apply_filters('docketcache/filter/view/tooltips', $info);

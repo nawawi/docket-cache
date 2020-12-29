@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Docket Cache plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 20.12.02\n"
+"Project-Id-Version: Docket Cache 20.12.03\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-12-27T17:31:41+00:00\n"
+"POT-Creation-Date: 2020-12-29T19:49:35+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -96,7 +96,7 @@ msgid "Run Garbage Collector"
 msgstr ""
 
 #: includes/admin/config.php:18
-#: includes/src/Plugin.php:1211
+#: includes/src/Plugin.php:1164
 #: includes/src/View.php:291
 msgid "Configuration"
 msgstr ""
@@ -113,7 +113,7 @@ msgstr ""
 #: includes/admin/config.php:38
 #: includes/admin/log.php:21
 #: includes/src/Canopt.php:79
-#: includes/src/Plugin.php:1186
+#: includes/src/Plugin.php:1139
 #: includes/src/View.php:284
 msgid "Cache Log"
 msgstr ""
@@ -270,53 +270,57 @@ msgstr ""
 msgid "Remove WP Application Passwords"
 msgstr ""
 
-#: includes/admin/config.php:216
+#: includes/admin/config.php:215
+msgid "Limit WP-Admin HTTP Requests"
+msgstr ""
+
+#: includes/admin/config.php:222
 msgid "Admin Interface"
 msgstr ""
 
-#: includes/admin/config.php:220
+#: includes/admin/config.php:226
 #: includes/src/Canopt.php:94
 msgid "Admin Page Loader"
 msgstr ""
 
-#: includes/admin/config.php:226
+#: includes/admin/config.php:232
 #: includes/src/Canopt.php:98
 msgid "Object Cache Data Stats"
 msgstr ""
 
-#: includes/admin/config.php:232
+#: includes/admin/config.php:238
 #: includes/src/Canopt.php:99
 msgid "Garbage Collector Action Button"
 msgstr ""
 
-#: includes/admin/config.php:239
+#: includes/admin/config.php:245
 msgid "Plugin Options"
 msgstr ""
 
-#: includes/admin/config.php:243
+#: includes/admin/config.php:249
 msgid "Docket Cache Auto-Updates"
 msgstr ""
 
-#: includes/admin/config.php:249
+#: includes/admin/config.php:255
 msgid "Check Critical Version"
 msgstr ""
 
-#: includes/admin/config.php:255
+#: includes/admin/config.php:261
 #: includes/src/Canopt.php:112
-msgid "Flush OPcache On Deactivation"
+msgid "Flush OPcache During Deactivation"
 msgstr ""
 
 #: includes/admin/cronbot.php:19
 #: includes/src/Plugin.php:169
-#: includes/src/Plugin.php:1398
-#: includes/src/Plugin.php:1399
-#: includes/src/Plugin.php:1406
-#: includes/src/Plugin.php:1408
+#: includes/src/Plugin.php:1351
+#: includes/src/Plugin.php:1352
+#: includes/src/Plugin.php:1359
+#: includes/src/Plugin.php:1361
 msgid "Not Available"
 msgstr ""
 
 #: includes/admin/cronbot.php:30
-#: includes/src/Plugin.php:1199
+#: includes/src/Plugin.php:1152
 #: includes/src/View.php:288
 msgid "Cronbot"
 msgstr ""
@@ -465,8 +469,8 @@ msgid "Web Proxy"
 msgstr ""
 
 #: includes/admin/overview.php:35
-#: includes/src/Plugin.php:1174
-#: includes/src/Plugin.php:1477
+#: includes/src/Plugin.php:1127
+#: includes/src/Plugin.php:1430
 #: includes/src/View.php:281
 msgid "Overview"
 msgstr ""
@@ -656,6 +660,10 @@ msgstr ""
 
 #: includes/src/Canopt.php:111
 msgid "Suspend Object Cache"
+msgstr ""
+
+#: includes/src/Canopt.php:113
+msgid "Limit WP-Admin HTTP requests"
 msgstr ""
 
 #: includes/src/Command.php:117
@@ -993,27 +1001,27 @@ msgid_plural "of %s Networks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/src/Plugin.php:991
+#: includes/src/Plugin.php:967
 msgid "No data available"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:1297
+#: includes/src/Plugin.php:1250
 msgid "The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href=\"%s\" style=\"min-width:100px;text-align:center;font-wight:bold;\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %1$s: url install, %2$s = url dismiss
-#: includes/src/Plugin.php:1301
+#: includes/src/Plugin.php:1254
 msgid "An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use <strong>Docket Cache</strong>. <br><br><a href=\"%1$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-primary button-small\">Install</a>&nbsp;<a href=\"%2$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-secondary button-small\">Dismiss</a>"
 msgstr ""
 
-#: includes/src/Plugin.php:1306
+#: includes/src/Plugin.php:1259
 msgid "The Object Cache feature has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: version
-#: includes/src/Plugin.php:1444
-#: includes/src/Plugin.php:1459
+#: includes/src/Plugin.php:1397
+#: includes/src/Plugin.php:1412
 msgid "Version %s"
 msgstr ""
 
@@ -1096,12 +1104,12 @@ msgstr ""
 
 #. translators: %s = option name
 #: includes/src/ReqAction.php:444
-msgid "%s enabled."
+msgid "%s. Enabled."
 msgstr ""
 
 #. translators: %s = option name
 #: includes/src/ReqAction.php:448
-msgid "%s disabled."
+msgid "%s. Disabled."
 msgstr ""
 
 #. translators: %s = option name
@@ -1270,6 +1278,10 @@ msgstr ""
 msgid "Flush OPcache when deactivate / uninstall"
 msgstr ""
 
-#: includes/src/View.php:540
+#: includes/src/View.php:536
+msgid "Limit HTTP requests in WP Admin."
+msgstr ""
+
+#: includes/src/View.php:541
 msgid "No info available"
 msgstr ""

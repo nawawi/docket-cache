@@ -1,3 +1,9 @@
+= v20.12.03 (2020-12-30)
+
+- Fixed Auto-updates -> remove v20.11.05 workaround, had issue with opcache, enable/disable docket auto-updates only in docket cache -> configuration.
+- Fixed nwdcx_cleanuptransient() -> didn't cleanup properly.
+- Added Configuration -> Limit WP-Admin HTTP Requests.
+
 = v20.12.02 (2020-12-28)
 
 - Fixed Filesystem::cache_size() -> getsize stat failed.

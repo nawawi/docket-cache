@@ -441,11 +441,11 @@ final class ReqAction
                     break;
                 case 'docket-option-enable':
                     /* translators: %s = option name */
-                    $this->pt->notice = sprintf(esc_html__('%s enabled.', 'docket-cache'), $option_name);
+                    $this->pt->notice = sprintf(esc_html__('%s. Enabled.', 'docket-cache'), $option_name);
                     break;
                 case 'docket-option-disable':
                     /* translators: %s = option name */
-                    $this->pt->notice = sprintf(esc_html__('%s disabled.', 'docket-cache'), $option_name);
+                    $this->pt->notice = sprintf(esc_html__('%s. Disabled.', 'docket-cache'), $option_name);
                     break;
                 case 'docket-option-save':
                     if (!empty($option_value)) {

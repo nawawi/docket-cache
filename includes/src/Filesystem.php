@@ -483,6 +483,7 @@ class Filesystem
                     $this->opcache_flush($fx);
                 }
             }
+            unset($opcache_status);
         } catch (\Throwable $e) {
             nwdcx_throwable(__METHOD__, $e);
 
@@ -545,11 +546,18 @@ class Filesystem
         }
 
         foreach ($this->scanfiles($dir) as $object) {
-            if (!$object->isFile() || 'file' !== $object->getType()) {
+            try {
+                if (!$object->isFile() || 'file' !== $object->getType()) {
+                    continue;
+                }
+
+                $this->unlink($object->getPathName(), $cleanup ? true : false);
+                ++$cnt;
+            } catch (\Throwable $e) {
+                // rare condition on some hosting
+                nwdcx_throwable(__METHOD__, $e);
                 continue;
             }
-            $this->unlink($object->getPathName(), $cleanup ? true : false);
-            ++$cnt;
         }
 
         if ($cleanup) {

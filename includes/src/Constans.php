@@ -375,6 +375,9 @@ final class Constans
         // wp application password: wp >= 5.6
         $this->maybe_define($this->px('WPAPPPASSWORD'), false);
 
+        // limit http request from uncommon page.
+        $this->maybe_define($this->px('LIMITHTTPREQUEST'), false);
+
         // @private
         // capture fatal error rarely incase non-throwable
         // set true for debugging only

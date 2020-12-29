@@ -140,20 +140,23 @@ if (!\function_exists('nwdcx_cleanuptransient')) {
         $results = $wpdb->get_results('SELECT `option_id`,`option_name`,`option_value` FROM `'.$wpdb->options.'` WHERE `option_name` LIKE "_transient_%" OR `option_name` LIKE "_site_transient_%" ORDER BY `option_id` ASC LIMIT 1000', ARRAY_A);
         if (!empty($results) && \is_array($results)) {
             while ($row = @array_shift($results)) {
-                $id = $row['option_id'];
-                $collect[$id] = $id;
+                $key = @preg_replace('@^(_site)?(_transient)(_timeout)?_@', '', $row['option_name']);
+                $collect[$key] = $key;
 
                 if (false !== strpos($row['option_name'], '_transient_timeout_') && (int) $row['option_value'] > time()) {
-                    unset($collect[$id]);
+                    unset($collect[$key]);
                 }
             }
 
             if (!empty($collect)) {
-                foreach ($collect as $id) {
-                    if ((int) $id > 0) {
-                        $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_id`='{$id}'");
-                    }
+                $wpdb->query('START TRANSACTION');
+                foreach ($collect as $key) {
+                    $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_name`='_transient_{$key}'");
+                    $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_name`='_transient_timeout_{$key}'");
+                    $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_name`='_site_transient_{$key}'");
+                    $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_name`='_site_transient_timeout_{$key}'");
                 }
+                $wpdb->query('COMMIT');
             }
         }
 
@@ -163,20 +166,21 @@ if (!\function_exists('nwdcx_cleanuptransient')) {
             $results = $wpdb->get_results('SELECT `meta_id`,`meta_key`,`meta_value` FROM `'.$wpdb->sitemeta.'` WHERE `meta_key` LIKE "_site_transient_%" ORDER BY `meta_id` ASC LIMIT 1000', ARRAY_A);
             if (!empty($results) && \is_array($results)) {
                 while ($row = @array_shift($results)) {
-                    $id = $row['meta_id'];
-                    $collect[$id] = $id;
+                    $key = @preg_replace('@^(_site)?(_transient)(_timeout)?_@', '', $row['meta_key']);
+                    $collect[$key] = $key;
 
                     if (false !== strpos($row['meta_key'], '_site_transient_timeout_') && (int) $row['meta_value'] > time()) {
-                        unset($collect[$id]);
+                        unset($collect[$key]);
                     }
                 }
 
                 if (!empty($collect)) {
-                    foreach ($collect as $id) {
-                        if ((int) $id > 0) {
-                            $wpdb->query("DELETE FROM `{$wpdb->sitemeta}` WHERE `meta_id`='{$id}'");
-                        }
+                    $wpdb->query('START TRANSACTION');
+                    foreach ($collect as $key) {
+                        $wpdb->query("DELETE FROM `{$wpdb->sitemeta}` WHERE `meta_key`='_site_transient_{$key}'");
+                        $wpdb->query("DELETE FROM `{$wpdb->sitemeta}` WHERE `meta_key`='_site_transient_timeout_{$key}'");
                     }
+                    $wpdb->query('COMMIT');
                 }
             }
         }

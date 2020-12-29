@@ -597,4 +597,54 @@ final class Tweaks
     {
         add_filter('wp_is_application_passwords_available', '__return_false', PHP_INT_MAX);
     }
+
+    public function limit_http_request()
+    {
+        add_action(
+            'admin_init',
+            function () {
+                if (empty($GLOBALS['pagebow'])) {
+                    return;
+                }
+
+                $pagenow = $GLOBALS['pagebow'];
+
+                switch ($pagenow) {
+                    case 'index.php':
+                    case 'plugins.php':
+                    case 'plugin-install.php':
+                    case 'update.php':
+                    case 'themes.php':
+                    case 'admin.php':
+                    case 'update-core.php':
+                        add_filter('pre_http_request', '__return_false', PHP_INT_MAX);
+                        break;
+                    default:
+                        add_filter(
+                            'pre_http_request',
+                            function ($preempt, $parsed_args, $url) {
+                                $host = parse_url($url, PHP_URL_HOST);
+                                $host_site = parse_url(home_url(), PHP_URL_HOST);
+                                $ok = true;
+                                switch ($host) {
+                                    case '127.0.0.1':
+                                    case 'localhost':
+                                        $ok = false;
+                                        break;
+                                    default:
+                                        if ($host === $host_site || false !== strpos($host, 'wordpress.org') || false !== strpos($host, 'docketcache.com')) {
+                                            $ok = false;
+                                        }
+                                }
+
+                                return $ok;
+                            },
+                            PHP_INT_MAX,
+                            3
+                        );
+                }
+            },
+            PHP_INT_MAX
+        );
+    }
 }

@@ -734,7 +734,7 @@ final class Plugin extends Bepart
     /**
      * cleanup.
      */
-    private function cleanup($is_uninstall = false)
+    private function deactivate_cleanup($is_uninstall = false)
     {
         if ($this->cx()->validate()) {
             $this->cx()->uninstall();
@@ -748,6 +748,9 @@ final class Plugin extends Bepart
         if ($is_uninstall) {
             // reset on/off button
             $this->co()->save('objectcacheoff', 'default');
+
+            // stats
+            $this->co()->clear_part('cachestats');
 
             // clear all network if available
             if (is_multisite()) {
@@ -765,7 +768,7 @@ final class Plugin extends Bepart
      */
     public static function uninstall()
     {
-        ( new self() )->cleanup(true);
+        ( new self() )->deactivate_cleanup(true);
     }
 
     /**
@@ -773,7 +776,7 @@ final class Plugin extends Bepart
      */
     public function deactivate()
     {
-        $this->cleanup();
+        $this->deactivate_cleanup();
         $this->unregister_cronjob();
     }
 
@@ -791,10 +794,6 @@ final class Plugin extends Bepart
 
         $this->unregister_cronjob();
         $this->wearechampion();
-
-        if ($this->cf()->is_dctrue('AUTOUPDATE', true)) {
-            $this->plugin_autoupdates(true);
-        }
     }
 
     /**
@@ -868,30 +867,6 @@ final class Plugin extends Bepart
     }
 
     /**
-     * plugin_autoupdates.
-     */
-    private function plugin_autoupdates($enable = true)
-    {
-        $options = (array) get_site_option('auto_update_plugins', []);
-        if ($enable) {
-            $options[] = $this->hook;
-            $options = array_unique($options);
-        } else {
-            $opt = [];
-            foreach ($options as $name) {
-                if ($this->hook === $name) {
-                    continue;
-                }
-                $opt[] = $name;
-            }
-            $options = $opt;
-            unset($opt);
-        }
-        update_site_option('auto_update_plugins', $options);
-        unset($options);
-    }
-
-    /**
      * register_plugin_hooks.
      */
     private function register_plugin_hooks()
@@ -957,7 +932,7 @@ final class Plugin extends Bepart
             PHP_INT_MAX
         );
 
-        if ($this->cf()->is_dctrue('SIGNATURE')) {
+        if (!is_admin() && $this->cf()->is_dctrue('SIGNATURE')) {
             add_action(
                 'send_headers',
                 function () {
@@ -968,30 +943,38 @@ final class Plugin extends Bepart
             );
         }
 
+        if (!empty($_SERVER['REQUEST_URI']) && false !== strpos($_SERVER['REQUEST_URI'], '/admin.php?page=docket-cache')) {
+            add_action(
+                'plugins_loaded',
+                function () {
+                    if (!headers_sent() && $this->cf()->is_dctrue('LOG') && !empty($_SERVER['REQUEST_URI'])) {
+                        $req = $_SERVER['REQUEST_URI'];
+                        if ((false !== strpos($req, '?page=docket-cache&idx=log&dl=0') || false !== strpos($req, '?page=docket-cache-log&idx=log&dl=0'))
+                            && preg_match('@log\&dl=\d+$@', $req)) {
+                            $file = $this->cf()->dcvalue('LOG_FILE');
+
+                            if (is_multisite()) {
+                                $file = nwdcx_network_filepath($file);
+                            }
+
+                            @header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
+                            @header('Content-Type: text/plain; charset=UTF-8');
+                            if (@is_file($file)) {
+                                @readfile($file);
+                                $this->close_exit();
+                            }
+
+                            $this->close_exit(__('No data available', 'docket-cache'));
+                        }
+                    }
+                },
+                PHP_INT_MIN
+            );
+        }
+
         add_action(
             'plugins_loaded',
             function () {
-                if (!headers_sent() && $this->cf()->is_dctrue('LOG') && !empty($_SERVER['REQUEST_URI'])) {
-                    $req = $_SERVER['REQUEST_URI'];
-                    if ((false !== strpos($req, '?page=docket-cache&idx=log&dl=0') || false !== strpos($req, '?page=docket-cache-log&idx=log&dl=0'))
-                        && preg_match('@log\&dl=\d+$@', $req)) {
-                        $file = $this->cf()->dcvalue('LOG_FILE');
-
-                        if (is_multisite()) {
-                            $file = nwdcx_network_filepath($file);
-                        }
-
-                        @header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
-                        @header('Content-Type: text/plain; charset=UTF-8');
-                        if (@is_file($file)) {
-                            @readfile($file);
-                            $this->close_exit();
-                        }
-
-                        $this->close_exit(__('No data available', 'docket-cache'));
-                    }
-                }
-
                 if (nwdcx_wpdb($wpdb)) {
                     $suppress = $wpdb->suppress_errors(true);
                     $ok = $wpdb->get_var('SELECT @@SESSION.SQL_BIG_SELECTS LIMIT 1');
@@ -1004,48 +987,18 @@ final class Plugin extends Bepart
             PHP_INT_MIN
         );
 
-        if (version_compare($GLOBALS['wp_version'], '5.5', '<')) {
-            if ($this->cf()->is_dctrue('AUTOUPDATE')) {
-                add_filter(
-                    'auto_update_plugin',
-                    function ($update, $item) {
-                        if ('docket-cache' === $item->slug) {
-                            return true;
-                        }
+        add_filter(
+            'auto_update_plugin',
+            function ($update, $item) {
+                if ('docket-cache' === $item->slug) {
+                    return $this->cf()->is_dctrue('AUTOUPDATE');
+                }
 
-                        return $update;
-                    },
-                    PHP_INT_MAX,
-                    2
-                );
-            }
-        } else {
-            add_action(
-                'shutdown',
-                function () {
-                    if (!wp_doing_ajax()) {
-                        return;
-                    }
-
-                    if (!current_user_can(is_multisite() ? 'manage_network_options' : 'manage_options')) {
-                        return;
-                    }
-
-                    if ((!empty($_POST['action']) && 'toggle-auto-updates' === $_POST['action']) && (!empty($_POST['asset']) && $this->hook === $_POST['asset'])) {
-                        $state = sanitize_text_field($_POST['state']);
-                        switch ($state) {
-                            case 'enable':
-                            case 'disable':
-                                $this->close_buffer();
-                                $this->co()->save('autoupdate', $state);
-                                break;
-                        }
-                        unset($options);
-                    }
-                },
-                PHP_INT_MAX
-            );
-        }
+                return $update;
+            },
+            PHP_INT_MAX,
+            2
+        );
 
         if (class_exists('Nawawi\\DocketCache\\CronAgent')) {
             ( new CronAgent($this) )->register();
@@ -1546,10 +1499,6 @@ final class Plugin extends Bepart
                             PHP_INT_MAX
                         );
                         break;
-                    case 'autoupdate':
-                        $action = 'enable' === $value ? true : false;
-                        $this->plugin_autoupdates($action);
-                        break;
                 }
             },
             -1,
@@ -1769,6 +1718,10 @@ final class Plugin extends Bepart
 
             if ($this->cf()->is_dctrue('WPAPPPASSWORD')) {
                 $tweaks->wpapppassword();
+            }
+
+            if ($this->cf()->is_dctrue('LIMITHTTPREQUEST')) {
+                $tweaks->limit_http_request();
             }
 
             if ($this->cf()->is_dctrue('POSTMISSEDSCHEDULE')) {

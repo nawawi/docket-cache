@@ -206,9 +206,15 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="wpapppassword">
-                    <th class="border-b"><?php echo esc_html__('Remove WP Application Passwords', 'docket-cache').$this->tooltip('wpapppassword'); ?></th>
+                    <th><?php echo esc_html__('Remove WP Application Passwords', 'docket-cache').$this->tooltip('wpapppassword'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpapppassword'); ?>
+                    </td>
+                </tr>
+                <tr id="limithttprequest">
+                    <th class="border-b"><?php echo esc_html__('Limit WP-Admin HTTP Requests', 'docket-cache').$this->tooltip('limithttprequest'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('limithttprequest'); ?>
                     </td>
                 </tr>
                 <tr>
@@ -252,7 +258,7 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="opcshutdown">
-                    <th><?php echo esc_html__('Flush OPcache On Deactivation', 'docket-cache').$this->tooltip('opcshutdown'); ?></th>
+                    <th><?php echo esc_html__('Flush OPcache During Deactivation', 'docket-cache').$this->tooltip('opcshutdown'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('opcshutdown'); ?>
                     </td>

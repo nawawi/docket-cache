@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.6
 Requires PHP: 7.2.5
-Stable tag: 20.12.02
+Stable tag: 20.12.03
 License: MIT
 License URI: ./license.txt
 
@@ -173,6 +173,14 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 20.12.03 =
+
+- Fixed Auto-updates -> remove v20.11.05 workaround, had issue with opcache, enable/disable docket auto-updates only in docket cache -> configuration.
+- Fixed nwdcx_cleanuptransient() -> didn't cleanup properly.
+- Added Configuration -> Limit WP-Admin HTTP Requests.
+
+If you're using Docket Cache v20.11.05 and below, please update to the latest version. Thanks.
+
 = 20.12.02 =
 
 - Fixed Filesystem::cache_size() -> getsize stat failed.
