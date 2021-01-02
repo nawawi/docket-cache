@@ -56,7 +56,7 @@ Thank you for sponsoring Docket Cache.
 <a href="https://docketcache.com/wp-content/spx/digitalocean/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/digitalocean/digitalocean-logo.png" width="150" height="50"></a>
 <a href="https://docketcache.com/wp-content/spx/kiahstore/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/kiahstore/kiahstore-logo.png" width="150" height="50"></a>
 <a href="https://docketcache.com/wp-content/spx/exabytes/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/exabytes/exabytes-logo.png" width="150" height="50"></a>
-<a href="https://docketcache.com/wp-content/spx/pikoseeds/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/pikoseeds/pikoseeds-logo.png" width="150" height="50"></a>
+<a href="https://docketcache.com/wp-content/spx/pikoseed/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/pikoseed/pikoseed-logo.png" width="150" height="50"></a>
 <a href="https://docketcache.com/wp-content/spx/serverfreak/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/serverfreak/serverfreak-logo.png" width="150" height="50"></a> 
 
 <br><br>
