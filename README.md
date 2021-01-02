@@ -49,6 +49,8 @@ Thank you for sponsoring Docket Cache.
 
 **Affiliates with:**
 
+<a href="https://docketcache.com/wp-content/spx/dreamhost/?utm_source=dcgh" target="_blank"><img src="https://docketcache.com/wp-content/spx/dreamhost/dreamhost-logo.png" width="150" height="50"></a>
+
 [![Dreamhost](https://docketcache.com/wp-content/spx/dreamhost/dreamhost-logo.png)](https://docketcache.com/wp-content/spx/dreamhost/?utm_source=dcgh) 
 [![LiteSpeed](https://docketcache.com/wp-content/spx/litespeed/litespeed-logo.png)](https://docketcache.com/wp-content/spx/litespeed/?utm_source=dcgh) 
 [![Bluehost](https://docketcache.com/wp-content/spx/bluehost/bluehost-logo.png)](https://docketcache.com/wp-content/spx/bluehost/?utm_source=dcgh)  
