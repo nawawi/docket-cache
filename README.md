@@ -40,7 +40,7 @@ Thank you for sponsoring Docket Cache.
 
 **Sponsored by:**
 
-[![Exnano Creative](https://docketcache.com/wp-content/spx/exnano/exnano-logo.png)](https://exnano.io/?utm_source=dcgh)  
+[![Exnano Creative](https://docketcache.com/wp-content/spx/exnano/exnano-logo.png)](https://exnano.io/?utm_source=dcgh) 
 [![Cun Host](https://docketcache.com/wp-content/spx/cunhost/cunhost-logo.png)](https://cunhost.com/?utm_source=dcgh)  
 [![DNSVault](https://docketcache.com/wp-content/spx/dnsvault/dnsvault-logo.png)](https://dnsvault.net/?utm_source=dcgh) 
 [![Jimat Hosting](https://docketcache.com/wp-content/spx/jimathosting/jimathosting-logo.png)](https://jimathosting.com/?utm_source=dcgh) 
