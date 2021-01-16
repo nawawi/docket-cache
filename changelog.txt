@@ -1,3 +1,15 @@
+= v20.12.04 (2021-01-16)
+
+- Fixed Limit WP-Admin HTTP Requests -> invalid variable pagenow.
+- Fixed Cache Log -> use get_utc_offset() instead of date('T').
+- Fixed Overview Actions -> rename admin/actcmd.php to admin/actions.php.
+- Fixed Cronbot Events -> display notice if failed to load EventList() .
+- Fixed nwdcx_throwable() -> only save data if WP_DEBUG defined .
+- Fixed Tweak::compat_notice() -> move to Plugin::compat_notice(), do check at CLI.
+- Fixed Plugin::get_subpage() -> add checking for adx variable.
+- Fixed OPcache flush -> lock for 20 seconds before accept new request.
+- Added Filesystem() methods -> sanitize_precache_maxfile, sanitize_maxsize, sanitize_maxsizedisk.
+
 = v20.12.03 (2020-12-30)
 
 - Fixed Auto-updates -> remove v20.11.05 workaround, had issue with opcache, enable/disable docket auto-updates only in docket cache -> configuration.

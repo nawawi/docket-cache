@@ -75,6 +75,7 @@ final class Canopt extends Bepart
 
     public function keys($key = false)
     {
+        // key = title
         $data = [
             'log' => esc_html__('Cache Log', 'docket-cache'),
             'log_time' => esc_html__('Log Timestamp', 'docket-cache'),
@@ -126,7 +127,7 @@ final class Canopt extends Bepart
         return array_keys($data);
     }
 
-    private function read_config($file = '', $force = false)
+    public function read_config($file = '', $force = false)
     {
         $file = empty($file) ? $this->file : $file;
         $config = [];
@@ -146,7 +147,7 @@ final class Canopt extends Bepart
         return $config;
     }
 
-    private function put_config($config, $file = '')
+    public function put_config($config, $file = '')
     {
         $file = empty($file) ? $this->file : $file;
         if (empty($config) || !\is_array($config)) {
@@ -163,13 +164,13 @@ final class Canopt extends Bepart
         return $this->dump($file, $code);
     }
 
-    private function config_cleanup($config)
+    public function config_cleanup($config)
     {
         if (!empty($config) && \is_array($config)) {
             $keys = $this->keys();
             foreach ($config as $name => $value) {
                 $nx = strtolower(nwdcx_constfx($name, true));
-                if (!\in_array($nx, $keys)) {
+                if (!\in_array($nx, $keys) || (\is_string($value) && 'default' === $value)) {
                     unset($config[$name]);
                 }
             }

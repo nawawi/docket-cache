@@ -32,19 +32,6 @@ final class ReqAction
         );
     }
 
-    private function compat_notice()
-    {
-        static $phpver = null;
-        if (null === $phpver) {
-            $phpver = $this->pt->plugin_meta($this->pt->file)['RequiresPHP'];
-        }
-
-        if (!empty($phpver) && version_compare(PHP_VERSION, $phpver, '<')) {
-            /* translators: %s: php version */
-            echo Resc::boxmsg(sprintf(__('This plugin requires PHP %s or greater.', 'docket-cache'), $phpver), 'error', false, false);
-        }
-    }
-
     private function exit_failed()
     {
         $args = [
@@ -91,7 +78,7 @@ final class ReqAction
             $keys[] = 'docket-save-'.$key;
         }
 
-        return $keys;
+        return array_unique($keys);
     }
 
     private function run_action($action, $param, &$option_name = '', &$option_value = '')
@@ -147,8 +134,13 @@ final class ReqAction
                 do_action('docketcache/action/flush/file/objectcache', $result, $filename);
                 break;
             case 'docket-flush-opcache':
-                $result = $this->pt->opcache_reset();
-                $response = $result ? 'docket-opcache-flushed' : 'docket-opcache-flushed-failed';
+                if ($this->pt->co()->lockproc('opcache_reset', time() + 20)) {
+                    $result = false;
+                    $response = 'docket-opcache-flushed-warn';
+                } else {
+                    $result = $this->pt->opcache_reset();
+                    $response = $result ? 'docket-opcache-flushed' : 'docket-opcache-flushed-failed';
+                }
                 do_action('docketcache/action/flush/opcache', $result);
                 break;
             case 'docket-connect-cronbot':
@@ -232,6 +224,9 @@ final class ReqAction
                 $nv = '';
                 if ('save' === $nk && isset($param['nv'])) {
                     $nv = sanitize_text_field($param['nv']);
+                    if (is_numeric($nv)) {
+                        $nv = (int) $nv;
+                    }
                     $ok = $this->pt->co()->save($nx, $nv);
                     $response = $ok ? 'docket-option-save' : 'docket-option-failed';
                     $option_value = $nv;
@@ -239,6 +234,10 @@ final class ReqAction
                     $okmsg = 'default' === $nk ? 'docket-option-default' : 'docket-option-'.$nk;
                     $ok = $this->pt->co()->save($nx, $nk);
                     $response = $ok ? $okmsg : 'docket-option-failed';
+                }
+
+                if ($ok && WpConfig::has($nx)) {
+                    $response = 'docket-option-wpf-warn';
                 }
 
                 do_action(
@@ -259,16 +258,22 @@ final class ReqAction
 
     private function parse_action()
     {
+        $param = [];
         if (isset($_GET['_wpnonce'], $_GET['action'])) {
-            $action = sanitize_text_field($_GET['action']);
+            $param = $_GET;
+        } elseif (isset($_POST['_wpnonce'], $_POST['action'])) {
+            $param = $_POST;
+        }
+
+        if (!empty($param) && \is_array($param)) {
+            $action = sanitize_text_field($param['action']);
 
             if (\in_array($action, $this->action_token())) {
-                if (!wp_verify_nonce($_GET['_wpnonce'], $action)) {
+                if (!wp_verify_nonce($param['_wpnonce'], $action)) {
                     $this->exit_failed();
                     exit;
                 }
 
-                $param = $_GET;
                 $option_name = '';
                 $option_value = '';
                 $response = $this->run_action($action, $param, $option_name, $option_value);
@@ -278,10 +283,14 @@ final class ReqAction
                         'message' => $response,
                     ];
 
-                    if (!empty($_GET['idx'])) {
-                        $args['idx'] = sanitize_text_field($_GET['idx']);
+                    if (!empty($param['idx'])) {
+                        $args['idx'] = sanitize_text_field($param['idx']);
 
-                        if (!empty($_GET['quiet']) && 1 === (int) $_GET['quiet']) {
+                        if (!empty($param['adx'])) {
+                            $args['adx'] = sanitize_text_field($param['adx']);
+                        }
+
+                        if (!empty($param['quiet']) && 1 === (int) $param['quiet']) {
                             $args['message'] = '';
                         }
 
@@ -304,17 +313,18 @@ final class ReqAction
 
     private function screen_notice()
     {
-        $this->compat_notice();
-
         if (isset($_GET['message'])) {
             $token = sanitize_text_field($_GET['message']);
             $this->pt->token = $token;
 
             $this->pt->notice = '';
 
+            $kx = '';
+
             $option_name = esc_html__('Option', 'docket-cache');
             if (!empty($_GET['nx'])) {
-                $nx = $this->pt->co()->keys(sanitize_text_field($_GET['nx']));
+                $kx = sanitize_text_field($_GET['nx']);
+                $nx = $this->pt->co()->keys($kx);
                 if (!empty($nx)) {
                     $option_name = $nx;
                 }
@@ -328,9 +338,9 @@ final class ReqAction
                 }
             }
 
-            $notice_filter = apply_filters('docketcache/filter/reqaction/screennotice', $token, $option_name, $option_value);
-            if (!empty($notice_filter) && \is_object($notice_filter)) {
-                $this->pt->notice = $notice_filter->token;
+            $notice_filter = apply_filters('docketcache/filter/reqaction/screennotice', $token, $option_name, $option_value, $kx);
+            if (!empty($notice_filter) && \is_string($notice_filter) && $notice_filter !== $token) {
+                $this->pt->notice = $notice_filter;
 
                 return;
             }
@@ -380,6 +390,9 @@ final class ReqAction
                     break;
                 case 'docket-opcache-flushed-failed':
                     $this->pt->notice = esc_html__('OPcache could not be flushed.', 'docket-cache');
+                    break;
+                case 'docket-opcache-flushed-warn':
+                    $this->pt->notice = esc_html__('OPcache already flushed. Try again in a few seconds.', 'docket-cache');
                     break;
                 case 'docket-cronbot-connect':
                     $this->pt->notice = esc_html__('Cronbot connected.', 'docket-cache');
@@ -467,6 +480,10 @@ final class ReqAction
                 case 'docket-option-failed':
                     /* translators: %s = option name */
                     $this->pt->notice = sprintf(esc_html__('Failed to update option %s.', 'docket-cache'), $option_name);
+                    break;
+                case 'docket-option-wpf-warn':
+                    /* translators: %s = option name */
+                    $this->pt->notice = sprintf(esc_html__('%s configuration has been defined in wp-config file.', 'docket-cache'), $option_name);
                     break;
                 case 'docket-action-failed':
                     /* translators: %s = option name */

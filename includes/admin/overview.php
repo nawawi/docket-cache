@@ -189,7 +189,7 @@ $has_stats = $this->vcf()->is_dctrue('STATS');
             </table>
         </div>
         <div class="row-right">
-            <?php $this->render('actcmd'); ?>
+            <?php $this->render('actions'); ?>
         </div>
     </div>
 </div>

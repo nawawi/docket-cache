@@ -54,6 +54,7 @@ class ComposerStaticInit71169967e8f502f7da209e4236957996
         'Nawawi\\DocketCache\\TermCount' => __DIR__ . '/../../..' . '/includes/src/TermCount.php',
         'Nawawi\\DocketCache\\Tweaks' => __DIR__ . '/../../..' . '/includes/src/Tweaks.php',
         'Nawawi\\DocketCache\\View' => __DIR__ . '/../../..' . '/includes/src/View.php',
+        'Nawawi\\DocketCache\\WpConfig' => __DIR__ . '/../../..' . '/includes/src/WpConfig.php',
         'Nawawi\\Symfony\\Component\\VarExporter\\Exception\\ClassNotFoundException' => __DIR__ . '/..' . '/symfony/var-exporter/Exception/ClassNotFoundException.php',
         'Nawawi\\Symfony\\Component\\VarExporter\\Exception\\ExceptionInterface' => __DIR__ . '/..' . '/symfony/var-exporter/Exception/ExceptionInterface.php',
         'Nawawi\\Symfony\\Component\\VarExporter\\Exception\\NotInstantiableTypeException' => __DIR__ . '/..' . '/symfony/var-exporter/Exception/NotInstantiableTypeException.php',

@@ -265,7 +265,6 @@ final class Event
                     $fm = time() + 300;
                     $ft = filemtime($fx);
                 } catch (\Throwable $e) {
-                    // rare condition on some hosting
                     nwdcx_throwable(__METHOD__, $e);
                     continue;
                 }
@@ -528,7 +527,7 @@ final class Event
         $results = Crawler::post($api_endpoint, $args);
 
         $output = [
-            'created' => date('Y-m-d H:i:s T'),
+            'timestamp' => time(),
             'endpoint' => $api_endpoint,
             'request' => [
                 'headers' => $args['headers'],

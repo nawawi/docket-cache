@@ -159,9 +159,6 @@ final class Resc
             } else {
                 $html .= '<p>'.$msg.'</p>';
             }
-            if ($is_dismiss) {
-                $html .= '<button type="button" class="notice-dismiss"></button>';
-            }
             $html .= '</div>';
 
             $html = apply_filters('docketcache/filter/resc/boxmsg', $html, $msg, $type, $is_dismiss);

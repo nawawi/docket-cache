@@ -207,10 +207,12 @@ if (!\function_exists('nwdcx_runaction')) {
 if (!\function_exists('nwdcx_throwable')) {
     function nwdcx_throwable($name, $error)
     {
-        if (!isset($GLOBALS['docketcache_throwable'])) {
-            $GLOBALS['docketcache_throwable'] = [];
+        if (\defined('WP_DEBUG') && WP_DEBUG) {
+            if (!isset($GLOBALS['docketcache_throwable'])) {
+                $GLOBALS['docketcache_throwable'] = [];
+            }
+            $GLOBALS['docketcache_throwable'][$name] = $error;
         }
-        $GLOBALS['docketcache_throwable'][$name] = print_r($error, 1);
     }
 }
 

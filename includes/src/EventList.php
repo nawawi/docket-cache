@@ -19,7 +19,7 @@ namespace Nawawi\DocketCache;
 \defined('ABSPATH') || exit;
 
 if (!class_exists('\\WP_List_Table', false)) {
-    require_once ABSPATH.'wp-admin/includes/class-wp-list-table.php';
+    require_once trailingslashit(ABSPATH).'wp-admin/includes/class-wp-list-table.php';
 }
 
 class EventList extends \WP_List_Table
@@ -110,28 +110,6 @@ class EventList extends \WP_List_Table
         }
 
         return $events;
-    }
-
-    public function get_utc_offset()
-    {
-        $offset = get_option('gmt_offset', 0);
-
-        if (empty($offset)) {
-            return 'UTC';
-        }
-
-        if (0 <= $offset) {
-            $formatted_offset = '+'.(string) $offset;
-        } else {
-            $formatted_offset = (string) $offset;
-        }
-        $formatted_offset = str_replace(
-            ['.25', '.5', '.75'],
-            [':15', ':30', ':45'],
-            $formatted_offset
-        );
-
-        return 'UTC'.$formatted_offset;
     }
 
     public function populate_callback($callback)
@@ -281,26 +259,6 @@ class EventList extends \WP_List_Table
         return  $until < (0 - (10 * MINUTE_IN_SECONDS));
     }
 
-    public function get_timezone_name()
-    {
-        $timezone_string = get_option('timezone_string', '');
-        $gmt_offset = get_option('gmt_offset', 0);
-
-        if ('UTC' === $timezone_string || (empty($gmt_offset) && empty($timezone_string))) {
-            return 'UTC';
-        }
-
-        if ('' === $timezone_string) {
-            return $this->get_utc_offset();
-        }
-
-        return sprintf(
-            '%s, %s',
-            str_replace('_', ' ', $timezone_string),
-            $this->get_utc_offset()
-        );
-    }
-
     public function prepare_items()
     {
         $events = $this->get_crons();
@@ -311,7 +269,7 @@ class EventList extends \WP_List_Table
             $events = array_filter(
                 $events,
                 function ($event) use ($s) {
-                    return  false !== strpos($event->hook, $s);
+                    return false !== strpos($event->hook, $s);
                 }
             );
         }
@@ -334,7 +292,7 @@ class EventList extends \WP_List_Table
     public function get_columns()
     {
         /* translators: %s: UTC offset */
-        $next_run_text = sprintf(esc_html__('Next Schedule (%s)', 'docket-cache'), $this->get_utc_offset());
+        $next_run_text = sprintf(esc_html__('Next Schedule (%s)', 'docket-cache'), $this->pt->get_utc_offset());
 
         return [
             'eventlist_hook' => esc_html__('Hook', 'docket-cache'),
@@ -342,13 +300,17 @@ class EventList extends \WP_List_Table
             'eventlist_next' => $next_run_text,
             'eventlist_actions' => esc_html__('Action', 'docket-cache'),
             'eventlist_recurrence' => esc_html__('Recurrence', 'docket-cache'),
-         ];
+        ];
     }
 
     public function get_table_classes()
     {
         return ['widefat', 'striped', $this->_args['plural']];
     }
+
+    /*protected function handle_row_actions( $event, $column_name, $primary ) {
+
+    }*/
 
     public function column_eventlist_hook($event)
     {
@@ -363,15 +325,15 @@ class EventList extends \WP_List_Table
 
         if (empty($event->args)) {
             return sprintf(
-                    '<em>%s</em>',
-                    esc_html__('None', 'docket-cache')
-                );
+                '<em>%s</em>',
+                esc_html__('None', 'docket-cache')
+            );
         }
 
         return sprintf(
-                    '<pre>%s</pre>',
-                    esc_html($args)
-                );
+            '<pre>%s</pre>',
+            esc_html($args)
+        );
     }
 
     public function column_eventlist_actions($event)
@@ -445,6 +407,10 @@ class EventList extends \WP_List_Table
 
     public function no_items()
     {
-        esc_html_e('There are currently no scheduled cron events.', 'docket-cache');
+        if (empty($_GET['s'])) {
+            esc_html_e('There are currently no scheduled cron events.', 'docket-cache');
+        } else {
+            esc_html_e('No matching cron events.', 'docket-cache');
+        }
     }
 }

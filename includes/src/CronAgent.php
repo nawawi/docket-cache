@@ -142,7 +142,7 @@ final class CronAgent
         }
 
         $output = [
-            'created' => date('Y-m-d H:i:s T'),
+            'timestamp' => time(),
             'endpoint' => $cronbot_endpoint,
             'connected' => false,
             'last_status' => $action,
@@ -234,6 +234,8 @@ final class CronAgent
 
     private function run_wpcron($run_now = false)
     {
+        $this->pt->cf()->maybe_define('DOING_RUN_WPCRON', true);
+
         $crons = $this->pt->get_crons($run_now, $cron_event);
 
         $results = [

@@ -15,6 +15,7 @@ namespace Nawawi\DocketCache;
 final class View
 {
     private $pt;
+    private $po;
     private $info;
     private $do_preload;
     private $do_flush;
@@ -196,7 +197,7 @@ final class View
         }
     }
 
-    public function index()
+    public function index($po = false)
     {
         if (!empty($_SERVER['REQUEST_URI']) && false === strpos($_SERVER['REQUEST_URI'], '/'.$this->pt->page)) {
             $url = network_admin_url('/'.$this->pt->page);
@@ -210,6 +211,7 @@ final class View
         $this->do_preload = false;
         $this->do_flush = false;
         $this->do_fetch = false;
+        $this->po = $po;
         $this->render('wrap');
         $this->pt->cx()->delay_expire();
     }
@@ -280,17 +282,19 @@ final class View
         $lists = [];
         $lists['overview'] = esc_html__('Overview', 'docket-cache');
 
-        if ($this->log_enable) {
-            $lists['log'] = esc_html__('Cache Log', 'docket-cache');
-        }
-
         if ($this->cronbot_enable) {
             $lists['cronbot'] = esc_html__('Cronbot', 'docket-cache');
         }
 
+        $lists = apply_filters('docketcache/filter/view/tabnavbefore', $lists);
+
+        if ($this->log_enable) {
+            $lists['log'] = esc_html__('Cache Log', 'docket-cache');
+        }
+
         $lists['config'] = esc_html__('Configuration', 'docket-cache');
 
-        $lists = apply_filters('docketcache/filter/view/tabnav', $lists);
+        $lists = apply_filters('docketcache/filter/view/tabnavafter', $lists);
 
         $option = '';
         $html = '<nav class="nav-tab-wrapper">';
@@ -320,7 +324,7 @@ final class View
         if ('utc' !== $val) {
             switch ($val) {
                 case 'local':
-                    $timestamp = wp_date('Y-m-d H:i:s T', $time);
+                    $timestamp = wp_date('Y-m-d H:i:s', $time);
                     break;
                 case 'wp':
                     $timestamp = wp_date(get_option('date_format'), $time).' '.wp_date(get_option('time_format'), $time);
@@ -383,7 +387,7 @@ final class View
 
     private function config_select_bool($name, $default = 'dcdefault', $idx = 'config', $quiet = false)
     {
-        if ('dcdefault' === $default) {
+        if (empty($default) || 'dcdefault' === $default) {
             $default = $this->vcf()->dcvalue(strtoupper($name), true);
         }
 
@@ -413,14 +417,15 @@ final class View
 
     private function config_select_set($name, $options, $default = 'dcdefault', $idx = 'config')
     {
-        if ('dcdefault' === $default) {
+        if (empty($default) || 'dcdefault' === $default) {
             $default = $this->vcf()->dcvalue(strtoupper($name));
         }
 
-        if (\is_array($idx) && !empty($idx) && !empty($idx['idx'])) {
-            $args = $idx;
-        } else {
-            $args = ['idx' => $idx];
+        $args = [];
+        $args['idx'] = $idx;
+
+        if (\is_array($idx) && !empty($idx)) {
+            $args = array_merge($args, $idx);
         }
 
         $action = 'save-'.$name;
@@ -465,13 +470,19 @@ final class View
     {
         static $inst;
 
-        if (!\is_object($inst)) {
-            $inst = new EventList($this->pt);
+        try {
+            if (!\is_object($inst)) {
+                $inst = new EventList($this->pt);
+            }
+
+            $inst->prepare_items();
+
+            return $inst;
+        } catch (\Throwable $e) {
+            nwdcx_throwable(__METHOD__, $e);
         }
 
-        $inst->prepare_items();
-
-        return $inst;
+        return false;
     }
 
     private function code_focus()
@@ -531,7 +542,7 @@ final class View
             'stats' => esc_html__('Display Object Cache stats at Overview page.', 'docket-cache'),
             'gcaction' => esc_html__('Enable the Garbage Collector action button on the Overview page.', 'docket-cache'),
             'autoupdate' => esc_html__('Enable automatic plugin updates for Docket Cache.', 'docket-cache'),
-            'checkversion' => esc_html__('Allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid error-prone.', 'docket-cache'),
+            'checkversion' => esc_html__('Allows Docket Cache to check any critical future version that requires removing cache files after doing the updates, purposely to avoid error-prone.', 'docket-cache'),
             'opcshutdown' => esc_html__('Flush OPcache when deactivate / uninstall', 'docket-cache'),
             'limithttprequest' => esc_html__('Limit HTTP requests in WP Admin.', 'docket-cache'),
         ];
@@ -547,7 +558,23 @@ final class View
     {
         static $done = false;
         if (!$done && !empty($this->pt->notice) && !empty($this->pt->token)) {
-            $type = 'failed' === substr($this->pt->token, -6) ? 'error' : 'success';
+            $type = 'success';
+            if (@preg_match('@\-(failed|warn|error|info|success)$@', $this->pt->token, $mm)) {
+                switch ($mm[1]) {
+                    case 'failed':
+                    case 'error':
+                        $type = 'error';
+                        break;
+                    case 'info':
+                        $type = 'info';
+                        break;
+                    case 'warn':
+                    case 'warning':
+                        $type = 'warning';
+                        break;
+                }
+            }
+
             echo Resc::boxmsg($this->pt->notice, $type);
             $done = true;
         }

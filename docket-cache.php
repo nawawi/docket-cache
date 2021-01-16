@@ -11,13 +11,13 @@
 /**
  * @wordpress-plugin
  * Plugin Name:         Docket Cache
- * Plugin URI:          https://wordpress.org/plugins/docket-cache/
- * Version:             20.12.03
- * VerPrev:             20.12.02
+ * Plugin URI:          https://docketcache.com/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash
+ * Version:             20.12.04
+ * VerPrev:             20.12.03
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * GitHub Plugin URI:   https://github.com/nawawi/docket-cache
  * Author:              Nawawi Jamili
- * Author URI:          https://docketcache.com
+ * Author URI:          https://docketcache.com/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash
  * Requires at least:   5.4
  * Requires PHP:        7.2.5
  * Network:             true

@@ -32,6 +32,9 @@ namespace Nawawi\DocketCache;
                         <?php echo $this->config_select_bool('cronbot'); ?>
                     </td>
                 </tr>
+
+                <?php $this->render('@inc:features'); ?>
+
                 <tr id="log">
                     <th class="border-b">
                         <?php

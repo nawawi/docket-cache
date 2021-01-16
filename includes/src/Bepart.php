@@ -384,4 +384,46 @@ class Bepart extends Filesystem
 
         return $crons;
     }
+
+    public function get_utc_offset()
+    {
+        $offset = get_option('gmt_offset', 0);
+
+        if (empty($offset)) {
+            return 'UTC';
+        }
+
+        if (0 <= $offset) {
+            $formatted_offset = '+'.(string) $offset;
+        } else {
+            $formatted_offset = (string) $offset;
+        }
+        $formatted_offset = str_replace(
+            ['.25', '.5', '.75'],
+            [':15', ':30', ':45'],
+            $formatted_offset
+        );
+
+        return 'UTC'.$formatted_offset;
+    }
+
+    public function get_timezone_name()
+    {
+        $timezone_string = get_option('timezone_string', '');
+        $gmt_offset = get_option('gmt_offset', 0);
+
+        if ('UTC' === $timezone_string || (empty($gmt_offset) && empty($timezone_string))) {
+            return 'UTC';
+        }
+
+        if ('' === $timezone_string) {
+            return $this->get_utc_offset();
+        }
+
+        return sprintf(
+            '%s, %s',
+            str_replace('_', ' ', $timezone_string),
+            $this->get_utc_offset()
+        );
+    }
 }

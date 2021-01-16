@@ -12,22 +12,29 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 $event_list = $this->cronbot_eventlist();
-$utc_offset = '('.$event_list->get_utc_offset().')';
-$total_page = $event_list->get_pagination_arg('total_pages');
+if (\is_object($event_list)) :
+    $utc_offset = '('.$this->pt->get_utc_offset().')';
+    $total_page = $event_list->get_pagination_arg('total_pages');
 
-$is_connected = $this->is_cronbot_connected();
-$ping_last = esc_html__('Not Available', 'docket-cache');
-$ping_next = $ping_last;
-$ping_data = $this->ping_next();
-if (!empty($ping_data)) :
-    $ping_next = $ping_data['next'].' '.$utc_offset;
-    $ping_last = $ping_data['last'].' '.$utc_offset;
+    $is_connected = $this->is_cronbot_connected();
+    $ping_last = esc_html__('Not Available', 'docket-cache');
+    $ping_next = $ping_last;
+    $ping_data = $this->ping_next();
+    if (!empty($ping_data)) :
+        $ping_next = $ping_data['next'].' '.$utc_offset;
+        $ping_last = $ping_data['last'].' '.$utc_offset;
+    endif;
 endif;
 ?>
 <div class="section cronbot">
     <div class="flex-container">
         <div class="row">
             <?php $this->tab_title(esc_html__('Cronbot', 'docket-cache')); ?>
+            <?php
+            if (!\is_object($event_list)) :
+                echo Resc::boxmsg(__('Failed to load EventList()', 'docket-cache'), 'error', false, true, false);
+else :
+    ?>
             <table class="form-table">
                 <tr>
                     <th><?php esc_html_e('Service Status', 'docket-cache'); ?></th>
@@ -94,7 +101,7 @@ endif;
                 </tr>
                 <?php endif; ?>
             </table>
-            <div class="eventlist">
+            <div class="gridlist">
 
                 <div class="box-left">
                     <a href="
@@ -132,6 +139,7 @@ endif;
                     <?php $event_list->display(); ?>
                 </div>
             </div>
+            <?php endif; // is_object?>
         </div>
     </div>
 </div>

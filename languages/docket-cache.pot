@@ -1,15 +1,15 @@
-# Copyright (C) 2020 Nawawi Jamili
+# Copyright (C) 2021 Nawawi Jamili
 # This file is distributed under the same license as the Docket Cache plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 20.12.03\n"
+"Project-Id-Version: Docket Cache 20.12.04\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-12-29T19:49:35+00:00\n"
+"POT-Creation-Date: 2021-01-16T17:46:30+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -19,7 +19,7 @@ msgid "Docket Cache"
 msgstr ""
 
 #. Plugin URI of the plugin
-msgid "https://wordpress.org/plugins/docket-cache/"
+msgid "https://docketcache.com/?utm_source=wp-plugins&utm_campaign=plugin-uri&utm_medium=wp-dash"
 msgstr ""
 
 #. Description of the plugin
@@ -31,73 +31,77 @@ msgid "Nawawi Jamili"
 msgstr ""
 
 #. Author URI of the plugin
-msgid "https://docketcache.com"
+msgid "https://docketcache.com/?utm_source=wp-plugins&utm_campaign=author-uri&utm_medium=wp-dash"
 msgstr ""
 
-#: includes/admin/actcmd.php:17
+#: includes/admin/actions.php:17
+#: modsadvpot/includes/admin/submits.php:21
 msgid "Actions"
 msgstr ""
 
-#: includes/admin/actcmd.php:20
+#: includes/admin/actions.php:20
+#: modsadvpot/includes/admin/opcache.php:185
 msgid "Object Cache Files"
 msgstr ""
 
-#: includes/admin/actcmd.php:22
+#: includes/admin/actions.php:22
+#: modsadvpot/includes/admin/submits.php:38
 msgid "Remove all cache files."
 msgstr ""
 
-#: includes/admin/actcmd.php:24
+#: includes/admin/actions.php:24
 msgid "Flush Object Cache"
 msgstr ""
 
-#: includes/admin/actcmd.php:27
+#: includes/admin/actions.php:27
 #: includes/admin/overview.php:85
 msgid "Zend OPcache"
 msgstr ""
 
-#: includes/admin/actcmd.php:29
+#: includes/admin/actions.php:29
 msgid "Reset OPcache usage."
 msgstr ""
 
-#: includes/admin/actcmd.php:31
+#: includes/admin/actions.php:31
+#: modsadvpot/includes/admin/opcache.php:159
 msgid "Flush OPcache"
 msgstr ""
 
-#: includes/admin/actcmd.php:34
+#: includes/admin/actions.php:34
 msgid "Object Cache Drop-In"
 msgstr ""
 
-#: includes/admin/actcmd.php:36
+#: includes/admin/actions.php:36
 msgid "Enable / Disable Drop-In usage."
 msgstr ""
 
-#: includes/admin/actcmd.php:40
+#: includes/admin/actions.php:40
 msgid "Drop-In Wrapper not available."
 msgstr ""
 
-#: includes/admin/actcmd.php:45
+#: includes/admin/actions.php:45
 msgid "Disable Object Cache"
 msgstr ""
 
-#: includes/admin/actcmd.php:47
+#: includes/admin/actions.php:47
 msgid "Enable Object Cache"
 msgstr ""
 
-#: includes/admin/actcmd.php:53
+#: includes/admin/actions.php:53
 msgid "Garbage Collector"
 msgstr ""
 
-#: includes/admin/actcmd.php:55
+#: includes/admin/actions.php:55
 msgid "Execute the Garbage Collector Task."
 msgstr ""
 
-#: includes/admin/actcmd.php:57
+#: includes/admin/actions.php:57
 msgid "Run Garbage Collector"
 msgstr ""
 
 #: includes/admin/config.php:18
-#: includes/src/Plugin.php:1164
-#: includes/src/View.php:291
+#: includes/src/Plugin.php:1253
+#: includes/src/View.php:295
 msgid "Configuration"
 msgstr ""
 
@@ -106,274 +110,279 @@ msgid "Feature Options"
 msgstr ""
 
 #: includes/admin/config.php:28
-#: includes/src/Canopt.php:97
+#: includes/src/Canopt.php:98
 msgid "Cronbot Service"
 msgstr ""
 
-#: includes/admin/config.php:38
+#: includes/admin/config.php:41
 #: includes/admin/log.php:21
-#: includes/src/Canopt.php:79
-#: includes/src/Plugin.php:1139
-#: includes/src/View.php:284
+#: includes/src/Canopt.php:80
+#: includes/src/Plugin.php:1242
+#: includes/src/View.php:292
 msgid "Cache Log"
 msgstr ""
 
-#: includes/admin/config.php:47
+#: includes/admin/config.php:50
+#: modsadvpot/includes/admin/advanced.php:30
 msgid "Cache Options"
 msgstr ""
 
-#: includes/admin/config.php:51
-#: includes/src/Canopt.php:83
+#: includes/admin/config.php:54
+#: includes/src/Canopt.php:84
 msgid "Advanced Post Caching"
 msgstr ""
 
-#: includes/admin/config.php:57
-#: includes/src/Canopt.php:85
+#: includes/admin/config.php:60
+#: includes/src/Canopt.php:86
 msgid "Object Cache Precaching"
 msgstr ""
 
-#: includes/admin/config.php:63
-#: includes/src/Canopt.php:86
+#: includes/admin/config.php:66
+#: includes/src/Canopt.php:87
 msgid "WordPress Translation Caching"
 msgstr ""
 
-#: includes/admin/config.php:69
+#: includes/admin/config.php:72
 msgid "Admin Object Cache Preloading"
 msgstr ""
 
-#: includes/admin/config.php:76
+#: includes/admin/config.php:79
 msgid "Optimisations"
 msgstr ""
 
-#: includes/admin/config.php:80
-#: includes/src/Canopt.php:102
+#: includes/admin/config.php:83
+#: includes/src/Canopt.php:103
 msgid "Optimize WP Query"
 msgstr ""
 
-#: includes/admin/config.php:86
-#: includes/src/Canopt.php:84
+#: includes/admin/config.php:89
+#: includes/src/Canopt.php:85
 msgid "Optimize Term Count Queries"
 msgstr ""
 
-#: includes/admin/config.php:92
-#: includes/src/Canopt.php:96
+#: includes/admin/config.php:95
+#: includes/src/Canopt.php:97
 msgid "Optimize Database Tables"
 msgstr ""
 
-#: includes/admin/config.php:98
+#: includes/admin/config.php:101
 #: includes/admin/log.php:31
-#: includes/src/View.php:400
+#: includes/src/View.php:404
 msgid "Default"
 msgstr ""
 
-#: includes/admin/config.php:99
+#: includes/admin/config.php:102
 msgid "Daily"
 msgstr ""
 
-#: includes/admin/config.php:100
+#: includes/admin/config.php:103
 msgid "Weekly"
 msgstr ""
 
-#: includes/admin/config.php:101
+#: includes/admin/config.php:104
 msgid "Monthly"
 msgstr ""
 
-#: includes/admin/config.php:102
+#: includes/admin/config.php:105
 msgid "Never"
 msgstr ""
 
-#: includes/admin/config.php:109
-#: includes/src/Canopt.php:95
+#: includes/admin/config.php:112
+#: includes/src/Canopt.php:96
 msgid "Suspend WP Options Autoload"
 msgstr ""
 
-#: includes/admin/config.php:115
-#: includes/src/Canopt.php:88
+#: includes/admin/config.php:118
+#: includes/src/Canopt.php:89
 msgid "Post Missed Schedule Tweaks"
 msgstr ""
 
-#: includes/admin/config.php:121
-#: includes/src/Canopt.php:87
+#: includes/admin/config.php:124
+#: includes/src/Canopt.php:88
 msgid "Misc Performance Tweaks"
 msgstr ""
 
-#: includes/admin/config.php:128
+#: includes/admin/config.php:131
 msgid "Woo Tweaks"
 msgstr ""
 
-#: includes/admin/config.php:132
-#: includes/src/Canopt.php:89
+#: includes/admin/config.php:135
+#: includes/src/Canopt.php:90
 msgid "Misc WooCommerce Tweaks"
 msgstr ""
 
-#: includes/admin/config.php:138
-#: includes/src/Canopt.php:90
+#: includes/admin/config.php:141
+#: includes/src/Canopt.php:91
 msgid "Deactivate WooCommerce Admin"
 msgstr ""
 
-#: includes/admin/config.php:144
-#: includes/src/Canopt.php:91
+#: includes/admin/config.php:147
+#: includes/src/Canopt.php:92
 msgid "Deactivate WooCommerce Widget"
 msgstr ""
 
-#: includes/admin/config.php:150
-#: includes/src/Canopt.php:92
+#: includes/admin/config.php:153
+#: includes/src/Canopt.php:93
 msgid "Deactivate WooCommerce WP Dashboard"
 msgstr ""
 
-#: includes/admin/config.php:156
-#: includes/src/Canopt.php:93
+#: includes/admin/config.php:159
+#: includes/src/Canopt.php:94
 msgid "Deactivate WooCommerce Cart Fragments"
 msgstr ""
 
-#: includes/admin/config.php:163
+#: includes/admin/config.php:166
 msgid "WP Tweaks"
 msgstr ""
 
-#: includes/admin/config.php:167
-#: includes/src/Canopt.php:103
+#: includes/admin/config.php:170
+#: includes/src/Canopt.php:104
 msgid "Remove XML-RPC / Pingbacks"
 msgstr ""
 
-#: includes/admin/config.php:173
-#: includes/src/Canopt.php:104
+#: includes/admin/config.php:176
+#: includes/src/Canopt.php:105
 msgid "Remove WP Header Junk"
 msgstr ""
 
-#: includes/admin/config.php:179
-#: includes/src/Canopt.php:105
+#: includes/admin/config.php:182
+#: includes/src/Canopt.php:106
 msgid "Remove WP Emoji"
 msgstr ""
 
-#: includes/admin/config.php:185
-#: includes/src/Canopt.php:107
+#: includes/admin/config.php:188
+#: includes/src/Canopt.php:108
 msgid "Remove WP Feed"
 msgstr ""
 
-#: includes/admin/config.php:191
-#: includes/src/Canopt.php:106
+#: includes/admin/config.php:194
+#: includes/src/Canopt.php:107
 msgid "Remove WP Embed"
 msgstr ""
 
-#: includes/admin/config.php:197
-#: includes/src/Canopt.php:108
+#: includes/admin/config.php:200
+#: includes/src/Canopt.php:109
 msgid "Remove WP Lazy Load"
 msgstr ""
 
-#: includes/admin/config.php:203
-#: includes/src/Canopt.php:109
+#: includes/admin/config.php:206
+#: includes/src/Canopt.php:110
 msgid "Remove WP Sitemap"
 msgstr ""
 
-#: includes/admin/config.php:209
-#: includes/src/Canopt.php:110
+#: includes/admin/config.php:212
+#: includes/src/Canopt.php:111
 msgid "Remove WP Application Passwords"
 msgstr ""
 
-#: includes/admin/config.php:215
+#: includes/admin/config.php:218
 msgid "Limit WP-Admin HTTP Requests"
 msgstr ""
 
-#: includes/admin/config.php:222
+#: includes/admin/config.php:225
 msgid "Admin Interface"
 msgstr ""
 
-#: includes/admin/config.php:226
-#: includes/src/Canopt.php:94
+#: includes/admin/config.php:229
+#: includes/src/Canopt.php:95
 msgid "Admin Page Loader"
 msgstr ""
 
-#: includes/admin/config.php:232
-#: includes/src/Canopt.php:98
+#: includes/admin/config.php:235
+#: includes/src/Canopt.php:99
 msgid "Object Cache Data Stats"
 msgstr ""
 
-#: includes/admin/config.php:238
-#: includes/src/Canopt.php:99
+#: includes/admin/config.php:241
+#: includes/src/Canopt.php:100
 msgid "Garbage Collector Action Button"
 msgstr ""
 
-#: includes/admin/config.php:245
+#: includes/admin/config.php:248
 msgid "Plugin Options"
 msgstr ""
 
-#: includes/admin/config.php:249
+#: includes/admin/config.php:252
 msgid "Docket Cache Auto-Updates"
 msgstr ""
 
-#: includes/admin/config.php:255
+#: includes/admin/config.php:258
 msgid "Check Critical Version"
 msgstr ""
 
-#: includes/admin/config.php:261
-#: includes/src/Canopt.php:112
+#: includes/admin/config.php:264
+#: includes/src/Canopt.php:113
 msgid "Flush OPcache During Deactivation"
 msgstr ""
 
-#: includes/admin/cronbot.php:19
+#: includes/admin/cronbot.php:20
 #: includes/src/Plugin.php:169
-#: includes/src/Plugin.php:1351
-#: includes/src/Plugin.php:1352
-#: includes/src/Plugin.php:1359
-#: includes/src/Plugin.php:1361
+#: includes/src/Plugin.php:1439
+#: includes/src/Plugin.php:1440
+#: includes/src/Plugin.php:1447
+#: includes/src/Plugin.php:1449
 msgid "Not Available"
 msgstr ""
 
-#: includes/admin/cronbot.php:30
-#: includes/src/Plugin.php:1152
-#: includes/src/View.php:288
+#: includes/admin/cronbot.php:32
+#: includes/src/Plugin.php:1228
+#: includes/src/View.php:286
 msgid "Cronbot"
 msgstr ""
 
-#: includes/admin/cronbot.php:33
+#: includes/admin/cronbot.php:35
+msgid "Failed to load EventList()"
+msgstr ""
+
+#: includes/admin/cronbot.php:40
 msgid "Service Status"
 msgstr ""
 
-#: includes/admin/cronbot.php:34
+#: includes/admin/cronbot.php:41
 msgid "Connected"
 msgstr ""
 
-#: includes/admin/cronbot.php:34
+#: includes/admin/cronbot.php:41
 msgid "Not Connected"
 msgstr ""
 
-#: includes/admin/cronbot.php:38
+#: includes/admin/cronbot.php:45
 msgid "Last Received Ping"
 msgstr ""
 
-#: includes/admin/cronbot.php:43
+#: includes/admin/cronbot.php:50
 msgid "Next Expecting Ping"
 msgstr ""
 
-#: includes/admin/cronbot.php:51
+#: includes/admin/cronbot.php:58
 msgid "Disconnect"
 msgstr ""
 
-#: includes/admin/cronbot.php:52
+#: includes/admin/cronbot.php:59
 msgid "Test Ping"
 msgstr ""
 
-#: includes/admin/cronbot.php:54
+#: includes/admin/cronbot.php:61
 msgid "Connect"
 msgstr ""
 
-#: includes/admin/cronbot.php:58
+#: includes/admin/cronbot.php:65
 msgid "Cron Events"
 msgstr ""
 
-#: includes/admin/cronbot.php:61
+#: includes/admin/cronbot.php:68
 msgid "Cron Events For Site"
 msgstr ""
 
-#: includes/admin/cronbot.php:109
+#: includes/admin/cronbot.php:116
 msgid "Run Scheduled Event"
 msgstr ""
 
-#: includes/admin/cronbot.php:119
+#: includes/admin/cronbot.php:126
 msgid "Run All Now"
 msgstr ""
 
-#: includes/admin/cronbot.php:127
+#: includes/admin/cronbot.php:134
 msgid "Filter Hook Names"
 msgstr ""
 
@@ -389,78 +398,79 @@ msgstr ""
 msgid "UTC"
 msgstr ""
 
-#: includes/admin/log.php:33
-msgid "Local time"
+#. translators: %s = utc offset
+#: includes/admin/log.php:34
+msgid "Local time (%s)"
 msgstr ""
 
-#: includes/admin/log.php:34
+#: includes/admin/log.php:35
 msgid "Site Format"
 msgstr ""
 
-#: includes/admin/log.php:46
-#: includes/src/Canopt.php:81
+#: includes/admin/log.php:47
+#: includes/src/Canopt.php:82
 msgid "Log All"
 msgstr ""
 
-#: includes/admin/log.php:50
+#: includes/admin/log.php:51
 msgid "Log File"
 msgstr ""
 
-#: includes/admin/log.php:55
+#: includes/admin/log.php:56
 msgid "Download"
 msgstr ""
 
-#: includes/admin/log.php:61
+#: includes/admin/log.php:62
 msgid "Cache Index"
 msgstr ""
 
-#: includes/admin/log.php:67
+#: includes/admin/log.php:68
 msgid "Data Not available"
 msgstr ""
 
-#: includes/admin/log.php:71
+#: includes/admin/log.php:72
 msgid "Cache Size"
 msgstr ""
 
-#: includes/admin/log.php:71
+#: includes/admin/log.php:72
 msgid "Log Size"
 msgstr ""
 
-#: includes/admin/log.php:91
+#: includes/admin/log.php:92
 msgid "Flush"
 msgstr ""
 
-#: includes/admin/log.php:92
-#: includes/admin/log.php:96
+#: includes/admin/log.php:93
+#: includes/admin/log.php:97
 msgid "Close"
 msgstr ""
 
-#: includes/admin/log.php:95
+#: includes/admin/log.php:96
 msgid "View"
 msgstr ""
 
-#: includes/admin/log.php:109
+#: includes/admin/log.php:110
 msgid "FIRST"
 msgstr ""
 
-#: includes/admin/log.php:110
+#: includes/admin/log.php:111
 msgid "LAST"
 msgstr ""
 
-#: includes/admin/log.php:128
+#: includes/admin/log.php:129
 msgid "ASCENDING"
 msgstr ""
 
-#: includes/admin/log.php:129
+#: includes/admin/log.php:130
 msgid "DESCENDING"
 msgstr ""
 
-#: includes/admin/log.php:141
+#: includes/admin/log.php:142
 msgid "Flush Log"
 msgstr ""
 
-#: includes/admin/log.php:145
-#: includes/admin/log.php:149
+#: includes/admin/log.php:146
+#: includes/admin/log.php:150
 msgid "Refresh"
 msgstr ""
 
@@ -469,9 +479,9 @@ msgid "Web Proxy"
 msgstr ""
 
 #: includes/admin/overview.php:35
-#: includes/src/Plugin.php:1127
-#: includes/src/Plugin.php:1430
-#: includes/src/View.php:281
+#: includes/src/Plugin.php:1217
+#: includes/src/Plugin.php:1509
+#: includes/src/View.php:283
 msgid "Overview"
 msgstr ""
 
@@ -496,6 +506,8 @@ msgid "WP OPcache Stats"
 msgstr ""
 
 #: includes/admin/overview.php:77
+#: modsadvpot/includes/admin/advanced.php:36
+#: modsadvpot/includes/admin/cacheobject.php:33
 msgid "Object Cache"
 msgstr ""
 
@@ -557,7 +569,7 @@ msgstr ""
 
 #: includes/admin/overview.php:170
 #: includes/src/Command.php:330
-#: includes/src/ReqAction.php:484
+#: includes/src/ReqAction.php:501
 msgid "Cache Disk Limit"
 msgstr ""
 
@@ -574,18 +586,22 @@ msgid "Config Path"
 msgstr ""
 
 #: includes/admin/resource.php:15
+#: modsadvpot/includes/admin/resource.php:15
 msgid "Resources"
 msgstr ""
 
 #: includes/admin/resource.php:20
+#: modsadvpot/includes/admin/resource.php:20
 msgid "DOCUMENTATION"
 msgstr ""
 
 #: includes/admin/resource.php:21
+#: modsadvpot/includes/admin/resource.php:21
 msgid "To adjust the plugin behaviour and manage through a command line, please refer to the documentation page for details."
 msgstr ""
 
 #: includes/admin/resource.php:22
+#: modsadvpot/includes/admin/resource.php:22
 msgid "Dcoumenation"
 msgstr ""
 
@@ -611,7 +627,7 @@ msgid "CHECK VERSION"
 msgstr ""
 
 #: includes/admin/resource.php:40
-msgid "The Check Critical Version allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid error-prone."
+msgid "The Check Critical Version allows Docket Cache to check any critical future version that requires removing cache files after doing the updates, purposely to avoid error-prone."
 msgstr ""
 
 #: includes/admin/resource.php:45
@@ -642,27 +658,27 @@ msgstr ""
 msgid "Please wait.."
 msgstr ""
 
-#: includes/src/Canopt.php:80
+#: includes/src/Canopt.php:81
 msgid "Log Timestamp"
 msgstr ""
 
-#: includes/src/Canopt.php:82
+#: includes/src/Canopt.php:83
 msgid "Admin Page Cache Preloading"
 msgstr ""
 
-#: includes/src/Canopt.php:100
+#: includes/src/Canopt.php:101
 msgid "Docket Cache Auto Update"
 msgstr ""
 
-#: includes/src/Canopt.php:101
+#: includes/src/Canopt.php:102
 msgid "Critical Version Checking"
 msgstr ""
 
-#: includes/src/Canopt.php:111
+#: includes/src/Canopt.php:112
 msgid "Suspend Object Cache"
 msgstr ""
 
-#: includes/src/Canopt.php:113
+#: includes/src/Canopt.php:114
 msgid "Limit WP-Admin HTTP requests"
 msgstr ""
 
@@ -675,12 +691,12 @@ msgid "An unknown object cache Drop-In was found. To use Docket object cache, ru
 msgstr ""
 
 #: includes/src/Command.php:124
-#: includes/src/ReqAction.php:340
+#: includes/src/ReqAction.php:350
 msgid "Object cache enabled."
 msgstr ""
 
 #: includes/src/Command.php:127
-#: includes/src/ReqAction.php:344
+#: includes/src/ReqAction.php:354
 msgid "Object cache could not be enabled."
 msgstr ""
 
@@ -693,27 +709,27 @@ msgid "An unknown object cache Drop-In was found. To use Docket run: wp cache dr
 msgstr ""
 
 #: includes/src/Command.php:153
-#: includes/src/ReqAction.php:347
+#: includes/src/ReqAction.php:357
 msgid "Object cache disabled."
 msgstr ""
 
 #: includes/src/Command.php:156
-#: includes/src/ReqAction.php:351
+#: includes/src/ReqAction.php:361
 msgid "Object cache could not be disabled."
 msgstr ""
 
 #: includes/src/Command.php:175
-#: includes/src/ReqAction.php:360
+#: includes/src/ReqAction.php:370
 msgid "Updated object cache Drop-In and enabled Docket object cache."
 msgstr ""
 
 #: includes/src/Command.php:177
-#: includes/src/ReqAction.php:363
+#: includes/src/ReqAction.php:373
 msgid "Object cache Drop-In could not be updated."
 msgstr ""
 
 #: includes/src/Command.php:194
-#: includes/src/ReqAction.php:357
+#: includes/src/ReqAction.php:367
 msgid "Object cache could not be flushed."
 msgstr ""
 
@@ -782,47 +798,47 @@ msgid "Executing the garbage collector. Please wait.."
 msgstr ""
 
 #: includes/src/Command.php:328
-#: includes/src/ReqAction.php:482
+#: includes/src/ReqAction.php:499
 msgid "Cache MaxTTL"
 msgstr ""
 
 #: includes/src/Command.php:329
-#: includes/src/ReqAction.php:483
+#: includes/src/ReqAction.php:500
 msgid "Cache File Limit"
 msgstr ""
 
 #: includes/src/Command.php:332
-#: includes/src/ReqAction.php:485
+#: includes/src/ReqAction.php:502
 msgid "Cleanup Cache MaxTTL"
 msgstr ""
 
 #: includes/src/Command.php:333
-#: includes/src/ReqAction.php:486
+#: includes/src/ReqAction.php:503
 msgid "Cleanup Cache File Limit"
 msgstr ""
 
 #: includes/src/Command.php:334
-#: includes/src/ReqAction.php:487
+#: includes/src/ReqAction.php:504
 msgid "Cleanup Cache Disk Limit"
 msgstr ""
 
 #: includes/src/Command.php:337
-#: includes/src/ReqAction.php:490
+#: includes/src/ReqAction.php:507
 msgid "Cleanup Precache Limit"
 msgstr ""
 
 #: includes/src/Command.php:341
-#: includes/src/ReqAction.php:493
+#: includes/src/ReqAction.php:510
 msgid "Total Cache Cleanup"
 msgstr ""
 
 #: includes/src/Command.php:342
-#: includes/src/ReqAction.php:494
+#: includes/src/ReqAction.php:511
 msgid "Total Cache Ignored"
 msgstr ""
 
 #: includes/src/Command.php:343
-#: includes/src/ReqAction.php:495
+#: includes/src/ReqAction.php:512
 msgid "Total Cache File"
 msgstr ""
 
@@ -851,100 +867,104 @@ msgid "Every 10 Days"
 msgstr ""
 
 #. translators: %s: Schedule name
-#: includes/src/EventList.php:221
+#: includes/src/EventList.php:199
 msgid "Unknown (%s)"
 msgstr ""
 
 #. translators: 1: The number of years in an interval of time.
-#: includes/src/EventList.php:231
+#: includes/src/EventList.php:209
 msgid "%s year"
 msgid_plural "%s years"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: The number of months in an interval of time.
-#: includes/src/EventList.php:233
+#: includes/src/EventList.php:211
 msgid "%s month"
 msgid_plural "%s months"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: The number of weeks in an interval of time.
-#: includes/src/EventList.php:235
+#: includes/src/EventList.php:213
 msgid "%s week"
 msgid_plural "%s weeks"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: The number of days in an interval of time.
-#: includes/src/EventList.php:237
+#: includes/src/EventList.php:215
 msgid "%s day"
 msgid_plural "%s days"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: The number of hours in an interval of time.
-#: includes/src/EventList.php:239
+#: includes/src/EventList.php:217
 msgid "%s hour"
 msgid_plural "%s hours"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: The number of minutes in an interval of time.
-#: includes/src/EventList.php:241
+#: includes/src/EventList.php:219
 msgid "%s minute"
 msgid_plural "%s minutes"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: The number of seconds in an interval of time.
-#: includes/src/EventList.php:243
+#: includes/src/EventList.php:221
 msgid "%s second"
 msgid_plural "%s seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/src/EventList.php:247
+#: includes/src/EventList.php:225
 msgid "now"
 msgstr ""
 
 #. translators: %s: UTC offset
-#: includes/src/EventList.php:337
+#: includes/src/EventList.php:295
 msgid "Next Schedule (%s)"
 msgstr ""
 
-#: includes/src/EventList.php:340
+#: includes/src/EventList.php:298
 msgid "Hook"
 msgstr ""
 
-#: includes/src/EventList.php:341
+#: includes/src/EventList.php:299
 msgid "Arguments"
 msgstr ""
 
-#: includes/src/EventList.php:343
+#: includes/src/EventList.php:301
 msgid "Action"
 msgstr ""
 
-#: includes/src/EventList.php:344
+#: includes/src/EventList.php:302
 msgid "Recurrence"
 msgstr ""
 
-#: includes/src/EventList.php:367
-#: includes/src/EventList.php:393
+#: includes/src/EventList.php:329
+#: includes/src/EventList.php:355
 msgid "None"
 msgstr ""
 
 #. translators: %s: Time period, for example "8 minutes"
-#: includes/src/EventList.php:413
+#: includes/src/EventList.php:375
 msgid "%s ago"
 msgstr ""
 
-#: includes/src/EventList.php:443
+#: includes/src/EventList.php:405
 msgid "Non-repeating"
 msgstr ""
 
-#: includes/src/EventList.php:448
+#: includes/src/EventList.php:411
 msgid "There are currently no scheduled cron events."
+msgstr ""
+
+#: includes/src/EventList.php:413
+msgid "No matching cron events."
 msgstr ""
 
 #: includes/src/Plugin.php:167
@@ -1001,287 +1021,716 @@ msgid_plural "of %s Networks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/src/Plugin.php:967
+#. translators: %s: php version
+#: includes/src/Plugin.php:737
+msgid "Docket Cache plugin requires PHP %s or greater."
+msgstr ""
+
+#: includes/src/Plugin.php:1007
 msgid "No data available"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:1250
+#: includes/src/Plugin.php:1338
 msgid "The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href=\"%s\" style=\"min-width:100px;text-align:center;font-wight:bold;\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %1$s: url install, %2$s = url dismiss
-#: includes/src/Plugin.php:1254
+#: includes/src/Plugin.php:1342
 msgid "An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use <strong>Docket Cache</strong>. <br><br><a href=\"%1$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-primary button-small\">Install</a>&nbsp;<a href=\"%2$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-secondary button-small\">Dismiss</a>"
 msgstr ""
 
-#: includes/src/Plugin.php:1259
+#: includes/src/Plugin.php:1347
 msgid "The Object Cache feature has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: version
-#: includes/src/Plugin.php:1397
-#: includes/src/Plugin.php:1412
+#: includes/src/Plugin.php:1480
+#: includes/src/Plugin.php:1495
 msgid "Version %s"
 msgstr ""
 
-#. translators: %s: php version
-#: includes/src/ReqAction.php:44
-msgid "This plugin requires PHP %s or greater."
+#: includes/src/Plugin.php:1510
+msgid "Configure"
 msgstr ""
 
-#: includes/src/ReqAction.php:315
+#: includes/src/Plugin.php:1522
+msgid "Docs"
+msgstr ""
+
+#: includes/src/Plugin.php:1523
+msgid "Sponsor"
+msgstr ""
+
+#: includes/src/ReqAction.php:324
 msgid "Option"
 msgstr ""
 
-#: includes/src/ReqAction.php:354
+#: includes/src/ReqAction.php:364
 msgid "Object cache was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:366
+#: includes/src/ReqAction.php:376
 msgid "Cache log was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:369
+#: includes/src/ReqAction.php:379
 msgid "Cache log could not be flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:372
+#: includes/src/ReqAction.php:382
 msgid "Cache file was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:375
+#: includes/src/ReqAction.php:385
 msgid "Cache file could not be flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:378
+#: includes/src/ReqAction.php:388
 msgid "OPcache was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:382
+#: includes/src/ReqAction.php:392
 msgid "OPcache could not be flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:385
+#: includes/src/ReqAction.php:395
+msgid "OPcache already flushed. Try again in a few seconds."
+msgstr ""
+
+#: includes/src/ReqAction.php:398
 msgid "Cronbot connected."
 msgstr ""
 
 #. translators: %s = error message
-#: includes/src/ReqAction.php:391
+#: includes/src/ReqAction.php:404
 msgid "Cronbot failed to connect%s"
 msgstr ""
 
-#: includes/src/ReqAction.php:395
+#: includes/src/ReqAction.php:408
 msgid "Cronbot disconnected."
 msgstr ""
 
-#: includes/src/ReqAction.php:398
+#: includes/src/ReqAction.php:411
 msgid "Cronbot failed to disconnect."
 msgstr ""
 
 #. translators: %1$s: cronbot endpoint, %2$s = error message
-#: includes/src/ReqAction.php:405
+#: includes/src/ReqAction.php:418
 msgid "Pong from %1$s: %2$s."
 msgstr ""
 
 #. translators: %s: cronbot endpoint
-#: includes/src/ReqAction.php:408
+#: includes/src/ReqAction.php:421
 msgid "Pong from %s : connected."
 msgstr ""
 
-#: includes/src/ReqAction.php:412
+#: includes/src/ReqAction.php:425
 msgid "Running cron successful."
 msgstr ""
 
 #. translators: %d = cron event
-#: includes/src/ReqAction.php:429
+#: includes/src/ReqAction.php:442
 msgid "Executed a total of %d cron events"
 msgstr ""
 
-#: includes/src/ReqAction.php:437
+#: includes/src/ReqAction.php:450
 msgid "Failed to run cron."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:444
+#: includes/src/ReqAction.php:457
 msgid "%s. Enabled."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:448
+#: includes/src/ReqAction.php:461
 msgid "%s. Disabled."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:453
-#: includes/src/ReqAction.php:465
+#: includes/src/ReqAction.php:466
+#: includes/src/ReqAction.php:478
 msgid "%s resets to default."
 msgstr ""
 
 #. translators: %1$s = option name, %2$s = option_value
-#: includes/src/ReqAction.php:456
+#: includes/src/ReqAction.php:469
 msgid "%1$s set to %2$s."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:460
+#: includes/src/ReqAction.php:473
 msgid "%s updated."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:469
+#: includes/src/ReqAction.php:482
 msgid "Failed to update option %s."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:473
+#: includes/src/ReqAction.php:486
+msgid "%s configuration has been defined in wp-config file."
+msgstr ""
+
+#. translators: %s = option name
+#: includes/src/ReqAction.php:490
 msgid "Failed to execute the action request. Please try again."
 msgstr ""
 
-#: includes/src/ReqAction.php:476
+#: includes/src/ReqAction.php:493
 msgid "Executing the garbage collector successful"
 msgstr ""
 
-#: includes/src/ReqAction.php:503
+#: includes/src/ReqAction.php:520
 msgid "Failed to run the garbage collector."
 msgstr ""
 
-#: includes/src/View.php:401
+#: includes/src/View.php:405
 msgid "Enable"
 msgstr ""
 
-#: includes/src/View.php:402
+#: includes/src/View.php:406
 msgid "Disable"
 msgstr ""
 
-#: includes/src/View.php:505
+#: includes/src/View.php:516
 msgid "The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively."
 msgstr ""
 
-#: includes/src/View.php:506
+#: includes/src/View.php:517
 msgid "The cache log intends to provide information on how the cache works. For performance and security concerns, disable it if no longer needed."
 msgstr ""
 
-#: includes/src/View.php:507
+#: includes/src/View.php:518
 msgid "Cache WordPress Post Queries which results in faster data retrieval and reduced database workload."
 msgstr ""
 
-#: includes/src/View.php:508
+#: includes/src/View.php:519
 msgid "Increase cache performance by early loading cached objects based on the current URL."
 msgstr ""
 
-#: includes/src/View.php:509
+#: includes/src/View.php:520
 msgid "Improve the performance of the WordPress Translation function."
 msgstr ""
 
-#: includes/src/View.php:510
+#: includes/src/View.php:521
 msgid "Docket Cache will attempt to optimize WordPress core query when this option enabled."
 msgstr ""
 
-#: includes/src/View.php:511
+#: includes/src/View.php:522
 msgid "Improve the performance of Word Term Count Update."
 msgstr ""
 
-#: includes/src/View.php:512
+#: includes/src/View.php:523
 msgid "Docket Cache will optimize WordPress database tables using SQL optimizing syntax at scheduled times."
 msgstr ""
 
-#: includes/src/View.php:513
+#: includes/src/View.php:524
 msgid "Reduce the size of Options Autoload by excluding non-WordPress Option from autoloading."
 msgstr ""
 
-#: includes/src/View.php:514
+#: includes/src/View.php:525
 msgid "Fix the WordPress Missed Schedule Error after scheduling a future blog post."
 msgstr ""
 
-#: includes/src/View.php:515
+#: includes/src/View.php:526
 msgid "Miscellaneous WordPress Tweaks. Including performance, security dan user experience."
 msgstr ""
 
-#: includes/src/View.php:516
+#: includes/src/View.php:527
 msgid "Miscellaneous WooCommerce Tweaks. Including performance, security dan user experience."
 msgstr ""
 
-#: includes/src/View.php:517
+#: includes/src/View.php:528
 msgid "Deactivate WooCommerce Admin feature."
 msgstr ""
 
-#: includes/src/View.php:518
+#: includes/src/View.php:529
 msgid "Deactivate WooCommerce Widget feature."
 msgstr ""
 
-#: includes/src/View.php:519
+#: includes/src/View.php:530
 msgid "Remove the WooCommerce meta box in the WordPress Dashboard."
 msgstr ""
 
-#: includes/src/View.php:520
+#: includes/src/View.php:531
 msgid "Remove the WooCommerce Cart Fragments."
 msgstr ""
 
-#: includes/src/View.php:521
+#: includes/src/View.php:532
 msgid "Remove the WordPress XML-RPC and Pingbacks related features."
 msgstr ""
 
-#: includes/src/View.php:522
+#: includes/src/View.php:533
 msgid "Remove WordPress features related to HTML header such as meta generators and feed links to reduce the page size."
 msgstr ""
 
-#: includes/src/View.php:523
+#: includes/src/View.php:534
 msgid "Remove the WordPress Emoji feature."
 msgstr ""
 
-#: includes/src/View.php:524
+#: includes/src/View.php:535
 msgid "Remove the WordPress Feed feature."
 msgstr ""
 
-#: includes/src/View.php:525
+#: includes/src/View.php:536
 msgid "Remove the WordPress Embed feature."
 msgstr ""
 
-#: includes/src/View.php:526
+#: includes/src/View.php:537
 msgid "Remove the WordPress Lazy Load feature."
 msgstr ""
 
-#: includes/src/View.php:527
+#: includes/src/View.php:538
 msgid "Remove the WordPress Auto-generate Sitemap feature."
 msgstr ""
 
-#: includes/src/View.php:528
+#: includes/src/View.php:539
 msgid "Remove the WordPress Application Passwords feature."
 msgstr ""
 
-#: includes/src/View.php:529
+#: includes/src/View.php:540
 msgid "Preload Object Cache by fetching administrator-related pages."
 msgstr ""
 
-#: includes/src/View.php:530
+#: includes/src/View.php:541
 msgid "Display page loader when loading administrator pages."
 msgstr ""
 
-#: includes/src/View.php:531
+#: includes/src/View.php:542
 msgid "Display Object Cache stats at Overview page."
 msgstr ""
 
-#: includes/src/View.php:532
+#: includes/src/View.php:543
 msgid "Enable the Garbage Collector action button on the Overview page."
 msgstr ""
 
-#: includes/src/View.php:533
+#: includes/src/View.php:544
 msgid "Enable automatic plugin updates for Docket Cache."
 msgstr ""
 
-#: includes/src/View.php:534
-msgid "Allows Docket Cache to check any critical future version that requires removing cache files before doing the updates, purposely to avoid error-prone."
+#: includes/src/View.php:545
+msgid "Allows Docket Cache to check any critical future version that requires removing cache files after doing the updates, purposely to avoid error-prone."
 msgstr ""
 
-#: includes/src/View.php:535
+#: includes/src/View.php:546
 msgid "Flush OPcache when deactivate / uninstall"
 msgstr ""
 
-#: includes/src/View.php:536
+#: includes/src/View.php:547
 msgid "Limit HTTP requests in WP Admin."
 msgstr ""
 
-#: includes/src/View.php:541
+#: includes/src/View.php:552
 msgid "No info available"
+msgstr ""
+
+#: modsadvpot/includes/admin/advanced.php:26
+#: modsadvpot/includes/admin/cacheobject.php:29
+#: modsadvpot/includes/src/Bemods.php:249
+#: modsadvpot/includes/src/Bemods.php:268
+msgid "Advanced"
+msgstr ""
+
+#: modsadvpot/includes/admin/advanced.php:46
+msgid "Page Cache"
+msgstr ""
+
+#: modsadvpot/includes/admin/advanced.php:56
+msgid "Browser Cache"
+msgstr ""
+
+#: modsadvpot/includes/admin/advanced.php:65
+msgid "Security Options"
+msgstr ""
+
+#: modsadvpot/includes/admin/advanced.php:71
+msgid "WP Login Protection"
+msgstr ""
+
+#: modsadvpot/includes/admin/advanced.php:81
+msgid "Bad Bot Prevention"
+msgstr ""
+
+#: modsadvpot/includes/admin/advanced.php:91
+#: modsadvpot/includes/src/Bemods.php:308
+msgid "Malicious Attack Prevention"
+msgstr ""
+
+#: modsadvpot/includes/admin/advanced.php:101
+#: modsadvpot/includes/src/Bemods.php:309
+msgid "Email Scraping Prevention"
+msgstr ""
+
+#: modsadvpot/includes/admin/cacheobject.php:37
+#: modsadvpot/includes/src/Bemods.php:310
+msgid "Default Object Lifespan"
+msgstr ""
+
+#: modsadvpot/includes/admin/cacheobject.php:43
+msgid "Maximum Object Size"
+msgstr ""
+
+#: modsadvpot/includes/admin/cacheobject.php:49
+msgid "Maximum Disk Size"
+msgstr ""
+
+#: modsadvpot/includes/admin/cacheobject.php:55
+msgid "Maximum Cache Files"
+msgstr ""
+
+#: modsadvpot/includes/admin/cacheobject.php:61
+msgid "Global Groups"
+msgstr ""
+
+#: modsadvpot/includes/admin/cacheobject.php:67
+msgid "Do Not Cache Groups"
+msgstr ""
+
+#: modsadvpot/includes/admin/cacheobject.php:73
+msgid "Do Not Cache Keys"
+msgstr ""
+
+#: modsadvpot/includes/admin/cacheobject.php:79
+msgid "Do Not Cache Group:Key"
+msgstr ""
+
+#: modsadvpot/includes/admin/cacheobject.php:85
+msgid "Maximum Pre Cache Files"
+msgstr ""
+
+#: modsadvpot/includes/admin/cacheobject.php:91
+msgid "Do Not Pre Cache Group:Key"
+msgstr ""
+
+#: modsadvpot/includes/admin/config-0.php:17
+#: modsadvpot/includes/admin/features.php:17
+#: modsadvpot/includes/src/Bemods.php:306
+msgid "OPcache Viewer"
+msgstr ""
+
+#: modsadvpot/includes/admin/config-0.php:25
+#: modsadvpot/includes/admin/features.php:25
+#: modsadvpot/includes/src/Bemods.php:307
+msgid "WP File Manager"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:27
+msgid "OPcache Config"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:30
+#: modsadvpot/includes/admin/opcache.php:94
+msgid "OPcache not available."
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:36
+msgid "Version"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:55
+msgid "Directives"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:66
+msgid "Not set"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:84
+#: modsadvpot/includes/admin/submits.php:30
+#: modsadvpot/includes/admin/submits.php:34
+msgid "Dismiss"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:91
+msgid "OPcache Usage"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:96
+msgid "Failed to load OPcacheList()"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:103
+msgid "Statistics"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:107
+#: modsadvpot/includes/src/OPcacheList.php:212
+#: modsadvpot/includes/src/OPcacheView.php:212
+msgid "Cache Hits"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:109
+msgid "Cache Misses"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:113
+msgid "Cached Files"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:115
+msgid "Cached Keys"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:120
+#: modsadvpot/includes/admin/opcache.php:133
+msgid "Max Cached Keys"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:122
+#: modsadvpot/includes/admin/opcache.php:135
+msgid "Hit Rate"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:126
+msgid "Blacklist Misses"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:128
+msgid "Blacklist Miss Ratio"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:141
+#: modsadvpot/includes/src/OPcacheList.php:213
+#: modsadvpot/includes/src/OPcacheView.php:213
+msgid "Memory Usage"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:145
+msgid "Used Memory"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:147
+msgid "Free Memory"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:151
+msgid "Wasted Memory"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:153
+msgid "Current Wasted"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:169
+msgid "Show Config"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:172
+msgid "OPcache Files"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:184
+msgid "All"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:186
+msgid "Other Files"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:187
+msgid "Removed Files"
+msgstr ""
+
+#: modsadvpot/includes/admin/opcache.php:200
+msgid "Filter File Paths"
+msgstr ""
+
+#: modsadvpot/includes/admin/resource.php:26
+msgid "DOCKET LOADER"
+msgstr ""
+
+#: modsadvpot/includes/admin/resource.php:27
+msgid "The Docket Loader is a file loaded in the early stage that bypass WordPress files and libraries. Purposely for security and page cache features."
+msgstr ""
+
+#: modsadvpot/includes/admin/resource.php:31
+msgid "PAGE CACHE"
+msgstr ""
+
+#: modsadvpot/includes/admin/resource.php:32
+msgid "The page cache serves as a built-in feature. Do not need to configure if already use a server-side caching like LiteSpeed Cache."
+msgstr ""
+
+#: modsadvpot/includes/admin/submits.php:24
+msgid "Updates"
+msgstr ""
+
+#: modsadvpot/includes/admin/submits.php:26
+msgid "Update configuration."
+msgstr ""
+
+#: modsadvpot/includes/admin/submits.php:28
+msgid "Save Changes"
+msgstr ""
+
+#: modsadvpot/includes/admin/submits.php:32
+msgid "Dismiss changes."
+msgstr ""
+
+#: modsadvpot/includes/admin/submits.php:36
+#: modsadvpot/includes/admin/submits.php:40
+msgid "Flush Cache"
+msgstr ""
+
+#: modsadvpot/includes/admin/submits.php:42
+msgid "Reset"
+msgstr ""
+
+#: modsadvpot/includes/admin/submits.php:44
+msgid "Reset to default configuration."
+msgstr ""
+
+#: modsadvpot/includes/admin/submits.php:46
+msgid "Reset to default"
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:137
+msgid "1 day"
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:138
+msgid "4 days"
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:139
+msgid "7 days"
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:140
+msgid "14 days"
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:141
+msgid "28 days"
+msgstr ""
+
+#. translators: %1$s = option name, %2$s = option_value, %3$s = day(s)
+#: modsadvpot/includes/src/Bemods.php:150
+#: modsadvpot/includes/src/Bemods.php:332
+msgid "days"
+msgstr ""
+
+#. translators: %1$s = option name, %2$s = option_value, %3$s = day(s)
+#: modsadvpot/includes/src/Bemods.php:150
+#: modsadvpot/includes/src/Bemods.php:332
+msgid "day"
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:186
+#: modsadvpot/includes/src/Bemods.php:205
+msgid "OPcache"
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:218
+#: modsadvpot/includes/src/Bemods.php:237
+msgid "Files"
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:279
+msgid "OPcache Viewer allows you to view OPcache status and usage."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:280
+msgid "WordPress File Manager allows you to browse and manage files in the website installation directory."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:281
+msgid "The Object Cache advanced configuration."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:282
+msgid "Enable and configure page cache features."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:283
+msgid "Enable and configure browser cache features."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:284
+msgid "Change WP Login default behaviour to prevent and protect from the attacker."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:285
+msgid "Bad Bot is a software programmed to perform a variety of malicious jobs by scraping content on your website for harvesting data like email address, phone number and other valuable information. Enable this option to prevent Bad Bot from accessing your website."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:286
+msgid "Enable this option to prevent a malicious attack like SQL/PHP/Code Injection, Cross-Site Scripting, Exploits and wide range of malicious requests."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:287
+msgid "Encode email address in your website to prevent harvesting by bots and spammers."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:288
+msgid "If there is no expire time was set to object or set to 0, Docket Cache will use this setting as an expiration time."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:289
+msgid "Maximum size of object data can be stored into a cache file."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:290
+msgid "Maximum size of the cache storage on disk. The minimum required size is 100 MB."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:291
+msgid "Maximum cache file can be store on disk."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:292
+msgid "Lists of groups cached at the network level in a Multisite setup. One per line."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:293
+msgid "List of cache groups that should not be cached. One per line."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:294
+msgid "List of cache keys that should not be cached. One per line."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:295
+msgid "List of cache groups and keys that should not be cached. One per line with group:key format."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:297
+msgid "List of cache groups and keys that should not be pre cached. One per line with group:key format."
+msgstr ""
+
+#. translators: %1$s = option name, %2$s = option_value, %3$s = day(s)
+#: modsadvpot/includes/src/Bemods.php:334
+msgid "%1$s set to %2$s %3$s."
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:338
+msgid "Configuration updated"
+msgstr ""
+
+#: modsadvpot/includes/src/Bemods.php:341
+msgid "Failed to update the configuration"
+msgstr ""
+
+#. translators: %s = utc offset
+#: modsadvpot/includes/src/OPcacheList.php:209
+#: modsadvpot/includes/src/OPcacheView.php:209
+msgid "Last Used %s"
+msgstr ""
+
+#: modsadvpot/includes/src/OPcacheList.php:214
+#: modsadvpot/includes/src/OPcacheView.php:214
+msgid "File Paths"
+msgstr ""
+
+#: modsadvpot/includes/src/OPcacheList.php:261
+#: modsadvpot/includes/src/OPcacheView.php:261
+msgid "OPcache stats not available."
+msgstr ""
+
+#: modsadvpot/includes/src/OPcacheList.php:263
+#: modsadvpot/includes/src/OPcacheView.php:263
+msgid "No matching OPcache file paths."
 msgstr ""

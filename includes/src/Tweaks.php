@@ -603,46 +603,52 @@ final class Tweaks
         add_action(
             'admin_init',
             function () {
-                if (empty($GLOBALS['pagebow'])) {
-                    return;
-                }
+                add_filter(
+                    'pre_http_request',
+                    function ($preempt, $parsed_args, $url) {
+                        if (empty($GLOBALS['pagenow'])) {
+                            return false;
+                        }
 
-                $pagenow = $GLOBALS['pagebow'];
+                        $pagenow = $GLOBALS['pagenow'];
+                        $pageok = [
+                            'index.php' => 1,
+                            'plugins.php' => 1,
+                            'plugin-install.php' => 1,
+                            'update.php' => 1,
+                            'themes.php' => 1,
+                            'admin.php' => 1,
+                            'update-core.php' => 1,
+                        ];
 
-                switch ($pagenow) {
-                    case 'index.php':
-                    case 'plugins.php':
-                    case 'plugin-install.php':
-                    case 'update.php':
-                    case 'themes.php':
-                    case 'admin.php':
-                    case 'update-core.php':
-                        add_filter('pre_http_request', '__return_false', PHP_INT_MAX);
-                        break;
-                    default:
-                        add_filter(
-                            'pre_http_request',
-                            function ($preempt, $parsed_args, $url) {
-                                $host = parse_url($url, PHP_URL_HOST);
-                                $host_site = parse_url(home_url(), PHP_URL_HOST);
-                                $ok = true;
-                                switch ($host) {
-                                    case '127.0.0.1':
-                                    case 'localhost':
-                                        $ok = false;
-                                        break;
-                                    default:
-                                        if ($host === $host_site || false !== strpos($host, 'wordpress.org') || false !== strpos($host, 'docketcache.com')) {
-                                            $ok = false;
-                                        }
-                                }
+                        if (\array_key_exists($pagenow, $pageok)) {
+                            return false;
+                        }
 
-                                return $ok;
-                            },
-                            PHP_INT_MAX,
-                            3
-                        );
-                }
+                        $hostme = parse_url(home_url(), PHP_URL_HOST);
+                        $hosturl = parse_url($url, PHP_URL_HOST);
+
+                        if ('127.0.0.1' === $hosturl || 'localhost' === $hosturl || $hostme === $hosturl) {
+                            return false;
+                        }
+
+                        if ('wordpress.org' === $hosturl || 'api.wordpress.org' === $hosturl || 'docketcache.com' === $hosturl) {
+                            return false;
+                        }
+
+                        if ('.wordpress.org' === substr($hosturl, -\strlen('.wordpress.org'))) {
+                            return false;
+                        }
+
+                        if ('.docketcache.com' === substr($hosturl, -\strlen('.docketcache.com'))) {
+                            return false;
+                        }
+
+                        return true;
+                    },
+                    PHP_INT_MIN,
+                    3
+                );
             },
             PHP_INT_MAX
         );

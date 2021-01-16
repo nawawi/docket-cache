@@ -420,7 +420,7 @@ class Filesystem
      */
     public function opcache_flush($file)
     {
-        if (!$this->is_opcache_enable()) {
+        if (!$this->is_php($file) || !@is_file($file) || !$this->is_opcache_enable()) {
             return false;
         }
 
@@ -429,7 +429,7 @@ class Filesystem
             return @wp_opcache_invalidate($file, true);
         }
 
-        if (\function_exists('opcache_invalidate') && $this->is_php($file) && @is_file($file)) {
+        if (\function_exists('opcache_invalidate')) {
             return @opcache_invalidate($file, true);
         }
 
@@ -936,9 +936,10 @@ class Filesystem
      */
     public function sanitize_maxfile($maxfile, $default = 50000)
     {
+        $maxfile = (int) $maxfile;
         $min = 200;
         $max = 1000000;
-        if (empty($maxfile) || !\is_int($maxfile)) {
+        if (empty($maxfile)) {
             $maxfile = $default;
         }
 
@@ -949,6 +950,54 @@ class Filesystem
         }
 
         return $maxfile;
+    }
+
+    /**
+     * sanitize_precache_maxfile.
+     */
+    public function sanitize_precache_maxfile($maxfile)
+    {
+        if (empty($maxfile) || (int) $maxfile < 1) {
+            return 0;
+        }
+
+        return $this->sanitize_maxfile($maxfile);
+    }
+
+    /**
+     * sanitize_maxsize.
+     */
+    public function sanitize_maxsize($bytes)
+    {
+        $min = 1048576; // 1M
+        $max = 10485760; // 10M
+        $bytes = (int) $bytes;
+
+        if ($bytes < $min) {
+            return 3145728; // 3M
+        }
+
+        if ($bytes > $max) {
+            $bytes = $max;
+        }
+
+        return $bytes;
+    }
+
+    /**
+     * sanitize_maxsizedisk.
+     */
+    public function sanitize_maxsizedisk($bytes)
+    {
+        if (empty($bytes) || !\is_int($bytes)) {
+            $maxsizedisk = 524288000; // 500MB
+        }
+
+        if ($bytes < 104857600) {
+            $bytes = 104857600;
+        }
+
+        return $bytes;
     }
 
     /**

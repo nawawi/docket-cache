@@ -102,14 +102,14 @@ class WP_Object_Cache
      *
      * @var int
      */
-    private $cache_maxsize = 5000000;
+    private $cache_maxsize = 3145728;
 
     /**
      * The cache file lifespan.
      *
      * @var int
      */
-    private $cache_maxttl = 0;
+    private $cache_maxttl = 345600;
 
     /**
      * List of filtered groups.
@@ -1107,7 +1107,7 @@ class WP_Object_Cache
      */
     private function dc_precache_load($hash)
     {
-        static $cached = [];
+        $cached = [];
         $group = 'docketcache-precache';
         $keys = $this->get($hash, $group);
 
@@ -1133,6 +1133,7 @@ class WP_Object_Cache
                 }
             }
         }
+        unset($keys, $cached);
     }
 
     /**
@@ -1233,11 +1234,8 @@ class WP_Object_Cache
     private function dc_init()
     {
         if ($this->cf()->is_dcint('MAXSIZE', $dcvalue)) {
-            if ($dcvalue >= 1000000) {
-                $this->cache_maxsize = $dcvalue;
-                if ($this->cache_maxsize > 10485760) {
-                    $this->cache_maxsize = 10485760;
-                }
+            if (!empty($dcvalue)) {
+                $this->cache_maxsize = $this->fs()->sanitize_maxsize($dcvalue);
             }
         }
 

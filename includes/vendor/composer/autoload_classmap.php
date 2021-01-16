@@ -25,6 +25,7 @@ return array(
     'Nawawi\\DocketCache\\TermCount' => $baseDir . '/includes/src/TermCount.php',
     'Nawawi\\DocketCache\\Tweaks' => $baseDir . '/includes/src/Tweaks.php',
     'Nawawi\\DocketCache\\View' => $baseDir . '/includes/src/View.php',
+    'Nawawi\\DocketCache\\WpConfig' => $baseDir . '/includes/src/WpConfig.php',
     'Nawawi\\Symfony\\Component\\VarExporter\\Exception\\ClassNotFoundException' => $vendorDir . '/symfony/var-exporter/Exception/ClassNotFoundException.php',
     'Nawawi\\Symfony\\Component\\VarExporter\\Exception\\ExceptionInterface' => $vendorDir . '/symfony/var-exporter/Exception/ExceptionInterface.php',
     'Nawawi\\Symfony\\Component\\VarExporter\\Exception\\NotInstantiableTypeException' => $vendorDir . '/symfony/var-exporter/Exception/NotInstantiableTypeException.php',

@@ -19,9 +19,9 @@ $log = $this->parse_log_query();
     <div class="flex-container">
         <div class="row">
             <?php $this->tab_title(!$this->has_vcache() ? esc_html__('Cache Log', 'docket-cache') : esc_html__('Cache View', 'docket-cache')); ?>
-            <table class="form-table noborder-b">
+            <table class="form-table form-table-selection noborder-b">
                 <?php if (!$this->has_vcache()) : ?>
-                <tr class="form-table-selection">
+                <tr>
                     <th><?php esc_html_e('Timestamp', 'docket-cache'); ?></th>
                     <td>
                         <?php
@@ -30,7 +30,8 @@ $log = $this->parse_log_query();
                             [
                                 'default' => __('Default', 'docket-cache'),
                                 'utc' => __('UTC', 'docket-cache'),
-                                'local' => __('Local time', 'docket-cache'),
+                                /* translators: %s = utc offset */
+                                'local' => sprintf(__('Local time (%s)', 'docket-cache'), $this->pt->get_utc_offset()),
                                 'wp' => __('Site Format', 'docket-cache'),
                             ],
                             'dcdefault',
@@ -42,9 +43,9 @@ $log = $this->parse_log_query();
                         ?>
                     </td>
                 </tr>
-                <tr class="form-table-selection">
+                <tr>
                     <th><?php esc_html_e('Log All', 'docket-cache'); ?></th>
-                    <td><?php echo $this->config_select_bool('log_all', 'dcdefault', 'log', 1); ?></td>
+                    <td><?php echo $this->config_select_bool('log_all', 'dcdefault', 'log'); ?></td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Log File', 'docket-cache'); ?></th>

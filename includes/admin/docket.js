@@ -30,7 +30,7 @@
                         'click.dc-dismiss-notice',
                         function( e ) {
                             e.preventDefault();
-                            var $el = $( this )
+                            /*var $el = $( this )
                                 .parent();
                             $el.fadeTo(
                                 100,
@@ -43,7 +43,7 @@
                                         }
                                     );
                                 }
-                            );
+                            );*/
 
                             $selector.find( '.notice-focus' )
                                 .removeClass( 'notice-focus' );

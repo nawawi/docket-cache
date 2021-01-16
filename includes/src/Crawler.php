@@ -14,7 +14,7 @@ namespace Nawawi\DocketCache;
 
 final class Crawler
 {
-    private static $version = '20.12.03';
+    private static $version = '20.12.04';
     public static $send_cookie = false;
 
     private static function default_args($param = [])
@@ -72,7 +72,7 @@ final class Crawler
     {
         self::$send_cookie = true;
         $param['timeout'] = 3;
-        self::fetch(get_home_url(), $param);
+        self::fetch(home_url('/'), $param);
     }
 
     public static function fetch($url, $param = [])
