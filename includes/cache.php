@@ -1153,6 +1153,10 @@ class WP_Object_Cache
                 continue;
             }
 
+            if ('transient' === $cache_group || 'site-transient' === $cache_group) {
+                continue;
+            }
+
             if ($this->is_non_persistent_groups($cache_group)) {
                 continue;
             }

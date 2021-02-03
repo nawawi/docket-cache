@@ -1,3 +1,11 @@
+= v21.01.01 (2021-02-03)
+
+- Fixed Tweaks::woocommerce_cart_fragments_remove() -> check if "wc-cart-fragments" script exists.
+- Fixed WP_Object_Cache::dc_precache_set -> ignore transient, site-transient.
+- Added Configuration -> Runtime Options.
+- Added Configuration -> Config reset.
+- Added WP-CLI command -> runtime:install, runtime:reset.
+
 = v20.12.04 (2021-01-16)
 
 - Fixed Limit WP-Admin HTTP Requests -> invalid variable pagenow.

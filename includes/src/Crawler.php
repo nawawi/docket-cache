@@ -14,7 +14,7 @@ namespace Nawawi\DocketCache;
 
 final class Crawler
 {
-    private static $version = '20.12.04';
+    private static $version = '21.01.01';
     public static $send_cookie = false;
 
     private static function default_args($param = [])
@@ -72,7 +72,8 @@ final class Crawler
     {
         self::$send_cookie = true;
         $param['timeout'] = 3;
-        self::fetch(home_url('/'), $param);
+
+        return self::fetch(home_url('/'), $param);
     }
 
     public static function fetch($url, $param = [])
@@ -87,5 +88,19 @@ final class Crawler
         $args = self::default_args($param);
 
         return wp_remote_post($url, $args);
+    }
+
+    public static function fetch_home_nocache($param = [])
+    {
+        self::$send_cookie = true;
+        $param['timeout'] = 3;
+        $param['headers'] = [
+            'REFERER' => site_url(),
+            'Cache-Control' => 'no-cache',
+        ];
+
+        $path = '/?nocache='.time();
+
+        return self::fetch(home_url($path), $param);
     }
 }

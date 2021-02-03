@@ -426,4 +426,9 @@ class Bepart extends Filesystem
             $this->get_utc_offset()
         );
     }
+
+    public function normalize_content($content)
+    {
+        return str_replace(["\r\n", "\n\r", "\r", "\n"], "\n", $content);
+    }
 }

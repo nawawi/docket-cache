@@ -166,4 +166,31 @@ final class Resc
             return $html;
         }
     }
+
+    public static function runtimenotice($action)
+    {
+        $code = WpConfig::runtime_code();
+        $is_bedrock = WpConfig::is_bedrock();
+        $fname = $is_bedrock ? 'config/application.php' : 'wp-config.php';
+
+        /* translators: %s: file name */
+        $text1 = sprintf(__('Docket Cache require to update the <code>%s</code> file to handle runtime options.', 'docket-cache'), $fname);
+        $text2 = __('Copy and place the code below before <code>require_once ABSPATH . \'wp-settings.php\';</code>', 'docket-cache');
+        $text3 = __('Copy and place the code below at the end of the file.', 'docket-cache');
+        $text4 = __('<br>Or click <strong>Install</strong> to update it now.', 'docket-cache');
+
+        $message = $text1.' ';
+        if ($is_bedrock) {
+            $message .= $text3;
+        } else {
+            $message .= $text2;
+        }
+
+        $message .= '<br><br><textarea rows="15" style="width:100%;font-family:monospace;font-size:11px;margin:0;" onclick="this.select();document.execCommand(\'copy\');" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly>'.$code.'</textarea>';
+
+        if (WpConfig::is_writable() && !$is_bedrock) {
+            $message .= '<br>'.$text4.'<br><a href="'.$action.'" style="display:block;width:150px;text-align:center;font-wight:bold;" class="button button-primary button-large btx-spinner">Install</a>';
+        }
+        echo self::boxmsg($message, 'warning', false, false, false);
+    }
 }

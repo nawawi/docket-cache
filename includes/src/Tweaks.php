@@ -326,6 +326,10 @@ final class Tweaks
             function () {
                 $id = 'wc-cart-fragments';
                 $wp_scripts = $GLOBALS['wp_scripts'];
+                if (!\is_object($wp_scripts) || !isset($wp_scripts->registered[$id])) {
+                    return;
+                }
+
                 $src = $wp_scripts->registered[$id]->src;
                 $wp_scripts->registered[$id]->src = null;
 

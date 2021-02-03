@@ -238,6 +238,54 @@ class Command extends WP_CLI_Command
     }
 
     /**
+     * Removes the Docket Cache runtime code.
+     *
+     * Remove runtime code.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache runtime:remove
+     *
+     * @subcommand runtime:remove
+     */
+    public function runtime_remove()
+    {
+        if (WpConfig::is_bedrock()) {
+            WP_CLI::line(__('This command does not support Bedrock. Please manually remove the runtime code.', 'docket-cache'));
+            WP_CLI::halt(1);
+        }
+
+        if (WpConfig::runtime_remove()) {
+            $this->halt_success(__('The runtime code has been removed.', 'docket-cache'));
+        }
+        $this->halt_error(__('Failed to remove runtime code.', 'docket-cache'));
+    }
+
+    /**
+     * Install the Docket Cache runtime code.
+     *
+     * Install runtime code in wp-config file.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache runtime:install
+     *
+     * @subcommand runtime:install
+     */
+    public function runtime_install()
+    {
+        if (WpConfig::is_bedrock()) {
+            WP_CLI::line(__('This command does not support Bedrock. Please manually install the runtime code.', 'docket-cache'));
+            WP_CLI::halt(1);
+        }
+
+        if (WpConfig::runtime_install()) {
+            $this->halt_success(__('Updating wp-config.php file successful', 'docket-cache'));
+        }
+        $this->halt_error(__('Failed to update wp-config.php file.', 'docket-cache'));
+    }
+
+    /**
      * Flushes the precaching files.
      *
      * Remove the precaching files.

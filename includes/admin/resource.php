@@ -12,6 +12,22 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 ?>
+<?php $this->tab_title(esc_html__('Actions', 'docket-cache')); ?>
+<div class="qact">
+    <div class="cmd">
+        <h4><?php esc_html_e('Config Reset', 'docket-cache'); ?></h4>
+        <p>
+            <?php esc_html_e('Reset all configuration to default.', 'docket-cache'); ?>
+        </p>
+        <a href="<?php echo $this->pt->action_query('configreset', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Reset to default', 'docket-cache'); ?></a>
+        <hr>
+        <h4><?php esc_html_e('Cleanup Post', 'docket-cache'); ?></h4>
+        <p>
+            <?php esc_html_e('Cleanup Revisions, Auto Draft, Trash Bin.', 'docket-cache'); ?>
+        </p>
+        <a href="<?php echo $this->pt->action_query('cleanuppost', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Cleanup Post', 'docket-cache'); ?></a>
+    </div>
+</div>
 <?php $this->tab_title(esc_html__('Resources', 'docket-cache')); ?>
 <div class="postbox">
     <div class="inside">
@@ -20,24 +36,6 @@ namespace Nawawi\DocketCache;
                 <strong><?php esc_html_e('DOCUMENTATION', 'docket-cache'); ?></strong><br class="break">
                 <?php esc_html_e('To adjust the plugin behaviour and manage through a command line, please refer to the documentation page for details.', 'docket-cache'); ?>
                 <a href="https://docs.docketcache.com/" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Dcoumenation', 'docket-cache'); ?></a>
-            </p>
-            <hr>
-            <p>
-                <strong><?php esc_html_e('CRONBOT', 'docket-cache'); ?></strong><br class="break">
-                <?php
-                    /* translators: %s: external service */
-                    printf(esc_html__('The Cronbot is an %s that pings your website every hour to keep WordPress Cron running actively. Only site Timezone, URL and version are involved when enabling this service.', 'docket-cache'), '<a href="https://cronbot.docketcache.com" rel="noopener" target="new">external service</a>');
-                ?>
-            </p>
-            <hr>
-            <p>
-                <strong><?php esc_html_e('CACHE LOG', 'docket-cache'); ?></strong><br class="break">
-                <?php esc_html_e('The cache log intends to provide information on how the cache works. For performance and security concerns, deactivate if no longer needed.', 'docket-cache'); ?>
-            </p>
-            <hr>
-            <p>
-                <strong><?php esc_html_e('CHECK VERSION', 'docket-cache'); ?></strong><br class="break">
-                <?php esc_html_e('The Check Critical Version allows Docket Cache to check any critical future version that requires removing cache files after doing the updates, purposely to avoid error-prone.', 'docket-cache'); ?>
             </p>
             <?php if (!apply_filters('docketcache/filter/view/nosponsor', false)) : ?>
             <hr>

@@ -222,6 +222,107 @@ namespace Nawawi\DocketCache;
                 </tr>
                 <tr>
                     <td colspan="2" class="stitle">
+                        <?php esc_html_e('Runtime Options', 'docket-cache'); ?>
+                    </td>
+                </tr>
+                <tr id="rtpostautosave">
+                    <th><?php echo esc_html__('Auto Save Interval', 'docket-cache').$this->tooltip('rtpostautosave'); ?></th>
+                    <td>
+                        <?php
+                            echo $this->config_select_set(
+                                'rtpostautosave',
+                                [
+                                    'default' => __('Default', 'docket-cache'),
+                                    '1' => __('Every Minute', 'docket-cache'),
+                                    '5' => __('Every 5 Minutes', 'docket-cache'),
+                                    '15' => __('Every 15 Minutes', 'docket-cache'),
+                                    'off' => __('Disable', 'docket-cache'),
+                                ]
+                            );
+                            ?>
+                    </td>
+                </tr>
+                <tr id="rtpostrevision">
+                    <th><?php echo esc_html__('Post Revisions', 'docket-cache').$this->tooltip('rtpostrevision'); ?></th>
+                    <td>
+                        <?php
+                            echo $this->config_select_set(
+                                'rtpostrevision',
+                                [
+                                    'default' => __('Default', 'docket-cache'),
+                                    '3' => __('Limit to 3 Revisions', 'docket-cache'),
+                                    '5' => __('Limit to 5 Revisions', 'docket-cache'),
+                                    'on' => __('Enable', 'docket-cache'),
+                                    'off' => __('Disable', 'docket-cache'),
+                                ]
+                            );
+                            ?>
+                    </td>
+                </tr>
+                <tr id="rtpostemptytrash">
+                    <th><?php echo esc_html__('Trash Bin', 'docket-cache').$this->tooltip('rtpostemptytrash'); ?></th>
+                    <td>
+                        <?php
+                            echo $this->config_select_set(
+                                'rtpostemptytrash',
+                                [
+                                    'default' => __('Default', 'docket-cache'),
+                                    '7' => __('Empty In 7 Days', 'docket-cache'),
+                                    '14' => __('Empty In 14 Days', 'docket-cache'),
+                                    '30' => __('Empty In 30 Days', 'docket-cache'),
+                                    'off' => __('Disable', 'docket-cache'),
+                                ]
+                            );
+                            ?>
+                    </td>
+                </tr>
+                <tr id="rtimageoverwrite">
+                    <th><?php echo esc_html__('Cleanup Image Edits', 'docket-cache').$this->tooltip('rtimageoverwrite'); ?></th>
+                    <td>
+                        <?php
+                            echo $this->config_select_set(
+                                'rtimageoverwrite',
+                                [
+                                    'default' => __('Default', 'docket-cache'),
+                                    'on' => __('Enable', 'docket-cache'),
+                                    'off' => __('Disable', 'docket-cache'),
+                                ]
+                            );
+                            ?>
+                    </td>
+                </tr>
+                <tr id="rtpluginthemeeditor">
+                    <th><?php echo esc_html__('Deactivate Plugin / Theme Editor', 'docket-cache').$this->tooltip('rtpluginthemeeditor'); ?></th>
+                    <td>
+                        <?php
+                            echo $this->config_select_set(
+                                'rtpluginthemeeditor',
+                                [
+                                    'default' => __('Default', 'docket-cache'),
+                                    'on' => __('Enable', 'docket-cache'),
+                                    'off' => __('Disable', 'docket-cache'),
+                                ]
+                            );
+                            ?>
+                    </td>
+                </tr>
+                <tr id="rtpluginthemeinstall">
+                    <th><?php echo esc_html__('Deactivate Plugin / Theme Update and Installation', 'docket-cache').$this->tooltip('rtpluginthemeinstall'); ?></th>
+                    <td>
+                        <?php
+                            echo $this->config_select_set(
+                                'rtpluginthemeinstall',
+                                [
+                                    'default' => __('WP Default', 'docket-cache'),
+                                    'on' => __('Enable', 'docket-cache'),
+                                    'off' => __('Disable', 'docket-cache'),
+                                ]
+                            );
+                            ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="stitle">
                         <?php esc_html_e('Admin Interface', 'docket-cache'); ?>
                     </td>
                 </tr>

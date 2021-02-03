@@ -378,6 +378,24 @@ final class Constans
         // limit http request from uncommon page.
         $this->maybe_define($this->px('LIMITHTTPREQUEST'), false);
 
+        // @private: auto save interval.
+        $this->maybe_define($this->px('RTPOSTAUTOSAVE'), 1);
+
+        // @private: post revision.
+        $this->maybe_define($this->px('RTPOSTREVISION'), 'on');
+
+        // @private: empty trash.
+        $this->maybe_define($this->px('RTPOSTEMPTYTRASH'), 30);
+
+        // @private: plugin / theme editor.
+        $this->maybe_define($this->px('RTPLUGINTHEMEEDITOR'), 'off');
+
+        // @private: plugin / theme install.
+        $this->maybe_define($this->px('RTPLUGINTHEMEINSTALL'), 'off');
+
+        // @private: plugin / theme install.
+        $this->maybe_define($this->px('RTIMAGEOVERWRITE'), 'off');
+
         // @private
         // capture fatal error rarely incase non-throwable
         // set true for debugging only

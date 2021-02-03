@@ -492,6 +492,11 @@ final class View
         }
 
         $nx = sanitize_text_field($_GET['nx']);
+
+        if (WpConfig::is_runtimeconst($nx) && WpConfig::is_runtimenotice()) {
+            return;
+        }
+
         $code = '<script id="docket-cache-focus">'.PHP_EOL;
         $code .= '(function($) {';
         $code .= '$(document).ready(function() {';
@@ -545,6 +550,12 @@ final class View
             'checkversion' => esc_html__('Allows Docket Cache to check any critical future version that requires removing cache files after doing the updates, purposely to avoid error-prone.', 'docket-cache'),
             'opcshutdown' => esc_html__('Flush OPcache when deactivate / uninstall', 'docket-cache'),
             'limithttprequest' => esc_html__('Limit HTTP requests in WP Admin.', 'docket-cache'),
+            'rtpostautosave' => esc_html__('WordPress by default automatically saves a draft every 1 minute when editing or create a new post. Changing this behaviour can reduce the usage of server resource.', 'docket-cache'),
+            'rtpostrevision' => esc_html__('Post revision is a copy of each edit made to a post or page, allowing the possibility of reverting to a previous version. However, have a revision too much can create a bad impact on database performance. Changing this behaviour can reduce the usage of server resource.', 'docket-cache'),
+            'rtpostemptytrash' => esc_html__('This option allows you to change the number of days before WordPress permanently deletes posts, pages, attachments, and comments, from the trash bin. The default is 30 days. There is no confirmation alert when someone clicks on "Delete Permanently" if this option is set to "Disable Trash Bin".', 'docket-cache'),
+            'rtpluginthemeeditor' => esc_html__('This option will completely disable the use of plugin and theme editor. If this option enabled, no plugins or theme file can be edited.', 'docket-cache'),
+            'rtpluginthemeinstall' => esc_html__('This option will block users being able to use the plugin and theme installation/update functionality from the WordPress admin area.', 'docket-cache'),
+            'rtimageoverwrite' => esc_html__('By default, WordPress creates a new set of images every time you edit image and restore the original. It leaves all the edits on the server. Enable this option to change this behaviour.', 'docket-cache'),
         ];
 
         $info = apply_filters('docketcache/filter/view/tooltips', $info);
@@ -576,6 +587,20 @@ final class View
             }
 
             echo Resc::boxmsg($this->pt->notice, $type);
+
+            if (WpConfig::is_runtimenotice() && !empty($this->pt->inruntime) && true === $this->pt->inruntime) {
+                $args['idx'] = 'config';
+                if (!empty($_GET['idx'])) {
+                    $args['idx'] = sanitize_text_field($_GET['idx']);
+
+                    if (!empty($_GET['adx'])) {
+                        $args['adx'] = sanitize_text_field($_GET['adx']);
+                    }
+                }
+                $action = $this->pt->action_query('runtime', $args);
+                echo Resc::runtimenotice($action);
+            }
+
             $done = true;
         }
     }

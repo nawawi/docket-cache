@@ -42,6 +42,10 @@ final class ReqAction
             $args['idx'] = sanitize_text_field($_GET['idx']);
         }
 
+        if (!empty($param['adx'])) {
+            $args['adx'] = sanitize_text_field($param['adx']);
+        }
+
         $query = add_query_arg($args, $this->pt->get_page());
         wp_safe_redirect(network_admin_url($query));
     }
@@ -67,6 +71,9 @@ final class ReqAction
              'docket-runeventnow-cronbot',
              'docket-selectsite-cronbot',
              'docket-rungc',
+             'docket-runtime',
+             'docket-configreset',
+             'docket-cleanuppost',
          ];
 
         $keys = apply_filters('docketcache/filter/reqaction/token', $keys);
@@ -213,6 +220,33 @@ final class ReqAction
 
                 do_action('docketcache/action/garbagecollector', $ok, $result);
                 break;
+            case 'docket-runtime':
+                $result = WpConfig::runtime_install();
+                $response = $result ? 'docket-runtimeok' : 'docket-runtimeok-failed';
+                do_action('docketcache/action/updatewpconfig', $result);
+                break;
+            case 'docket-configreset':
+                $result = $this->pt->co()->reset();
+                $response = $result ? 'docket-configresetok' : 'docket-configresetok-failed';
+                do_action('docketcache/action/configreset', $result);
+                break;
+            case 'docket-cleanuppost':
+                if ($this->pt->co()->lockproc('cleanuppost_check', time() + 20)) {
+                    $result = false;
+                    $response = 'docket-cleanuppostok-warn';
+                } else {
+                    $ok = false;
+                    $response = 'docket-cleanuppostok-failed';
+                    $result = $this->pt->cleanuppost();
+                    if (!empty($result) && \is_object($result)) {
+                        $this->pt->co()->lookup_set('cleanuppost', (array) $result);
+                        $response = 'docket-cleanuppostok';
+                        $ok = true;
+                    }
+
+                    do_action('docketcache/action/cleanuppost', $ok, $result);
+                }
+                break;
         }
 
         if (empty($response) && preg_match('@^docket-(default|enable|disable|save)-([a-z_]+)$@', $action, $mm)) {
@@ -318,6 +352,7 @@ final class ReqAction
             $this->pt->token = $token;
 
             $this->pt->notice = '';
+            $this->pt->inruntime = false;
 
             $kx = '';
 
@@ -327,6 +362,10 @@ final class ReqAction
                 $nx = $this->pt->co()->keys($kx);
                 if (!empty($nx)) {
                     $option_name = $nx;
+
+                    if (WpConfig::is_runtimeconst($kx)) {
+                        $this->pt->inruntime = true;
+                    }
                 }
             }
 
@@ -462,11 +501,21 @@ final class ReqAction
                     break;
                 case 'docket-option-save':
                     if (!empty($option_value)) {
-                        if ('default' === $option_value) {
-                            $this->pt->notice = sprintf(esc_html__('%s resets to default.', 'docket-cache'), $option_name);
+                        $noticewpconfig = '';
+                        if ($this->pt->inruntime) {
+                            $noticewpconfig = WpConfig::notice_filter($option_name, $option_value, $kx);
+                        }
+
+                        if (!empty($noticewpconfig)) {
+                            $this->pt->notice = $noticewpconfig;
                         } else {
-                            /* translators: %1$s = option name, %2$s = option_value */
-                            $this->pt->notice = sprintf(esc_html__('%1$s set to %2$s.', 'docket-cache'), $option_name, $option_value);
+                            if ('default' === $option_value) {
+                                /* translators: %s = option name */
+                                $this->pt->notice = sprintf(esc_html__('%s resets to default.', 'docket-cache'), $option_name);
+                            } else {
+                                /* translators: %1$s = option name, %2$s = option_value */
+                                $this->pt->notice = sprintf(esc_html__('%1$s set to %2$s.', 'docket-cache'), $option_name, $option_value);
+                            }
                         }
                     } else {
                         /* translators: %s = option name */
@@ -514,10 +563,51 @@ final class ReqAction
 
                         $this->pt->notice .= $gcmsg;
                     }
-                    unset($msg, $wmsg, $gcmsg);
+                    unset($msg, $gcmsg);
                     break;
                 case 'docket-gcrun-failed':
                     $this->pt->notice = esc_html__('Failed to run the garbage collector.', 'docket-cache');
+                    break;
+                case 'docket-runtimeok':
+                    $this->pt->notice = esc_html__('Updating wp-config.php file successful.', 'docket-cache');
+                    break;
+                case 'docket-runtimeok-failed':
+                    $this->pt->notice = esc_html__('Failed to update wp-config.php file.', 'docket-cache');
+                    break;
+                case 'docket-configresetok':
+                    $this->pt->notice = esc_html__('Reset all configuration successful.', 'docket-cache');
+                    break;
+                case 'docket-configresetok-failed':
+                    $this->pt->notice = esc_html__('Failed to reset configuration.', 'docket-cache');
+                    break;
+                case 'docket-cleanuppostok':
+                    $this->pt->notice = esc_html__('Cleanup Post successful', 'docket-cache');
+                    $msg = $this->pt->co()->lookup_get('cleanuppost', true);
+                    if (!empty($msg) && \is_array($msg)) {
+                        $collect = (object) $msg;
+
+                        $clmsg = '<div class="gc"><ul>';
+                        $clmsg .= '<li><span>'.esc_html__('Revisions', 'docket-cache').'</span>'.$collect->revision.'</li>';
+                        $clmsg .= '<li><span>'.esc_html__('Auto Drafts', 'docket-cache').'</span>'.$collect->autodraft.'</li>';
+                        $clmsg .= '<li><span>'.esc_html__('Trash Bin', 'docket-cache').'</span>'.$collect->trashbin.'</li>';
+                        $clmsg .= '</ul>';
+
+                        if (isset($collect->site) && is_multisite()) {
+                            /* translators: %d = sites */
+                            $clmsg .= '<p>'.sprintf(esc_html__('From %d sites', 'docket-cache'), $collect->site).'</p>';
+                        }
+
+                        $clmsg .= '</div>';
+
+                        $this->pt->notice .= $clmsg;
+                    }
+                    unset($msg, $clmsg);
+                    break;
+                case 'docket-cleanuppostok-failed':
+                    $this->pt->notice = esc_html__('Failed to cleanup Post.', 'docket-cache');
+                    break;
+                case 'docket-cleanuppostok-warn':
+                    $this->pt->notice = esc_html__('Post already cleanup. Try again in a few seconds.', 'docket-cache');
                     break;
             }
         }

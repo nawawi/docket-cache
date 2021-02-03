@@ -5,7 +5,7 @@ Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
 Tested up to: 5.6
 Requires PHP: 7.2.5
-Stable tag: 20.12.04
+Stable tag: 21.01.01
 License: MIT
 License URI: ./license.txt
 
@@ -42,8 +42,7 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 - Cache Log
 - Cronbot Service
 - WP-CLI support
-- Multisite support
-- Multi-Network support
+- Multisite / Multi-Network support
 
 == Requirements ==
 
@@ -69,20 +68,24 @@ There is a lot of room for improvement and features to add, require plenty of pe
 
 Thank you for sponsoring Docket Cache.
 
-Sponsored by:
+**Sponsored by:**
+
+A heartful thanks and appreciation.
 
 - [Exnano Creative](https://exnano.io/?utm_source=docketcachewporg)
 - [Cun Host](https://cunhost.com/?utm_source=docketcachewporg)
 - [DNSVault](https://dnsvault.net/?utm_source=docketcachewporg)
 - [Jimat Hosting](https://jimathosting.com/?utm_source=docketcachewporg)
 
-Affiliates with:
+**Affiliates with:**
 
-- [Dreamhost](https://mbsy.co/3cGLwM)
-- [LiteSpeed](https://store.litespeedtech.com/store/aff.php?aff=1260&promo=wpaccel)
-- [Bluehost](https://www.bluehost.com/track/docketcache/)
+By using one of the services below, you are indirectly sponsoring this project. We get a commission for every successful sale.
+
 - [Onlinenic](https://onlinenic.com/en/Home/cloudReferral.html?usercode=87783819348ea6021e9df91d9bfd4981)
 - [Digitalocean](https://m.do.co/c/6c93db5b1ef6)
+- [LiteSpeed](https://store.litespeedtech.com/store/aff.php?aff=1260&promo=wpaccel)
+- [Dreamhost](https://mbsy.co/3cGLwM)
+- [Bluehost](https://www.bluehost.com/track/docketcache/)
 - [WPJohnny](https://wpjohnny.com?ref=1)
 
 The Docket Cache has been reported seemly works with these hosting provider:
@@ -161,7 +164,7 @@ To use it in Windows OS, create RAM Disk and change [DOCKET_CACHE_PATH](https://
 By default, WordPress allocates the memory limit to 256 MB. Combined with MySQL and Web Server, you need more than 256 MB. If you're using a cheap hosting plan that allocates only 256 MB for totals usage. It is not enough, and Docket Cache can't improve your website performance.
 
 = What’s the difference with the other object cache plugins? =
-Docket Cache is an Object Cache Accelerator. It does some Optimisation of caching like cache post queries, comments counting, WordPress translation and more before storing the object caches.
+Docket Cache is an Object Cache Accelerator. It does some optimization of caching like cache post queries, comments counting, WordPress translation and more before storing the object caches.
 
 = Can I pair using it with other cache plugin? =
 Yes and No. You can pair using it with page caching plugin, but not with the object cache plugin.
@@ -173,6 +176,16 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.01.01 =
+
+- Fixed Tweaks::woocommerce_cart_fragments_remove() -> check if "wc-cart-fragments" script exists.
+- Fixed WP_Object_Cache::dc_precache_set -> ignore transient, site-transient.
+- Added Configuration Options -> Runtime Options.
+- Added Configuration Actions -> Config reset.
+- Added Configuration Actions -> Cleanup Post revisions, auto drafts, trash bin.
+- Added WP-CLI command -> runtime:install, runtime:reset.
+
+
 = 20.12.04 =
 
 - Fixed Limit WP-Admin HTTP Requests -> invalid variable pagenow.

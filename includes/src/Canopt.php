@@ -112,6 +112,12 @@ final class Canopt extends Bepart
             'objectcacheoff' => esc_html__('Suspend Object Cache', 'docket-cache'),
             'opcshutdown' => esc_html__('Flush OPcache During Deactivation', 'docket-cache'),
             'limithttprequest' => esc_html__('Limit WP-Admin HTTP requests', 'docket-cache'),
+            'rtpostautosave' => esc_html__('Auto Save Interval', 'docket-cache'),
+            'rtpostrevision' => esc_html__('Post Revisions', 'docket-cache'),
+            'rtpostemptytrash' => esc_html__('Trash Bin', 'docket-cache'),
+            'rtpluginthemeeditor' => esc_html__('Deactivate Plugin / Theme Editor', 'docket-cache'),
+            'rtpluginthemeinstall' => esc_html__('Deactivate Plugin / Theme Update and Installation', 'docket-cache'),
+            'rtimageoverwrite' => esc_html__('Cleanup Image Edits', 'docket-cache'),
         ];
 
         $data = apply_filters('docketcache/filter/optionkeys', $data);
@@ -382,5 +388,32 @@ final class Canopt extends Bepart
         $fkey = 'lockup-'.$key;
 
         return $this->unlock($fkey);
+    }
+
+    public function reset()
+    {
+        $this->clear_lock();
+
+        $parts = [
+            'options',
+            'runtime',
+            'pings',
+            'cronbot',
+            'checkversion',
+            'cachestats',
+            'gc',
+        ];
+
+        $ok = true;
+        foreach ($parts as $part) {
+            $file = $this->path.'/'.$part.'.php';
+            if (@is_file($file) && is_writable($file)) {
+                if (!@unlink($file)) {
+                    $ok = false;
+                }
+            }
+        }
+
+        return $ok;
     }
 }

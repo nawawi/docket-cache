@@ -92,6 +92,13 @@ final class Plugin extends Bepart
     public $cronbot_endpoint;
 
     /**
+     * WpConfig runtime notice.
+     *
+     * @var bool
+     */
+    public $inruntime = false;
+
+    /**
      * constructor.
      */
     public function __construct()
@@ -707,6 +714,76 @@ final class Plugin extends Bepart
         return $siteid;
     }
 
+    public function cleanuppost()
+    {
+        if (!nwdcx_wpdb($wpdb)) {
+            return false;
+        }
+
+        $sites = $this->get_network_sites($siteall);
+        $is_multisite = is_multisite();
+
+        $collect = [
+            'revision' => 0,
+            'autodraft' => 0,
+            'trashbin' => 0,
+        ];
+
+        if ($is_multisite) {
+            $collect['site'] = \count($sites);
+        }
+
+        $suppress = $wpdb->suppress_errors(true);
+        $doflush = false;
+        foreach ($sites as $num => $site) {
+            if ($is_multisite) {
+                switch_to_blog($site['id']);
+            }
+
+            $query = $wpdb->get_col($wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE post_type = %s ORDER BY ID ASC LIMIT 1000", 'revision'));
+            if ($query) {
+                foreach ($query as $id) {
+                    $id = (int) $id;
+                    wp_delete_post_revision($id);
+                    $doflush = true;
+                }
+                $collect['revision'] += \count($query);
+            }
+
+            $query = $wpdb->get_col($wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE post_status = %s ORDER BY ID ASC LIMIT 1000", 'auto-draft'));
+            if ($query) {
+                foreach ($query as $id) {
+                    $id = (int) $id;
+                    wp_delete_post($id, true);
+                    $doflush = true;
+                }
+                $collect['autodraft'] += \count($query);
+            }
+
+            $query = $wpdb->get_col($wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE post_status = %s ORDER BY ID ASC LIMIT 1000", 'trash'));
+            if ($query) {
+                foreach ($query as $id) {
+                    $id = (int) $id;
+                    wp_delete_post($id, true);
+                    $doflush = true;
+                }
+                $collect['autodraft'] += \count($query);
+            }
+
+            if ($is_multisite) {
+                restore_current_blog();
+            }
+        }
+
+        $wpdb->suppress_errors($suppress);
+
+        if ($doflush) {
+            $this->flush_cache();
+        }
+
+        return (object) $collect;
+    }
+
     /**
      * wearechampion.
      */
@@ -732,11 +809,9 @@ final class Plugin extends Bepart
      */
     private function compat_notice()
     {
-        $phpver = '7.2.5';
-        /* translators: %s: php version */
-        $text = sprintf(__('Docket Cache plugin requires PHP %s or greater.', 'docket-cache'), $phpver);
+        if (!(\PHP_VERSION_ID >= 70205)) {
+            $text = __('Docket Cache plugin requires PHP 7.2.5 or greater.', 'docket-cache');
 
-        if (version_compare(PHP_VERSION, $phpver, '<')) {
             add_action(
                 'all_admin_notices',
                 function () use ($text) {
@@ -782,6 +857,8 @@ final class Plugin extends Bepart
         $this->suspend_wp_options_autoload(false);
 
         if ($is_uninstall) {
+            WpConfig::runtime_remove();
+
             // reset on/off button
             $this->co()->save('objectcacheoff', 'default');
 
@@ -863,6 +940,7 @@ final class Plugin extends Bepart
 
         $this->token = '';
         $this->notice = '';
+        $this->inruntime = false;
     }
 
     /**
@@ -1580,6 +1658,10 @@ final class Plugin extends Bepart
                         );
                         break;
                 }
+
+                if (WpConfig::is_runtimeconst($name)) {
+                    WpConfig::write_runtime();
+                }
             },
             -1,
             3
@@ -1735,6 +1817,16 @@ final class Plugin extends Bepart
      */
     private function register_tweaks()
     {
+        if (\defined('AUTOSAVE_INTERVAL') && false === AUTOSAVE_INTERVAL) {
+            add_action(
+                'init',
+                function () {
+                    wp_deregister_script('autosave');
+                },
+                PHP_INT_MAX
+            );
+        }
+
         $this->wearechampion();
 
         if (class_exists('Nawawi\\DocketCache\\Tweaks')) {
@@ -1886,6 +1978,8 @@ final class Plugin extends Bepart
             \WP_CLI::add_command('cache reset:cron', [$cli, 'reset_cron']);
             \WP_CLI::add_command('cache flush:precache', [$cli, 'flush_precache']);
             \WP_CLI::add_command('cache flush', [$cli, 'flush_cache']);
+            \WP_CLI::add_command('cache runtime:install', [$cli, 'runtime_install']);
+            \WP_CLI::add_command('cache runtime:remove', [$cli, 'runtime_remove']);
             \WP_CLI::add_command('cache status', [$cli, 'status']);
             \WP_CLI::add_command('cache type', [$cli, 'type']);
 

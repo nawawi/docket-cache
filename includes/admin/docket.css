@@ -370,6 +370,7 @@ body {
 #docket-cache .flex-container .postbox .inside .bt-cx {
     margin-top: 10px;
     margin-bottom: 10px;
+    width: 100%;
     display: table;
 }
 
