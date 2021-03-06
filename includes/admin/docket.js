@@ -47,6 +47,9 @@
 
                             $selector.find( '.notice-focus' )
                                 .removeClass( 'notice-focus' );
+
+                            $selector.find( 'p#innotice' )
+                                .remove();
                         }
                     );
 
@@ -87,6 +90,22 @@
                         }
                     );
 
+                $selector.find( 'select.config-filter' )
+                    .on(
+                        'change.dc-select-config-filter',
+                        function() {
+                            var $self = $( this );
+                            var s = $self.children( 'option:selected' )
+                                .val();
+                            var f = 'all' !== s ? '@filter:' + s : '';
+                            $selector.find( 'input[type=search][name=s]' )
+                                .val( f );
+                            $selector.find( 'form#search-filter' )
+                                .submit();
+                            return false;
+                        }
+                    );
+
                 window.dospinner = false;
                 var spinner = function() {
                     if ( !window.dospinner ) {
@@ -124,6 +143,27 @@
                             }
                             window.dospinner = true;
                             spinner();
+                        }
+                    );
+
+                $selector.find( 'a.btx-cleanuppost' )
+                    .on(
+                        'click.cleanuppost',
+                        function( e ) {
+                            e.preventDefault();
+                            var url = $( this )
+                                .attr( 'href' );
+                            url = url.replace( /\&siteid=.*/, '' );
+                            var siteid = $selector.find( 'select#siteid' )
+                                .children( 'option:selected' )
+                                .val() || false;
+                            if ( siteid ) {
+                                url += '&siteid=' + siteid;
+                            }
+                            window.dospinner = true;
+                            spinner();
+                            window.location.replace( url );
+                            return false;
                         }
                     );
 

@@ -32,6 +32,16 @@ namespace Nawawi\DocketCache;
                         <?php echo $this->config_select_bool('cronbot'); ?>
                     </td>
                 </tr>
+                <tr id="opcviewer">
+                    <th>
+                        <?php
+                        echo esc_html__('OPcache Viewer', 'docket-cache').$this->tooltip('opcviewer');
+                        ?>
+                    </th>
+                    <td>
+                        <?php echo $this->config_select_bool('opcviewer'); ?>
+                    </td>
+                </tr>
 
                 <?php $this->render('@inc:features'); ?>
 
@@ -252,7 +262,7 @@ namespace Nawawi\DocketCache;
                                     'default' => __('Default', 'docket-cache'),
                                     '3' => __('Limit to 3 Revisions', 'docket-cache'),
                                     '5' => __('Limit to 5 Revisions', 'docket-cache'),
-                                    'on' => __('Enable', 'docket-cache'),
+                                    'on' => __('No Limit', 'docket-cache'),
                                     'off' => __('Disable', 'docket-cache'),
                                 ]
                             );

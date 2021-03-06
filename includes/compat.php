@@ -231,8 +231,14 @@ if (!\function_exists('nwdcx_construe')) {
     function nwdcx_construe($name)
     {
         $name = nwdcx_constfx($name);
+        if (\defined($name)) {
+            $value = (bool) \constant($name);
+            if (true === $value || 1 === $value) {
+                return true;
+            }
+        }
 
-        return \defined($name) && \constant($name);
+        return false;
     }
 }
 
@@ -264,6 +270,17 @@ if (!\function_exists('nwdcx_consdef')) {
         $name = nwdcx_constfx($name);
 
         return !\defined($name) && \define($name, $value);
+    }
+}
+
+if (!\function_exists('nwdcx_suppresserrors')) {
+    function nwdcx_suppresserrors($level = true)
+    {
+        $errlevel = error_reporting();
+        $erropt = true === $level ? 0 : $level;
+        error_reporting($erropt);
+
+        return $errlevel;
     }
 }
 

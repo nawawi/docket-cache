@@ -720,7 +720,7 @@ final class Plugin extends Bepart
             return false;
         }
 
-        $sites = $this->get_network_sites($siteall);
+        $sites = $this->get_network_sites();
         $is_multisite = is_multisite();
 
         $collect = [
@@ -729,14 +729,24 @@ final class Plugin extends Bepart
             'trashbin' => 0,
         ];
 
+        $siteid = 0;
         if ($is_multisite) {
             $collect['site'] = \count($sites);
+
+            if (isset($_GET['siteid'])) {
+                $siteid = (int) sanitize_text_field($_GET['siteid']);
+                $this->set_current_select_siteid($siteid);
+            }
         }
 
         $suppress = $wpdb->suppress_errors(true);
         $doflush = false;
         foreach ($sites as $num => $site) {
             if ($is_multisite) {
+                if (!empty($siteid) && $siteid !== (int) $site['id']) {
+                    continue;
+                }
+
                 switch_to_blog($site['id']);
             }
 
@@ -782,6 +792,31 @@ final class Plugin extends Bepart
         }
 
         return (object) $collect;
+    }
+
+    public function delete_current_select_siteid($userid = false)
+    {
+        if (empty($userid)) {
+            $userid = get_current_user_id();
+        }
+
+        $key = 'current-select-siteid-'.get_current_user_id();
+
+        return $this->co()->lookup_delete($key);
+    }
+
+    public function get_current_select_siteid()
+    {
+        $key = 'current-select-siteid-'.get_current_user_id();
+
+        return (int) $this->co()->lookup_get($key);
+    }
+
+    public function set_current_select_siteid($id)
+    {
+        $key = 'current-select-siteid-'.get_current_user_id();
+
+        return $this->co()->lookup_set($key, $id);
     }
 
     /**
@@ -847,6 +882,8 @@ final class Plugin extends Bepart
      */
     private function deactivate_cleanup($is_uninstall = false)
     {
+        WpConfig::unlink_runtime();
+
         if ($this->cx()->validate()) {
             $this->cx()->uninstall();
         }
@@ -1314,6 +1351,18 @@ final class Plugin extends Bepart
                     );
                 }
 
+                if ($this->cf()->is_dctrue('OPCVIEWER')) {
+                    $title = esc_html__('OPcache', 'docket-cache');
+                    add_submenu_page(
+                        $this->slug,
+                        $title,
+                        $title,
+                        $cap,
+                        $this->slug.'-opcviewer',
+                        [$view, 'index']
+                    );
+                }
+
                 do_action('docketcache/view/submenubefore', $this->slug, $cap, $view);
 
                 if ($this->cf()->is_dctrue('LOG')) {
@@ -1476,6 +1525,7 @@ final class Plugin extends Bepart
                         if (\is_object($user) && isset($user->ID)) {
                             wp_cache_delete($user->ID, 'user_meta');
                             $this->delete_cron_siteid($user->ID);
+                            $this->delete_current_select_siteid($user->ID);
                         }
                     },
                     PHP_INT_MAX

@@ -72,6 +72,7 @@ body {
     border-bottom: 1px solid #ddd;
 }
 
+#docket-cache .form-table .btitle,
 #docket-cache .form-table .stitle {
     border: none !important;
     padding-top: 15px !important;
@@ -79,6 +80,14 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
     font-size: 14px !important;
     text-transform: uppercase;
+}
+
+#docket-cache .form-table .btitle a {
+    text-decoration: none;
+}
+
+#docket-cache .form-table .btitle .dashicons {
+    margin-right: 0;
 }
 
 #docket-cache .form-table th {
@@ -204,6 +213,20 @@ body {
     background-color: #ddd;
 }
 
+#docket-cache div.qact select {
+    margin: 6px 0 6px 0;
+    padding: 2px 8px;
+    width: 180px;
+    font-family: monospace, Consolas, Monaco;
+    unicode-bidi: embed;
+    font-size: 12px;
+    width: 100%;
+}
+
+#docket-cache div.qact label {
+    font-size: 12px;
+}
+
 /* config */
 
 #docket-cache .form-table-selection td,
@@ -237,6 +260,10 @@ body {
     text-transform: uppercase;
     font-weight: normal;
     font-size: 16px;
+}
+
+#docket-cache h2.title-below {
+    margin-top: 30px;
 }
 
 #docket-cache h3.title {
@@ -705,6 +732,77 @@ body {
 }
 
 /* /gridlist */
+
+/* opcklist */
+#docket-cache select.config-filter {
+    min-width: 180px;
+}
+
+#docket-cache .grid-opclist {
+    padding-top: 16px;
+}
+
+#docket-cache .grid-opclist td {
+    word-wrap: break-word;
+}
+
+#docket-cache .opcconfig th,
+#docket-cache .opcconfig th a {
+    font-weight: normal;
+    font-family: monospace, Consolas, Monaco;
+    unicode-bidi: embed;
+}
+
+#docket-cache .opcconfig th a {
+    text-decoration: none;
+    color: #444444;
+}
+
+#docket-cache .opcconfig th a:hover {
+    text-decoration: underline;
+    color: orangered;
+}
+
+#docket-cache .rsep {
+    position: relative;
+    float: right;
+    text-align: center;
+    vertical-align: middle;
+    min-width: 2px;
+    margin-right: 6px;
+}
+
+/* desktop */
+@media only screen and (min-width: 782px) {
+    #docket-cache .opcache .form-table:not(.opcconfig) th {
+        min-width: 200px;
+    }
+
+    #docket-cache .td-second {
+        width: 200px;
+    }
+
+    #docket-cache .th-third {
+        padding-left: 50px;
+    }
+
+    #docket-cache .opcache .opcconfig th {
+        min-width: 350px;
+    }
+}
+
+@media only screen and (max-width:782px) {
+    #docket-cache .rsep {
+        display: none;
+    }
+
+    #docket-cache select.config-filter {
+        display: block !important;
+        width: 100%;
+    }
+}
+
+/* /opcklist */
 
 #docket-cache .gc ul,
 #docket-cache .gc li {

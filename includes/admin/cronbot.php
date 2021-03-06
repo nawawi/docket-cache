@@ -62,7 +62,7 @@ else :
                 <?php endif; ?>
             </p>
 
-            <?php $this->tab_title(esc_html__('Cron Events', 'docket-cache')); ?>
+            <?php $this->tab_title(esc_html__('Cron Events', 'docket-cache'), 'title-below'); ?>
             <table class="form-table">
                 <?php
                 $title = esc_html__('Cron Events For Site', 'docket-cache');
@@ -73,10 +73,10 @@ else :
                     <th><?php echo $title; ?></th>
                     <td><select id="siteid" class="config-select">
                             <?php
-                            $cronbot_siteid = $this->pt->get_cron_siteid();
+                            $cronbot_siteid = (int) $this->pt->get_cron_siteid();
 
                             foreach ($sites as $site) {
-                                $site_id = $site['id'];
+                                $site_id = (int) $site['id'];
                                 $site_url = $site['url'];
                                 $v = '['.$site_id.'] '.nwdcx_noscheme($site_url);
                                 $url = $this->pt->action_query(

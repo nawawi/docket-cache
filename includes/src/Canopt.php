@@ -96,6 +96,7 @@ final class Canopt extends Bepart
             'wpoptaload' => esc_html__('Suspend WP Options Autoload', 'docket-cache'),
             'cronoptmzdb' => esc_html__('Optimize Database Tables', 'docket-cache'),
             'cronbot' => esc_html__('Cronbot Service', 'docket-cache'),
+            'opcviewer' => esc_html__('OPcache Viewer', 'docket-cache'),
             'stats' => esc_html__('Object Cache Data Stats', 'docket-cache'),
             'gcaction' => esc_html__('Garbage Collector Action Button', 'docket-cache'),
             'autoupdate' => esc_html__('Docket Cache Auto Update', 'docket-cache'),
@@ -198,7 +199,7 @@ final class Canopt extends Bepart
 
     public function save($name, $value)
     {
-        if (!@wp_mkdir_p($this->path)) {
+        if (!$this->mkdir_p($this->path)) {
             return false;
         }
 
@@ -278,7 +279,7 @@ final class Canopt extends Bepart
     {
         $key = substr(md5($key), 0, 12);
         $path = $this->path_lock;
-        if (!@wp_mkdir_p($path.'/')) {
+        if (!$this->mkdir_p($path.'/')) {
             return false;
         }
         $this->placeholder($path);

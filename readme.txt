@@ -3,9 +3,9 @@ Contributors: nawawijamili
 Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance, redis, memcached, speed, multisite, server load, docket
 Donate link: https://www.patreon.com/bePatron?u=41796862
 Requires at least: 5.4
-Tested up to: 5.6
+Tested up to: 5.7
 Requires PHP: 7.2.5
-Stable tag: 21.01.01
+Stable tag: 21.02.01
 License: MIT
 License URI: ./license.txt
 
@@ -79,7 +79,7 @@ A heartful thanks and appreciation.
 
 **Affiliates with:**
 
-By using one of the services below, you are indirectly sponsoring this project. We get a commission for every successful sale.
+By subscribing service using link one of the services below, you are indirectly sponsoring this project. We get a commission for every successful sale.
 
 - [Onlinenic](https://onlinenic.com/en/Home/cloudReferral.html?usercode=87783819348ea6021e9df91d9bfd4981)
 - [Digitalocean](https://m.do.co/c/6c93db5b1ef6)
@@ -87,10 +87,11 @@ By using one of the services below, you are indirectly sponsoring this project. 
 - [Dreamhost](https://mbsy.co/3cGLwM)
 - [Bluehost](https://www.bluehost.com/track/docketcache/)
 - [WPJohnny](https://wpjohnny.com?ref=1)
+- [Luno](https://www.luno.com/invite/X3V4XC)
 
 The Docket Cache has been reported seemly works with these hosting provider:
 
-- [GB Network](https://www.gbnetwork.my/?utm_source=docketcachewporg)
+- [GB Network](https://secure.gbnetwork.com/aff.php?aff=805)
 - [Zenpipe](https://www.zenpipe.com/?utm_source=docketcachewporg)
 - [KelateBiz](https://kelate.biz/?utm_source=docketcachewporg)
 - [ServerFreak](https://secure.web-hosting.net.my/clients/aff.php?aff=4725)
@@ -176,6 +177,21 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.02.01 =
+
+- Fixed Filesystem::chmod() -> invalid mode for file.
+- Fixed Filesystem::define_cache_path() -> avoid checking if the cache path exists and create the content path if define.
+- Fixed Overview -> Cache Path not same with DOCKET_CACHE_PATH, due to error at define_cache_path().
+- Added Filesystem::mkdir_p() -> fix directory permissions issues, when web server and php have different user/group.
+- Added Filesystem::touch() -> fix notice "Utime failed: Operation not permitted" when web server and php have different user/group.
+- Added Filesysten::getchmod() -> gets file/dir permissions in octal format.
+- Added sites selection for cleanup post on multisite.
+- Added OPcache viewer.
+- Updated tested up to 5.7
+- Improved action notice at the configuration page.
+
+Thanks to @patrickwgs for reporting an issue on bedrock installation.
+
 = 21.01.01 =
 
 - Fixed Tweaks::woocommerce_cart_fragments_remove() -> check if "wc-cart-fragments" script exists.
@@ -184,7 +200,6 @@ Please do manually remove wp-content/object-cache.php and wp-content/cache/docke
 - Added Configuration Actions -> Config reset.
 - Added Configuration Actions -> Cleanup Post revisions, auto drafts, trash bin.
 - Added WP-CLI command -> runtime:install, runtime:reset.
-
 
 = 20.12.04 =
 

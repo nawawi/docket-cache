@@ -176,7 +176,7 @@ final class Resc
         /* translators: %s: file name */
         $text1 = sprintf(__('Docket Cache require to update the <code>%s</code> file to handle runtime options.', 'docket-cache'), $fname);
         $text2 = __('Copy and place the code below before <code>require_once ABSPATH . \'wp-settings.php\';</code>', 'docket-cache');
-        $text3 = __('Copy and place the code below at the end of the file.', 'docket-cache');
+        $text3 = __('Copy and place the code below after <code>Config::apply();</code>.', 'docket-cache');
         $text4 = __('<br>Or click <strong>Install</strong> to update it now.', 'docket-cache');
 
         $message = $text1.' ';

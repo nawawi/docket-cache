@@ -291,7 +291,8 @@ final class WpConfig
         $code = '<?php '.PHP_EOL;
         $code .= "if ( !defined('ABSPATH') ) { return; }".PHP_EOL;
         $code .= '$runtime = (object)'.var_export($runtime, 1).';'.PHP_EOL;
-
+        $code .= 'if ( !@is_dir($runtime->configpath) ) { return; }'.PHP_EOL;
+        $code .= 'if ( !@is_file($runtime->pluginpath.\'/docket-cache.php\') ) { return; }'.PHP_EOL;
         if (!empty($cons)) {
             $code .= $cons;
         }
@@ -300,7 +301,15 @@ final class WpConfig
 
         self::canopt()->opcache_flush($file);
 
-        return file_put_contents($file, $data, LOCK_EX);
+        return @file_put_contents($file, $data, LOCK_EX);
+    }
+
+    public static function unlink_runtime()
+    {
+        $file = self::canopt()->path.'/runtime.php';
+        if (@is_file($file)) {
+            @unlink($file);
+        }
     }
 
     public static function notice_filter($name, $value, $key)
@@ -330,7 +339,7 @@ final class WpConfig
                     $notice = sprintf(esc_html__('%s set to disable.', 'docket-cache'), $name);
                 } elseif ('on' === $value) {
                     /* translators: %s = option name */
-                    $notice = sprintf(esc_html__('%s set to enable.', 'docket-cache'), $name);
+                    $notice = sprintf(esc_html__('%s set to no limit.', 'docket-cache'), $name);
                 } else {
                     /* translators: %1$s = option name, %2$s = option_value */
                     $notice = sprintf(esc_html__('%1$s set limit to %2$s revisions.', 'docket-cache'), $name, $value);

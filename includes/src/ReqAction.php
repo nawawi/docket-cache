@@ -532,7 +532,7 @@ final class ReqAction
                     break;
                 case 'docket-option-wpf-warn':
                     /* translators: %s = option name */
-                    $this->pt->notice = sprintf(esc_html__('%s configuration has been defined in wp-config file.', 'docket-cache'), $option_name);
+                    $this->pt->notice = sprintf(esc_html__('%s configuration already defined or exists in wp-config.php file. This update has no effect.', 'docket-cache'), $option_name);
                     break;
                 case 'docket-action-failed':
                     /* translators: %s = option name */
@@ -592,9 +592,9 @@ final class ReqAction
                         $clmsg .= '<li><span>'.esc_html__('Trash Bin', 'docket-cache').'</span>'.$collect->trashbin.'</li>';
                         $clmsg .= '</ul>';
 
-                        if (isset($collect->site) && is_multisite()) {
+                        if (isset($collect->site) && is_multisite() && $this->pt->get_current_select_siteid() <= 0) {
                             /* translators: %d = sites */
-                            $clmsg .= '<p>'.sprintf(esc_html__('From %d sites', 'docket-cache'), $collect->site).'</p>';
+                            $clmsg .= '<p>'.sprintf(esc_html__('For %d sites', 'docket-cache'), $collect->site).'</p>';
                         }
 
                         $clmsg .= '</div>';

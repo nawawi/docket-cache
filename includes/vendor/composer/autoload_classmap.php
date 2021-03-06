@@ -19,6 +19,7 @@ return array(
     'Nawawi\\DocketCache\\EventList' => $baseDir . '/includes/src/EventList.php',
     'Nawawi\\DocketCache\\Filesystem' => $baseDir . '/includes/src/Filesystem.php',
     'Nawawi\\DocketCache\\MoCache' => $baseDir . '/includes/src/MoCache.php',
+    'Nawawi\\DocketCache\\OPcacheView' => $baseDir . '/includes/src/OPcacheView.php',
     'Nawawi\\DocketCache\\Plugin' => $baseDir . '/includes/src/Plugin.php',
     'Nawawi\\DocketCache\\PostCache' => $baseDir . '/includes/src/PostCache.php',
     'Nawawi\\DocketCache\\ReqAction' => $baseDir . '/includes/src/ReqAction.php',

@@ -24,6 +24,7 @@ final class View
     private $log_max_size;
     private $cache_max_size;
     private $cronbot_enable;
+    private $opcviewer_enable;
 
     public function __construct(Plugin $pt)
     {
@@ -42,6 +43,7 @@ final class View
         $this->log_max_size = $this->pt->normalize_size($this->vcf()->dcvalue('LOG_SIZE'));
         $this->cache_max_size = $this->pt->normalize_size($this->vcf()->dcvalue('MAXSIZE'));
         $this->cronbot_enable = $this->vcf()->is_dctrue('CRONBOT');
+        $this->opcviewer_enable = $this->vcf()->is_dctrue('OPCVIEWER');
     }
 
     /**
@@ -216,9 +218,10 @@ final class View
         $this->pt->cx()->delay_expire();
     }
 
-    private function tab_title($title)
+    private function tab_title($title, $cls = '')
     {
-        echo '<h2 class="title">'.$title.'</h2>';
+        $class = !empty($cls) ? ' '.$cls : '';
+        echo '<h2 class="title'.$class.'">'.$title.'</h2>';
         $this->action_notice();
     }
 
@@ -258,6 +261,11 @@ final class View
                     $idx = 'config';
                 }
                 break;
+            case 'opcviewer':
+                if (!$this->opcviewer_enable) {
+                    $idx = 'config';
+                }
+                break;
         }
 
         return $idx;
@@ -284,6 +292,10 @@ final class View
 
         if ($this->cronbot_enable) {
             $lists['cronbot'] = esc_html__('Cronbot', 'docket-cache');
+        }
+
+        if ($this->opcviewer_enable) {
+            $lists['opcviewer'] = esc_html__('OPcache', 'docket-cache');
         }
 
         $lists = apply_filters('docketcache/filter/view/tabnavbefore', $lists);
@@ -394,17 +406,25 @@ final class View
         $args = [];
         $args['idx'] = $idx;
 
+        if (\is_array($idx) && !empty($idx)) {
+            $args = array_merge($args, $idx);
+        }
+
         if ($quiet) {
             $args['quiet'] = 1;
         }
 
+        if (empty($args['nodefault'])) {
+            $options['default'] = __('Default', 'docket-cache');
+        }
+
+        $options['enable'] = __('Enable', 'docket-cache');
+        $options['disable'] = __('Disable', 'docket-cache');
+
+        $cls = !empty($args['cls']) ? $args['cls'] : 'config-select';
         $default = $default ? 'enable' : 'disable';
-        $html = '<select id="'.$name.'" class="config-select">';
-        foreach ([
-            'default' => __('Default', 'docket-cache'),
-            'enable' => __('Enable', 'docket-cache'),
-            'disable' => __('Disable', 'docket-cache'),
-        ] as $n => $v) {
+        $html = '<select id="'.$name.'" class="'.$cls.'">';
+        foreach ($options as $n => $v) {
             $action = $n.'-'.$name;
             $url = $this->pt->action_query($action, $args);
             $selected = $n === $default ? ' selected' : '';
@@ -485,6 +505,25 @@ final class View
         return false;
     }
 
+    private function opcache_view()
+    {
+        static $inst;
+
+        try {
+            if (!\is_object($inst)) {
+                $inst = new OPcacheView($this->pt);
+            }
+
+            $inst->prepare_items();
+
+            return $inst;
+        } catch (\Throwable $e) {
+            nwdcx_throwable(__METHOD__, $e);
+        }
+
+        return false;
+    }
+
     private function code_focus()
     {
         if (empty($_GET['nx'])) {
@@ -505,6 +544,8 @@ final class View
         $code .= 'fx[0].scrollIntoView({block:"center", behavior:"smooth"});';
         $code .= 'if ( $(document).find("div").hasClass("notice") ) {';
         $code .= 'fx.addClass("notice-focus");';
+        $code .= 'var ftxt = $(document).find("div.notice").text();';
+        $code .= 'fx.children("td").append("<p id=\"innotice\">"+ftxt+"</p>");';
         $code .= 'setTimeout(function() { fx.removeClass("notice-focus"); }, 3000);';
         $code .= '}';
         $code .= '}';
@@ -520,6 +561,7 @@ final class View
         $info = [
             'cronbot' => esc_html__('The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively.', 'docket-cache'),
             'log' => esc_html__('The cache log intends to provide information on how the cache works. For performance and security concerns, disable it if no longer needed.', 'docket-cache'),
+            'opcviewer' => esc_html__('OPcache Viewer allows you to view OPcache status and usage.', 'docket-cache'),
             'advcpost' => esc_html__('Cache WordPress Post Queries which results in faster data retrieval and reduced database workload.', 'docket-cache'),
             'precache' => esc_html__('Increase cache performance by early loading cached objects based on the current URL.', 'docket-cache'),
             'mocache' => esc_html__('Improve the performance of the WordPress Translation function.', 'docket-cache'),

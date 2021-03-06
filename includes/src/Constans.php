@@ -333,6 +333,9 @@ final class Constans
         // docket cronbot
         $this->maybe_define($this->px('CRONBOT_MAX'), 10);
 
+        // opcviewer
+        $this->maybe_define($this->px('OPCVIEWER'), false);
+
         // cache stats
         $this->maybe_define($this->px('STATS'), true);
 

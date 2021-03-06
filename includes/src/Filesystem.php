@@ -90,31 +90,122 @@ class Filesystem
     }
 
     /**
+     * touch.
+     */
+    public function touch($file, $time = 0, $atime = 0)
+    {
+        if (0 == $time) {
+            $time = time();
+        }
+
+        if (0 == $atime) {
+            $atime = time();
+        }
+
+        $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+
+        $ok = @touch($file, $time, $atime);
+
+        // user:group not same -> Utime failed: Operation not permitted
+        if (!$ok) {
+            $e = error_get_last();
+            if (!\is_array($e)) {
+                nwdcx_throwable(__METHOD__, $e);
+            }
+        }
+
+        // restore error level
+        nwdcx_suppresserrors($nwdcx_suppresserrors);
+
+        return $ok;
+    }
+
+    /**
+     * getchmod.
+     */
+    public function getchmod($file)
+    {
+        return substr(decoct(@fileperms($file)), -3);
+    }
+
+    /**
      * chmod.
      */
-    public function chmod($file)
+    public function chmod($file, $mode = false)
     {
-        static $cache = [];
+        if (!$mode) {
+            if (@is_file($file) && \defined('FS_CHMOD_FILE')) {
+                $mode = FS_CHMOD_FILE;
+            } elseif (@is_dir($file) && \defined('FS_CHMOD_DIR')) {
+                $mode = FS_CHMOD_DIR;
+            } else {
+                clearstatcache();
+                $stat = @stat(\dirname($file));
+                $mode = $stat['mode'] & 0007777;
 
-        if (isset($cache[$file])) {
-            return $cache[$file];
-        }
-
-        if (@is_file($file) && \defined('FS_CHMOD_FILE')) {
-            $perms = FS_CHMOD_FILE;
-        } elseif (@is_dir($file) && \defined('FS_CHMOD_DIR')) {
-            $perms = FS_CHMOD_DIR;
-        } else {
-            $stat = @stat(\dirname($file));
-            $perms = $stat['mode'] & 0007777;
-            $perms = $perms & 0000666;
-        }
-
-        if (@chmod($file, $perms)) {
-            $cache[$file] = $perms;
+                if (@is_file($file)) {
+                    $mode = $mode & 0000666;
+                }
+            }
         }
 
         clearstatcache();
+
+        $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+
+        $ok = @chmod($file, $mode);
+
+        nwdcx_suppresserrors($nwdcx_suppresserrors);
+
+        return $ok;
+    }
+
+    /**
+     * mkdir.
+     */
+    public function mkdir_p($path)
+    {
+        $parent = \dirname($path);
+        $okperms = [
+            '777',
+            '775',
+            '755',
+        ];
+
+        if (@is_dir($path) && \in_array($this->getchmod($path), $okperms) && \in_array($this->getchmod($parent), $okperms)) {
+            return true;
+        }
+
+        $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+
+        if (\function_exists('wp_mkdir_p')) {
+            $ok = @wp_mkdir_p($path);
+        } else {
+            $stat = @stat($parent);
+            if ($stat) {
+                $dir_perms = $stat['mode'] & 0007777;
+            } else {
+                $dir_perms = 0777;
+            }
+
+            $ok = @mkdir($path, $dir_perms, true);
+        }
+
+        nwdcx_suppresserrors($nwdcx_suppresserrors);
+
+        if (!$ok) {
+            return false;
+        }
+
+        if (!\in_array($this->getchmod($parent), $okperms)) {
+            $this->chmod($parent, 0755);
+        }
+
+        if (!\in_array($this->getchmod($path), $okperms)) {
+            $this->chmod($path, 0755);
+        }
+
+        return true;
     }
 
     /**
@@ -450,7 +541,7 @@ class Filesystem
         }
 
         if (\function_exists('opcache_compile_file') && $this->is_php($file) && @is_file($file) && false === $this->opcache_is_cached($file)) {
-            @touch($file, time() - 60);
+            $this->touch($file, time() - 60);
 
             try {
                 return @opcache_compile_file($file);
@@ -514,9 +605,22 @@ class Filesystem
      */
     public function define_cache_path($cache_path)
     {
-        $cache_path = !empty($cache_path) && @is_dir($cache_path) && '/' !== $cache_path ? rtrim($cache_path, '/\\').'/' : DOCKET_CACHE_CONTENT_PATH.'/cache/docket-cache/';
+        $content_path = \defined('DOCKET_CACHE_CONTENT_PATH') ? DOCKET_CACHE_CONTENT_PATH : WP_CONTENT_DIR;
+
+        $cache_path = !empty($cache_path) && '/' !== $cache_path ? rtrim($cache_path, '/\\').'/' : $content_path.'/cache/docket-cache/';
         if (!$this->is_docketcachedir($cache_path)) {
             $cache_path = rtim($cache_path, '/').'docket-cache/';
+        }
+
+        // create if not normal installation
+        if (false === strpos($content_path, '/wp-content/')) {
+            if (!@is_dir($cache_path)) {
+                $this->mkdir_p($cache_path);
+            }
+
+            if (!@is_dir($content_path)) {
+                $this->mkdir_p($content_path);
+            }
         }
 
         return $cache_path;
@@ -542,7 +646,7 @@ class Filesystem
 
         $flush_lock = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-flush.txt';
         if ($this->put($flush_lock, time())) {
-            @touch($flush_lock, time() + 120);
+            $this->touch($flush_lock, time() + 120);
         }
 
         foreach ($this->scanfiles($dir) as $object) {
@@ -684,7 +788,7 @@ class Filesystem
             }
 
             // update timestamp
-            @touch($file_fatal);
+            $this->touch($file_fatal);
         }
     }
 
@@ -696,7 +800,7 @@ class Filesystem
         $errmsg = date('Y-m-d H:i:s T').PHP_EOL.$error;
         if ($this->dump($file_fatal, $errmsg)) {
             if ($seconds > 0) {
-                @touch($file, time() + $seconds);
+                $this->touch($file, time() + $seconds);
             }
 
             $this->dump(\dirname($file_fatal).'/last-error.txt', $errmsg);

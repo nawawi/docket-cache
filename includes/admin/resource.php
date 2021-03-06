@@ -15,17 +15,36 @@ namespace Nawawi\DocketCache;
 <?php $this->tab_title(esc_html__('Actions', 'docket-cache')); ?>
 <div class="qact">
     <div class="cmd">
+        <h4><?php esc_html_e('Cleanup Post', 'docket-cache'); ?></h4>
+        <p>
+            <?php esc_html_e('Cleanup Revisions, Auto Draft, Trash Bin.', 'docket-cache'); ?>
+        </p>
+        <?php
+            $sites = $this->pt->get_network_sites();
+        if (is_multisite() && !empty($sites) && \is_array($sites) && \count($sites) > 1) :
+            $current_siteid = (int) $this->pt->get_current_select_siteid();
+            ?>
+        <label for="siteid"><?php esc_html_e('For Site:', 'docket-cache'); ?></label>
+        <select id="siteid">
+            <option value='0' <?php echo 0 === $current_siteid ? ' selected' : ''; ?>><?php esc_html_e('all', 'docket-cache'); ?></option>
+            <?php
+            foreach ($sites as $site) {
+                $site_id = (int) $site['id'];
+                $site_url = $site['url'];
+                $v = nwdcx_noscheme($site_url);
+                $selected = $site_id > 0 && $site_id === $current_siteid ? ' selected' : '';
+                echo '<option value="'.$site_id.'"'.$selected.'>'.$v.'</option>';
+            }
+            ?>
+        </select>
+        <?php endif; ?>
+        <a href="<?php echo $this->pt->action_query('cleanuppost', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner btx-cleanuppost"><?php esc_html_e('Cleanup Post', 'docket-cache'); ?></a>
+        <hr>
         <h4><?php esc_html_e('Config Reset', 'docket-cache'); ?></h4>
         <p>
             <?php esc_html_e('Reset all configuration to default.', 'docket-cache'); ?>
         </p>
         <a href="<?php echo $this->pt->action_query('configreset', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Reset to default', 'docket-cache'); ?></a>
-        <hr>
-        <h4><?php esc_html_e('Cleanup Post', 'docket-cache'); ?></h4>
-        <p>
-            <?php esc_html_e('Cleanup Revisions, Auto Draft, Trash Bin.', 'docket-cache'); ?>
-        </p>
-        <a href="<?php echo $this->pt->action_query('cleanuppost', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Cleanup Post', 'docket-cache'); ?></a>
     </div>
 </div>
 <?php $this->tab_title(esc_html__('Resources', 'docket-cache')); ?>

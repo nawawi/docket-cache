@@ -998,7 +998,7 @@ class WP_Object_Cache
             return false;
         }
 
-        if (!wp_mkdir_p($this->cache_path)) {
+        if (!$this->fs()->mkdir_p($this->cache_path)) {
             return false;
         }
 
