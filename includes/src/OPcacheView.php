@@ -1,11 +1,11 @@
 <?php
 /**
- * Docket Cache Premium.
+ * Docket Cache.
  *
- * @author  Ghostbird Media
- * @license Commercial
+ * @author  Nawawi Jamili
+ * @license MIT
  *
- * @see    https://docketcache.com
+ * @see    https://github.com/nawawi/docket-cache
  */
 
 namespace Nawawi\DocketCache;
