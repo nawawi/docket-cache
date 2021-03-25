@@ -1,10 +1,18 @@
+= v21.02.02 (2021-03-25) =
+
+- Fixed Plugin::is_subpage() -> opcach viewer left menu link.
+- Fixed Filesystem::fastcgi_close() -> Theme editor failed to verify updated file.
+- Added Tweaks::http_headers_expect() -> HTTP Request Expect header tweaks.
+
+Thanks to Oleg for reporting an issue with Theme Editor https://docketcache.com/feedback/#comment-2
+
 = v21.02.01 (2021-03-06)
 
 - Fixed Filesystem::chmod() -> invalid mode for file.
 - Fixed Filesystem::define_cache_path() -> avoid checking if the cache path exists and create the content path if define.
 - Fixed Overview -> Cache Path not same with DOCKET_CACHE_PATH, due to error at define_cache_path().
-- Added Filesystem::mkdir_p() -> fix directory permissions issues, when web server and php have different user/group.
-- Added Filesystem::touch() -> fix notice "Utime failed: Operation not permitted" when web server and php have different user/group.
+- Added Filesystem::mkdir_p() -> fix directory permissions issues, when web server and php has different user/group.
+- Added Filesystem::touch() -> fix notice "Utime failed: Operation not permitted" when web server and php has different user/group.
 - Added Filesysten::getchmod() -> gets file/dir permissions in octal format.
 - Added OPcache viewer.
 - Added sites selection for cleanup post on multisite.

@@ -1,11 +1,11 @@
 === Docket Cache - Object Cache Accelerator ===
 Contributors: nawawijamili
 Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance, redis, memcached, speed, multisite, server load, docket
-Donate link: https://www.patreon.com/bePatron?u=41796862
+Donate link: https://docketcache.com/sponsorship/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg
 Requires at least: 5.4
 Tested up to: 5.7
 Requires PHP: 7.2.5
-Stable tag: 21.02.01
+Stable tag: 21.02.02
 License: MIT
 License URI: ./license.txt
 
@@ -38,7 +38,7 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 - WooCommerce Optimisation
 - WP Options Autoload suspension
 - Post Missed Schedule Tweaks
-- Object Cache + OPcache Stats
+- Object Cache + OPcache Stats + OPcache Viewer
 - Cache Log
 - Cronbot Service
 - WP-CLI support
@@ -64,7 +64,9 @@ To adjust the plugin behaviour, installation or manage through a command line, p
 
 There is a lot of room for improvement and features to add, require plenty of person-hours dedicated to testing and development.
 
-[Become our sponsor](https://www.patreon.com/bePatron?u=41796862). All funds will be dedicated to maintenance, development, and marketing of this project.
+[Become our sponsor](https://docketcache.com/sponsorship/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg), to fund monthly or one-off, [alternatively here](https://github.com/nawawi/docket-cache/issues/5) for other options.
+
+All funds will be dedicated to maintenance, development, and marketing of this project.
 
 Thank you for sponsoring Docket Cache.
 
@@ -72,10 +74,11 @@ Thank you for sponsoring Docket Cache.
 
 A heartful thanks and appreciation.
 
-- [Exnano Creative](https://exnano.io/?utm_source=docketcachewporg)
-- [Cun Host](https://cunhost.com/?utm_source=docketcachewporg)
-- [DNSVault](https://dnsvault.net/?utm_source=docketcachewporg)
-- [Jimat Hosting](https://jimathosting.com/?utm_source=docketcachewporg)
+- [Exnano Creative](https://exnano.io/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
+- [Cun Host](https://cunhost.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
+- [DNSVault](https://dnsvault.net/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
+- [Jimat Hosting](https://jimathosting.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
+- [SecurePay](https://www.securepay.my/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 
 **Affiliates with:**
 
@@ -89,11 +92,11 @@ By subscribing service using link one of the services below, you are indirectly 
 - [WPJohnny](https://wpjohnny.com?ref=1)
 - [Luno](https://www.luno.com/invite/X3V4XC)
 
-The Docket Cache has been reported seemly works with these hosting provider:
+The Docket Cache has been reported seemly works with these Malaysian hosting provider:
 
 - [GB Network](https://secure.gbnetwork.com/aff.php?aff=805)
-- [Zenpipe](https://www.zenpipe.com/?utm_source=docketcachewporg)
-- [KelateBiz](https://kelate.biz/?utm_source=docketcachewporg)
+- [Zenpipe](https://www.zenpipe.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
+- [KelateBiz](https://kelate.biz/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [ServerFreak](https://secure.web-hosting.net.my/clients/aff.php?aff=4725)
 - [Exabytes](https://billing.exabytes.my/mypanel/aff.php?aff=8102792)
 
@@ -137,7 +140,12 @@ OPcache is a caching engine built into PHP, improves performance by storing prec
 Docket Cache converts the object cache into plain PHP code. When read and write cache, it will use OPcache directly which results in faster data retrieval and better performance.
 
 = What is the Cronbot Service in Docket Cache? =
-The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively. This service offered as an alternative option and is not compulsory to use. By default, this service not connected to the [end-point server](https://cronbot.docketcache.com/). You can completely disable it at the configuration page.
+The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively. 
+
+This service offered as an alternative option and is not compulsory to use. By default, this service not connected to the [end-point server](https://cronbot.docketcache.com/). You can completely disable it at the configuration page.
+
+= What is Garbage Collector in Docket Cache? =
+Garbage Collector is a Cron Events than run every 5 minutes to monitoring cache file purposely for cleanup and collecting stats.
 
 = What is a RAM disk in Docket Cache? =
 A RAM disk is a representation of a hard disk using RAM resources, and it can take the form of a hardware device or a virtual disk. 
@@ -177,13 +185,21 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.02.02 =
+
+- Fixed Plugin::is_subpage() -> opcach viewer left menu link.
+- Fixed Filesystem::fastcgi_close() -> Theme editor failed to verify updated file.
+- Added Tweaks::http_headers_expect() -> HTTP Request Expect header tweaks.
+
+Thanks to Oleg for reporting an issue with Theme Editor https://docketcache.com/feedback/#comment-2
+
 = 21.02.01 =
 
 - Fixed Filesystem::chmod() -> invalid mode for file.
 - Fixed Filesystem::define_cache_path() -> avoid checking if the cache path exists and create the content path if define.
 - Fixed Overview -> Cache Path not same with DOCKET_CACHE_PATH, due to error at define_cache_path().
-- Added Filesystem::mkdir_p() -> fix directory permissions issues, when web server and php have different user/group.
-- Added Filesystem::touch() -> fix notice "Utime failed: Operation not permitted" when web server and php have different user/group.
+- Added Filesystem::mkdir_p() -> fix directory permissions issues, when web server and php has different user/group.
+- Added Filesystem::touch() -> fix notice "Utime failed: Operation not permitted" when web server and php has different user/group.
 - Added Filesysten::getchmod() -> gets file/dir permissions in octal format.
 - Added sites selection for cleanup post on multisite.
 - Added OPcache viewer.
@@ -212,72 +228,6 @@ Thanks to @patrickwgs for reporting an issue on bedrock installation.
 - Fixed Plugin::get_subpage() -> add checking for adx variable.
 - Fixed OPcache flush -> lock for 20 seconds before accept new request.
 - Added Filesystem() methods -> sanitize_precache_maxfile, sanitize_maxsize, sanitize_maxsizedisk.
-
-= 20.12.03 =
-
-- Fixed Auto-updates -> remove v20.11.05 workaround, had issue with opcache, enable/disable docket auto-updates only in docket cache -> configuration.
-- Fixed nwdcx_cleanuptransient() -> didn't cleanup properly.
-- Added Configuration -> Limit WP-Admin HTTP Requests.
-
-If you're using Docket Cache v20.11.05 and below, please update to the latest version. Thanks.
-
-= 20.12.02 =
-
-- Fixed Filesystem::cache_size() -> getsize stat failed.
-- Fixed Overview -> Object/WP OPcache Stats data empty called from worker.
-- Fixed Plugin::active() -> Randomly slow.
-- Added Configuration -> Flush OPcache On Deactivation.
-
-= 20.12.01 =
-
-- Fixed Event::register() -> cron_schedules, merge if not exists.
-- Fixed ReqAction::screen_notice() -> missing cronbot executed events message.
-- Fixed WP_Hook -> use PHP_INT_MIN instead of -PHP_INT_MAX for earlier sequence.
-- Added WP_Object_Cache::dc_close() -> save precache after shutdown hooks.
-- Added WP_Object_Cache::dc_precache_load -> replace dc_precache_get().
-- Added Filesystem::close_buffer() -> close fastcgi request if no output buffer.
-
-= 20.11.06 =
-
-- Fixed Plugin::get_opcache_status() -> Missing match pattern.
-- Fixed Plugin::register_plugin_hooks() -> Redundant loading, change plugin_loaded to plugins_loaded.
-- Fixed Filesystem::opcache_compile() -> Change filemtime early to 60 seconds. Opcache won't compile if file newer than runtime.
-- Fixed WP_Object_Cache::dc_save() -> Remove change filemtime. Cache expiration now handles by timeout key.
-- Fixed Event::garbage_collector() -> Filemtime comparison with maxttl only applies to cache file without timeout or 0.
-- Fixed Event::register() -> Redundant loading, change plugin_loaded to plugins_loaded.
-- Fixed Dropino::multinet_install() -> Wrong flags for file_put_contents.
-
-= 20.11.05 =
-
-- Fixed CronAgent::check_connection() -> close_ping() -> Invalid selfcheck delay. Set to 90 minutes instead of current time.
-- Fixed Auto-updates -> wp >= 5.5 can't enable/disable auto-updates for docket cache at plugins page. Now, it should works vise-versa.
-- Fixed ReqAction -> Error notice undefined variable nv.
-
-= 20.11.04 =
-
-- Fixed Admin Interface -> filter others admin notice using hook.
-- Fixed Event -> rare condition checkversion cronagent process lock timestamp no effect.
-- Fixed Event -> invalid remove event.
-- Fixed Actions -> when disable object cache, it will stay disabled until enable it back.
-- Fixed Notice -> only show compability notice at plugins, updates page and our overview page.
-- Added Constans() -> option to reload config at dc* methods.
-- Added Configuration -> deactivate WooCommerce Cart Fragments.
-- Added nwdcx_cleanuptransient -> makes it reuseable for Event::delete_expired_transients_db().
-
-= 20.11.03 =
-
-- Fixed Admin Interface -> action notice can't dismiss.
-- Fixed Admin Notice -> exclude Dismissible Notices Handler dnh_dismissed_notices option from cache.
-- Added Configuration -> remove the WordPress Application Passwords feature.
-
-= 20.11.02 =
-
-- Fixed PostCache::setup_hooks() -> removed deprecated jetpack hook instagram_cache_oembed_api_response_body.
-
-= 20.11.01 =
-
-- Added WP-CLI command -> run:gc, run:stats, run:cron, reset:lock, reset:cron, dropin:enable, dropin:disable, dropin:update, flush:precache
-- Fixed Admin Interface -> only show our own notice.
 
 
 Kindly refer to [changelog.txt](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt) for previous changes.

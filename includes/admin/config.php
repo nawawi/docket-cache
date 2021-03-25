@@ -225,9 +225,15 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="limithttprequest">
-                    <th class="border-b"><?php echo esc_html__('Limit WP-Admin HTTP Requests', 'docket-cache').$this->tooltip('limithttprequest'); ?></th>
+                    <th><?php echo esc_html__('Limit WP-Admin HTTP Requests', 'docket-cache').$this->tooltip('limithttprequest'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('limithttprequest'); ?>
+                    </td>
+                </tr>
+                <tr id="httpheadersexpect">
+                    <th class="border-b"><?php echo esc_html__('HTTP Request Expect header tweaks', 'docket-cache').$this->tooltip('httpheadersexpect'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('httpheadersexpect'); ?>
                     </td>
                 </tr>
                 <tr>

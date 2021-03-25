@@ -592,6 +592,7 @@ final class View
             'checkversion' => esc_html__('Allows Docket Cache to check any critical future version that requires removing cache files after doing the updates, purposely to avoid error-prone.', 'docket-cache'),
             'opcshutdown' => esc_html__('Flush OPcache when deactivate / uninstall', 'docket-cache'),
             'limithttprequest' => esc_html__('Limit HTTP requests in WP Admin.', 'docket-cache'),
+            'httpheadersexpect' => esc_html__('By default, cURL sends the "Expect" header all the time which severely impacts performance. Enable this option, only send it if the body is larger than 1 MB.', 'docket-cache'),
             'rtpostautosave' => esc_html__('WordPress by default automatically saves a draft every 1 minute when editing or create a new post. Changing this behaviour can reduce the usage of server resource.', 'docket-cache'),
             'rtpostrevision' => esc_html__('Post revision is a copy of each edit made to a post or page, allowing the possibility of reverting to a previous version. However, have a revision too much can create a bad impact on database performance. Changing this behaviour can reduce the usage of server resource.', 'docket-cache'),
             'rtpostemptytrash' => esc_html__('This option allows you to change the number of days before WordPress permanently deletes posts, pages, attachments, and comments, from the trash bin. The default is 30 days. There is no confirmation alert when someone clicks on "Delete Permanently" if this option is set to "Disable Trash Bin".', 'docket-cache'),

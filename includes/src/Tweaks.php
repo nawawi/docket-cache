@@ -657,4 +657,24 @@ final class Tweaks
             PHP_INT_MAX
         );
     }
+
+    public function http_headers_expect()
+    {
+        add_filter('http_request_args', function ($args) {
+            if (\is_array($args)) {
+                $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+                $body = $args['body'];
+
+                if (\is_array($body) || \is_object($body)) {
+                    $body = json_encode($body);
+                }
+
+                $args['headers']['expect'] = !empty($body) && \strlen($body) > 1048576 ? '100-Continue' : '';
+
+                nwdcx_suppresserrors($nwdcx_suppresserrors);
+            }
+
+            return $args;
+        }, PHP_INT_MAX);
+    }
 }

@@ -17,11 +17,33 @@ use Nawawi\DocketCache\Exporter\VarExporter;
 class Filesystem
 {
     /**
+     * is_request_from_theme_editor.
+     */
+    public function is_request_from_theme_editor()
+    {
+        if (!empty($_POST)) {
+            if ((!empty($_POST['_wp_http_referer']) && false !== strpos($_POST['_wp_http_referer'], '/theme-editor.php?file=')) && (!empty($_POST['newcontent']) && false !== strpos($_POST['newcontent'], '<?php'))) {
+                return true;
+            }
+
+            if (!empty($_POST['action']) && 'heartbeat' === $_POST['action'] && !empty($_POST['']) && 'theme-editor' === $_POST['screen_id']) {
+                return true;
+            }
+        }
+
+        if (!empty($_GET) && !empty($_GET['wp_scrape_key']) && !empty($_GET['wp_scrape_nonce'])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * fastcgi_close.
      */
     public function fastcgi_close()
     {
-        if (\function_exists('fastcgi_finish_request')) {
+        if (\function_exists('fastcgi_finish_request') && !$this->is_request_from_theme_editor()) {
             @fastcgi_finish_request();
         }
     }

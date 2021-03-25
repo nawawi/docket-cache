@@ -113,6 +113,7 @@ final class Canopt extends Bepart
             'objectcacheoff' => esc_html__('Suspend Object Cache', 'docket-cache'),
             'opcshutdown' => esc_html__('Flush OPcache During Deactivation', 'docket-cache'),
             'limithttprequest' => esc_html__('Limit WP-Admin HTTP requests', 'docket-cache'),
+            'httpheadersexpect' => esc_html__('HTTP Request Expect header tweaks', 'docket-cache'),
             'rtpostautosave' => esc_html__('Auto Save Interval', 'docket-cache'),
             'rtpostrevision' => esc_html__('Post Revisions', 'docket-cache'),
             'rtpostemptytrash' => esc_html__('Trash Bin', 'docket-cache'),

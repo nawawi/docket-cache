@@ -53,21 +53,21 @@ namespace Nawawi\DocketCache;
         <div>
             <p>
                 <strong><?php esc_html_e('DOCUMENTATION', 'docket-cache'); ?></strong><br class="break">
-                <?php esc_html_e('To adjust the plugin behaviour and manage through a command line, please refer to the documentation page for details.', 'docket-cache'); ?>
-                <a href="https://docs.docketcache.com/" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Dcoumenation', 'docket-cache'); ?></a>
+                <?php esc_html_e('To adjust the plugin behaviour and manage through a command line.', 'docket-cache'); ?>
+                <a href="https://docs.docketcache.com/?utm_source=wp-plugins&utm_campaign=docs-uri&utm_medium=dc-config" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Dcoumenation', 'docket-cache'); ?></a>
             </p>
             <?php if (!apply_filters('docketcache/filter/view/nosponsor', false)) : ?>
             <hr>
             <p>
                 <strong><?php esc_html_e('FEEDBACK', 'docket-cache'); ?></strong><br class="break">
-                <?php esc_html_e('Kindly write a review of your experience using this plugin.', 'docket-cache'); ?>
-                <a href="https://docketcache.com/feedback" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Submit Review', 'docket-cache'); ?></a>
+                <?php esc_html_e('Write a review of your experience using this plugin.', 'docket-cache'); ?>
+                <a href="https://docketcache.com/feedback/?utm_source=wp-plugins&utm_campaign=reviews-uri&utm_medium=dc-config" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Submit Review', 'docket-cache'); ?></a>
             </p>
             <hr>
             <p>
                 <strong><?php esc_html_e('SPONSOR', 'docket-cache'); ?></strong><br class="break">
-                <?php esc_html_e('Become our sponsor to funding further development of this project.', 'docket-cache'); ?>
-                <a href="https://www.patreon.com/bePatron?u=41796862" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Become Sponsor', 'docket-cache'); ?></a>
+                <?php esc_html_e('Fund Docket Cache one-off or recurring payment to support our open-source development efforts.', 'docket-cache'); ?>
+                <a href="https://docketcache.com/sponsorship/?utm_source=wp-plugins&utm_campaign=sponsor-uri&utm_medium=dc-config" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Become Sponsor', 'docket-cache'); ?></a>
             </p>
             <?php endif; ?>
             <?php do_action('docketcache/action/view/resources'); ?>

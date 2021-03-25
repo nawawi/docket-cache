@@ -381,6 +381,9 @@ final class Constans
         // limit http request from uncommon page.
         $this->maybe_define($this->px('LIMITHTTPREQUEST'), false);
 
+        // curl "Expect" header performance tweak
+        $this->maybe_define($this->px('HTTPHEADERSEXPECT'), false);
+
         // @private: auto save interval.
         $this->maybe_define($this->px('RTPOSTAUTOSAVE'), 1);
 
@@ -396,7 +399,7 @@ final class Constans
         // @private: plugin / theme install.
         $this->maybe_define($this->px('RTPLUGINTHEMEINSTALL'), 'off');
 
-        // @private: plugin / theme install.
+        // @private: overwrite image after edit.
         $this->maybe_define($this->px('RTIMAGEOVERWRITE'), 'off');
 
         // @private

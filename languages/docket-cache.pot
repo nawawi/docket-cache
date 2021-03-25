@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Docket Cache plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 21.02.01\n"
+"Project-Id-Version: Docket Cache 21.02.02\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-03-06T22:53:30+00:00\n"
+"POT-Creation-Date: 2021-03-25T08:33:21+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: docket-cache\n"
@@ -103,7 +103,7 @@ msgid "Run Garbage Collector"
 msgstr ""
 
 #: includes/admin/config.php:18
-#: includes/src/Plugin.php:1380
+#: includes/src/Plugin.php:1381
 #: includes/src/View.php:307
 msgid "Configuration"
 msgstr ""
@@ -128,7 +128,7 @@ msgstr ""
 #: includes/admin/config.php:51
 #: includes/admin/log.php:21
 #: includes/src/Canopt.php:80
-#: includes/src/Plugin.php:1369
+#: includes/src/Plugin.php:1370
 #: includes/src/View.php:304
 msgid "Cache Log"
 msgstr ""
@@ -177,11 +177,11 @@ msgid "Optimize Database Tables"
 msgstr ""
 
 #: includes/admin/config.php:111
-#: includes/admin/config.php:245
-#: includes/admin/config.php:262
-#: includes/admin/config.php:279
-#: includes/admin/config.php:296
-#: includes/admin/config.php:311
+#: includes/admin/config.php:251
+#: includes/admin/config.php:268
+#: includes/admin/config.php:285
+#: includes/admin/config.php:302
+#: includes/admin/config.php:317
 #: includes/admin/log.php:31
 #: includes/src/View.php:418
 msgid "Default"
@@ -295,146 +295,151 @@ msgstr ""
 msgid "Limit WP-Admin HTTP Requests"
 msgstr ""
 
-#: includes/admin/config.php:235
+#: includes/admin/config.php:234
+#: includes/src/Canopt.php:116
+msgid "HTTP Request Expect header tweaks"
+msgstr ""
+
+#: includes/admin/config.php:241
 msgid "Runtime Options"
 msgstr ""
 
-#: includes/admin/config.php:239
-#: includes/src/Canopt.php:116
+#: includes/admin/config.php:245
+#: includes/src/Canopt.php:117
 msgid "Auto Save Interval"
 msgstr ""
 
-#: includes/admin/config.php:246
+#: includes/admin/config.php:252
 msgid "Every Minute"
 msgstr ""
 
-#: includes/admin/config.php:247
+#: includes/admin/config.php:253
 #: includes/src/Event.php:58
 msgid "Every 5 Minutes"
 msgstr ""
 
-#: includes/admin/config.php:248
+#: includes/admin/config.php:254
 msgid "Every 15 Minutes"
 msgstr ""
 
-#: includes/admin/config.php:249
-#: includes/admin/config.php:266
-#: includes/admin/config.php:283
-#: includes/admin/config.php:298
-#: includes/admin/config.php:313
-#: includes/admin/config.php:328
+#: includes/admin/config.php:255
+#: includes/admin/config.php:272
+#: includes/admin/config.php:289
+#: includes/admin/config.php:304
+#: includes/admin/config.php:319
+#: includes/admin/config.php:334
 #: includes/src/View.php:422
 msgid "Disable"
 msgstr ""
 
-#: includes/admin/config.php:256
-#: includes/src/Canopt.php:117
+#: includes/admin/config.php:262
+#: includes/src/Canopt.php:118
 msgid "Post Revisions"
 msgstr ""
 
-#: includes/admin/config.php:263
+#: includes/admin/config.php:269
 msgid "Limit to 3 Revisions"
 msgstr ""
 
-#: includes/admin/config.php:264
+#: includes/admin/config.php:270
 msgid "Limit to 5 Revisions"
 msgstr ""
 
-#: includes/admin/config.php:265
+#: includes/admin/config.php:271
 msgid "No Limit"
 msgstr ""
 
-#: includes/admin/config.php:273
-#: includes/src/Canopt.php:118
+#: includes/admin/config.php:279
+#: includes/src/Canopt.php:119
 #: includes/src/ReqAction.php:592
 msgid "Trash Bin"
 msgstr ""
 
-#: includes/admin/config.php:280
+#: includes/admin/config.php:286
 msgid "Empty In 7 Days"
 msgstr ""
 
-#: includes/admin/config.php:281
+#: includes/admin/config.php:287
 msgid "Empty In 14 Days"
 msgstr ""
 
-#: includes/admin/config.php:282
+#: includes/admin/config.php:288
 msgid "Empty In 30 Days"
 msgstr ""
 
-#: includes/admin/config.php:290
-#: includes/src/Canopt.php:121
+#: includes/admin/config.php:296
+#: includes/src/Canopt.php:122
 msgid "Cleanup Image Edits"
 msgstr ""
 
-#: includes/admin/config.php:297
-#: includes/admin/config.php:312
-#: includes/admin/config.php:327
+#: includes/admin/config.php:303
+#: includes/admin/config.php:318
+#: includes/admin/config.php:333
 #: includes/src/View.php:421
 msgid "Enable"
 msgstr ""
 
-#: includes/admin/config.php:305
-#: includes/src/Canopt.php:119
+#: includes/admin/config.php:311
+#: includes/src/Canopt.php:120
 msgid "Deactivate Plugin / Theme Editor"
 msgstr ""
 
-#: includes/admin/config.php:320
-#: includes/src/Canopt.php:120
+#: includes/admin/config.php:326
+#: includes/src/Canopt.php:121
 msgid "Deactivate Plugin / Theme Update and Installation"
 msgstr ""
 
-#: includes/admin/config.php:326
+#: includes/admin/config.php:332
 msgid "WP Default"
 msgstr ""
 
-#: includes/admin/config.php:336
+#: includes/admin/config.php:342
 msgid "Admin Interface"
 msgstr ""
 
-#: includes/admin/config.php:340
+#: includes/admin/config.php:346
 #: includes/src/Canopt.php:95
 msgid "Admin Page Loader"
 msgstr ""
 
-#: includes/admin/config.php:346
+#: includes/admin/config.php:352
 #: includes/src/Canopt.php:100
 msgid "Object Cache Data Stats"
 msgstr ""
 
-#: includes/admin/config.php:352
+#: includes/admin/config.php:358
 #: includes/src/Canopt.php:101
 msgid "Garbage Collector Action Button"
 msgstr ""
 
-#: includes/admin/config.php:359
+#: includes/admin/config.php:365
 msgid "Plugin Options"
 msgstr ""
 
-#: includes/admin/config.php:363
+#: includes/admin/config.php:369
 msgid "Docket Cache Auto-Updates"
 msgstr ""
 
-#: includes/admin/config.php:369
+#: includes/admin/config.php:375
 msgid "Check Critical Version"
 msgstr ""
 
-#: includes/admin/config.php:375
+#: includes/admin/config.php:381
 #: includes/src/Canopt.php:114
 msgid "Flush OPcache During Deactivation"
 msgstr ""
 
 #: includes/admin/cronbot.php:20
 #: includes/src/Plugin.php:176
-#: includes/src/Plugin.php:1567
 #: includes/src/Plugin.php:1568
-#: includes/src/Plugin.php:1575
-#: includes/src/Plugin.php:1577
+#: includes/src/Plugin.php:1569
+#: includes/src/Plugin.php:1576
+#: includes/src/Plugin.php:1578
 msgid "Not Available"
 msgstr ""
 
 #: includes/admin/cronbot.php:32
-#: includes/src/Plugin.php:1343
+#: includes/src/Plugin.php:1344
 #: includes/src/View.php:294
 msgid "Cronbot"
 msgstr ""
@@ -740,8 +745,8 @@ msgid "Web Proxy"
 msgstr ""
 
 #: includes/admin/overview.php:35
-#: includes/src/Plugin.php:1332
-#: includes/src/Plugin.php:1637
+#: includes/src/Plugin.php:1333
+#: includes/src/Plugin.php:1638
 #: includes/src/View.php:291
 msgid "Overview"
 msgstr ""
@@ -887,8 +892,7 @@ msgid "DOCUMENTATION"
 msgstr ""
 
 #: includes/admin/resource.php:56
-#: modsadvpot/includes/admin/resource.php:21
-msgid "To adjust the plugin behaviour and manage through a command line, please refer to the documentation page for details."
+msgid "To adjust the plugin behaviour and manage through a command line."
 msgstr ""
 
 #: includes/admin/resource.php:57
@@ -901,7 +905,7 @@ msgid "FEEDBACK"
 msgstr ""
 
 #: includes/admin/resource.php:63
-msgid "Kindly write a review of your experience using this plugin."
+msgid "Write a review of your experience using this plugin."
 msgstr ""
 
 #: includes/admin/resource.php:64
@@ -913,7 +917,7 @@ msgid "SPONSOR"
 msgstr ""
 
 #: includes/admin/resource.php:69
-msgid "Become our sponsor to funding further development of this project."
+msgid "Fund Docket Cache one-off or recurring payment to support our open-source development efforts."
 msgstr ""
 
 #: includes/admin/resource.php:70
@@ -1341,7 +1345,7 @@ msgstr ""
 msgid "No data available"
 msgstr ""
 
-#: includes/src/Plugin.php:1355
+#: includes/src/Plugin.php:1356
 #: includes/src/View.php:298
 #: modsadvpot/includes/src/Bemods.php:186
 #: modsadvpot/includes/src/Bemods.php:205
@@ -1349,34 +1353,34 @@ msgid "OPcache"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:1465
+#: includes/src/Plugin.php:1466
 msgid "The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href=\"%s\" style=\"min-width:100px;text-align:center;font-wight:bold;\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %1$s: url install, %2$s = url dismiss
-#: includes/src/Plugin.php:1469
+#: includes/src/Plugin.php:1470
 msgid "An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use <strong>Docket Cache</strong>. <br><br><a href=\"%1$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-primary button-small\">Install</a>&nbsp;<a href=\"%2$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-secondary button-small\">Dismiss</a>"
 msgstr ""
 
-#: includes/src/Plugin.php:1474
+#: includes/src/Plugin.php:1475
 msgid "The Object Cache feature has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: version
-#: includes/src/Plugin.php:1608
-#: includes/src/Plugin.php:1623
+#: includes/src/Plugin.php:1609
+#: includes/src/Plugin.php:1624
 msgid "Version %s"
 msgstr ""
 
-#: includes/src/Plugin.php:1638
+#: includes/src/Plugin.php:1639
 msgid "Configure"
 msgstr ""
 
-#: includes/src/Plugin.php:1650
+#: includes/src/Plugin.php:1651
 msgid "Docs"
 msgstr ""
 
-#: includes/src/Plugin.php:1651
+#: includes/src/Plugin.php:1652
 msgid "Sponsor"
 msgstr ""
 
@@ -1693,30 +1697,34 @@ msgid "Limit HTTP requests in WP Admin."
 msgstr ""
 
 #: includes/src/View.php:595
-msgid "WordPress by default automatically saves a draft every 1 minute when editing or create a new post. Changing this behaviour can reduce the usage of server resource."
+msgid "By default, cURL sends the \"Expect\" header all the time which severely impacts performance. Enable this option, only send it if the body is larger than 1 MB."
 msgstr ""
 
 #: includes/src/View.php:596
-msgid "Post revision is a copy of each edit made to a post or page, allowing the possibility of reverting to a previous version. However, have a revision too much can create a bad impact on database performance. Changing this behaviour can reduce the usage of server resource."
+msgid "WordPress by default automatically saves a draft every 1 minute when editing or create a new post. Changing this behaviour can reduce the usage of server resource."
 msgstr ""
 
 #: includes/src/View.php:597
-msgid "This option allows you to change the number of days before WordPress permanently deletes posts, pages, attachments, and comments, from the trash bin. The default is 30 days. There is no confirmation alert when someone clicks on \"Delete Permanently\" if this option is set to \"Disable Trash Bin\"."
+msgid "Post revision is a copy of each edit made to a post or page, allowing the possibility of reverting to a previous version. However, have a revision too much can create a bad impact on database performance. Changing this behaviour can reduce the usage of server resource."
 msgstr ""
 
 #: includes/src/View.php:598
-msgid "This option will completely disable the use of plugin and theme editor. If this option enabled, no plugins or theme file can be edited."
+msgid "This option allows you to change the number of days before WordPress permanently deletes posts, pages, attachments, and comments, from the trash bin. The default is 30 days. There is no confirmation alert when someone clicks on \"Delete Permanently\" if this option is set to \"Disable Trash Bin\"."
 msgstr ""
 
 #: includes/src/View.php:599
-msgid "This option will block users being able to use the plugin and theme installation/update functionality from the WordPress admin area."
+msgid "This option will completely disable the use of plugin and theme editor. If this option enabled, no plugins or theme file can be edited."
 msgstr ""
 
 #: includes/src/View.php:600
+msgid "This option will block users being able to use the plugin and theme installation/update functionality from the WordPress admin area."
+msgstr ""
+
+#: includes/src/View.php:601
 msgid "By default, WordPress creates a new set of images every time you edit image and restore the original. It leaves all the edits on the server. Enable this option to change this behaviour."
 msgstr ""
 
-#: includes/src/View.php:605
+#: includes/src/View.php:606
 msgid "No info available"
 msgstr ""
 
@@ -1853,6 +1861,10 @@ msgstr ""
 
 #: modsadvpot/includes/admin/opcache.php:187
 msgid "Removed Files"
+msgstr ""
+
+#: modsadvpot/includes/admin/resource.php:21
+msgid "To adjust the plugin behaviour and manage through a command line, please refer to the documentation page for details."
 msgstr ""
 
 #: modsadvpot/includes/admin/resource.php:26

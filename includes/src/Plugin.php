@@ -1227,6 +1227,7 @@ final class Plugin extends Bepart
             'config' => 1,
             'log' => 1,
             'cronbot' => 1,
+            'opcviewer' => 1,
         ];
 
         return \array_key_exists($index, $subpage);
@@ -1648,7 +1649,7 @@ final class Plugin extends Bepart
                 if ($plugin_file === $this->hook) {
                     $row_meta = [
                         'docs' => '<a href="https://docs.docketcache.com/?utm_source=wp-plugins&utm_campaign=doc-uri&utm_medium=wp-dash" target="new" rel="noopener">'.__('Docs', 'docket-cache').'</a>',
-                        'sponsor' => '<a href="https://www.patreon.com/bePatron?u=41796862" target="new" rel="noopener"><span class="dashicons dashicons-star-filled" aria-hidden="true" style="font-size:14px;line-height:1.3"></span>'.__('Sponsor', 'docket-cache').'</a>',
+                        'sponsor' => '<a href="https://docketcache.com/sponsorship/?utm_source=wp-plugins&utm_campaign=sponsor-uri&utm_medium=wp-dash" target="new" rel="noopener"><span class="dashicons dashicons-star-filled" aria-hidden="true" style="font-size:14px;line-height:1.3"></span>'.__('Sponsor', 'docket-cache').'</a>',
                     ];
                     $plugin_meta = array_merge($plugin_meta, $row_meta);
                 }
@@ -1944,6 +1945,10 @@ final class Plugin extends Bepart
 
             if ($this->cf()->is_dctrue('LIMITHTTPREQUEST')) {
                 $tweaks->limit_http_request();
+            }
+
+            if ($this->cf()->is_dctrue('HTTPHEADERSEXPECT')) {
+                $tweaks->http_headers_expect();
             }
 
             if ($this->cf()->is_dctrue('POSTMISSEDSCHEDULE')) {
