@@ -42,11 +42,11 @@ Thank you for sponsoring Docket Cache.
 
 A heartful thanks and appreciation.
 
-<a href="https://dnsvault.net/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/dnsvault.jpg" width="200" height="100" style="margin:10px;"></a>
-<a href="https://exnano.io/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/exnano2-1.jpg" width="200" height="100" style="margin:10px;"></a>
-<a href="https://cunhost.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/cunhosting.jpg" width="200" height="100" style="margin:10px;"></a>
-<a href="https://jimathosting.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/jimathosting.jpg" width="200" height="100" style="margin:10px;"></a>
-<a href="https://www.securepay.my/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/securepay.jpg" width="200" height="100" style="margin:10px;"></a>
+<a href="https://dnsvault.net/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/dnsvault.jpg" width="300" height="150" style="margin:10px;"></a>
+<a href="https://exnano.io/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/exnano2-1.jpg" width="300" height="150" style="margin:10px;"></a>
+<a href="https://cunhost.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/cunhosting.jpg" width="300" height="150" style="margin:10px;"></a>
+<a href="https://jimathosting.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/jimathosting.jpg" width="300" height="150" style="margin:10px;"></a>
+<a href="https://www.securepay.my/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/securepay.jpg" width="300" height="150" style="margin:10px;"></a>
 
 
 <br>
