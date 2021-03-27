@@ -30,36 +30,26 @@ Or download directly from [WordPress Plugin Directory](https://wordpress.org/plu
 
 ## Sponsor this project
 
-There is a lot of room for improvement and features to add, require plenty of person-hours dedicated to testing and development.
+Fund Docket Cache one-off or recurring payment to support our open-source development efforts.
 
-[Become our sponsor](https://www.patreon.com/bePatron?u=41796862). All funds will be dedicated to maintenance, development, and marketing of this project.
+[Become our sponsor](https://docketcache.com/sponsorship/). All funds will be dedicated to maintenance, development, and marketing of this project.
 
 Thank you for sponsoring Docket Cache.
 
 <br>
 
-**Sponsored by:**
+**Noteworthy Sponsors**
 
-[![Exnano Creative](https://docketcache.com/wp-content/spx/exnano/exnano-logo.png)](https://exnano.io/?utm_source=dcgh) 
-[![Cun Host](https://docketcache.com/wp-content/spx/cunhost/cunhost-logo.png)](https://cunhost.com/?utm_source=dcgh) 
-[![DNSVault](https://docketcache.com/wp-content/spx/dnsvault/dnsvault-logo.png)](https://dnsvault.net/?utm_source=dcgh) 
-[![Jimat Hosting](https://docketcache.com/wp-content/spx/jimathosting/jimathosting-logo.png)](https://jimathosting.com/?utm_source=dcgh) 
+A heartful thanks and appreciation.
+
+<a href="https://dnsvault.net/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/dnsvault.jpg" width="200" height="100" style="margin:10px;"></a>
+<a href="https://exnano.io/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/exnano2-1.jpg" width="200" height="100" style="margin:10px;"></a>
+<a href="https://cunhost.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/cunhosting.jpg" width="200" height="100" style="margin:10px;"></a>
+<a href="https://jimathosting.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/jimathosting.jpg" width="200" height="100" style="margin:10px;"></a>
+<a href="https://www.securepay.my/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/securepay.jpg" width="200" height="100" style="margin:10px;"></a>
+
 
 <br>
-
-**Affiliates with:**
-
-<a href="https://docketcache.com/wp-content/spx/dreamhost/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/dreamhost/dreamhost-logo.png" width="80" height="32"></a>
-<a href="https://docketcache.com/wp-content/spx/litespeed/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/litespeed/litespeed-logo.png" width="80" height="32"></a>
-<a href="https://docketcache.com/wp-content/spx/bluehost/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/bluehost/bluehost-logo.png" width="80" height="32"></a>
-<a href="https://docketcache.com/wp-content/spx/onlinenic/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/onlinenic/onlinenic-logo.png" width="80" height="32"></a>
-<a href="https://docketcache.com/wp-content/spx/digitalocean/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/digitalocean/digitalocean-logo.png" width="80" height="32"></a>
-<a href="https://docketcache.com/wp-content/spx/kiahstore/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/kiahstore/kiahstore-logo.png" width="80" height="32"></a>
-<a href="https://docketcache.com/wp-content/spx/exabytes/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/exabytes/exabytes-logo.png" width="80" height="32"></a>
-<a href="https://docketcache.com/wp-content/spx/pikoseed/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/pikoseed/pikoseed-logo.png" width="80" height="32"></a>
-<a href="https://docketcache.com/wp-content/spx/serverfreak/?utm_source=dc-githubs&utm_campaign=aff-uri&utm_medium=github" target="_blank"><img src="https://docketcache.com/wp-content/spx/serverfreak/serverfreak-logo.png" width="80" height="32"></a> 
-
-<br><br>
 
 ## How Versions Work
 
