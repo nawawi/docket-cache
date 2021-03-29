@@ -62,15 +62,11 @@ To adjust the plugin behaviour, installation or manage through a command line, p
 
 == Sponsor this project ==
 
-There is a lot of room for improvement and features to add, require plenty of person-hours dedicated to testing and development.
+Fund Docket Cache one-off or recurring payment to support our open-source development efforts.
 
-[Become our sponsor](https://docketcache.com/sponsorship/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg), to fund monthly or one-off, [alternatively here](https://github.com/nawawi/docket-cache/issues/5) for other options.
+[Become our sponsor](https://docketcache.com/sponsorship/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg), all funds will be dedicated to the maintenance, development, and marketing of this project.
 
-All funds will be dedicated to maintenance, development, and marketing of this project.
-
-Thank you for sponsoring Docket Cache.
-
-**Sponsored by:**
+**Noteworthy Sponsors:**
 
 A heartful thanks and appreciation.
 
