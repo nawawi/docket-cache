@@ -32,7 +32,7 @@ Or download directly from [WordPress Plugin Directory](https://wordpress.org/plu
 
 Fund Docket Cache one-off or recurring payment to support our open-source development efforts.
 
-[Become our sponsor](https://docketcache.com/sponsorship/). All funds will be dedicated to maintenance, development, and marketing of this project.
+[Become our sponsor](https://docketcache.com/sponsorship/), all funds will be dedicated to the maintenance, development, and marketing of this project.
 
 <br>
 
