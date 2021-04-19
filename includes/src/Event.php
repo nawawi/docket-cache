@@ -507,6 +507,7 @@ final class Event
 
         $main_site_url = $this->pt->site_url();
         $site_url = $this->pt->site_url(true);
+        $home_url = $this->pt->site_url(true, true);
         $stmp = time() + 120;
         $api_endpoint = $this->pt->api_endpoint.'/'.$part.'?v='.$stmp;
 
@@ -520,7 +521,8 @@ final class Event
                 'meta' => $this->pt->site_meta(),
             ],
             'headers' => [
-                'REFERER' => $site_url,
+                'REFERER' => $home_url,
+                'Cache-Control' => 'no-cache',
             ],
         ];
 

@@ -1238,6 +1238,8 @@ class Filesystem
                     'comment_previously_approved' => 1,
                     'finished_updating_comment_type' => 1,
                     'db_upgraded' => 1,
+                    /* wp >= 5.7 */
+                    'https_detection_errors' => 1,
                 ];
 
                 foreach ($alloptions as $key => $value) {

@@ -1,11 +1,10 @@
 === Docket Cache - Object Cache Accelerator ===
 Contributors: nawawijamili
 Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance, redis, memcached, speed, multisite, server load, docket
-Donate link: https://docketcache.com/sponsorship/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg
 Requires at least: 5.4
 Tested up to: 5.7
 Requires PHP: 7.2.5
-Stable tag: 21.02.02
+Stable tag: 21.02.03
 License: MIT
 License URI: ./license.txt
 
@@ -57,14 +56,14 @@ To use Docket Cache requires minimum:
 To adjust the plugin behaviour, installation or manage through a command line, please refer to the [Documentation](https://docs.docketcache.com) for details.
 
 == Development ==
-- [Report issues](https://github.com/nawawi/docket-cache/issues)
+- [Github Repo](https://github.com/nawawi/docket-cache/)
 - [Changelog](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt)
 
 == Sponsor this project ==
 
-Fund Docket Cache one-off or recurring payment to support our open-source development efforts.
+[Fund Docket Cache](https://docketcache.com/sponsorship/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg) one-off or recurring payment to support our open-source development efforts.
 
-[Become our sponsor](https://docketcache.com/sponsorship/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg), all funds will be dedicated to the maintenance, development, and marketing of this project.
+All funds will be dedicated to the maintenance, development, and marketing of this project.
 
 **Noteworthy Sponsors:**
 
@@ -76,25 +75,9 @@ A heartful thanks and appreciation.
 - [Jimat Hosting](https://jimathosting.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [SecurePay](https://www.securepay.my/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 
-**Affiliates with:**
 
-By subscribing service using link one of the services below, you are indirectly sponsoring this project. We get a commission for every successful sale.
+Other sponsors are mentioned in the [honourable list](https://github.com/nawawi/docket-cache/issues/5)
 
-- [Onlinenic](https://onlinenic.com/en/Home/cloudReferral.html?usercode=87783819348ea6021e9df91d9bfd4981)
-- [Digitalocean](https://m.do.co/c/6c93db5b1ef6)
-- [LiteSpeed](https://store.litespeedtech.com/store/aff.php?aff=1260&promo=wpaccel)
-- [Dreamhost](https://mbsy.co/3cGLwM)
-- [Bluehost](https://www.bluehost.com/track/docketcache/)
-- [WPJohnny](https://wpjohnny.com?ref=1)
-- [Luno](https://www.luno.com/invite/X3V4XC)
-
-The Docket Cache has been reported seemly works with these Malaysian hosting provider:
-
-- [GB Network](https://secure.gbnetwork.com/aff.php?aff=805)
-- [Zenpipe](https://www.zenpipe.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
-- [KelateBiz](https://kelate.biz/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
-- [ServerFreak](https://secure.web-hosting.net.my/clients/aff.php?aff=4725)
-- [Exabytes](https://billing.exabytes.my/mypanel/aff.php?aff=8102792)
 
 == Installation ==
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
@@ -181,6 +164,12 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.02.03 =
+
+- Fixed WpConfig::has() -> missing argument for nwdcx_throwable.
+
+Thanks to Stanislav Khromov for testing with php 8. https://github.com/nawawi/docket-cache/issues/10
+
 = 21.02.02 =
 
 - Fixed Plugin::is_subpage() -> opcach viewer left menu link.

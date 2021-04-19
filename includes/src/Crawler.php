@@ -14,7 +14,7 @@ namespace Nawawi\DocketCache;
 
 final class Crawler
 {
-    private static $version = '21.02.02';
+    private static $version = '21.02.03';
     public static $send_cookie = false;
 
     private static function default_args($param = [])
@@ -29,7 +29,10 @@ final class Crawler
             'decompress' => false,
             'sslverify' => apply_filters('https_local_ssl_verify', false),
             'stream' => false,
-            'headers' => ['REFERER' => site_url()],
+            'headers' => [
+                'REFERER' => home_url(),
+                'Cache-Control' => 'no-cache',
+            ],
         ];
 
         if (self::$send_cookie && !empty($_COOKIE) && class_exists('\\WP_Http_Cookie')) {
@@ -95,7 +98,7 @@ final class Crawler
         self::$send_cookie = true;
         $param['timeout'] = 3;
         $param['headers'] = [
-            'REFERER' => site_url(),
+            'REFERER' => home_url(),
             'Cache-Control' => 'no-cache',
         ];
 
