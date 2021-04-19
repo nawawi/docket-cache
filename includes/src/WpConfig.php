@@ -217,7 +217,7 @@ final class WpConfig
             try {
                 $tokens = token_get_all($config);
             } catch (\Throwable $e) {
-                nwdcx_throwable($e);
+                nwdcx_throwable(__METHOD__, $e);
 
                 return false;
             }
