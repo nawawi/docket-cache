@@ -589,14 +589,15 @@ class Filesystem
                 return false;
             }
 
-            $opcache_status = opcache_get_status();
+            // NOTE: 21052021 memory burst when run admin preloading
+            /*$opcache_status = opcache_get_status();
             if (!empty($opcache_status) && \is_array($opcache_status) && !empty($opcache_status['scripts'])) {
                 foreach ($opcache_status['scripts'] as $key => $data) {
                     $fx = $data['full_path'];
                     $this->opcache_flush($fx);
                 }
             }
-            unset($opcache_status);
+            unset($opcache_status);*/
         } catch (\Throwable $e) {
             nwdcx_throwable(__METHOD__, $e);
 
