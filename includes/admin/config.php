@@ -166,9 +166,15 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="woocartfragsoff">
-                    <th class="border-b"><?php echo esc_html__('Deactivate WooCommerce Cart Fragments', 'docket-cache').$this->tooltip('woocartfragsoff'); ?></th>
+                    <th><?php echo esc_html__('Deactivate WooCommerce Cart Fragments', 'docket-cache').$this->tooltip('woocartfragsoff'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('woocartfragsoff'); ?>
+                    </td>
+                </tr>
+                <tr id="wooaddtochartcrawling">
+                    <th class="border-b"><?php echo esc_html__('Prevent robots crawling add-to-cart links', 'docket-cache').$this->tooltip('wooaddtochartcrawling'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('wooaddtochartcrawling'); ?>
                     </td>
                 </tr>
                 <tr>
@@ -222,6 +228,12 @@ namespace Nawawi\DocketCache;
                     <th><?php echo esc_html__('Remove WP Application Passwords', 'docket-cache').$this->tooltip('wpapppassword'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpapppassword'); ?>
+                    </td>
+                </tr>
+                <tr id="wpdashboardnews">
+                    <th><?php echo esc_html__('Remove WP Events & News Feed Dashboard', 'docket-cache').$this->tooltip('wpdashboardnews'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('wpdashboardnews'); ?>
                     </td>
                 </tr>
                 <tr id="limithttprequest">

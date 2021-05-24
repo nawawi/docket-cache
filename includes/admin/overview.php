@@ -41,7 +41,7 @@ $has_stats = $this->vcf()->is_dctrue('STATS');
 
                 <tr>
                     <th<?php echo !$has_proxy ? ' class="border-b"' : ''; ?>><?php esc_html_e('PHP SAPI', 'docket-cache'); ?></th>
-                        <td><?php echo PHP_VERSION.' / '.\PHP_SAPI; ?></td>
+                        <td><?php echo PHP_VERSION.' / '.\PHP_SAPI.' ('.PHP_OS_FAMILY.')'; ?></td>
                 </tr>
 
                 <?php if ($has_proxy) : ?>

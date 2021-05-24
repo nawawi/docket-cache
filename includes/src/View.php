@@ -541,11 +541,14 @@ final class View
         $code .= '$(document).ready(function() {';
         $code .= 'var fx = $(document).find("tr#'.$nx.'");';
         $code .= 'if ( fx && fx[0]) {';
-        $code .= 'fx[0].scrollIntoView({block:"center", behavior:"smooth"});';
+        $code .= 'fx[0].scrollIntoView({block:"center"});';
         $code .= 'if ( $(document).find("div").hasClass("notice") ) {';
         $code .= 'fx.addClass("notice-focus");';
-        $code .= 'var ftxt = $(document).find("div.notice").text();';
-        $code .= 'fx.children("td").append("<p id=\"innotice\">"+ftxt+"</p>");';
+        $code .= 'var mx = $(document).find("div.notice");';
+        $code .= 'var mg = mx.text();';
+        $code .= 'var tc = "";';
+        $code .= 'if ( mx.hasClass("notice-success") ) { tc = "text-green"; } else if ( mx.hasClass("notice-alert") ) { tc = "text-red"; } else if ( mx.hasClass("notice-warning") ) { tc = "text-maroon"; }';
+        $code .= 'fx.children("td").append("<p id=\"innotice\" class=\""+tc+"\">"+mg+"</p>");';
         $code .= 'setTimeout(function() { fx.removeClass("notice-focus"); }, 3000);';
         $code .= '}';
         $code .= '}';
@@ -576,6 +579,7 @@ final class View
             'woowidgetoff' => esc_html__('Deactivate WooCommerce Widget feature.', 'docket-cache'),
             'woowpdashboardoff' => esc_html__('Remove the WooCommerce meta box in the WordPress Dashboard.', 'docket-cache'),
             'woocartfragsoff' => esc_html__('Remove the WooCommerce Cart Fragments.', 'docket-cache'),
+            'wooaddtochartcrawling' => esc_html__('This option will add rules to robots.txt to prevent robots from crawling add-to-cart links.', 'docket-cache'),
             'pingback' => esc_html__('Remove the WordPress XML-RPC and Pingbacks related features.', 'docket-cache'),
             'headerjunk' => esc_html__('Remove WordPress features related to HTML header such as meta generators and feed links to reduce the page size.', 'docket-cache'),
             'wpemoji' => esc_html__('Remove the WordPress Emoji feature.', 'docket-cache'),
@@ -584,6 +588,7 @@ final class View
             'wplazyload' => esc_html__('Remove the WordPress Lazy Load feature.', 'docket-cache'),
             'wpsitemap' => esc_html__('Remove the WordPress Auto-generate Sitemap feature.', 'docket-cache'),
             'wpapppassword' => esc_html__('Remove the WordPress Application Passwords feature.', 'docket-cache'),
+            'wpdashboardnews' => esc_html__('Remove the WordPress Events & News feed in Dashboard.', 'docket-cache'),
             'preload' => esc_html__('Preload Object Cache by fetching administrator-related pages.', 'docket-cache'),
             'pageloader' => esc_html__('Display page loader when loading administrator pages.', 'docket-cache'),
             'stats' => esc_html__('Display Object Cache stats at Overview page.', 'docket-cache'),

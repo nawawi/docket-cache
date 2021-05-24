@@ -28,8 +28,16 @@ body {
     color: red;
 }
 
+#docket-cache .text-maroon {
+    color: maroon;
+}
+
 #docket-cache .text-capitalize {
     text-transform: capitalize !important;
+}
+
+#docket-cache #innotice {
+    font-size: 13px !important;
 }
 
 #docket-cache .dashicons {
@@ -638,6 +646,7 @@ body {
 #docket-cache .gridlist .wp-list-table pre {
     white-space: pre-wrap;
     margin: 0;
+    font-size: 12px;
 }
 
 #docket-cache .gridlist .wp-list-table code {

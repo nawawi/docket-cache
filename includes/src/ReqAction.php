@@ -69,6 +69,7 @@ final class ReqAction
              'docket-pong-cronbot',
              'docket-runevent-cronbot',
              'docket-runeventnow-cronbot',
+             'docket-runeventuno-cronbot',
              'docket-selectsite-cronbot',
              'docket-rungc',
              'docket-runtime',
@@ -141,13 +142,19 @@ final class ReqAction
                 do_action('docketcache/action/flush/file/objectcache', $result, $filename);
                 break;
             case 'docket-flush-opcache':
-                if ($this->pt->co()->lockproc('opcache_reset', time() + 20)) {
+                if ($this->pt->co()->lockexp('preload_lock_opcache_reset')) {
                     $result = false;
-                    $response = 'docket-opcache-flushed-warn';
+                    $response = 'docket-opcache-flushed-lock-warn';
                 } else {
-                    $result = $this->pt->opcache_reset();
-                    $response = $result ? 'docket-opcache-flushed' : 'docket-opcache-flushed-failed';
+                    if ($this->pt->co()->lockproc('opcache_reset', time() + 30)) {
+                        $result = false;
+                        $response = 'docket-opcache-flushed-warn';
+                    } else {
+                        $result = $this->pt->opcache_reset();
+                        $response = $result ? 'docket-opcache-flushed' : 'docket-opcache-flushed-failed';
+                    }
                 }
+
                 do_action('docketcache/action/flush/opcache', $result);
                 break;
             case 'docket-connect-cronbot':
@@ -184,6 +191,16 @@ final class ReqAction
                 }
 
                 do_action('docketcache/action/runeventnow/cronbot', $result);
+                break;
+            case 'docket-runeventuno-cronbot':
+                $response = 'docket-cronbot-runevent-failed';
+                $result = apply_filters('docketcache/filter/runevent/cronbot', $param);
+                if (false !== $result) {
+                    $this->pt->co()->lookup_set('cronbotrun', $result);
+                    $response = 'docket-cronbot-runevent';
+                }
+
+                do_action('docketcache/action/runeventuno/cronbot', $result);
                 break;
             case 'docket-selectsite-cronbot':
                 if (isset($param['nv'])) {
@@ -270,8 +287,17 @@ final class ReqAction
                     $response = $ok ? $okmsg : 'docket-option-failed';
                 }
 
-                if ($ok && WpConfig::has($nx)) {
-                    $response = 'docket-option-wpf-warn';
+                if ($ok) {
+                    if (WpConfig::has($nx)) {
+                        $response = 'docket-option-wpf-warn';
+                    } else {
+                        if ('wooaddtochartcrawling' === $nx && 'enable' == $nk) {
+                            $robotsfile = ABSPATH.'robots.txt';
+                            if (@is_file($robotsfile)) {
+                                $response = 'docket-option-rbt-warn';
+                            }
+                        }
+                    }
                 }
 
                 do_action(
@@ -433,6 +459,9 @@ final class ReqAction
                 case 'docket-opcache-flushed-warn':
                     $this->pt->notice = esc_html__('OPcache already flushed. Try again in a few seconds.', 'docket-cache');
                     break;
+                case 'docket-opcache-flushed-lock-warn':
+                    $this->pt->notice = esc_html__('Process locked. Admin Object Cache Preloading is running. Try again in a few seconds.', 'docket-cache');
+                    break;
                 case 'docket-cronbot-connect':
                     $this->pt->notice = esc_html__('Cronbot connected.', 'docket-cache');
                     break;
@@ -477,8 +506,13 @@ final class ReqAction
                             if (!empty($wmsg) && empty($msg['wpcron_event'])) {
                                 $this->pt->notice = $wmsg;
                             } else {
-                                /* translators: %d = cron event */
-                                $this->pt->notice = sprintf(esc_html__('Executed a total of %d cron events', 'docket-cache'), $msg['wpcron_event']);
+                                if (!empty($msg['wpcron_uno'])) {
+                                    /* translators: %s = event hook */
+                                    $this->pt->notice = sprintf(esc_html__('Executed the %s event successful', 'docket-cache'), $msg['wpcron_uno']);
+                                } else {
+                                    /* translators: %d = cron event */
+                                    $this->pt->notice = sprintf(esc_html__('Executed a total of %d cron events', 'docket-cache'), $msg['wpcron_event']);
+                                }
                             }
                         }
                     }
@@ -532,7 +566,10 @@ final class ReqAction
                     break;
                 case 'docket-option-wpf-warn':
                     /* translators: %s = option name */
-                    $this->pt->notice = sprintf(esc_html__('%s configuration already defined or exists in wp-config.php file. This update has no effect.', 'docket-cache'), $option_name);
+                    $this->pt->notice = sprintf(esc_html__('%s constant already defined or exists in wp-config.php file. This update has no effects.', 'docket-cache'), $option_name);
+                    break;
+                case 'docket-option-rbt-warn':
+                    $this->pt->notice = esc_html__('The physical robots.txt file exists. This update only works with the WordPress robots.txt virtual file.', 'docket-cache');
                     break;
                 case 'docket-action-failed':
                     /* translators: %s = option name */

@@ -9,9 +9,10 @@
  */
 
 /*
- * Reference:
+ * Credits:
  *  plugins/wp-crontrol/src/event-list-table.php
- *	plugins/wp-crontrol/src/event.php
+ *  plugins/wp-crontrol/src/event.php
+ *  plugins/query-monitor/classes/Util.php
  */
 
 namespace Nawawi\DocketCache;
@@ -112,6 +113,19 @@ class EventList extends \WP_List_Table
         return $events;
     }
 
+    public function shorten_path($callback)
+    {
+        return preg_replace_callback(
+            '@\\\\[a-zA-Z0-9_\\\\]{4,}\\\\@',
+            function ($mm) {
+                preg_match_all('@\\\\([a-zA-Z0-9_])@', $mm[0], $m);
+
+                return '\\'.implode('\\', $m[1]).'\\';
+            },
+            $callback
+        );
+    }
+
     public function populate_callback($callback)
     {
         $callback = (array) $callback;
@@ -133,23 +147,23 @@ class EventList extends \WP_List_Table
                 $access = '::';
             }
 
-            $callback['name'] = $class.$access.$callback['function'][1].'()';
+            $callback['name'] = $this->shorten_path($class.$access.$callback['function'][1].'()');
         } elseif (\is_object($callback['function'])) {
             if (is_a($callback['function'], 'Closure')) {
                 $callback['name'] = 'Closure';
             } else {
                 $class = \get_class($callback['function']);
 
-                $callback['name'] = $class.'->__invoke()';
+                $callback['name'] = $this->shorten_path($class).'->__invoke()';
             }
         } else {
-            $callback['name'] = $callback['function'].'()';
+            $callback['name'] = $this->shorten_path($callback['function']).'()';
         }
 
         return $callback;
     }
 
-    public function json_output($input)
+    public function pretty_args($input)
     {
         $json_options = 0;
 
@@ -205,19 +219,19 @@ class EventList extends \WP_List_Table
     {
         // Array of time period chunks.
         $chunks = [
-            /* translators: 1: The number of years in an interval of time. */
+            /* translators: %s: The number of years in an interval of time. */
             [60 * 60 * 24 * 365, _n_noop('%s year', '%s years', 'docket-cache')],
-            /* translators: 1: The number of months in an interval of time. */
+            /* translators: %s: The number of months in an interval of time. */
             [60 * 60 * 24 * 30, _n_noop('%s month', '%s months', 'docket-cache')],
-            /* translators: 1: The number of weeks in an interval of time. */
+            /* translators: %s: The number of weeks in an interval of time. */
             [60 * 60 * 24 * 7, _n_noop('%s week', '%s weeks', 'docket-cache')],
-            /* translators: 1: The number of days in an interval of time. */
+            /* translators: %s: The number of days in an interval of time. */
             [60 * 60 * 24, _n_noop('%s day', '%s days', 'docket-cache')],
-            /* translators: 1: The number of hours in an interval of time. */
+            /* translators: %s: The number of hours in an interval of time. */
             [60 * 60, _n_noop('%s hour', '%s hours', 'docket-cache')],
-            /* translators: 1: The number of minutes in an interval of time. */
+            /* translators: %s: The number of minutes in an interval of time. */
             [60, _n_noop('%s minute', '%s minutes', 'docket-cache')],
-            /* translators: 1: The number of seconds in an interval of time. */
+            /* translators: %s: The number of seconds in an interval of time. */
             [1, _n_noop('%s second', '%s seconds', 'docket-cache')],
         ];
 
@@ -308,9 +322,24 @@ class EventList extends \WP_List_Table
         return ['widefat', 'striped', $this->_args['plural']];
     }
 
-    /*protected function handle_row_actions( $event, $column_name, $primary ) {
+    protected function handle_row_actions($event, $column_name, $primary)
+    {
+        if ($primary !== $column_name) {
+            return '';
+        }
 
-    }*/
+        $action = $this->pt->action_query(
+            'runeventuno-cronbot',
+            [
+                'idx' => 'cronbot',
+                'ehk' => rawurlencode($event->hook),
+                'eky' => rawurlencode($event->sig),
+            ]
+        );
+        $links[] = "<a href='".$action."'>".esc_html__('Run Now', 'docket-cache').'</a>';
+
+        return $this->row_actions($links);
+    }
 
     public function column_eventlist_hook($event)
     {
@@ -320,19 +349,19 @@ class EventList extends \WP_List_Table
     public function column_eventlist_args($event)
     {
         if (!empty($event->args)) {
-            $args = $this->json_output($event->args);
-        }
+            if (\count($event->args) > 1) {
+                return sprintf(
+                    '<pre>%s</pre>',
+                    esc_html($this->pretty_args($event->args))
+                );
+            }
 
-        if (empty($event->args)) {
-            return sprintf(
-                '<em>%s</em>',
-                esc_html__('None', 'docket-cache')
-            );
+            return $event->args[0];
         }
 
         return sprintf(
-            '<pre>%s</pre>',
-            esc_html($args)
+            '<em>%s</em>',
+            esc_html__('None', 'docket-cache')
         );
     }
 

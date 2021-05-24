@@ -4,7 +4,7 @@ Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance
 Requires at least: 5.4
 Tested up to: 5.7
 Requires PHP: 7.2.5
-Stable tag: 21.02.03
+Stable tag: 21.02.04
 License: MIT
 License URI: ./license.txt
 
@@ -164,6 +164,18 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.02.04 =
+
+- Fixed View::code_focus() -> remove {behavior: "smooth"} to correct scroll position in firefox.
+- Fixed OPcacheView::get_files() -> normalize files path.
+- Fixed Filesystem::opcache_reset() -> remove additional invalidate files, issue with memory burst when run admin preloading.
+- Fixed ReqAction::run_action() -> prevent run opcache_reset after flush object cache.
+- Fixed Tweaks::limit_http_request() -> allows admin-ajax.php and .local hostname.
+- Added Tweaks::woocommerce_crawling_addtochart_links() -> simple tweaks to prevent robots from crawling add-to-cart links.
+- Added LIMITHTTPREQUEST_WHITELIST constant -> list of hostname to exclude from checking.
+- Added Tweaks::wpdashboardnews() -> remove Events & News Feed in WP dashboard.
+- Added Cronbot -> Run Now for single event.
+
 = 21.02.03 =
 
 - Fixed WpConfig::has() -> missing argument for nwdcx_throwable.

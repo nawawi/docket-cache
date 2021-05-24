@@ -30,21 +30,6 @@
                         'click.dc-dismiss-notice',
                         function( e ) {
                             e.preventDefault();
-                            /*var $el = $( this )
-                                .parent();
-                            $el.fadeTo(
-                                100,
-                                0,
-                                function() {
-                                    $el.slideUp(
-                                        100,
-                                        function() {
-                                            $el.remove();
-                                        }
-                                    );
-                                }
-                            );*/
-
                             $selector.find( '.notice-focus' )
                                 .removeClass( 'notice-focus' );
 

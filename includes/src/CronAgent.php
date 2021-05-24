@@ -236,6 +236,33 @@ final class CronAgent
     {
         $this->pt->cf()->maybe_define('DOING_RUN_WPCRON', true);
 
+        $run_uno = false;
+        $uno_ehk = '';
+        $uno_eky = '';
+        if (!empty($run_now) && \is_array($run_now)) {
+            if (empty($run_now['ehk']) || empty($run_now['eky'])) {
+                $results['wpcron_return'] = 0;
+                $results['wpcron_msg'] = esc_html__('Invalid request for single event', 'docket-cache');
+
+                return $results;
+            }
+
+            $uno_ehk = sanitize_text_field($run_now['ehk']);
+            $uno_eky = sanitize_text_field($run_now['eky']);
+
+            if (!has_action($uno_ehk)) {
+                $results['wpcron_return'] = 1;
+
+                /* translators: %s: Event Hook. */
+                $results['wpcron_msg'] = sprintf(esc_html__('Event hook not found %s', 'docket-cache'), $uno_ehk);
+
+                return $results;
+            }
+
+            $run_now = true;
+            $run_uno = true;
+        }
+
         $crons = $this->pt->get_crons($run_now, $cron_event);
 
         $results = [
@@ -247,14 +274,14 @@ final class CronAgent
 
         if (empty($crons)) {
             $results['wpcron_return'] = 1;
-            $results['wpcron_msg'] = 'No scheduled event ready to run';
+            $results['wpcron_msg'] = esc_html__('No scheduled event ready to run', 'docket-cache');
 
             return $results;
         }
 
         if (false !== strpos($_SERVER['REQUEST_URI'], '/wp-cron.php') || isset($_GET['doing_wp_cron']) || wp_doing_cron()) {
             $results['wpcron_return'] = 1;
-            $results['wpcron_msg'] = 'Another cron process is currently running wp-cron.php';
+            $results['wpcron_msg'] = esc_html__('Another cron process is currently running wp-cron.php', 'docket-cache');
 
             return $results;
         }
@@ -287,7 +314,17 @@ final class CronAgent
                     continue;
                 }
 
+                // single
+                if ($run_uno && $hook !== $uno_ehk) {
+                    continue;
+                }
+
                 foreach ($keys as $k => $v) {
+                    // single
+                    if ($run_uno && $k !== $uno_eky) {
+                        continue;
+                    }
+
                     $schedule = $v['schedule'];
 
                     if ($schedule) {
@@ -320,6 +357,10 @@ final class CronAgent
 
         $results['wpcron_return'] = 1;
         $results['wpcron_event'] = $run_event;
+
+        if ($run_uno && 1 === $run_event) {
+            $results['wpcron_uno'] = $uno_ehk;
+        }
 
         return $results;
     }
@@ -379,7 +420,7 @@ final class CronAgent
         }
 
         if ($this->pt->co()->lockproc('receive_ping', time() + 60)) {
-            $response['msg'] = 'Already received. Try again in a few minutes';
+            $response['msg'] = esc_html__('Already received. Try again in a few minutes', 'docket-cache');
             $this->close_ping($response);
 
             return false;

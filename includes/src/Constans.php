@@ -273,9 +273,6 @@ final class Constans
             $this->px('IGNORED_PRECACHE'),
             [
                 'freemius:fs_accounts',
-                'site-transient:update_themes',
-                'site-transient:update_plugins',
-                'site-transient:update_core',
                 'options:uninstall_plugins',
                 'options:active_plugins',
                 'options:cron',
@@ -301,6 +298,9 @@ final class Constans
 
         // woocommerce cart fragments
         $this->maybe_define($this->px('WOOCARTFRAGSOFF'), false);
+
+        // woocommerce robots crawling add-to-cart links
+        $this->maybe_define($this->px('WOOADDTOCHARTCRAWLING'), true);
 
         // post missed schedule
         $this->maybe_define($this->px('POSTMISSEDSCHEDULE'), false);
@@ -375,11 +375,17 @@ final class Constans
         // wp sitemap
         $this->maybe_define($this->px('WPSITEMAP'), false);
 
+        // wp sitemap
+        $this->maybe_define($this->px('WPDASHBOARDNEWS'), false);
+
         // wp application password: wp >= 5.6
         $this->maybe_define($this->px('WPAPPPASSWORD'), false);
 
         // limit http request from uncommon page.
         $this->maybe_define($this->px('LIMITHTTPREQUEST'), false);
+
+        // whitelist host from limit http request.
+        $this->maybe_define($this->px('LIMITHTTPREQUEST_WHITELIST'), []/*['feeds.feedburner.com']*/);
 
         // curl "Expect" header performance tweak
         $this->maybe_define($this->px('HTTPHEADERSEXPECT'), false);

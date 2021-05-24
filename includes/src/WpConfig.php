@@ -85,20 +85,8 @@ final class WpConfig
         return $content;
     }
 
-    public static function get_file_loader()
-    {
-        $contentpath = \dirname(self::canopt()->path);
-
-        return $contentpath.'/docketcache-loader.php';
-    }
-
     public static function runtime_remove()
     {
-        $file = self::get_file_loader();
-        if (@is_file($file) && is_writable($file)) {
-            @unlink($file);
-        }
-
         $wpconfig = self::get_contents();
         if (!$wpconfig) {
             return false;
@@ -368,20 +356,5 @@ final class WpConfig
         }
 
         return $notice;
-    }
-
-    public static function backup($dest)
-    {
-        if (@is_dir($dest)) {
-            return false;
-        }
-
-        $dir = \dirname($dest);
-        $dest_file = trailingslashit($dir).'backup-wp-config.php';
-        if (@copy($file, $dest_file)) {
-            return true;
-        }
-
-        return false;
     }
 }

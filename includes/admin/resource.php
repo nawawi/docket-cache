@@ -56,13 +56,13 @@ namespace Nawawi\DocketCache;
                 <?php esc_html_e('To adjust the plugin behaviour and manage through a command line.', 'docket-cache'); ?>
                 <a href="https://docs.docketcache.com/?utm_source=wp-plugins&utm_campaign=docs-uri&utm_medium=dc-config" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Dcoumenation', 'docket-cache'); ?></a>
             </p>
-            <?php if (!apply_filters('docketcache/filter/view/nosponsor', false)) : ?>
             <hr>
             <p>
                 <strong><?php esc_html_e('FEEDBACK', 'docket-cache'); ?></strong><br class="break">
                 <?php esc_html_e('Write a review of your experience using this plugin.', 'docket-cache'); ?>
                 <a href="https://docketcache.com/feedback/?utm_source=wp-plugins&utm_campaign=reviews-uri&utm_medium=dc-config" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Submit Review', 'docket-cache'); ?></a>
             </p>
+            <?php if (!apply_filters('docketcache/filter/view/nosponsor', false)) : ?>
             <hr>
             <p>
                 <strong><?php esc_html_e('SPONSOR', 'docket-cache'); ?></strong><br class="break">

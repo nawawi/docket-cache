@@ -1725,15 +1725,23 @@ final class Plugin extends Bepart
                     return;
                 }
 
+                // lock opcache reset
+                $this->co()->setlock('preload_lock_opcache_reset', time() + 20);
+
                 // warmup: see after_delay
                 if ($this->cf()->is_dcfalse('PRELOAD')) {
                     add_action(
                         'shutdown',
                         function () {
+                            if ($this->co()->lockproc('preload', time() + 3600)) {
+                                return false;
+                            }
                             wp_load_alloptions();
                             wp_count_comments(0);
                             wp_count_posts();
                             @Crawler::fetch_home();
+
+                            $this->co()->lockreset('preload');
                         },
                         PHP_INT_MAX
                     );
@@ -1907,6 +1915,10 @@ final class Plugin extends Bepart
                 $tweaks->woocommerce_cart_fragments_remove();
             }
 
+            if ($this->cf()->is_dctrue('WOOADDTOCHARTCRAWLING')) {
+                $tweaks->woocommerce_crawling_addtochart_links();
+            }
+
             if ($this->cf()->is_dctrue('MISC_TWEAKS')) {
                 $tweaks->misc();
             }
@@ -1941,6 +1953,10 @@ final class Plugin extends Bepart
 
             if ($this->cf()->is_dctrue('WPAPPPASSWORD')) {
                 $tweaks->wpapppassword();
+            }
+
+            if ($this->cf()->is_dctrue('WPDASHBOARDNEWS')) {
+                $tweaks->wpdashboardnews();
             }
 
             if ($this->cf()->is_dctrue('LIMITHTTPREQUEST')) {

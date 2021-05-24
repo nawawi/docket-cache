@@ -112,7 +112,7 @@ class OPcacheView extends \WP_List_Table
                 }
 
                 foreach ($data['scripts'] as $script => $arr) {
-                    $cpath = $arr['full_path'];
+                    $cpath = wp_normalize_path($arr['full_path']);
 
                     if (!empty($sstr)) {
                         if (false !== strpos($sstr, '@filter:')) {

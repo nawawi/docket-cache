@@ -92,6 +92,7 @@ final class Canopt extends Bepart
             'woowidgetoff' => esc_html__('Deactivate WooCommerce Widget', 'docket-cache'),
             'woowpdashboardoff' => esc_html__('Deactivate WooCommerce WP Dashboard', 'docket-cache'),
             'woocartfragsoff' => esc_html__('Deactivate WooCommerce Cart Fragments', 'docket-cache'),
+            'wooaddtochartcrawling' => esc_html__('Prevent robots crawling add-to-cart links', 'docket-cache'),
             'pageloader' => esc_html__('Admin Page Loader', 'docket-cache'),
             'wpoptaload' => esc_html__('Suspend WP Options Autoload', 'docket-cache'),
             'cronoptmzdb' => esc_html__('Optimize Database Tables', 'docket-cache'),
@@ -110,6 +111,7 @@ final class Canopt extends Bepart
             'wplazyload' => esc_html__('Remove WP Lazy Load', 'docket-cache'),
             'wpsitemap' => esc_html__('Remove WP Sitemap', 'docket-cache'),
             'wpapppassword' => esc_html__('Remove WP Application Passwords', 'docket-cache'),
+            'wpdashboardnews' => esc_html__('Remove WP Events & News Feed Dashboard', 'docket-cache'),
             'objectcacheoff' => esc_html__('Suspend Object Cache', 'docket-cache'),
             'opcshutdown' => esc_html__('Flush OPcache During Deactivation', 'docket-cache'),
             'limithttprequest' => esc_html__('Limit WP-Admin HTTP requests', 'docket-cache'),
@@ -329,6 +331,7 @@ final class Canopt extends Bepart
         return true;
     }
 
+    // locked and not expire
     public function lockexp($key)
     {
         if ($this->locked($key, $locked)) {
@@ -340,13 +343,15 @@ final class Canopt extends Bepart
         return false;
     }
 
-    // if expire set new lock
+    // lock process
     public function lockproc($key, $value)
     {
+        // if locked and not expire
         if ($this->lockexp($key)) {
             return true;
         }
 
+        // if expire set new lock
         $this->setlock($key, $value);
 
         return false;

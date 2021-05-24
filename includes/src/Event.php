@@ -59,8 +59,8 @@ final class Event
                 ];
 
                 $schedules['docketcache_checkversion_schedule'] = [
-                    'interval' => 10 * DAY_IN_SECONDS,
-                    'display' => esc_html__('Every 10 Days', 'docket-cache'),
+                    'interval' => 15 * DAY_IN_SECONDS,
+                    'display' => esc_html__('Every 15 Days', 'docket-cache'),
                 ];
 
                 return $schedules;

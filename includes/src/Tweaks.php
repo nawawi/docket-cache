@@ -363,6 +363,44 @@ final class Tweaks
         );
     }
 
+    public function woocommerce_crawling_addtochart_links()
+    {
+        add_filter('robots_txt', function ($output, $public) {
+            if (!$this->has_woocommerce()) {
+                return $output;
+            }
+
+            if (empty($output)) {
+                return $output;
+            }
+
+            $append = '';
+            if (!@preg_match('@^Disallow:\s+/\*add\-to\-cart=\*@is', $output)) {
+                $append .= "Disallow: /*add-to-cart=*\n";
+            }
+
+            if (!@preg_match('@^Disallow:\s+/cart/@is', $output)) {
+                $append .= "Disallow: /cart/\n";
+            }
+
+            if (!@preg_match('@^Disallow:\s+/checkout/@is', $output)) {
+                $append .= "Disallow: /checkout/\n";
+            }
+
+            if (!@preg_match('@^Disallow:\s+/my\-account/@is', $output)) {
+                $append .= "Disallow: /my-account/\n";
+            }
+
+            if (!empty($append)) {
+                $output .= "\n# added by Docket Cache\n";
+                $output .= "User-agent: *\n";
+                $output .= $append;
+            }
+
+            return $output;
+        }, PHP_INT_MAX, 2);
+    }
+
     public function post_missed_schedule()
     {
         if (!nwdcx_wpdb($wpdb)) {
@@ -602,6 +640,25 @@ final class Tweaks
         add_filter('wp_is_application_passwords_available', '__return_false', PHP_INT_MAX);
     }
 
+    public function wpdashboardnews()
+    {
+        add_action(
+            'wp_dashboard_setup',
+            function () {
+                remove_meta_box('dashboard_primary', 'dashboard', 'side');
+            },
+            PHP_INT_MAX
+        );
+
+        add_action(
+            'admin_init',
+            function () {
+                remove_meta_box('dashboard_primary', 'dashboard-network', 'side');
+            },
+            PHP_INT_MAX
+        );
+    }
+
     public function limit_http_request()
     {
         add_action(
@@ -623,6 +680,7 @@ final class Tweaks
                             'themes.php' => 1,
                             'admin.php' => 1,
                             'update-core.php' => 1,
+                            'admin-ajax.php' => 1,
                         ];
 
                         if (\array_key_exists($pagenow, $pageok)) {
@@ -630,25 +688,53 @@ final class Tweaks
                         }
 
                         $hostme = parse_url(home_url(), PHP_URL_HOST);
-                        $hosturl = parse_url($url, PHP_URL_HOST);
+                        $hostname = parse_url($url, PHP_URL_HOST);
 
-                        if ('127.0.0.1' === $hosturl || 'localhost' === $hosturl || $hostme === $hosturl) {
+                        if ('127.0.0.1' === $hostname || 'localhost' === $hostname || $hostme === $hostname) {
                             return false;
                         }
 
-                        if ('wordpress.org' === $hosturl || 'api.wordpress.org' === $hosturl || 'docketcache.com' === $hosturl) {
+                        if ('.local' === substr($hostname, -\strlen('.local'))) {
                             return false;
                         }
 
-                        if ('.wordpress.org' === substr($hosturl, -\strlen('.wordpress.org'))) {
+                        if ('wordpress.org' === $hostname || 'api.wordpress.org' === $hostname || 'docketcache.com' === $hostname) {
                             return false;
                         }
 
-                        if ('.docketcache.com' === substr($hosturl, -\strlen('.docketcache.com'))) {
+                        if ('.wordpress.org' === substr($hostname, -\strlen('.wordpress.org'))) {
                             return false;
                         }
 
-                        return true;
+                        if ('.docketcache.com' === substr($hostname, -\strlen('.docketcache.com'))) {
+                            return false;
+                        }
+
+                        $ok = true;
+                        $wkey = nwdcx_constfx('LIMITHTTPREQUEST_WHITELIST');
+                        if (\defined($wkey)) {
+                            $whitelist = \constant($wkey);
+                            if (!empty($whitelist) && \is_array($whitelist)) {
+                                while ($hosta = @array_shift($whitelist)) {
+                                    $hostb = nwdcx_noscheme($hosta);
+                                    if ($hostname === $hostb) {
+                                        $ok = false;
+                                        break;
+                                    }
+
+                                    if ('.' === $hostb[0] && $hostb === substr($hostname, -\strlen($hostb))) {
+                                        $ok = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        /*if ( $ok ) {
+                            error_log('docket-cache: Tweaks::limit_http_request(): Drop -> '.$hostname);
+                        }*/
+
+                        return $ok;
                     },
                     PHP_INT_MIN,
                     3

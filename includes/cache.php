@@ -488,12 +488,14 @@ class WP_Object_Cache
         $ret .= '</p>';
         $ret .= '<ul>';
         $total = 0;
+
         foreach ($this->cache as $group => $cache) {
             $ret .= '<li><strong>Group:</strong> '.esc_html($group).' - ( '.number_format(\strlen(serialize($cache)) / KB_IN_BYTES, 2).'K )</li>';
             $total += \strlen(serialize($cache));
         }
+
         $ret .= '</ul>';
-        echo '<p>total: '.number_format($total / KB_IN_BYTES).'</p>';
+        $ret .= '<p>total: '.number_format($total / KB_IN_BYTES).'</p>';
         echo $ret;
     }
 
