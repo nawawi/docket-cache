@@ -322,7 +322,10 @@ final class Plugin extends Bepart
      */
     public function sanitize_rootpath($path)
     {
-        return rtrim(str_replace([WP_CONTENT_DIR, ABSPATH], ['/'.basename(WP_CONTENT_DIR), '/'], $path), '/');
+        $wp_content_dir = nwdcx_normalizepath(WP_CONTENT_DIR);
+        $abspath = nwdcx_normalizepath(ABSPATH);
+
+        return rtrim(str_replace([$wp_content_dir, $abspath], ['/'.basename($wp_content_dir), '/'], $path), '/');
     }
 
     /**

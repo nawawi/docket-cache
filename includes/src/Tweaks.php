@@ -667,6 +667,10 @@ final class Tweaks
                 add_filter(
                     'pre_http_request',
                     function ($preempt, $parsed_args, $url) {
+                        if (!is_admin()) {
+                            return false;
+                        }
+
                         if (empty($GLOBALS['pagenow'])) {
                             return false;
                         }
@@ -694,7 +698,7 @@ final class Tweaks
                             return false;
                         }
 
-                        if ('.local' === substr($hostname, -\strlen('.local'))) {
+                        if ('.local' === substr($hostme, -\strlen('.local')) || '.test' === substr($hostme, -\strlen('.test'))) {
                             return false;
                         }
 

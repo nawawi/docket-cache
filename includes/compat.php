@@ -284,6 +284,21 @@ if (!\function_exists('nwdcx_suppresserrors')) {
     }
 }
 
+if (!\function_exists('nwdcx_normalizepath')) {
+    function nwdcx_normalizepath($path)
+    {
+        if (false === strpos($path, '\\')) {
+            return $path;
+        }
+
+        if (\function_exists('wp_normalize_path')) {
+            return wp_normalize_path($path);
+        }
+
+        return str_replace('\\', '/', $path);
+    }
+}
+
 // network specific
 
 if (!\function_exists('nwdcx_network_multi')) {
@@ -313,7 +328,7 @@ if (!\function_exists('nwdcx_network_multi')) {
 
         // this lock file should only exists if network more than 1
         // see Dropino::multinet_active
-        $lock_file = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-multi.txt';
+        $lock_file = nwdcx_normalizepath(DOCKET_CACHE_CONTENT_PATH).'/.object-cache-network-multi.txt';
         $timeout = time() + 86400;
         if (@is_file($lock_file) && @is_readable($lock_file) && $timeout > @filemtime($lock_file)) {
             $ok = !empty(@file_get_contents($lock_file)) ? true : false;
@@ -337,7 +352,7 @@ if (!\function_exists('nwdcx_network_ignore')) {
     function nwdcx_network_ignore()
     {
         if (nwdcx_network_multi()) {
-            if (!@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-'.nwdcx_network_id().'.txt')) {
+            if (!@is_file(nwdcx_normalizepath(DOCKET_CACHE_CONTENT_PATH).'/.object-cache-network-'.nwdcx_network_id().'.txt')) {
                 return true;
             }
 
@@ -375,7 +390,7 @@ if (!\function_exists('nwdcx_network_main')) {
             return true;
         }
 
-        $lock_file = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-main.txt';
+        $lock_file = nwdcx_normalizepath(DOCKET_CACHE_CONTENT_PATH).'/.object-cache-network-main.txt';
         $timeout = time() + 86400;
         if (@is_file($lock_file) && @is_readable($lock_file) && $timeout > @filemtime($lock_file)) {
             $data = @file_get_contents($lock_file);

@@ -66,6 +66,8 @@ class Filesystem
         $name = 'docket-cache';
         $ok = false;
 
+        $dir = nwdcx_normalizepath($dir);
+
         if (false === strpos($dir.'/', '/'.$name.'/')) {
             return $ok;
         }
@@ -252,7 +254,7 @@ class Filesystem
      */
     public function scanfiles($dir, $maxdepth = 0)
     {
-        $dir = realpath($dir);
+        $dir = nwdcx_normalizepath(realpath($dir));
         if (false !== $dir && is_dir($dir) && is_readable($dir)) {
             $diriterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \RecursiveDirectoryIterator::KEY_AS_FILENAME | \RecursiveDirectoryIterator::CURRENT_AS_FILEINFO);
             $object = new \RegexIterator(new \RecursiveIteratorIterator($diriterator), '@^(dump_)?([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', \RegexIterator::MATCH, \RegexIterator::USE_KEY);
@@ -629,10 +631,13 @@ class Filesystem
     public function define_cache_path($cache_path)
     {
         $content_path = \defined('DOCKET_CACHE_CONTENT_PATH') ? DOCKET_CACHE_CONTENT_PATH : WP_CONTENT_DIR;
+        $content_path = nwdcx_normalizepath($content_path);
 
         $cache_path = !empty($cache_path) && '/' !== $cache_path ? rtrim($cache_path, '/\\').'/' : $content_path.'/cache/docket-cache/';
+        $cache_path = nwdcx_normalizepath($cache_path);
+
         if (!$this->is_docketcachedir($cache_path)) {
-            $cache_path = rtim($cache_path, '/').'docket-cache/';
+            $cache_path = rtrim($cache_path, '/\\').'docket-cache/';
         }
 
         // create if not normal installation
@@ -658,7 +663,8 @@ class Filesystem
 
         clearstatcache();
         $cnt = 0;
-        $dir = realpath($dir);
+        $dir = nwdcx_normalizepath(realpath($dir));
+
         if (false === $dir || !@is_dir($dir) || !@is_writable($dir) || !$this->is_docketcachedir($dir)) {
             return false;
         }

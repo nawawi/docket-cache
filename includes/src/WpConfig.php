@@ -26,7 +26,7 @@ final class WpConfig
 
     private static function normalize_eol($content)
     {
-        return str_replace(["\r\n", "\n\r", "\r", "\n"], PHP_EOL, $content);
+        return str_replace(["\r\n", "\n\r", "\r"], "\n", $content);
     }
 
     private static function keys()
@@ -49,17 +49,20 @@ final class WpConfig
     public static function get_file()
     {
         $file = false;
-        if (@is_file(ABSPATH.'wp-config.php')) {
-            $file = ABSPATH.'wp-config.php';
-        } elseif (@is_file(\dirname(ABSPATH).'/wp-config.php') && !@is_file(\dirname(ABSPATH).'/wp-settings.php')) {
-            $file = \dirname(ABSPATH).'/wp-config.php';
+        $abspath = nwdcx_normalizepath(ABSPATH);
+        $parent_dir = \dirname($abspath);
+
+        if (@is_file($abspath.'wp-config.php')) {
+            $file = $abspath.'wp-config.php';
+        } elseif (@is_file($parent_dir.'/wp-config.php') && !@is_file($parent_dir.'/wp-settings.php')) {
+            $file = $parent_dir.'/wp-config.php';
         }
 
         if (!$file) {
             return false;
         }
 
-        return str_replace('\\', '/', $file);
+        return $file;
     }
 
     public static function is_writable()

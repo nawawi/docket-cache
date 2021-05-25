@@ -35,17 +35,19 @@ final class Canopt extends Bepart
 
         if (!empty($path)) {
             if ('docket-cache-data' !== basename($path)) {
-                $path = rtrim($path, '/').'/docket-cache-data';
+                $path = rtrim($path, '/\\').'/docket-cache-data';
             }
         } else {
-            $path = DOCKET_CACHE_CONTENT_PATH.'/docket-cache-data';
+            $path = rtrim(DOCKET_CACHE_CONTENT_PATH, '/\\').'/docket-cache-data';
         }
+
+        $path = nwdcx_normalizepath($path);
 
         if (is_multisite()) {
             $path = nnwdcx_network_dirpath($path);
         }
 
-        $this->path = rtrim($path, '/');
+        $this->path = rtrim($path, '/\\');
 
         $this->file = $this->path.'/options.php';
         $this->path_lock = $this->path.'/lock';

@@ -20,9 +20,13 @@ final class Dropino extends Bepart
 
     public function __construct($path)
     {
-        $this->path = $path;
+        $this->path = nwdcx_normalizepath($path);
+
         $this->wpcondir = \defined('WP_CONTENT_DIR') ? WP_CONTENT_DIR : ABSPATH.'wp-content';
-        $this->condir = \defined('DOCKET_CACHE_CONTENT_PATH') ? DOCKET_CACHE_CONTENT_PATH : WP_CONTENT_DIR;
+        $this->wpcondir = nwdcx_normalizepath($this->wpcondir);
+
+        $this->condir = \defined('DOCKET_CACHE_CONTENT_PATH') ? DOCKET_CACHE_CONTENT_PATH : $this->wpcondir;
+        $this->condir = nwdcx_normalizepath($this->condir);
     }
 
     /**
@@ -36,8 +40,8 @@ final class Dropino extends Bepart
         $dt['wpdst'] = $this->wpcondir.'/object-cache.php';
 
         // sync with includes/object-cache.php
-        $dt['halt'] = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-delay.txt';
-        $dt['after'] = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-after-delay.txt';
+        $dt['halt'] = $this->condir.'/.object-cache-delay.txt';
+        $dt['after'] = $this->condir.'/.object-cache-after-delay.txt';
 
         return (object) $dt;
     }
@@ -246,7 +250,7 @@ final class Dropino extends Bepart
         }
 
         if (null !== $network_id) {
-            @file_put_contents(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-main.txt', $network_id, LOCK_EX);
+            @file_put_contents($this->condir.'/.object-cache-network-main.txt', $network_id, LOCK_EX);
         }
 
         $wpdb->suppress_errors($suppress);
@@ -254,13 +258,13 @@ final class Dropino extends Bepart
 
     private function multinet_clear_main($cleanup = false)
     {
-        $file = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-main.txt';
+        $file = $this->condir.'/.object-cache-network-main.txt';
         if (@is_file($file)) {
             @unlink($file);
         }
 
         if ($cleanup) {
-            $file = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-multi.txt';
+            $file = $this->condir.'/.object-cache-network-multi.txt';
             if (@is_file($file)) {
                 @unlink($file);
             }
@@ -270,7 +274,7 @@ final class Dropino extends Bepart
     private function multinet_list()
     {
         $list = [];
-        $files = @glob(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-*.txt', GLOB_MARK | GLOB_NOSORT);
+        $files = @glob($this->condir.'/.object-cache-network-*.txt', GLOB_MARK | GLOB_NOSORT);
         if (!empty($files) && \is_array($files)) {
             foreach ($files as $file) {
                 $fx = basename($file);
@@ -333,7 +337,7 @@ final class Dropino extends Bepart
     {
         $network_id = empty($network_id) ? get_current_network_id() : $network_id;
 
-        return sprintf('%s/.object-cache-network-%s.txt', DOCKET_CACHE_CONTENT_PATH, $network_id);
+        return sprintf('%s/.object-cache-network-%s.txt', $this->condir, $network_id);
     }
 
     public function multinet_active($status = false, $network_id = false)
@@ -342,7 +346,7 @@ final class Dropino extends Bepart
             return false;
         }
 
-        $lock_file = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-network-multi.txt';
+        $lock_file = $this->condir.'/.object-cache-network-multi.txt';
         if (!@is_file($lock_file)) {
             @file_put_contents($lock_file, 1, LOCK_EX);
         }

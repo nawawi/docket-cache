@@ -155,9 +155,9 @@ final class Constans
     public function register_default()
     {
         // compat
-        $this->maybe_define('WP_CONTENT_DIR', ABSPATH.'wp-content', false);
-        $this->maybe_define('WP_PLUGIN_DIR', WP_CONTENT_DIR.'/plugins', false);
-        $this->maybe_define('DOCKET_CACHE_CONTENT_PATH', WP_CONTENT_DIR, false);
+        $this->maybe_define('WP_CONTENT_DIR', nwdcx_normalizepath(ABSPATH).'wp-content', false);
+        $this->maybe_define('WP_PLUGIN_DIR', nwdcx_normalizepath(WP_CONTENT_DIR).'/plugins', false);
+        $this->maybe_define('DOCKET_CACHE_CONTENT_PATH', nwdcx_normalizepath(WP_CONTENT_DIR), false);
 
         // data dir
         $this->maybe_define($this->px('DATA_PATH'), DOCKET_CACHE_CONTENT_PATH.'/docket-cache-data/', false);
