@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'cd077466295c3045c6af404f2e36cf671aac42e1',
+    'reference' => '95a72824960d3a47306b432c470aa199cc9248a4',
     'name' => 'nawawi/docket-cache',
   ),
   'versions' => 
@@ -18,16 +18,16 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'cd077466295c3045c6af404f2e36cf671aac42e1',
+      'reference' => '95a72824960d3a47306b432c470aa199cc9248a4',
     ),
     'symfony/polyfill-php80' => 
     array (
-      'pretty_version' => 'v1.22.1',
-      'version' => '1.22.1.0',
+      'pretty_version' => 'v1.23.0',
+      'version' => '1.23.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'dc3063ba22c2a1fd2f45ed856374d79114998f91',
+      'reference' => 'eca0bf41ed421bed1b57c4958bab16aa86b757d0',
     ),
     'symfony/var-exporter' => 
     array (

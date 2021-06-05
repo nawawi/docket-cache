@@ -370,10 +370,6 @@ final class Tweaks
                 return $output;
             }
 
-            if (empty($output)) {
-                return $output;
-            }
-
             $append = '';
             if (!@preg_match('@^Disallow:\s+/\*add\-to\-cart=\*@is', $output)) {
                 $append .= "Disallow: /*add-to-cart=*\n";
@@ -381,19 +377,46 @@ final class Tweaks
 
             if (!@preg_match('@^Disallow:\s+/cart/@is', $output)) {
                 $append .= "Disallow: /cart/\n";
+            } else {
+                $cart = basename(wc_get_cart_url());
+                if (!@preg_match('@^Disallow:\s+/'.$cart.'/@is', $output)) {
+                    $append .= 'Disallow: /'.$cart."/\n";
+                }
             }
 
             if (!@preg_match('@^Disallow:\s+/checkout/@is', $output)) {
                 $append .= "Disallow: /checkout/\n";
+            } else {
+                $checkout = basename(wc_get_checkout_url());
+                if (!@preg_match('@^Disallow:\s+/'.$checkout.'/@is', $output)) {
+                    $append .= 'Disallow: /'.$checkout."/\n";
+                }
             }
 
             if (!@preg_match('@^Disallow:\s+/my\-account/@is', $output)) {
                 $append .= "Disallow: /my-account/\n";
+            } else {
+                $myaccount = basename(wc_get_page_permalink('myaccount'));
+                if (!@preg_match('@^Disallow:\s+/'.$myaccount.'/@is', $output)) {
+                    $append .= 'Disallow: /'.$myaccount."/\n";
+                }
             }
 
             if (!empty($append)) {
-                $output .= "\n# added by Docket Cache\n";
-                $output .= "User-agent: *\n";
+                $addua = true;
+                if (@preg_match_all('@User-agent:\s+\S+@is', $output, $mm, PREG_SET_ORDER)) {
+                    $last = end($mm);
+                    if (@preg_match('@User-agent:\s+\*@i', $last[0])) {
+                        $addua = false;
+                    }
+                }
+
+                $output .= "\n# Added by Docket Cache\n";
+
+                if ($addua) {
+                    $output .= "User-agent: *\n";
+                }
+
                 $output .= $append;
             }
 

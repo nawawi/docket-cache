@@ -4,7 +4,7 @@ Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance
 Requires at least: 5.4
 Tested up to: 5.7
 Requires PHP: 7.2.5
-Stable tag: 21.02.04
+Stable tag: 21.02.05
 License: MIT
 License URI: ./license.txt
 
@@ -164,42 +164,56 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.02.05 =
+
+- Fixed: Normalize a filesystem path on Windows.
+- Fixed: Plugin::cleanuppost() -> Invalid counting for trash.
+- Fixed: Tweaks::woocommerce_crawling_addtochart_links() -> Checking user-agent to avoid redundancy in robots.txt.
+- Fixed: OPcache -> OPcache Config. Proper link directives name to php documentation.
+- Added: Configuration -> Actions -> Runtime code. install/uninstall runtime code.
+- Added: Configuration -> Runtime Options. Possible to handles wp debug and auto update core.
+- Added: OPcache -> OPcache Files -> Items limit selection. Limit items to display.
+- Improved: runtime code and how to handle wp constants.
+- Removed: Our sequence order to the first index in the plugin list.
+
+Thanks to @kotyarashop for reporting an issue with robots.txt.
+
 = 21.02.04 =
 
-- Fixed View::code_focus() -> remove {behavior: "smooth"} to correct scroll position in firefox.
-- Fixed OPcacheView::get_files() -> normalize files path.
-- Fixed Filesystem::opcache_reset() -> remove additional invalidate files, issue with memory burst when run admin preloading.
-- Fixed ReqAction::run_action() -> prevent run opcache_reset after flush object cache.
-- Fixed Tweaks::limit_http_request() -> allows admin-ajax.php and .local hostname.
-- Added Tweaks::woocommerce_crawling_addtochart_links() -> simple tweaks to prevent robots from crawling add-to-cart links.
-- Added LIMITHTTPREQUEST_WHITELIST constant -> list of hostname to exclude from checking.
-- Added Tweaks::wpdashboardnews() -> remove Events & News Feed in WP dashboard.
-- Added Cronbot -> Run Now for single event.
+- Fixed: View::code_focus() -> remove {behavior: "smooth"} to correct scroll position in firefox.
+- Fixed: OPcacheView::get_files() -> normalize files path.
+- Fixed: Filesystem::opcache_reset() -> remove additional invalidate files, issue with memory burst when run admin preloading.
+- Fixed: ReqAction::run_action() -> prevent run opcache_reset after flush object cache.
+- Fixed: Tweaks::limit_http_request() -> allows admin-ajax.php and .local hostname.
+- Added: Tweaks::woocommerce_crawling_addtochart_links() -> simple tweaks to prevent robots from crawling add-to-cart links.
+- Added: LIMITHTTPREQUEST_WHITELIST constant -> list of hostname to exclude from checking.
+- Added: Tweaks::wpdashboardnews() -> remove Events & News Feed in WP dashboard.
+- Added: Cronbot -> Run Now for single event.
 
 = 21.02.03 =
 
-- Fixed WpConfig::has() -> missing argument for nwdcx_throwable.
+- Fixed: WpConfig::has() -> missing argument for nwdcx_throwable.
 
 Thanks to Stanislav Khromov for testing with php 8. https://github.com/nawawi/docket-cache/issues/10
 
 = 21.02.02 =
 
-- Fixed Plugin::is_subpage() -> opcach viewer left menu link.
-- Fixed Filesystem::fastcgi_close() -> Theme editor failed to verify updated file.
-- Added Tweaks::http_headers_expect() -> HTTP Request Expect header tweaks.
+- Fixed: Plugin::is_subpage() -> opcach viewer left menu link.
+- Fixed: Filesystem::fastcgi_close() -> Theme editor failed to verify updated file.
+- Added: Tweaks::http_headers_expect() -> HTTP Request Expect header tweaks.
 
 Thanks to Oleg for reporting an issue with Theme Editor https://docketcache.com/feedback/#comment-2
 
 = 21.02.01 =
 
-- Fixed Filesystem::chmod() -> invalid mode for file.
-- Fixed Filesystem::define_cache_path() -> avoid checking if the cache path exists and create the content path if define.
-- Fixed Overview -> Cache Path not same with DOCKET_CACHE_PATH, due to error at define_cache_path().
-- Added Filesystem::mkdir_p() -> fix directory permissions issues, when web server and php has different user/group.
-- Added Filesystem::touch() -> fix notice "Utime failed: Operation not permitted" when web server and php has different user/group.
-- Added Filesysten::getchmod() -> gets file/dir permissions in octal format.
-- Added sites selection for cleanup post on multisite.
-- Added OPcache viewer.
+- Fixed: Filesystem::chmod() -> invalid mode for file.
+- Fixed: Filesystem::define_cache_path() -> avoid checking if the cache path exists and create the content path if define.
+- Fixed: Overview -> Cache Path not same with DOCKET_CACHE_PATH, due to error at define_cache_path().
+- Added: Filesystem::mkdir_p() -> fix directory permissions issues, when web server and php has different user/group.
+- Added: Filesystem::touch() -> fix notice "Utime failed: Operation not permitted" when web server and php has different user/group.
+- Added: Filesysten::getchmod() -> gets file/dir permissions in octal format.
+- Added: sites selection for cleanup post on multisite.
+- Added: OPcache viewer.
 - Updated tested up to 5.7
 - Improved action notice at the configuration page.
 
@@ -207,24 +221,24 @@ Thanks to @patrickwgs for reporting an issue on bedrock installation.
 
 = 21.01.01 =
 
-- Fixed Tweaks::woocommerce_cart_fragments_remove() -> check if "wc-cart-fragments" script exists.
-- Fixed WP_Object_Cache::dc_precache_set -> ignore transient, site-transient.
-- Added Configuration Options -> Runtime Options.
-- Added Configuration Actions -> Config reset.
-- Added Configuration Actions -> Cleanup Post revisions, auto drafts, trash bin.
-- Added WP-CLI command -> runtime:install, runtime:reset.
+- Fixed: Tweaks::woocommerce_cart_fragments_remove() -> check if "wc-cart-fragments" script exists.
+- Fixed: WP_Object_Cache::dc_precache_set -> ignore transient, site-transient.
+- Added: Configuration Options -> Runtime Options.
+- Added: Configuration Actions -> Config reset.
+- Added: Configuration Actions -> Cleanup Post revisions, auto drafts, trash bin.
+- Added: WP-CLI command -> runtime:install, runtime:reset.
 
 = 20.12.04 =
 
-- Fixed Limit WP-Admin HTTP Requests -> invalid variable pagenow.
-- Fixed Cache Log -> use get_utc_offset() instead of date('T').
-- Fixed Overview Actions -> rename admin/actcmd.php to admin/actions.php.
-- Fixed Cronbot Events -> display notice if failed to load EventList() .
-- Fixed nwdcx_throwable() -> only save data if WP_DEBUG defined .
-- Fixed Tweak::compat_notice() -> move to Plugin::compat_notice(), do check at CLI.
-- Fixed Plugin::get_subpage() -> add checking for adx variable.
-- Fixed OPcache flush -> lock for 20 seconds before accept new request.
-- Added Filesystem() methods -> sanitize_precache_maxfile, sanitize_maxsize, sanitize_maxsizedisk.
+- Fixed: Limit WP-Admin HTTP Requests -> invalid variable pagenow.
+- Fixed: Cache Log -> use get_utc_offset() instead of date('T').
+- Fixed: Overview Actions -> rename admin/actcmd.php to admin/actions.php.
+- Fixed: Cronbot Events -> display notice if failed to load EventList() .
+- Fixed: nwdcx_throwable() -> only save data if WP_DEBUG defined .
+- Fixed: Tweak::compat_notice() -> move to Plugin::compat_notice(), do check at CLI.
+- Fixed: Plugin::get_subpage() -> add checking for adx variable.
+- Fixed: OPcache flush -> lock for 20 seconds before accept new request.
+- Added: Filesystem() methods -> sanitize_precache_maxfile, sanitize_maxsize, sanitize_maxsizedisk.
 
 
 Kindly refer to [changelog.txt](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt) for previous changes.

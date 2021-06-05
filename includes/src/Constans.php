@@ -19,7 +19,7 @@ final class Constans
         $this->register_default();
     }
 
-    private function px($name)
+    public function px($name)
     {
         return nwdcx_constfx($name);
     }
@@ -400,13 +400,25 @@ final class Constans
         $this->maybe_define($this->px('RTPOSTEMPTYTRASH'), 30);
 
         // @private: plugin / theme editor.
-        $this->maybe_define($this->px('RTPLUGINTHEMEEDITOR'), 'off');
+        $this->maybe_define($this->px('RTPLUGINTHEMEEDITOR'), (\defined('DISALLOW_FILE_EDIT') && DISALLOW_FILE_EDIT ? 'on' : 'off'));
 
         // @private: plugin / theme install.
-        $this->maybe_define($this->px('RTPLUGINTHEMEINSTALL'), 'off');
+        $this->maybe_define($this->px('RTPLUGINTHEMEINSTALL'), (\defined('DISALLOW_FILE_MODS') && DISALLOW_FILE_MODS ? 'on' : 'off'));
 
         // @private: overwrite image after edit.
-        $this->maybe_define($this->px('RTIMAGEOVERWRITE'), 'off');
+        $this->maybe_define($this->px('RTIMAGEOVERWRITE'), (\defined('IMAGE_EDIT_OVERWRITE') && IMAGE_EDIT_OVERWRITE ? 'on' : 'off'));
+
+        // @private: wp debug.
+        $this->maybe_define($this->px('RTWPDEBUG'), (\defined('WP_DEBUG') && WP_DEBUG ? 'on' : 'off'));
+
+        // @private: wp debug display.
+        $this->maybe_define($this->px('RTWPDEBUGDISPLAY'), (\defined('WP_DEBUG_DISPLAY') && WP_DEBUG_DISPLAY ? 'on' : 'off'));
+
+        // @private: wp debug log.
+        $this->maybe_define($this->px('RTWPDEBUGLOG'), (\defined('WP_DEBUG_LOG') && WP_DEBUG_LOG ? 'on' : 'off'));
+
+        // @private: deactivate wp auto update core.
+        $this->maybe_define($this->px('RTWPCOREUPDATE'), (\defined('WP_AUTO_UPDATE_CORE') && WP_AUTO_UPDATE_CORE ? 'off' : 'on'));
 
         // @private
         // capture fatal error rarely incase non-throwable

@@ -94,17 +94,14 @@ $has_stats = $this->vcf()->is_dctrue('STATS');
                     <th><?php esc_html_e('PHP Memory Limit', 'docket-cache'); ?></th>
                     <td><?php echo $this->info->php_memory_limit; ?></td>
                 </tr>
-
                 <tr>
                     <th><?php esc_html_e('WP Frontend Memory Limit', 'docket-cache'); ?></th>
                     <td><?php echo $this->info->wp_memory_limit; ?></td>
                 </tr>
-
                 <tr>
                     <th class="border-b"><?php esc_html_e('WP Backend Memory Limit', 'docket-cache'); ?></th>
                     <td><?php echo $this->info->wp_max_memory_limit; ?></td>
                 </tr>
-
                 <?php
                 if (is_multisite()) :
                     $wp_multinetlock = $this->info->wp_multinetlock;

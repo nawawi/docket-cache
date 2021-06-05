@@ -36,10 +36,6 @@ body {
     text-transform: capitalize !important;
 }
 
-#docket-cache #innotice {
-    font-size: 13px !important;
-}
-
 #docket-cache .dashicons {
     font-weight: normal;
     font-size: 20px;
@@ -174,6 +170,12 @@ body {
     overflow: auto;
     background-color: white;
 }
+
+#docket-cache span.wpdebuglog {
+    font-size: 12px;
+    display: block;
+}
+
 
 /* cronbot */
 #docket-cache .cronbot p.submit {
@@ -695,6 +697,11 @@ body {
     text-align: center;
 }
 
+#docket-cache .gridlist .tablenav .tablenav-pages {
+    margin-top: 6px;
+    margin-bottom: 10px;
+}
+
 /* small */
 @media only screen and (max-width: 782px) {
 
@@ -809,6 +816,10 @@ body {
         display: block !important;
         width: 100%;
     }
+
+    #docket-cache select.config-filter:not(:first-of-type) {
+        margin-top: 10px;
+    }
 }
 
 /* /opcklist */
@@ -917,12 +928,44 @@ body {
 }
 
 /* notice */
+#docket-cache #innotice {
+    font-size: 13px !important;
+}
+
 #docket-cache div.notice:not(#docket-cache-notice):not(#setting-error-docket-cache) {
     display: none;
 }
 
-#docket-cache .notice-focus select {
-    background: #eee;
+#docket-cache #runtimenotice {
+    margin: 0;
+    padding: 0;
+}
+
+#docket-cache #runtimenotice textarea {
+    width: 100%;
+    font-family: monospace, Consolas, Monaco;
+    unicode-bidi: embed;
+    font-size: 11px;
+    margin: 0;
+}
+
+#docket-cache #runtimenotice a.button {
+    width: 150px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+#docket-cache #runtimenotice a.btx-btu {
+    margin-left: 6px;
+}
+
+@media only screen and (max-width:782px) {
+    #docket-cache #runtimenotice a.button {
+        display: block;
+        width: 100% !important;
+        margin-left: 0;
+        margin-right: 0;
+    }
 }
 
 /* wp */

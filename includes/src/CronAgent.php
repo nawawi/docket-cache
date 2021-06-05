@@ -339,6 +339,14 @@ final class CronAgent
                     } catch (\Throwable $e) {
                         $results['wpcron_error'][$hook] = $e->getMessage();
                         wp_clear_scheduled_hook($hook);
+
+                        if ($run_uno) {
+                            $results['wpcron_return'] = 0;
+                            $results['wpcron_event'] = 1;
+                            $results['wpcron_uno'] = $uno_ehk;
+                            break;
+                        }
+
                         --$run_event;
                     }
 

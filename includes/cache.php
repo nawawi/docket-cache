@@ -683,7 +683,7 @@ class WP_Object_Cache
         // if 0 let gc handle it by comparing file mtime.
         if (0 === $expire && $maxttl < 2419200) {
             if (\in_array($group, ['site-transient', 'transient'])) {
-                if ('site-transient' === $group && \in_array($key, ['update_plugins', 'update_themes', 'update_core'])) {
+                if ('site-transient' === $group && \in_array($key, ['update_plugins', 'update_themes', 'update_core', '_woocommerce_helper_updates'])) {
                     $expire = $maxttl < 2419200 ? 2419200 : $maxttl; // 28d
                 } else {
                     $expire = $maxttl < 604800 ? 604800 : $maxttl; // 7d
@@ -1178,6 +1178,8 @@ class WP_Object_Cache
 
             $this->set($hash, $data, $group, 86400); // 1d
         }
+
+        unset($data, $hash);
     }
 
     /**
@@ -1277,7 +1279,7 @@ class WP_Object_Cache
 
         $this->cache_path = $this->fs()->define_cache_path($this->cf()->dcvalue('PATH'));
         if ($this->multisite) {
-            $this->cache_path = nnwdcx_network_dirpath($this->cache_path);
+            $this->cache_path = nwdcx_network_dirpath($this->cache_path);
         }
 
         if ($this->cf()->is_dctrue('WPOPTALOAD')) {
@@ -1342,6 +1344,7 @@ class WP_Object_Cache
                                 PHP_INT_MAX - 1
                             );
                         }
+                        unset($alloptions);
                     }
                 },
                 PHP_INT_MAX

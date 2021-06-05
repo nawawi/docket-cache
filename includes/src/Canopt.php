@@ -41,10 +41,10 @@ final class Canopt extends Bepart
             $path = rtrim(DOCKET_CACHE_CONTENT_PATH, '/\\').'/docket-cache-data';
         }
 
-        $path = nwdcx_normalizepath($path);
+        $path = wp_normalize_path($path);
 
         if (is_multisite()) {
-            $path = nnwdcx_network_dirpath($path);
+            $path = nwdcx_network_dirpath($path);
         }
 
         $this->path = rtrim($path, '/\\');
@@ -124,6 +124,10 @@ final class Canopt extends Bepart
             'rtpluginthemeeditor' => esc_html__('Deactivate Plugin / Theme Editor', 'docket-cache'),
             'rtpluginthemeinstall' => esc_html__('Deactivate Plugin / Theme Update and Installation', 'docket-cache'),
             'rtimageoverwrite' => esc_html__('Cleanup Image Edits', 'docket-cache'),
+            'rtwpdebug' => esc_html__('WP Debug', 'docket-cache'),
+            'rtwpdebugdisplay' => esc_html__('WP Debug Display', 'docket-cache'),
+            'rtwpdebuglog' => esc_html__('WP Debug Log', 'docket-cache'),
+            'rtwpcoreupdate' => esc_html__('WP Auto Update Core', 'docket-cache'),
         ];
 
         $data = apply_filters('docketcache/filter/optionkeys', $data);
@@ -270,6 +274,15 @@ final class Canopt extends Bepart
                     if (\defined('DocketCache_CLI') && DocketCache_CLI) {
                         @fwrite(STDOUT, basename($file).PHP_EOL);
                     }
+                    @unlink($file);
+                }
+            }
+        }
+
+        $files = @glob($path.'/dump_*.txt', GLOB_MARK | GLOB_NOSORT);
+        if (!empty($files) && \is_array($files)) {
+            foreach ($files as $file) {
+                if (@is_file($file) && @is_writable($file)) {
                     @unlink($file);
                 }
             }

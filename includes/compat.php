@@ -484,8 +484,8 @@ if (!\function_exists('nwdcx_network_id')) {
     }
 }
 
-if (!\function_exists('nnwdcx_network_dirpath')) {
-    function nnwdcx_network_dirpath($save_path)
+if (!\function_exists('nwdcx_network_dirpath')) {
+    function nwdcx_network_dirpath($save_path)
     {
         if (nwdcx_network_multi() && !nwdcx_network_main()) {
             $save_path = rtrim($save_path, '/').'/network-'.nwdcx_network_id().'/';

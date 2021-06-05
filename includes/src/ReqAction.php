@@ -238,7 +238,11 @@ final class ReqAction
                 do_action('docketcache/action/garbagecollector', $ok, $result);
                 break;
             case 'docket-runtime':
-                $result = WpConfig::runtime_install();
+                if (!empty($param['adr'])) {
+                    $result = WpConfig::runtime_remove();
+                } else {
+                    $result = WpConfig::runtime_install();
+                }
                 $response = $result ? 'docket-runtimeok' : 'docket-runtimeok-failed';
                 do_action('docketcache/action/updatewpconfig', $result);
                 break;
@@ -278,8 +282,17 @@ final class ReqAction
                     if (is_numeric($nv)) {
                         $nv = (int) $nv;
                     }
-                    $ok = $this->pt->co()->save($nx, $nv);
-                    $response = $ok ? 'docket-option-save' : 'docket-option-failed';
+
+                    if (WpConfig::is_runtimeconst($nx) && WpConfig::is_runtimefalse()) {
+                        $ok = false;
+                        $response = 'docket-option-rtm-warn';
+                    } elseif (WpConfig::has($nx)) {
+                        $ok = false;
+                        $response = 'docket-option-wpf-warn';
+                    } else {
+                        $ok = $this->pt->co()->save($nx, $nv);
+                        $response = $ok ? 'docket-option-save' : 'docket-option-failed';
+                    }
                     $option_value = $nv;
                 } else {
                     $okmsg = 'default' === $nk ? 'docket-option-default' : 'docket-option-'.$nk;
@@ -288,14 +301,10 @@ final class ReqAction
                 }
 
                 if ($ok) {
-                    if (WpConfig::has($nx)) {
-                        $response = 'docket-option-wpf-warn';
-                    } else {
-                        if ('wooaddtochartcrawling' === $nx && 'enable' == $nk) {
-                            $robotsfile = ABSPATH.'robots.txt';
-                            if (@is_file($robotsfile)) {
-                                $response = 'docket-option-rbt-warn';
-                            }
+                    if ('wooaddtochartcrawling' === $nx && 'enable' == $nk) {
+                        $robotsfile = wp_normalize_path(ABSPATH).'robots.txt';
+                        if (@is_file($robotsfile)) {
+                            $response = 'docket-option-rbt-warn';
                         }
                     }
                 }
@@ -451,7 +460,6 @@ final class ReqAction
                     break;
                 case 'docket-opcache-flushed':
                     $this->pt->notice = esc_html__('OPcache was flushed.', 'docket-cache');
-                    $this->pt->opcache_reset();
                     break;
                 case 'docket-opcache-flushed-failed':
                     $this->pt->notice = esc_html__('OPcache could not be flushed.', 'docket-cache');
@@ -570,6 +578,10 @@ final class ReqAction
                     break;
                 case 'docket-option-rbt-warn':
                     $this->pt->notice = esc_html__('The physical robots.txt file exists. This update only works with the WordPress robots.txt virtual file.', 'docket-cache');
+                    break;
+                case 'docket-option-rtm-warn':
+                    /* translators: %s = option name */
+                    $this->pt->notice = sprintf(esc_html__('%s requires runtime code to be installed. This update has no effects.', 'docket-cache'), $option_name);
                     break;
                 case 'docket-action-failed':
                     /* translators: %s = option name */

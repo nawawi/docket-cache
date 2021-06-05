@@ -322,8 +322,8 @@ final class Plugin extends Bepart
      */
     public function sanitize_rootpath($path)
     {
-        $wp_content_dir = nwdcx_normalizepath(WP_CONTENT_DIR);
-        $abspath = nwdcx_normalizepath(ABSPATH);
+        $wp_content_dir = wp_normalize_path(WP_CONTENT_DIR);
+        $abspath = wp_normalize_path(ABSPATH);
 
         return rtrim(str_replace([$wp_content_dir, $abspath], ['/'.basename($wp_content_dir), '/'], $path), '/');
     }
@@ -385,7 +385,6 @@ final class Plugin extends Bepart
 
         $stale = 0;
 
-        $raw = [];
         $data = [];
         if ($this->is_opcache_enable() && \function_exists('opcache_get_status')) {
             $data = @opcache_get_status();
@@ -424,8 +423,6 @@ final class Plugin extends Bepart
                         }
                     }
                 }
-
-                $raw = $data;
             }
         }
 
@@ -780,7 +777,7 @@ final class Plugin extends Bepart
                     wp_delete_post($id, true);
                     $doflush = true;
                 }
-                $collect['autodraft'] += \count($query);
+                $collect['trash'] += \count($query);
             }
 
             if ($is_multisite) {
@@ -827,7 +824,8 @@ final class Plugin extends Bepart
      */
     public function wearechampion()
     {
-        add_action(
+        // NOTE: 29052021, no longer needed
+        /*add_action(
             'shutdown',
             function () {
                 $this->close_buffer();
@@ -839,7 +837,7 @@ final class Plugin extends Bepart
                 }
             },
             PHP_INT_MAX
-        );
+        );*/
     }
 
     /**
@@ -905,6 +903,12 @@ final class Plugin extends Bepart
             // stats
             $this->co()->clear_part('cachestats');
 
+            // cronbot/etc
+            $this->co()->save('cronbot', 'default');
+            $this->co()->clear_part('cronbot');
+            $this->co()->clear_part('pings');
+            $this->co()->clear_part('checkversion');
+
             // clear all network if available
             if (is_multisite()) {
                 $this->cx()->multinet_clear($this->cache_path, $this->cf()->dcvalue('LOG_FILE'));
@@ -950,7 +954,7 @@ final class Plugin extends Bepart
         }
 
         $this->unregister_cronjob();
-        $this->wearechampion();
+        //$this->wearechampion();
     }
 
     /**
@@ -966,7 +970,7 @@ final class Plugin extends Bepart
         $this->cache_path = $this->define_cache_path($this->cf()->dcvalue('PATH'));
 
         if (is_multisite()) {
-            $this->cache_path = nnwdcx_network_dirpath($this->cache_path);
+            $this->cache_path = nwdcx_network_dirpath($this->cache_path);
         }
 
         $this->api_endpoint = 'https://api.docketcache.com';
@@ -1105,24 +1109,43 @@ final class Plugin extends Bepart
             add_action(
                 'plugins_loaded',
                 function () {
-                    if (!headers_sent() && $this->cf()->is_dctrue('LOG') && !empty($_SERVER['REQUEST_URI'])) {
-                        $req = $_SERVER['REQUEST_URI'];
-                        if ((false !== strpos($req, '?page=docket-cache&idx=log&dl=0') || false !== strpos($req, '?page=docket-cache-log&idx=log&dl=0'))
-                            && preg_match('@log\&dl=\d+$@', $req)) {
-                            $file = $this->cf()->dcvalue('LOG_FILE');
+                    if (!headers_sent() && !empty($_SERVER['REQUEST_URI'])) {
+                        if ($this->cf()->is_dctrue('LOG')) {
+                            $req = $_SERVER['REQUEST_URI'];
+                            if ((false !== strpos($req, '?page=docket-cache&idx=log&dl=0') || false !== strpos($req, '?page=docket-cache-log&idx=log&dl=0'))
+                                && preg_match('@log\&dl=\d+$@', $req)) {
+                                $file = $this->cf()->dcvalue('LOG_FILE');
 
-                            if (is_multisite()) {
-                                $file = nwdcx_network_filepath($file);
+                                if (is_multisite()) {
+                                    $file = nwdcx_network_filepath($file);
+                                }
+
+                                @header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
+                                @header('Content-Type: text/plain; charset=UTF-8');
+                                if (@is_file($file) && @is_readable($file)) {
+                                    @readfile($file);
+                                    $this->close_exit();
+                                }
+
+                                $this->close_exit(__('No data available', 'docket-cache'));
                             }
+                        }
 
-                            @header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
-                            @header('Content-Type: text/plain; charset=UTF-8');
-                            if (@is_file($file)) {
-                                @readfile($file);
-                                $this->close_exit();
+                        if (\defined('WP_DEBUG') && WP_DEBUG && \defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+                            $req = $_SERVER['REQUEST_URI'];
+                            if ((false !== strpos($req, '?page=docket-cache&idx=config&wplog=0') || false !== strpos($req, '?page=docket-cache-config&idx=config&wplog=0'))
+                                && preg_match('@config\&wplog=\d+$@', $req)) {
+                                $file = ini_get('error_log');
+
+                                @header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
+                                @header('Content-Type: text/plain; charset=UTF-8');
+                                if (@is_file($file) && @is_readable($file)) {
+                                    @readfile($file);
+                                    $this->close_exit();
+                                }
+
+                                $this->close_exit(__('No data available', 'docket-cache'));
                             }
-
-                            $this->close_exit(__('No data available', 'docket-cache'));
                         }
                     }
                 },
@@ -1134,11 +1157,20 @@ final class Plugin extends Bepart
             'plugins_loaded',
             function () {
                 if (nwdcx_wpdb($wpdb)) {
+                    if ($this->co()->lockexp('sqlbigselect')) {
+                        return;
+                    }
+
                     $suppress = $wpdb->suppress_errors(true);
                     $ok = $wpdb->get_var('SELECT @@SESSION.SQL_BIG_SELECTS LIMIT 1');
                     if (empty($ok)) {
                         $wpdb->query('SET SESSION SQL_BIG_SELECTS=1');
+                    } else {
+                        // already big select, lock 24h
+                        $locktime = time() + 86400;
+                        $this->co()->setlock('sqlbigselect', $locktime);
                     }
+
                     $wpdb->suppress_errors($suppress);
                 }
             },
@@ -1564,6 +1596,7 @@ final class Plugin extends Bepart
 
                     if ('countcachesize' === $type) {
                         do_action('docketcache/action/countcachesize');
+
                         $info = (object) $this->get_info();
 
                         $cache_stats = 1 === $info->status_code && !empty($info->status_text_stats) ? $info->status_text_stats : $info->status_text;
@@ -1711,6 +1744,13 @@ final class Plugin extends Bepart
                             PHP_INT_MAX
                         );
                         break;
+                    case 'rtwpdebug':
+                    case 'rtwpdebuglog':
+                        $error_log = ini_get('error_log');
+                        if ('off' === $value && @is_file($error_log) && @is_writable($error_log)) {
+                            @unlink($error_log);
+                        }
+                        break;
                 }
 
                 if (WpConfig::is_runtimeconst($name)) {
@@ -1742,7 +1782,7 @@ final class Plugin extends Bepart
                             wp_load_alloptions();
                             wp_count_comments(0);
                             wp_count_posts();
-                            @Crawler::fetch_home();
+                            @Crawler::fetch_home(['blocking' => true]);
 
                             $this->co()->lockreset('preload');
                         },
@@ -1764,7 +1804,7 @@ final class Plugin extends Bepart
                         wp_count_comments(0);
                         wp_count_posts();
 
-                        @Crawler::fetch_home();
+                        @Crawler::fetch_home(['blocking' => true]);
 
                         $preload_admin = [
                             'index.php',
@@ -1815,7 +1855,7 @@ final class Plugin extends Bepart
                         if (\is_array($preload_admin) && !empty($preload_admin)) {
                             foreach ($preload_admin as $path) {
                                 $url = admin_url('/'.$path);
-                                @Crawler::fetch_admin($url);
+                                @Crawler::fetch_admin($url, ['blocking' => true]);
                                 usleep(500000);
                             }
                         }
@@ -1823,7 +1863,7 @@ final class Plugin extends Bepart
                         if (is_multisite() && \is_array($preload_network) && !empty($preload_network)) {
                             foreach ($preload_network as $path) {
                                 $url = network_admin_url('/'.$path);
-                                @Crawler::fetch_admin($url);
+                                @Crawler::fetch_admin($url, ['blocking' => true]);
                                 usleep(500000);
                             }
                         }
@@ -1838,11 +1878,6 @@ final class Plugin extends Bepart
         add_action(
             'docketcache/action/countcachesize',
             function () {
-                $cache_stats = $this->co()->save_part('cachestats');
-                if (!empty($cache_stats)) {
-                    return;
-                }
-
                 if ($this->co()->lockproc('doing_countcachesize', time() + 60)) {
                     return;
                 }
@@ -1889,7 +1924,7 @@ final class Plugin extends Bepart
             );
         }
 
-        $this->wearechampion();
+        //$this->wearechampion();
 
         if (class_exists('Nawawi\\DocketCache\\Tweaks')) {
             $tweaks = new Tweaks();

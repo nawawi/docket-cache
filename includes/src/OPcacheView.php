@@ -36,11 +36,7 @@ class OPcacheView extends \WP_List_Table
 
     public function get_doc($name)
     {
-        $sep = explode('_', $name);
-        $cnt = \count($sep);
-        if (1 === $sep || $sep > 2) {
-            $name = str_replace('_', '-', $name);
-        }
+        $name = str_replace('_', '-', $name);
 
         return 'https://www.php.net/manual/en/opcache.configuration.php#ini.'.$name;
     }
@@ -106,35 +102,40 @@ class OPcacheView extends \WP_List_Table
         $data = $this->get_status();
         if (!empty($data) && \is_array($data)) {
             if (!empty($data['scripts']) && \is_array($data['scripts'])) {
-                $sstr = '';
-                if (!empty($_GET['s'])) {
-                    $sstr = sanitize_text_field(wp_unslash($_GET['s']));
+                $sstr = !empty($_GET['s']) ? sanitize_text_field(wp_unslash($_GET['s'])) : '';
+                $sftr = !empty($_GET['sf']) ? sanitize_text_field($_GET['sf']) : 'obc';
+                $smtr = !empty($_GET['sm']) ? sanitize_text_field($_GET['sm']) : '1k';
+
+                $cnt = 0;
+                $limit = 0;
+
+                if ('all' !== $smtr) {
+                    $smtr = strtok($smtr, 'k').'000';
+                    $limit = (int) $smtr;
                 }
 
                 foreach ($data['scripts'] as $script => $arr) {
                     $cpath = wp_normalize_path($arr['full_path']);
                     $script = wp_normalize_path($script);
 
-                    if (!empty($sstr)) {
-                        if (false !== strpos($sstr, '@filter:')) {
-                            $cfile = basename($cpath);
-                            $cdir = \dirname($cpath);
+                    if (!empty($sstr) && false === strpos($cpath, $sstr)) {
+                        continue;
+                    }
 
-                            if ('@filter:obc' === $sstr && (false === strpos($script, $this->pt->cache_path) || !$this->pt->is_docketcachedir($cdir) || !@preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', $cfile))) {
-                                continue;
-                            }
+                    if (!empty($sftr)) {
+                        $cfile = basename($cpath);
+                        $cdir = \dirname($cpath);
 
-                            if ('@filter:wpc' === $sstr && (false !== strpos($script, $this->pt->cache_path) && $this->pt->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', $cfile))) {
-                                continue;
-                            }
+                        if ('obc' === $sftr && (false === strpos($script, $this->pt->cache_path) || !$this->pt->is_docketcachedir($cdir) || !@preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', $cfile))) {
+                            continue;
+                        }
 
-                            if ('@filter:dfc' === $sstr && @is_file($cpath)) {
-                                continue;
-                            }
-                        } else {
-                            if (false === strpos($cpath, $sstr)) {
-                                continue;
-                            }
+                        if ('wpc' === $sftr && (false !== strpos($script, $this->pt->cache_path) && $this->pt->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', $cfile))) {
+                            continue;
+                        }
+
+                        if ('dfc' === $sftr && @is_file($cpath)) {
+                            continue;
                         }
                     }
 
@@ -160,17 +161,25 @@ class OPcacheView extends \WP_List_Table
                         'mem' => $this->pt->normalize_size($arr['memory_consumption']),
                         'stmp' => wp_date('Y-m-d H:i:s', $arr['last_used_timestamp']),
                     ];
+
+                    ++$cnt;
+                    if ($limit > 0 && $cnt >= $limit) {
+                        break;
+                    }
                 }
 
                 if (!empty($_GET['orderby']) && !empty($_GET['order'])) {
-                    if ('desc' === $_GET['order']) {
-                        if ('file' !== $_GET['orderby']) {
+                    $order = sanitize_text_field($_GET['order']);
+                    $orderby = sanitize_text_field($_GET['orderby']);
+
+                    if ('desc' === $order) {
+                        if ('file' !== $orderby) {
                             krsort($stats, SORT_NUMERIC);
                         } else {
                             krsort($stats, SORT_STRING);
                         }
                     } else {
-                        if ('file' !== $_GET['orderby']) {
+                        if ('file' !== $orderby) {
                             ksort($stats, SORT_NUMERIC);
                         } else {
                             ksort($stats, SORT_STRING);
@@ -181,6 +190,8 @@ class OPcacheView extends \WP_List_Table
                 }
             }
         }
+
+        unset($data);
 
         return $stats;
     }
@@ -210,9 +221,9 @@ class OPcacheView extends \WP_List_Table
         $lastused = sprintf(esc_html__('Last Used %s', 'docket-cache'), '('.$this->pt->get_utc_offset().')');
 
         return [
+            'opclist_file' => esc_html__('Cached Files', 'docket-cache'),
             'opclist_hits' => esc_html__('Cache Hits', 'docket-cache'),
             'opclist_mem' => esc_html__('Memory Usage', 'docket-cache'),
-            'opclist_file' => esc_html__('File Paths', 'docket-cache'),
             'opclist_timestamp' => $lastused,
         ];
     }
@@ -220,9 +231,9 @@ class OPcacheView extends \WP_List_Table
     public function get_sortable_columns()
     {
         return [
+             'opclist_file' => ['file', false],
              'opclist_hits' => ['hits', false],
              'opclist_mem' => ['mem', false],
-             'opclist_file' => ['file', false],
              'opclist_timestamp' => ['stmp', false],
          ];
     }
@@ -261,7 +272,7 @@ class OPcacheView extends \WP_List_Table
         if (empty($_GET['s'])) {
             esc_html_e('OPcache stats not available.', 'docket-cache');
         } else {
-            esc_html_e('No matching OPcache file paths.', 'docket-cache');
+            esc_html_e('No matching OPcache Cached Files.', 'docket-cache');
         }
     }
 }

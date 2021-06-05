@@ -167,30 +167,49 @@ final class Resc
         }
     }
 
-    public static function runtimenotice($action)
+    public static function runtimenotice($action, $is_adr = false)
     {
         $code = WpConfig::runtime_code();
         $is_bedrock = WpConfig::is_bedrock();
         $fname = $is_bedrock ? 'config/application.php' : 'wp-config.php';
 
-        /* translators: %s: file name */
-        $text1 = sprintf(__('Docket Cache require to update the <code>%s</code> file to handle runtime options.', 'docket-cache'), $fname);
-        $text2 = __('Copy and place the code below before <code>require_once ABSPATH . \'wp-settings.php\';</code>', 'docket-cache');
-        $text3 = __('Copy and place the code below after <code>Config::apply();</code>.', 'docket-cache');
-        $text4 = __('<br>Or click <strong>Install</strong> to update it now.', 'docket-cache');
+        $is_remove = !WpConfig::is_runtimefalse();
 
-        $message = $text1.' ';
+        /* translators: %s: file name */
+        $text1 = sprintf(__('<strong>Docket Cache</strong> require updating the <code>%s</code> file to handle runtime options.<br>', 'docket-cache'), $fname);
+        $text2 = '<br>&bull; '.__('To Install: Copy and insert the code below before <code>require_once ABSPATH . \'wp-settings.php\';</code>', 'docket-cache');
+        $text3 = '<br>&bull; '.__('To Install: Copy and insert the code below after <code>Config::apply();</code>.', 'docket-cache');
+        $text4 = '<br>'.__('Or click <strong>Install</strong> to update it now.', 'docket-cache');
+
+        if ($is_adr) {
+            $textr = '<br>&bull; '.__('To Un-install: Find the code below and remove it manually.', 'docket-cache');
+
+            if ($is_remove) {
+                $text2 = '<br>&bull; '.__('To Update: Copy and insert the code below before <code>require_once ABSPATH . \'wp-settings.php\';</code>', 'docket-cache');
+                $text3 = '<br>&bull; '.__('To Update: Copy and insert the code below after <code>Config::apply();</code>.', 'docket-cache');
+                $text2 .= $textr;
+                $text3 .= $textr;
+                $text4 = '<br>'.__('Or click <strong>Install</strong> to update it now. Click <strong>Un-Install</strong> to remove the code.', 'docket-cache');
+            }
+        }
+
+        $message = $text1;
         if ($is_bedrock) {
             $message .= $text3;
         } else {
             $message .= $text2;
         }
 
-        $message .= '<br><br><textarea rows="15" style="width:100%;font-family:monospace;font-size:11px;margin:0;" onclick="this.select();document.execCommand(\'copy\');" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly>'.$code.'</textarea>';
+        $message .= '<br><br><textarea rows="15" onclick="this.select();document.execCommand(\'copy\');" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly>'.$code.'</textarea>';
 
         if (WpConfig::is_writable() && !$is_bedrock) {
-            $message .= '<br>'.$text4.'<br><a href="'.$action.'" style="display:block;width:150px;text-align:center;font-wight:bold;" class="button button-primary button-large btx-spinner">Install</a>';
+            $message .= '<br>'.$text4.'<br><a href="'.$action.'" class="button button-primary btx-bti btx-spinner">'.esc_html__('Install', 'docket-cache').'</a>';
+            if ($is_remove && $is_adr) {
+                $message .= '<a href="'.$is_adr.'" class="button button-secondary btx-btu btx-spinner">'.esc_html__('Un-Install', 'docket-cache').'</a>';
+            }
         }
-        echo self::boxmsg($message, 'warning', false, false, false);
+
+        $message = '<div id="runtimenotice">'.$message.'</div>';
+        echo self::boxmsg($message, 'warning', true, false, false);
     }
 }

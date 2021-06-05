@@ -45,6 +45,25 @@ namespace Nawawi\DocketCache;
             <?php esc_html_e('Reset all configuration to default.', 'docket-cache'); ?>
         </p>
         <a href="<?php echo $this->pt->action_query('configreset', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Reset to default', 'docket-cache'); ?></a>
+        <hr>
+        <h4><?php esc_html_e('Runtime Code', 'docket-cache'); ?></h4>
+        <p>
+            <?php esc_html_e('Code to handles WordPress constants.', 'docket-cache'); ?>
+        </p>
+        <a href="
+        <?php
+        $is_install = WpConfig::is_runtimefalse();
+        $act = $is_install ? esc_html__('Install Runtime Code', 'docket-cache') : esc_html__('Update Runtime Code', 'docket-cache');
+        $actc = $is_install ? 'button-primary' : 'button-secondary';
+        echo $this->pt->get_page(
+            [
+                'idx' => 'config',
+                'adx' => 'rtcnf',
+                'st' => time(),
+            ]
+        );
+        ?>
+        " class="button <?php echo $actc; ?> button-large btx-spinner"><?php echo $act; ?></a>
     </div>
 </div>
 <?php $this->tab_title(esc_html__('Resources', 'docket-cache')); ?>

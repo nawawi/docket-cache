@@ -38,6 +38,10 @@ final class WpConfig
              'rtpluginthemeeditor' => 'DISALLOW_FILE_EDIT',
              'rtpluginthemeinstall' => 'DISALLOW_FILE_MODS',
              'rtimageoverwrite' => 'IMAGE_EDIT_OVERWRITE',
+             'rtwpdebug' => 'WP_DEBUG',
+             'rtwpdebugdisplay' => 'WP_DEBUG_DISPLAY',
+             'rtwpdebuglog' => 'WP_DEBUG_LOG',
+             'rtwpcoreupdate' => 'WP_AUTO_UPDATE_CORE',
          ];
     }
 
@@ -49,7 +53,7 @@ final class WpConfig
     public static function get_file()
     {
         $file = false;
-        $abspath = nwdcx_normalizepath(ABSPATH);
+        $abspath = wp_normalize_path(ABSPATH);
         $parent_dir = \dirname($abspath);
 
         if (@is_file($abspath.'wp-config.php')) {
@@ -76,7 +80,7 @@ final class WpConfig
     {
         if (!empty($content) && false !== strpos($content, '/*@DOCKETCACHE-RUNTIME-BEGIN*/') && false !== strpos($content, '/*@DOCKETCACHE-RUNTIME-END*/')) {
             try {
-                $content_r = @preg_replace('#/\*@DOCKETCACHE-RUNTIME-BEGIN\*/.*/\*@DOCKETCACHE-RUNTIME-END\*/'.PHP_EOL.'#sm', '', $content, -1, $cnt);
+                $content_r = @preg_replace('#/\*@DOCKETCACHE-RUNTIME-BEGIN\*/.*/\*@DOCKETCACHE-RUNTIME-END\*/(\n|'.PHP_EOL.')?#sm', '', $content, -1, $cnt);
                 if (!empty($content_r) && $cnt > 0) {
                     $content = $content_r;
                 }
@@ -100,7 +104,32 @@ final class WpConfig
             return false;
         }
 
-        return self::put_contents($wpconfig);
+        self::canopt()->opcache_flush(self::get_file());
+
+        if (self::put_contents($wpconfig)) {
+            $config = self::canopt()->read_config();
+            if (!empty($config) && \is_array($config)) {
+                $keys = self::keys();
+                $ok = false;
+                foreach ($keys as $k => $v) {
+                    $nk = nwdcx_constfx($k);
+                    if (!empty($config[$nk])) {
+                        unset($config[$nk]);
+                        $ok = true;
+                    }
+                }
+
+                if ($ok) {
+                    self::canopt()->put_config($config);
+                }
+            }
+
+            self::unlink_runtime();
+
+            return true;
+        }
+
+        return false;
     }
 
     public static function runtime_code()
@@ -192,11 +221,44 @@ final class WpConfig
             return false;
         }
 
+        self::put_backup();
+
         return @file_put_contents($file, $content, LOCK_EX);
+    }
+
+    private static function put_backup()
+    {
+        $path = self::canopt()->path;
+        $fm = glob($path.'/wp-config-bak*.php');
+
+        $cnt = 0;
+        if (!empty($fm)) {
+            $cnt = \count($fm);
+        }
+
+        if ($cnt >= 3) {
+            $cnt = 0;
+            foreach ($fm as $k => $f) {
+                if (@is_file($f) && @is_writable($f)) {
+                    @unlink($f);
+                }
+            }
+        }
+
+        clearstatcache();
+
+        $src = self::get_file();
+        $dst = $path.'/wp-config-bak'.$cnt.'.php';
+
+        return @copy($src, $dst);
     }
 
     public static function has($name)
     {
+        if (!empty($GLOBALS[nwdcx_constfx($name.'_false')])) {
+            return true;
+        }
+
         static $found = [];
 
         if (empty($found) || !\is_array($found)) {
@@ -238,7 +300,7 @@ final class WpConfig
         return \array_key_exists($name, self::keys());
     }
 
-    public static function is_runtimenotice()
+    public static function is_runtimefalse()
     {
         return !\function_exists('docketcache_runtime');
     }
@@ -275,20 +337,25 @@ final class WpConfig
                     }
                 }
 
-                $cons .= "!defined('".$v."') && define('".$v."', ".$val.');'.PHP_EOL;
+                $cons .= "if(!defined('".$v."')){define('".$v."', ".$val.");}else{\$GLOBALS['".$ka."_FALSE']=1;}".PHP_EOL;
             }
         }
 
         $code = '<?php '.PHP_EOL;
-        $code .= "if ( !defined('ABSPATH') ) { return; }".PHP_EOL;
-        $code .= '$runtime = (object)'.var_export($runtime, 1).';'.PHP_EOL;
-        $code .= 'if ( !@is_dir($runtime->configpath) ) { return; }'.PHP_EOL;
-        $code .= 'if ( !@is_file($runtime->pluginpath.\'/docket-cache.php\') ) { return; }'.PHP_EOL;
+        $code .= "if(!defined('ABSPATH')){return;}".PHP_EOL;
+        $code .= '$runtime=(object)'.var_export($runtime, 1).';'.PHP_EOL;
+        $code .= 'if(!@is_dir($runtime->configpath)){return;}'.PHP_EOL;
+        $code .= 'if(!@is_file($runtime->pluginpath.\'/docket-cache.php\')){return;}'.PHP_EOL;
         if (!empty($cons)) {
             $code .= $cons;
         }
 
         $data = apply_filters('docketcache/filter/wpconfig/runtime', $code, $runtime);
+        if (empty($data)) {
+            $data = $code;
+        }
+
+        $data = rtrim($data).PHP_EOL.'/*@DOCKET_CACHE_EOF*/'.PHP_EOL;
 
         self::canopt()->opcache_flush($file);
 
@@ -348,6 +415,9 @@ final class WpConfig
             case 'rtimageoverwrite':
             case 'rtpluginthemeeditor':
             case 'rtpluginthemeinstall':
+            case 'rtwpdebug':
+            case 'rtwpdebugdisplay':
+            case 'rtwpdebuglog':
                 if ('off' === $value) {
                     /* translators: %s = option name */
                     $notice = sprintf(esc_html__('%s set to disable.', 'docket-cache'), $name);

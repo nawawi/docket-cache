@@ -20,13 +20,13 @@ final class Dropino extends Bepart
 
     public function __construct($path)
     {
-        $this->path = nwdcx_normalizepath($path);
+        $this->path = wp_normalize_path($path);
 
         $this->wpcondir = \defined('WP_CONTENT_DIR') ? WP_CONTENT_DIR : ABSPATH.'wp-content';
-        $this->wpcondir = nwdcx_normalizepath($this->wpcondir);
+        $this->wpcondir = wp_normalize_path($this->wpcondir);
 
         $this->condir = \defined('DOCKET_CACHE_CONTENT_PATH') ? DOCKET_CACHE_CONTENT_PATH : $this->wpcondir;
-        $this->condir = nwdcx_normalizepath($this->condir);
+        $this->condir = wp_normalize_path($this->condir);
     }
 
     /**

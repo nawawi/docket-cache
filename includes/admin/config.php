@@ -314,7 +314,24 @@ namespace Nawawi\DocketCache;
                                     'default' => __('Default', 'docket-cache'),
                                     'on' => __('Enable', 'docket-cache'),
                                     'off' => __('Disable', 'docket-cache'),
-                                ]
+                                ],
+                                !empty($GLOBALS[$this->vcf()->px('rtimageoverwrite_false')]) && IMAGE_EDIT_OVERWRITE ? 'on' : $this->vcf()->dcvalue('rtimageoverwrite')
+                            );
+                            ?>
+                    </td>
+                </tr>
+                <tr id="rtwpcoreupdate">
+                    <th><?php echo esc_html__('Deactivate WP Auto Update Core', 'docket-cache').$this->tooltip('rtwpcoreupdate'); ?></th>
+                    <td>
+                        <?php
+                            echo $this->config_select_set(
+                                'rtwpcoreupdate',
+                                [
+                                    'default' => __('Default', 'docket-cache'),
+                                    'off' => __('Enable', 'docket-cache'),
+                                    'on' => __('Disable', 'docket-cache'),
+                                ],
+                                !empty($GLOBALS[$this->vcf()->px('rtwpcoreupdate_false')]) && !(bool) WP_AUTO_UPDATE_CORE ? 'on' : $this->vcf()->dcvalue('rtwpcoreupdate')
                             );
                             ?>
                     </td>
@@ -329,7 +346,8 @@ namespace Nawawi\DocketCache;
                                     'default' => __('Default', 'docket-cache'),
                                     'on' => __('Enable', 'docket-cache'),
                                     'off' => __('Disable', 'docket-cache'),
-                                ]
+                                ],
+                                !empty($GLOBALS[$this->vcf()->px('rtpluginthemeeditor_false')]) && DISALLOW_FILE_EDIT ? 'on' : $this->vcf()->dcvalue('rtpluginthemeeditor')
                             );
                             ?>
                     </td>
@@ -341,14 +359,77 @@ namespace Nawawi\DocketCache;
                             echo $this->config_select_set(
                                 'rtpluginthemeinstall',
                                 [
-                                    'default' => __('WP Default', 'docket-cache'),
+                                    'default' => __('Default', 'docket-cache'),
                                     'on' => __('Enable', 'docket-cache'),
                                     'off' => __('Disable', 'docket-cache'),
-                                ]
+                                ],
+                                !empty($GLOBALS[$this->vcf()->px('rtpluginthemeinstall_false')]) && DISALLOW_FILE_MODS ? 'on' : $this->vcf()->dcvalue('rtpluginthemeinstall')
                             );
                             ?>
                     </td>
                 </tr>
+                <?php
+                    $rtwpdebug_default = !empty($GLOBALS[$this->vcf()->px('rtwpdebug_false')]) && WP_DEBUG ? 'on' : $this->vcf()->dcvalue('rtwpdebug');
+                ?>
+                <tr id="rtwpdebug">
+                    <th<?php echo  'off' === $rtwpdebug_default ? ' class="border-b"' : ''; ?>><?php echo esc_html__('WP Debug', 'docket-cache').$this->tooltip('rtwpdebug'); ?></th>
+                        <td>
+                            <?php
+                            echo $this->config_select_set(
+                                'rtwpdebug',
+                                [
+                                    'default' => __('Default', 'docket-cache'),
+                                    'on' => __('Enable', 'docket-cache'),
+                                    'off' => __('Disable', 'docket-cache'),
+                                ],
+                                $rtwpdebug_default
+                            );
+                            ?>
+                        </td>
+                </tr>
+                <?php if ('on' === $rtwpdebug_default) : ?>
+                <tr id="rtwpdebugdisplay">
+                    <th><?php echo esc_html__('WP Debug Display', 'docket-cache').$this->tooltip('rtwpdebugdisplay'); ?></th>
+                    <td>
+                        <?php
+                            echo $this->config_select_set(
+                                'rtwpdebugdisplay',
+                                [
+                                    'default' => __('Default', 'docket-cache'),
+                                    'on' => __('Enable', 'docket-cache'),
+                                    'off' => __('Disable', 'docket-cache'),
+                                ],
+                                !empty($GLOBALS[$this->vcf()->px('rtwpdebugdisplay_false')]) && WP_DEBUG_DISPLAY ? 'on' : $this->vcf()->dcvalue('rtwpdebugdisplay')
+                            );
+                        ?>
+                    </td>
+                </tr>
+                <?php
+                    $rtwpdebuglog_default = !empty($GLOBALS[$this->vcf()->px('rtwpdebuglog_false')]) && WP_DEBUG_LOG ? 'on' : $this->vcf()->dcvalue('rtwpdebuglog');
+                    $error_log = ini_get('error_log');
+                    ?>
+                <tr id="rtwpdebuglog">
+                    <th class="border-b"><?php echo esc_html__('WP Debug Log', 'docket-cache').$this->tooltip('rtwpdebuglog'); ?></th>
+                    <td>
+                        <?php
+                            echo $this->config_select_set(
+                                'rtwpdebuglog',
+                                [
+                                    'default' => __('Default', 'docket-cache'),
+                                    'on' => __('Enable', 'docket-cache'),
+                                    'off' => __('Disable', 'docket-cache'),
+                                ],
+                                $rtwpdebuglog_default
+                            );
+
+                        if (\defined('WP_DEBUG') && WP_DEBUG && \defined('WP_DEBUG_LOG') && WP_DEBUG_LOG && @is_file($error_log) && is_readable($error_log)) {
+                            $error_log = basename($error_log);
+                            echo '<span class="wpdebuglog"><a class="btxo" title="'.$error_log.'" href="'.$this->tab_query('config', ['wplog' => '0'.time()]).'" rel="noopener" target="new"><span class="dashicons dashicons-external"></span>View Log</a></span>';
+                        }
+                        ?>
+                    </td>
+                </tr>
+                <?php endif; ?>
                 <tr>
                     <td colspan="2" class="stitle">
                         <?php esc_html_e('Admin Interface', 'docket-cache'); ?>

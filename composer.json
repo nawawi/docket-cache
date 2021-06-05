@@ -10,19 +10,15 @@
     "type": "wordpress-plugin",
     "license": "MIT",
     "homepage": "https://github.com/nawawi/docket-cache",
-    "authors": [
-        {
-            "name": "Nawawi Jamili",
-            "email": "nawawijamili@gmail.com",
-            "homepage": "https://github.com/nawawi"
-        }
-    ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/nawawi/docket-cache"
-        }
-    ],
+    "authors": [ {
+        "name": "Nawawi Jamili",
+        "email": "nawawijamili@gmail.com",
+        "homepage": "https://github.com/nawawi"
+    } ],
+    "repositories": [ {
+        "type": "vcs",
+        "url": "https://github.com/nawawi/docket-cache"
+    } ],
     "support": {
         "issues": "https://github.com/nawawi/docket-cache/issues",
         "source": "https://github.com/nawawi/docket-cache"
