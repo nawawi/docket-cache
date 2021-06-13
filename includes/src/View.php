@@ -213,7 +213,10 @@ final class View
         $this->do_preload = false;
         $this->do_flush = false;
         $this->do_fetch = false;
+
+        // for addon
         $this->po = $po;
+
         $this->render('wrap');
         $this->pt->cx()->delay_expire();
     }

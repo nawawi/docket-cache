@@ -32,14 +32,14 @@ final class ReqAction
         );
     }
 
-    private function exit_failed()
+    private function exit_failed($param)
     {
         $args = [
              'message' => 'docket-action-failed',
          ];
 
-        if (!empty($_GET['idx'])) {
-            $args['idx'] = sanitize_text_field($_GET['idx']);
+        if (!empty($param['idx'])) {
+            $args['idx'] = sanitize_text_field($param['idx']);
         }
 
         if (!empty($param['adx'])) {
@@ -328,54 +328,52 @@ final class ReqAction
     private function parse_action()
     {
         $param = [];
-        if (isset($_GET['_wpnonce'], $_GET['action'])) {
-            $param = $_GET;
-        } elseif (isset($_POST['_wpnonce'], $_POST['action'])) {
-            $param = $_POST;
+        if (empty($_REQUEST) || !\is_array($_REQUEST) || !isset($_REQUEST['_wpnonce'], $_REQUEST['action'])) {
+            return;
         }
 
-        if (!empty($param) && \is_array($param)) {
-            $action = sanitize_text_field($param['action']);
+        $param = $_REQUEST;
 
-            if (\in_array($action, $this->action_token())) {
-                if (!wp_verify_nonce($param['_wpnonce'], $action)) {
-                    $this->exit_failed();
-                    exit;
-                }
+        $action = sanitize_text_field($param['action']);
 
-                $option_name = '';
-                $option_value = '';
-                $response = $this->run_action($action, $param, $option_name, $option_value);
+        if (\in_array($action, $this->action_token())) {
+            if (!wp_verify_nonce($param['_wpnonce'], $action)) {
+                $this->exit_failed($param);
+                exit;
+            }
 
-                if (!empty($response)) {
-                    $args = [
+            $option_name = '';
+            $option_value = '';
+            $response = $this->run_action($action, $param, $option_name, $option_value);
+
+            if (!empty($response)) {
+                $args = [
                         'message' => $response,
                     ];
 
-                    if (!empty($param['idx'])) {
-                        $args['idx'] = sanitize_text_field($param['idx']);
+                if (!empty($param['idx'])) {
+                    $args['idx'] = sanitize_text_field($param['idx']);
 
-                        if (!empty($param['adx'])) {
-                            $args['adx'] = sanitize_text_field($param['adx']);
-                        }
-
-                        if (!empty($param['quiet']) && 1 === (int) $param['quiet']) {
-                            $args['message'] = '';
-                        }
-
-                        if (!empty($option_name)) {
-                            $args['nx'] = $option_name;
-                        }
-
-                        if (!empty($option_value)) {
-                            $args['nv'] = $option_value;
-                        }
+                    if (!empty($param['adx'])) {
+                        $args['adx'] = sanitize_text_field($param['adx']);
                     }
 
-                    $query = add_query_arg($args, $this->pt->get_page());
-                    wp_safe_redirect(network_admin_url($query));
-                    exit;
+                    if (!empty($param['quiet']) && 1 === (int) $param['quiet']) {
+                        $args['message'] = '';
+                    }
+
+                    if (!empty($option_name)) {
+                        $args['nx'] = $option_name;
+                    }
+
+                    if (!empty($option_value)) {
+                        $args['nv'] = $option_value;
+                    }
                 }
+
+                $query = add_query_arg($args, $this->pt->get_page());
+                wp_safe_redirect(network_admin_url($query));
+                exit;
             }
         }
     }
