@@ -74,7 +74,7 @@ if (!\function_exists('nwdcx_fixscheme')) {
     // replace http scheme
     function nwdcx_fixscheme($url, $scheme = 'http://')
     {
-        return @preg_replace('@^((([a-zA-Z]+)?:)?(//))?@', $scheme, $url);
+        return @preg_replace('@^((([a-zA-Z]+)?:)?(//))?@', $scheme, trim($url));
     }
 }
 

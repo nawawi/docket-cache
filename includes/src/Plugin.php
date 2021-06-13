@@ -527,6 +527,7 @@ final class Plugin extends Bepart
 
     public function site_url_scheme($site_url)
     {
+        $site_url = trim($site_url);
         if ('https://' !== substr($site_url, 0, 8) && $this->is_ssl()) {
             $site_url = nwdcx_fixscheme($site_url, 'https://');
         } elseif (!@preg_match('@^(https?:)?//@', $site_url)) {
@@ -2006,15 +2007,18 @@ final class Plugin extends Bepart
             }
 
             if ($this->cf()->is_dctrue('POSTMISSEDSCHEDULE')) {
-                foreach (['wp_footer', 'admin_footer'] as $hx) {
-                    add_action(
-                        $hx,
-                        function () use ($tweaks) {
-                            $tweaks->post_missed_schedule();
-                        },
-                        PHP_INT_MAX
-                    );
-                }
+                add_action(
+                    'shutdown',
+                    function () use ($tweaks) {
+                        if ($this->co()->lockproc('post_missed_schedule', time() + 180)) {
+                            return false;
+                        }
+                        $this->close_buffer();
+                        $tweaks->post_missed_schedule();
+                        $this->co()->lockreset('post_missed_schedule');
+                    },
+                    PHP_INT_MAX
+                );
             }
         }
 

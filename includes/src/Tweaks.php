@@ -441,8 +441,6 @@ final class Tweaks
         }
 
         $limit = 1000;
-
-        $now = gmdate('Y-m-d H:i:59');
         $args = [
             'public' => true,
             'exclude_from_search' => false,
@@ -452,9 +450,9 @@ final class Tweaks
         $post_types = get_post_types($args, 'names', 'and');
         if (!empty($post_types) && \is_array($post_types)) {
             $types = implode("','", $post_types);
-            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page','%s') AND post_status='future' AND post_date_gmt < %s ORDER BY ID ASC LIMIT %d", $types, $now, $limit);
+            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page','%s') AND post_status='future' ORDER BY ID ASC LIMIT %d", $types, $limit);
         } else {
-            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page') AND post_status='future' AND post_date_gmt < %s ORDER BY ID ASC LIMIT %d", $now, $limit);
+            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page') AND post_status='future' ORDER BY ID ASC LIMIT %d", $limit);
         }
 
         $results = $wpdb->get_results($query, ARRAY_A);
