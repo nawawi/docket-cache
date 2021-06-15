@@ -2,14 +2,14 @@
 # This file is distributed under the MIT.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 21.02.06-dev1\n"
+"Project-Id-Version: Docket Cache 21.02.06-dev2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-06-13T00:25:23+00:00\n"
+"POT-Creation-Date: 2021-06-15T08:32:00+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.5.0\n"
 "X-Domain: docket-cache\n"
@@ -108,7 +108,7 @@ msgid "Run Garbage Collector"
 msgstr ""
 
 #: includes/admin/config.php:18
-#: includes/src/Plugin.php:1417
+#: includes/src/Plugin.php:1395
 #: includes/src/View.php:310
 msgid "Configuration"
 msgstr ""
@@ -131,7 +131,7 @@ msgstr ""
 #: includes/admin/config.php:51
 #: includes/admin/log.php:21
 #: includes/src/Canopt.php:82
-#: includes/src/Plugin.php:1406
+#: includes/src/Plugin.php:1384
 #: includes/src/View.php:307
 msgid "Cache Log"
 msgstr ""
@@ -477,15 +477,15 @@ msgstr ""
 
 #: includes/admin/cronbot.php:20
 #: includes/src/Plugin.php:176
-#: includes/src/Plugin.php:1605
-#: includes/src/Plugin.php:1606
-#: includes/src/Plugin.php:1613
-#: includes/src/Plugin.php:1615
+#: includes/src/Plugin.php:1583
+#: includes/src/Plugin.php:1584
+#: includes/src/Plugin.php:1591
+#: includes/src/Plugin.php:1593
 msgid "Not Available"
 msgstr ""
 
 #: includes/admin/cronbot.php:32
-#: includes/src/Plugin.php:1380
+#: includes/src/Plugin.php:1358
 #: includes/src/View.php:297
 msgid "Cronbot"
 msgstr ""
@@ -805,8 +805,8 @@ msgid "Web Proxy"
 msgstr ""
 
 #: includes/admin/overview.php:35
-#: includes/src/Plugin.php:1369
-#: includes/src/Plugin.php:1675
+#: includes/src/Plugin.php:1347
+#: includes/src/Plugin.php:1653
 #: includes/src/View.php:294
 #: modsadvpot/includes/src/Plugin.php:202
 #: modsadvpot/includes/src/Premium.php:202
@@ -1439,52 +1439,52 @@ msgid_plural "of %s Networks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/src/Plugin.php:850
+#: includes/src/Plugin.php:829
 msgid "Docket Cache plugin requires PHP 7.2.5 or greater."
 msgstr ""
 
-#: includes/src/Plugin.php:1131
-#: includes/src/Plugin.php:1148
+#: includes/src/Plugin.php:1109
+#: includes/src/Plugin.php:1126
 msgid "No data available"
 msgstr ""
 
-#: includes/src/Plugin.php:1392
+#: includes/src/Plugin.php:1370
 #: includes/src/View.php:301
 msgid "OPcache"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:1502
+#: includes/src/Plugin.php:1480
 msgid "The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href=\"%s\" style=\"min-width:100px;text-align:center;font-wight:bold;\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %1$s: url install, %2$s = url dismiss
-#: includes/src/Plugin.php:1506
+#: includes/src/Plugin.php:1484
 msgid "An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use <strong>Docket Cache</strong>. <br><br><a href=\"%1$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-primary button-small\">Install</a>&nbsp;<a href=\"%2$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-secondary button-small\">Dismiss</a>"
 msgstr ""
 
-#: includes/src/Plugin.php:1511
+#: includes/src/Plugin.php:1489
 msgid "The Object Cache feature has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: version
-#: includes/src/Plugin.php:1646
-#: includes/src/Plugin.php:1661
+#: includes/src/Plugin.php:1624
+#: includes/src/Plugin.php:1639
 msgid "Version %s"
 msgstr ""
 
-#: includes/src/Plugin.php:1676
+#: includes/src/Plugin.php:1654
 #: modsadvpot/includes/src/Bemods.php:146
 msgid "Configure"
 msgstr ""
 
-#: includes/src/Plugin.php:1688
+#: includes/src/Plugin.php:1666
 #: modsadvpot/includes/src/Plugin.php:215
 #: modsadvpot/includes/src/Premium.php:215
 msgid "Docs"
 msgstr ""
 
-#: includes/src/Plugin.php:1689
+#: includes/src/Plugin.php:1667
 msgid "Sponsor"
 msgstr ""
 

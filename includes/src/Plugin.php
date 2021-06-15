@@ -821,27 +821,6 @@ final class Plugin extends Bepart
     }
 
     /**
-     * wearechampion.
-     */
-    public function wearechampion()
-    {
-        // NOTE: 29052021, no longer needed
-        /*add_action(
-            'shutdown',
-            function () {
-                $this->close_buffer();
-                $active_plugins = (array) get_option('active_plugins', []);
-                if (!empty($active_plugins) && \is_array($active_plugins) && isset($active_plugins[0]) && \in_array($this->hook, $active_plugins) && $this->hook !== $active_plugins[0]) {
-                    unset($active_plugins[array_search($this->hook, $active_plugins)]);
-                    array_unshift($active_plugins, $this->hook);
-                    update_option('active_plugins', $active_plugins);
-                }
-            },
-            PHP_INT_MAX
-        );*/
-    }
-
-    /**
      * compat_notice.
      */
     private function compat_notice()
@@ -955,7 +934,6 @@ final class Plugin extends Bepart
         }
 
         $this->unregister_cronjob();
-        //$this->wearechampion();
     }
 
     /**
@@ -1229,7 +1207,7 @@ final class Plugin extends Bepart
     }
 
     /**
-     * action_field.
+     * action_field. Use at addons.
      */
     public function action_field($key, $args = [])
     {
@@ -1924,8 +1902,6 @@ final class Plugin extends Bepart
                 PHP_INT_MAX
             );
         }
-
-        //$this->wearechampion();
 
         if (class_exists('Nawawi\\DocketCache\\Tweaks')) {
             $tweaks = new Tweaks();
