@@ -2,14 +2,14 @@
 # This file is distributed under the MIT.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 21.02.06-dev2\n"
+"Project-Id-Version: Docket Cache 21.02.06-dev3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-06-15T08:32:00+00:00\n"
+"POT-Creation-Date: 2021-06-18T14:51:52+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.5.0\n"
 "X-Domain: docket-cache\n"
@@ -42,7 +42,6 @@ msgstr ""
 
 #: includes/admin/actions.php:20
 #: includes/admin/opcviewer.php:179
-#: modsadvpot/includes/admin/opcache.php:185
 msgid "Object Cache Files"
 msgstr ""
 
@@ -66,7 +65,6 @@ msgstr ""
 
 #: includes/admin/actions.php:31
 #: includes/admin/opcviewer.php:154
-#: modsadvpot/includes/admin/opcache.php:159
 msgid "Flush OPcache"
 msgstr ""
 
@@ -108,7 +106,7 @@ msgid "Run Garbage Collector"
 msgstr ""
 
 #: includes/admin/config.php:18
-#: includes/src/Plugin.php:1395
+#: includes/src/Plugin.php:1356
 #: includes/src/View.php:310
 msgid "Configuration"
 msgstr ""
@@ -124,14 +122,13 @@ msgstr ""
 
 #: includes/admin/config.php:38
 #: includes/src/Canopt.php:102
-#: modsadvpot/includes/admin/config-0.php:17
 msgid "OPcache Viewer"
 msgstr ""
 
 #: includes/admin/config.php:51
 #: includes/admin/log.php:21
 #: includes/src/Canopt.php:82
-#: includes/src/Plugin.php:1384
+#: includes/src/Plugin.php:1345
 #: includes/src/View.php:307
 msgid "Cache Log"
 msgstr ""
@@ -477,15 +474,15 @@ msgstr ""
 
 #: includes/admin/cronbot.php:20
 #: includes/src/Plugin.php:176
-#: includes/src/Plugin.php:1583
-#: includes/src/Plugin.php:1584
-#: includes/src/Plugin.php:1591
-#: includes/src/Plugin.php:1593
+#: includes/src/Plugin.php:1544
+#: includes/src/Plugin.php:1545
+#: includes/src/Plugin.php:1552
+#: includes/src/Plugin.php:1554
 msgid "Not Available"
 msgstr ""
 
 #: includes/admin/cronbot.php:32
-#: includes/src/Plugin.php:1358
+#: includes/src/Plugin.php:1319
 #: includes/src/View.php:297
 msgid "Cronbot"
 msgstr ""
@@ -635,125 +632,96 @@ msgid "Refresh"
 msgstr ""
 
 #: includes/admin/opcviewer.php:22
-#: modsadvpot/includes/admin/opcache.php:27
 msgid "OPcache Config"
 msgstr ""
 
 #: includes/admin/opcviewer.php:25
 #: includes/admin/opcviewer.php:89
-#: modsadvpot/includes/admin/opcache.php:30
-#: modsadvpot/includes/admin/opcache.php:94
 msgid "OPcache not available."
 msgstr ""
 
 #: includes/admin/opcviewer.php:31
-#: modsadvpot/includes/admin/opcache.php:36
 msgid "Version"
 msgstr ""
 
 #: includes/admin/opcviewer.php:50
-#: modsadvpot/includes/admin/opcache.php:55
 msgid "Directives"
 msgstr ""
 
 #: includes/admin/opcviewer.php:61
-#: modsadvpot/includes/admin/opcache.php:66
 msgid "Not set"
 msgstr ""
 
 #: includes/admin/opcviewer.php:79
-#: modsadvpot/includes/admin/opcache.php:84
 msgid "Dismiss"
 msgstr ""
 
 #: includes/admin/opcviewer.php:86
-#: modsadvpot/includes/admin/opcache.php:91
 msgid "OPcache Usage"
 msgstr ""
 
 #: includes/admin/opcviewer.php:91
-#: modsadvpot/includes/admin/opcache.php:96
 msgid "Failed to load OPcacheList()"
 msgstr ""
 
 #: includes/admin/opcviewer.php:98
-#: modsadvpot/includes/admin/opcache.php:103
 msgid "Statistics"
 msgstr ""
 
 #: includes/admin/opcviewer.php:102
 #: includes/src/OPcacheView.php:225
-#: modsadvpot/includes/admin/opcache.php:107
-#: modsadvpot/includes/src/OPcacheList.php:212
-#: modsadvpot/includes/src/OPcacheView.php:212
 msgid "Cache Hits"
 msgstr ""
 
 #: includes/admin/opcviewer.php:104
-#: modsadvpot/includes/admin/opcache.php:109
 msgid "Cache Misses"
 msgstr ""
 
 #: includes/admin/opcviewer.php:108
 #: includes/src/OPcacheView.php:224
-#: modsadvpot/includes/admin/opcache.php:113
 msgid "Cached Files"
 msgstr ""
 
 #: includes/admin/opcviewer.php:110
-#: modsadvpot/includes/admin/opcache.php:115
 msgid "Cached Keys"
 msgstr ""
 
 #: includes/admin/opcviewer.php:115
 #: includes/admin/opcviewer.php:128
-#: modsadvpot/includes/admin/opcache.php:120
-#: modsadvpot/includes/admin/opcache.php:133
 msgid "Max Cached Keys"
 msgstr ""
 
 #: includes/admin/opcviewer.php:117
 #: includes/admin/opcviewer.php:130
-#: modsadvpot/includes/admin/opcache.php:122
-#: modsadvpot/includes/admin/opcache.php:135
 msgid "Hit Rate"
 msgstr ""
 
 #: includes/admin/opcviewer.php:121
-#: modsadvpot/includes/admin/opcache.php:126
 msgid "Blacklist Misses"
 msgstr ""
 
 #: includes/admin/opcviewer.php:123
-#: modsadvpot/includes/admin/opcache.php:128
 msgid "Blacklist Miss Ratio"
 msgstr ""
 
 #: includes/admin/opcviewer.php:136
 #: includes/src/OPcacheView.php:226
-#: modsadvpot/includes/admin/opcache.php:141
-#: modsadvpot/includes/src/OPcacheList.php:213
-#: modsadvpot/includes/src/OPcacheView.php:213
 msgid "Memory Usage"
 msgstr ""
 
 #: includes/admin/opcviewer.php:140
-#: modsadvpot/includes/admin/opcache.php:145
 msgid "Used Memory"
 msgstr ""
 
 #: includes/admin/opcviewer.php:142
-#: modsadvpot/includes/admin/opcache.php:147
 msgid "Free Memory"
 msgstr ""
 
 #: includes/admin/opcviewer.php:146
-#: modsadvpot/includes/admin/opcache.php:151
 msgid "Wasted Memory"
 msgstr ""
 
 #: includes/admin/opcviewer.php:148
-#: modsadvpot/includes/admin/opcache.php:153
 msgid "Current Wasted"
 msgstr ""
 
@@ -762,12 +730,10 @@ msgid "Display Config"
 msgstr ""
 
 #: includes/admin/opcviewer.php:167
-#: modsadvpot/includes/admin/opcache.php:172
 msgid "OPcache Files"
 msgstr ""
 
 #: includes/admin/opcviewer.php:180
-#: modsadvpot/includes/admin/opcache.php:186
 msgid "Other Files"
 msgstr ""
 
@@ -776,7 +742,6 @@ msgid "Stale Files"
 msgstr ""
 
 #: includes/admin/opcviewer.php:182
-#: modsadvpot/includes/admin/opcache.php:184
 msgid "All"
 msgstr ""
 
@@ -805,11 +770,10 @@ msgid "Web Proxy"
 msgstr ""
 
 #: includes/admin/overview.php:35
-#: includes/src/Plugin.php:1347
-#: includes/src/Plugin.php:1653
+#: includes/src/Plugin.php:1308
+#: includes/src/Plugin.php:1614
 #: includes/src/View.php:294
 #: modsadvpot/includes/src/Plugin.php:202
-#: modsadvpot/includes/src/Premium.php:202
 msgid "Overview"
 msgstr ""
 
@@ -1370,15 +1334,11 @@ msgstr ""
 
 #. translators: %s = utc offset
 #: includes/src/OPcacheView.php:221
-#: modsadvpot/includes/src/OPcacheList.php:209
-#: modsadvpot/includes/src/OPcacheView.php:209
 msgid "Last Used %s"
 msgstr ""
 
 #: includes/src/OPcacheView.php:273
-#: modsadvpot/includes/src/OPcacheList.php:261
-#: modsadvpot/includes/src/OPcacheView.php:261
-msgid "OPcache stats not available."
+msgid "OPcache items not available."
 msgstr ""
 
 #: includes/src/OPcacheView.php:275
@@ -1439,52 +1399,51 @@ msgid_plural "of %s Networks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/src/Plugin.php:829
+#: includes/src/Plugin.php:792
 msgid "Docket Cache plugin requires PHP 7.2.5 or greater."
 msgstr ""
 
-#: includes/src/Plugin.php:1109
-#: includes/src/Plugin.php:1126
+#: includes/src/Plugin.php:1070
+#: includes/src/Plugin.php:1087
 msgid "No data available"
 msgstr ""
 
-#: includes/src/Plugin.php:1370
+#: includes/src/Plugin.php:1331
 #: includes/src/View.php:301
 msgid "OPcache"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:1480
+#: includes/src/Plugin.php:1441
 msgid "The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href=\"%s\" style=\"min-width:100px;text-align:center;font-wight:bold;\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %1$s: url install, %2$s = url dismiss
-#: includes/src/Plugin.php:1484
+#: includes/src/Plugin.php:1445
 msgid "An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use <strong>Docket Cache</strong>. <br><br><a href=\"%1$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-primary button-small\">Install</a>&nbsp;<a href=\"%2$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-secondary button-small\">Dismiss</a>"
 msgstr ""
 
-#: includes/src/Plugin.php:1489
+#: includes/src/Plugin.php:1450
 msgid "The Object Cache feature has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: version
-#: includes/src/Plugin.php:1624
-#: includes/src/Plugin.php:1639
+#: includes/src/Plugin.php:1585
+#: includes/src/Plugin.php:1600
 msgid "Version %s"
 msgstr ""
 
-#: includes/src/Plugin.php:1654
+#: includes/src/Plugin.php:1615
 #: modsadvpot/includes/src/Bemods.php:146
 msgid "Configure"
 msgstr ""
 
-#: includes/src/Plugin.php:1666
+#: includes/src/Plugin.php:1627
 #: modsadvpot/includes/src/Plugin.php:215
-#: modsadvpot/includes/src/Premium.php:215
 msgid "Docs"
 msgstr ""
 
-#: includes/src/Plugin.php:1667
+#: includes/src/Plugin.php:1628
 msgid "Sponsor"
 msgstr ""
 
@@ -1946,7 +1905,6 @@ msgstr ""
 #: modsadvpot/includes/src/Bemods.php:443
 #: modsadvpot/includes/src/Bemods.php:493
 #: modsadvpot/includes/src/Plugin.php:203
-#: modsadvpot/includes/src/Premium.php:203
 msgid "Advanced"
 msgstr ""
 
@@ -2131,26 +2089,6 @@ msgstr ""
 
 #: modsadvpot/includes/admin/cachepage.php:194
 msgid "Email Scraping Prevention"
-msgstr ""
-
-#: modsadvpot/includes/admin/config-0.php:25
-msgid "WP File Manager"
-msgstr ""
-
-#: modsadvpot/includes/admin/features.php:17
-msgid "WP Config Editor"
-msgstr ""
-
-#: modsadvpot/includes/admin/opcache.php:169
-msgid "Show Config"
-msgstr ""
-
-#: modsadvpot/includes/admin/opcache.php:187
-msgid "Removed Files"
-msgstr ""
-
-#: modsadvpot/includes/admin/opcache.php:200
-msgid "Filter File Paths"
 msgstr ""
 
 #: modsadvpot/includes/admin/resource.php:32
@@ -2345,14 +2283,4 @@ msgstr ""
 
 #: modsadvpot/includes/src/Bemods.php:565
 msgid "Failed to update the configuration"
-msgstr ""
-
-#: modsadvpot/includes/src/OPcacheList.php:214
-#: modsadvpot/includes/src/OPcacheView.php:214
-msgid "File Paths"
-msgstr ""
-
-#: modsadvpot/includes/src/OPcacheList.php:263
-#: modsadvpot/includes/src/OPcacheView.php:263
-msgid "No matching OPcache file paths."
 msgstr ""

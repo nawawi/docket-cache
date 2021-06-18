@@ -167,7 +167,9 @@ final class Canopt extends Bepart
     {
         $file = empty($file) ? $this->file : $file;
         if (empty($config) || !\is_array($config)) {
-            @unlink($file);
+            if (@is_file($file) && @is_writable($file)) {
+                @unlink($file);
+            }
 
             clearstatcache();
 

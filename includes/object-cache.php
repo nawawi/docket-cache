@@ -3,7 +3,7 @@
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
  * Plugin URI:          https://wordpress.org/plugins/docket-cache/
- * Version:             21.02.06-dev2
+ * Version:             21.02.06-dev3
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * Author:              Nawawi Jamili
  * Author URI:          https://docketcache.com
@@ -130,6 +130,21 @@ if (@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-delay.txt')) {
             );
         }
 
+        // early cache transient/alloptions
+        if (class_exists('Nawawi\\DocketCache\\Becache')) {
+            add_action(
+                'shutdown',
+                function () {
+                    try {
+                        Nawawi\DocketCache\Becache::export();
+                    } catch (\Throwable $e) {
+                    }
+                },
+                PHP_INT_MIN
+            );
+        }
+
+        // early cleanup transient
         if (\function_exists('nwdcx_cleanuptransient')) {
             add_action(
                 'shutdown',

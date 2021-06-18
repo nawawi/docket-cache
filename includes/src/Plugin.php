@@ -635,43 +635,6 @@ final class Plugin extends Bepart
         return false;
     }
 
-    /**
-     * suspend_wp_options_autoload.
-     */
-    public function suspend_wp_options_autoload($status = null)
-    {
-        if (version_compare($this->version(), '20.09.05', '>')) {
-            return false;
-        }
-
-        if (!nwdcx_wpdb($wpdb)) {
-            return false;
-        }
-
-        // 20201020: always false for compat. now handle by Filesystem::optimize_alloptions()
-        $status = false;
-
-        $suspend_value = 'docketcache-no';
-        $options_tbl = $wpdb->options;
-
-        // check
-        $query = $wpdb->prepare("SELECT autoload FROM `{$options_tbl}` WHERE autoload=%s ORDER BY option_id ASC LIMIT 1", $suspend_value);
-        $check = $wpdb->query($query);
-        if ($check < 1) {
-            return false;
-        }
-
-        $query = $wpdb->prepare("UPDATE `{$options_tbl}` SET autoload='yes' WHERE autoload=%s ORDER BY option_id ASC", $suspend_value);
-
-        $suppress = $wpdb->suppress_errors(true);
-        $result = $wpdb->query($query);
-        $wpdb->suppress_errors($suppress);
-
-        wp_cache_delete('alloptions', 'options');
-
-        return $result;
-    }
-
     public function switch_cron_site()
     {
         if (is_multisite()) {
@@ -872,7 +835,6 @@ final class Plugin extends Bepart
         $this->cx()->undelay();
         $this->cachedir_flush($this->cache_path, true);
         $this->flush_log();
-        $this->suspend_wp_options_autoload(false);
 
         if ($is_uninstall) {
             WpConfig::runtime_remove();
@@ -927,7 +889,6 @@ final class Plugin extends Bepart
         }
 
         $this->flush_cache();
-        $this->suspend_wp_options_autoload(null);
 
         if ($this->cf()->is_dcfalse('OBJECTCACHEOFF', true)) {
             $this->cx()->install(true);
@@ -1688,9 +1649,6 @@ final class Plugin extends Bepart
                         }
                         break;
                     case 'wpoptaload':
-                        $opt = 'enable' === $value ? true : false;
-                        $this->suspend_wp_options_autoload($opt);
-
                         add_action(
                             'shutdown',
                             function () {
@@ -1758,7 +1716,7 @@ final class Plugin extends Bepart
                             if ($this->co()->lockproc('preload', time() + 3600)) {
                                 return false;
                             }
-                            wp_load_alloptions();
+                            //wp_load_alloptions();
                             wp_count_comments(0);
                             wp_count_posts();
                             @Crawler::fetch_home(['blocking' => true]);
@@ -1870,16 +1828,10 @@ final class Plugin extends Bepart
         );
 
         add_action(
-            'docketcache/action/wpoptaload',
+            'docketcache/action/flushcache/object',
             function () {
-                if ($this->co()->lockproc('doing_suspend_wp_options_autoload', time() + 3600)) {
-                    return;
-                }
-
-                $this->suspend_wp_options_autoload(null);
-                $this->co()->lockreset('doing_suspend_wp_options_autoload');
-            },
-            PHP_INT_MAX
+                $this->flush_cache(true);
+            }
         );
 
         // page action
@@ -2071,7 +2023,6 @@ final class Plugin extends Bepart
             \WP_CLI::add_command('cache runtime:remove', [$cli, 'runtime_remove']);
             \WP_CLI::add_command('cache status', [$cli, 'status']);
             \WP_CLI::add_command('cache type', [$cli, 'type']);
-
             nwdcx_runaction('docketcache/init/cli', $this, $cli);
         }
     }

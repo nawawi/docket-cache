@@ -270,7 +270,7 @@ class OPcacheView extends \WP_List_Table
     public function no_items()
     {
         if (empty($_GET['s'])) {
-            esc_html_e('OPcache stats not available.', 'docket-cache');
+            esc_html_e('OPcache items not available.', 'docket-cache');
         } else {
             esc_html_e('No matching OPcache Cached Files.', 'docket-cache');
         }

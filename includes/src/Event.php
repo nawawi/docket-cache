@@ -178,9 +178,6 @@ final class Event
         }
 
         $this->clear_unknown_cron();
-        if (has_action('docketcache/action/wpoptaload')) {
-            do_action('docketcache/action/wpoptaload');
-        }
 
         $this->pt->get_cache_stats(true);
         $this->pt->co()->lockreset('watchproc');

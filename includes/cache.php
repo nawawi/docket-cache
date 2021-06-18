@@ -11,7 +11,7 @@
 
 /*
  * Reference:
- *  wp-includes/class-wp-object-cache.php.
+ *  wp-includes/class-wp-object-cache.php
  *  wp-includes/cache.php
  */
 
@@ -685,6 +685,8 @@ class WP_Object_Cache
             if (\in_array($group, ['site-transient', 'transient'])) {
                 if ('site-transient' === $group && \in_array($key, ['update_plugins', 'update_themes', 'update_core', '_woocommerce_helper_updates'])) {
                     $expire = $maxttl < 2419200 ? 2419200 : $maxttl; // 28d
+                } elseif ('transient' === $group && 'health-check-site-status-result' === $key) {
+                    $expire = 0; // to check with is_data_uptodate
                 } else {
                     $expire = $maxttl < 604800 ? 604800 : $maxttl; // 7d
                 }
