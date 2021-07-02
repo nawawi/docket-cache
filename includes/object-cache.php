@@ -3,7 +3,7 @@
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
  * Plugin URI:          https://wordpress.org/plugins/docket-cache/
- * Version:             21.02.06-dev3
+ * Version:             21.02.06
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * Author:              Nawawi Jamili
  * Author URI:          https://docketcache.com
@@ -33,7 +33,7 @@ if (\defined('DOCKET_CACHE_DISABLED') && DOCKET_CACHE_DISABLED) {
 /*
  * Check for minimum php version.
  */
-if (version_compare(PHP_VERSION, '7.2.5', '<')) {
+if (version_compare(\PHP_VERSION, '7.2.5', '<')) {
     return;
 }
 
@@ -118,14 +118,14 @@ if (@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-delay.txt')) {
                 return $value;
             }
 
-            add_filter('pre_update_option', 'nwdcx_halttransient', PHP_INT_MIN, 3);
-            add_filter('pre_get_option', 'nwdcx_halttransient', PHP_INT_MIN, 3);
+            add_filter('pre_update_option', 'nwdcx_halttransient', \PHP_INT_MIN, 3);
+            add_filter('pre_get_option', 'nwdcx_halttransient', \PHP_INT_MIN, 3);
             add_filter(
                 'added_option',
                 function ($option, $value) {
                     return nwdcx_halttransient($value, $option);
                 },
-                PHP_INT_MIN,
+                \PHP_INT_MIN,
                 2
             );
         }
@@ -140,7 +140,7 @@ if (@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-delay.txt')) {
                     } catch (\Throwable $e) {
                     }
                 },
-                PHP_INT_MIN
+                \PHP_INT_MIN
             );
         }
 
@@ -149,7 +149,7 @@ if (@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-delay.txt')) {
             add_action(
                 'shutdown',
                 'nwdcx_cleanuptransient',
-                PHP_INT_MAX - 1
+                \PHP_INT_MAX - 1
             );
         }
 
@@ -158,7 +158,7 @@ if (@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-delay.txt')) {
             function () {
                 @rename(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-delay.txt', DOCKET_CACHE_CONTENT_PATH.'/.object-cache-after-delay.txt');
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
     }
 

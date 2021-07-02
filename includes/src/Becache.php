@@ -245,7 +245,8 @@ class Becache
 
             if (!empty($collect)) {
                 foreach ($collect as $key => $arr) {
-                    $this->store_cache($key, $arr['value'], $arr['group'], $arr['timeout']);
+                    $timeout = isset($arr['timeout']) ? $arr['timeout'] : 0;
+                    $this->store_cache($key, $arr['value'], $arr['group'], $timeout);
                 }
             }
         }
@@ -270,7 +271,8 @@ class Becache
 
                 if (!empty($collect)) {
                     foreach ($collect as $key => $arr) {
-                        $this->store_cache($key, $arr['value'], $arr['group'], $arr['timeout']);
+                        $timeout = isset($arr['timeout']) ? $arr['timeout'] : 0;
+                        $this->store_cache($key, $arr['value'], $arr['group'], $timeout);
                     }
                 }
             }

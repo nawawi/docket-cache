@@ -105,15 +105,15 @@ final class Canopt extends Bepart
             'autoupdate' => esc_html__('Docket Cache Auto Update', 'docket-cache'),
             'checkversion' => esc_html__('Critical Version Checking', 'docket-cache'),
             'optwpquery' => esc_html__('Optimize WP Query', 'docket-cache'),
-            'pingback' => esc_html__('Remove XML-RPC / Pingbacks', 'docket-cache'),
-            'headerjunk' => esc_html__('Remove WP Header Junk', 'docket-cache'),
-            'wpemoji' => esc_html__('Remove WP Emoji', 'docket-cache'),
-            'wpembed' => esc_html__('Remove WP Embed', 'docket-cache'),
-            'wpfeed' => esc_html__('Remove WP Feed', 'docket-cache'),
-            'wplazyload' => esc_html__('Remove WP Lazy Load', 'docket-cache'),
-            'wpsitemap' => esc_html__('Remove WP Sitemap', 'docket-cache'),
-            'wpapppassword' => esc_html__('Remove WP Application Passwords', 'docket-cache'),
-            'wpdashboardnews' => esc_html__('Remove WP Events & News Feed Dashboard', 'docket-cache'),
+            'pingback' => esc_html__('Deactivate XML-RPC / Pingbacks', 'docket-cache'),
+            'headerjunk' => esc_html__('Deactivate WP Header Junk', 'docket-cache'),
+            'wpemoji' => esc_html__('Deactivate WP Emoji', 'docket-cache'),
+            'wpembed' => esc_html__('Deactivate WP Embed', 'docket-cache'),
+            'wpfeed' => esc_html__('Deactivate WP Feed', 'docket-cache'),
+            'wplazyload' => esc_html__('Deactivate WP Lazy Load', 'docket-cache'),
+            'wpsitemap' => esc_html__('Deactivate WP Sitemap', 'docket-cache'),
+            'wpapppassword' => esc_html__('Deactivate WP Application Passwords', 'docket-cache'),
+            'wpdashboardnews' => esc_html__('Deactivate WP Events & News Feed Dashboard', 'docket-cache'),
             'objectcacheoff' => esc_html__('Suspend Object Cache', 'docket-cache'),
             'opcshutdown' => esc_html__('Flush OPcache During Deactivation', 'docket-cache'),
             'limithttprequest' => esc_html__('Limit WP-Admin HTTP requests', 'docket-cache'),
@@ -121,13 +121,13 @@ final class Canopt extends Bepart
             'rtpostautosave' => esc_html__('Auto Save Interval', 'docket-cache'),
             'rtpostrevision' => esc_html__('Post Revisions', 'docket-cache'),
             'rtpostemptytrash' => esc_html__('Trash Bin', 'docket-cache'),
-            'rtpluginthemeeditor' => esc_html__('Deactivate Plugin / Theme Editor', 'docket-cache'),
-            'rtpluginthemeinstall' => esc_html__('Deactivate Plugin / Theme Update and Installation', 'docket-cache'),
+            'rtpluginthemeeditor' => esc_html__('Disallows Plugin / Theme Editor', 'docket-cache'),
+            'rtpluginthemeinstall' => esc_html__('Disallows Plugin / Theme Update and Installation', 'docket-cache'),
             'rtimageoverwrite' => esc_html__('Cleanup Image Edits', 'docket-cache'),
             'rtwpdebug' => esc_html__('WP Debug', 'docket-cache'),
             'rtwpdebugdisplay' => esc_html__('WP Debug Display', 'docket-cache'),
             'rtwpdebuglog' => esc_html__('WP Debug Log', 'docket-cache'),
-            'rtwpcoreupdate' => esc_html__('WP Auto Update Core', 'docket-cache'),
+            'rtwpcoreupdate' => esc_html__('Disallows WP Auto Update Core', 'docket-cache'),
         ];
 
         $data = apply_filters('docketcache/filter/optionkeys', $data);
@@ -269,19 +269,19 @@ final class Canopt extends Bepart
             return false;
         }
 
-        $files = @glob($path.'/lock-*.txt', GLOB_MARK | GLOB_NOSORT);
+        $files = @glob($path.'/lock-*.txt', \GLOB_MARK | \GLOB_NOSORT);
         if (!empty($files) && \is_array($files)) {
             foreach ($files as $file) {
                 if (@is_file($file) && @is_writable($file)) {
                     if (\defined('DocketCache_CLI') && DocketCache_CLI) {
-                        @fwrite(STDOUT, basename($file).PHP_EOL);
+                        @fwrite(\STDOUT, basename($file).\PHP_EOL);
                     }
                     @unlink($file);
                 }
             }
         }
 
-        $files = @glob($path.'/dump_*.txt', GLOB_MARK | GLOB_NOSORT);
+        $files = @glob($path.'/dump_*.txt', \GLOB_MARK | \GLOB_NOSORT);
         if (!empty($files) && \is_array($files)) {
             foreach ($files as $file) {
                 if (@is_file($file) && @is_writable($file)) {

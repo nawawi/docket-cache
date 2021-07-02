@@ -1305,7 +1305,7 @@ class WP_Object_Cache
 
                 return $alloptions;
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         // litespeed admin notice
@@ -1316,7 +1316,7 @@ class WP_Object_Cache
                 $this->delete('litespeed_messages', 'options');
                 $this->delete('litespeed.admin_display.messages', 'options');
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         add_action(
@@ -1327,7 +1327,7 @@ class WP_Object_Cache
                     $this->delete('litespeed.admin_display.messages', 'options');
                 }
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         foreach (['added', 'updated', 'deleted'] as $prefix) {
@@ -1343,13 +1343,13 @@ class WP_Object_Cache
                                     $this->fs()->close_buffer();
                                     $this->delete('alloptions', 'options');
                                 },
-                                PHP_INT_MAX - 1
+                                \PHP_INT_MAX - 1
                             );
                         }
                         unset($alloptions);
                     }
                 },
-                PHP_INT_MAX
+                \PHP_INT_MAX
             );
         }
 
@@ -1364,7 +1364,7 @@ class WP_Object_Cache
                                 $this->fs()->close_buffer();
                                 $this->delete(get_current_network_id().':active_sitewide_plugins', 'site-options');
                             },
-                            PHP_INT_MAX - 1
+                            \PHP_INT_MAX - 1
                         );
                     }
                     add_action(
@@ -1373,10 +1373,10 @@ class WP_Object_Cache
                             $this->fs()->close_buffer();
                             $this->delete('uninstall_plugins', 'options');
                         },
-                        PHP_INT_MAX - 1
+                        \PHP_INT_MAX - 1
                     );
                 },
-                PHP_INT_MAX,
+                \PHP_INT_MAX,
                 2
             );
         }
@@ -1388,7 +1388,7 @@ class WP_Object_Cache
                 function ($post_id, $post, $update) {
                     $this->flush_filtered_groups('save_post', [$post_id, $post, $update]);
                 },
-                PHP_INT_MIN,
+                \PHP_INT_MIN,
                 3
             );
 
@@ -1397,7 +1397,7 @@ class WP_Object_Cache
                 function ($post_id, $post) {
                     $this->flush_filtered_groups('edit_post', [$post_id, $post]);
                 },
-                PHP_INT_MIN,
+                \PHP_INT_MIN,
                 2
             );
 
@@ -1406,7 +1406,7 @@ class WP_Object_Cache
                 function ($post_id) {
                     $this->flush_filtered_groups('delete_post', [$post_id]);
                 },
-                PHP_INT_MIN
+                \PHP_INT_MIN
             );
         }
 
@@ -1422,7 +1422,7 @@ class WP_Object_Cache
                         $args['order'] = 'ASC';
                     }
                 },
-                PHP_INT_MIN
+                \PHP_INT_MIN
             );
 
             add_action(
@@ -1436,7 +1436,7 @@ class WP_Object_Cache
                         $args['order'] = 'ASC';
                     }
                 },
-                PHP_INT_MIN
+                \PHP_INT_MIN
             );
 
             add_action(
@@ -1447,7 +1447,7 @@ class WP_Object_Cache
                         $wpq->query_vars['nwdcx_count_total'] = true;
                     }
                 },
-                PHP_INT_MIN
+                \PHP_INT_MIN
             );
 
             add_action(
@@ -1459,7 +1459,7 @@ class WP_Object_Cache
                         $wpq->total_users = $wpdb->get_var($sql);
                     }
                 },
-                PHP_INT_MIN
+                \PHP_INT_MIN
             );
         }
 
@@ -1473,7 +1473,7 @@ class WP_Object_Cache
                         $this->add_signature = true;
                     }
                 },
-                PHP_INT_MIN
+                \PHP_INT_MIN
             );
 
             add_action(
@@ -1484,7 +1484,7 @@ class WP_Object_Cache
                         $this->fs()->close_buffer();
                     }
                 },
-                PHP_INT_MAX
+                \PHP_INT_MAX
             );
         }
 

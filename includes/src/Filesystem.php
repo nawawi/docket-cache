@@ -279,18 +279,18 @@ class Filesystem
             return false;
         }
 
-        if ($fileo->flock(LOCK_EX)) {
-            $fileo->seek(PHP_INT_MAX);
+        if ($fileo->flock(\LOCK_EX)) {
+            $fileo->seek(\PHP_INT_MAX);
             $lines = $fileo->key();
             $object = new \LimitIterator($fileo, $lines - 2);
             foreach ($object as $line) {
                 if (false !== strpos($line, '/*@DOCKET_CACHE_EOF*/')) {
-                    $fileo->flock(LOCK_UN);
+                    $fileo->flock(\LOCK_UN);
 
                     return true;
                 }
             }
-            $fileo->flock(LOCK_UN);
+            $fileo->flock(\LOCK_UN);
         }
 
         $fileo = null;
@@ -361,10 +361,10 @@ class Filesystem
 
         $handle = @fopen($file, 'cb');
         if ($handle) {
-            $lock = $is_block ? LOCK_EX : LOCK_EX | LOCK_NB;
+            $lock = $is_block ? \LOCK_EX : \LOCK_EX | \LOCK_NB;
             if (@flock($handle, $lock)) {
                 $ok = @ftruncate($handle, 0); // true, false
-                @flock($handle, LOCK_UN);
+                @flock($handle, \LOCK_UN);
             }
             @fclose($handle);
         }
@@ -401,13 +401,13 @@ class Filesystem
             return false;
         }
 
-        $lock = $is_block ? LOCK_EX : LOCK_EX | LOCK_NB;
+        $lock = $is_block ? \LOCK_EX : \LOCK_EX | \LOCK_NB;
         $ok = false;
         if (@flock($handle, $lock)) {
             $len = \strlen($data);
             $cnt = @fwrite($handle, $data);
             @fflush($handle);
-            @flock($handle, LOCK_UN);
+            @flock($handle, \LOCK_UN);
             if ($len === $cnt) {
                 $ok = true;
             }
@@ -436,7 +436,7 @@ class Filesystem
         $tmpfile = $dir.'/'.'dump_'.uniqid().'_'.basename($file);
 
         // cleanup at shutdown
-        $this->shutdown_cleanup($tmpfile, PHP_INT_MAX);
+        $this->shutdown_cleanup($tmpfile, \PHP_INT_MAX);
 
         // truncate reason
         $this->opcache_flush($file);
@@ -621,7 +621,7 @@ class Filesystem
                 $this->close_buffer();
                 $this->opcache_reset();
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
     }
 
@@ -826,7 +826,7 @@ class Filesystem
         $seconds = (int) $seconds;
         $file_fatal = $this->get_fatal_error_filename($file);
 
-        $errmsg = date('Y-m-d H:i:s T').PHP_EOL.$error;
+        $errmsg = date('Y-m-d H:i:s T').\PHP_EOL.$error;
         if ($this->dump($file_fatal, $errmsg)) {
             if ($seconds > 0) {
                 $this->touch($file, time() + $seconds);
@@ -850,7 +850,7 @@ class Filesystem
         register_shutdown_function(
             function () {
                 $error = error_get_last();
-                if ($error && \in_array($error['type'], [E_ERROR, E_PARSE, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR, E_CORE_ERROR], true)) {
+                if ($error && \in_array($error['type'], [\E_ERROR, \E_PARSE, \E_COMPILE_ERROR, \E_USER_ERROR, \E_RECOVERABLE_ERROR, \E_CORE_ERROR], true)) {
                     $file_error = $error['file'];
 
                     if ($this->is_cache_file($file_error)) {
@@ -897,7 +897,7 @@ class Filesystem
 
         // include when we can read, try to avoid fatal error.
         // LOCK_SH = shared lock
-        if (flock($handle, LOCK_SH)) {
+        if (flock($handle, \LOCK_SH)) {
             try {
                 $data = @include $file;
             } catch (\Throwable $e) {
@@ -905,9 +905,9 @@ class Filesystem
 
                 $file_error = $e->getFile();
                 if ($this->is_cache_file($file_error)) {
-                    $errmsg = 'E: '.$error.PHP_EOL;
-                    $errmsg .= 'L: '.$e->getLine().PHP_EOL;
-                    $errmsg .= 'F: '.basename($file_error).PHP_EOL;
+                    $errmsg = 'E: '.$error.\PHP_EOL;
+                    $errmsg .= 'L: '.$e->getLine().\PHP_EOL;
+                    $errmsg .= 'F: '.basename($file_error).\PHP_EOL;
                     $this->suspend_cache_file($file, $errmsg);
                 }
 
@@ -915,7 +915,7 @@ class Filesystem
                 $data = false;
             }
 
-            @flock($handle, LOCK_UN);
+            @flock($handle, \LOCK_UN);
         }
         @fclose($handle);
 
@@ -947,10 +947,10 @@ class Filesystem
                                 $reflector = new \ReflectionClass($clsname);
                                 $clsfname = $reflector->getFileName();
                                 if (false !== $clsfname) {
-                                    $ucode .= '/* f: '.str_replace(ABSPATH, '', $clsfname).' */'.PHP_EOL;
+                                    $ucode .= '/* f: '.str_replace(ABSPATH, '', $clsfname).' */'.\PHP_EOL;
                                 }
                             }
-                            $ucode .= "if ( !@class_exists('".$clsname."', false) ) { return false; }".PHP_EOL;
+                            $ucode .= "if ( !@class_exists('".$clsname."', false) ) { return false; }".\PHP_EOL;
                         }
                     }
                     unset($cls, $clsname);
@@ -960,12 +960,12 @@ class Filesystem
         }
 
         $code = '<?php ';
-        $code .= "if ( !\defined('ABSPATH') ) { return false; }".PHP_EOL;
+        $code .= "if ( !\defined('ABSPATH') ) { return false; }".\PHP_EOL;
         if (!empty($data)) {
             if (!empty($ucode)) {
                 $code .= $ucode;
             }
-            $code .= 'return '.$data.';'.PHP_EOL;
+            $code .= 'return '.$data.';'.\PHP_EOL;
             $code .= '/*@DOCKET_CACHE_EOF*/';
         }
 
@@ -1006,9 +1006,9 @@ class Filesystem
         }
         $log = '['.$timestamp.'] '.$tag.': "'.$id.'" "'.trim($data).'" "'.$caller.'"';
 
-        $flags = !$do_flush ? LOCK_EX | FILE_APPEND : LOCK_EX;
+        $flags = !$do_flush ? \LOCK_EX | \FILE_APPEND : \LOCK_EX;
         $do_chmod = !@is_file($file);
-        if (@file_put_contents($file, $log.PHP_EOL, $flags)) {
+        if (@file_put_contents($file, $log.\PHP_EOL, $flags)) {
             if ($do_chmod) {
                 $this->chmod($file);
             }
@@ -1274,7 +1274,7 @@ class Filesystem
 
                 return $alloptions;
             },
-            PHP_INT_MIN
+            \PHP_INT_MIN
         );
     }
 }

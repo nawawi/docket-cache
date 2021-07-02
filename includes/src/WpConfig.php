@@ -80,7 +80,7 @@ final class WpConfig
     {
         if (!empty($content) && false !== strpos($content, '/*@DOCKETCACHE-RUNTIME-BEGIN*/') && false !== strpos($content, '/*@DOCKETCACHE-RUNTIME-END*/')) {
             try {
-                $content_r = @preg_replace('#/\*@DOCKETCACHE-RUNTIME-BEGIN\*/.*/\*@DOCKETCACHE-RUNTIME-END\*/(\n|'.PHP_EOL.')?#sm', '', $content, -1, $cnt);
+                $content_r = @preg_replace('#/\*@DOCKETCACHE-RUNTIME-BEGIN\*/.*/\*@DOCKETCACHE-RUNTIME-END\*/(\n|'.\PHP_EOL.')?#sm', '', $content, -1, $cnt);
                 if (!empty($content_r) && $cnt > 0) {
                     $content = $content_r;
                 }
@@ -135,18 +135,18 @@ final class WpConfig
     public static function runtime_code()
     {
         $data_path = self::canopt()->path;
-        $code = '/*@DOCKETCACHE-RUNTIME-BEGIN*/'.PHP_EOL;
-        $code .= "if(!\\function_exists('docketcache_runtime')){".PHP_EOL;
-        $code .= ' function docketcache_runtime(){'.PHP_EOL;
-        $code .= '  try{'.PHP_EOL;
-        $code .= '   $path="'.$data_path.'";'.PHP_EOL;
-        $code .= '   $runtime=$path."/runtime.php";'.PHP_EOL;
-        $code .= '   if(is_file($runtime)){include_once $runtime;}'.PHP_EOL;
-        $code .= '  }catch(\\Throwable $e){}'.PHP_EOL;
-        $code .= ' }'.PHP_EOL;
-        $code .= ' docketcache_runtime();'.PHP_EOL;
-        $code .= '}'.PHP_EOL;
-        $code .= '/*@DOCKETCACHE-RUNTIME-END*/'.PHP_EOL;
+        $code = '/*@DOCKETCACHE-RUNTIME-BEGIN*/'.\PHP_EOL;
+        $code .= "if(!\\function_exists('docketcache_runtime')){".\PHP_EOL;
+        $code .= ' function docketcache_runtime(){'.\PHP_EOL;
+        $code .= '  try{'.\PHP_EOL;
+        $code .= '   $path="'.$data_path.'";'.\PHP_EOL;
+        $code .= '   $runtime=$path."/runtime.php";'.\PHP_EOL;
+        $code .= '   if(is_file($runtime)){include_once $runtime;}'.\PHP_EOL;
+        $code .= '  }catch(\\Throwable $e){}'.\PHP_EOL;
+        $code .= ' }'.\PHP_EOL;
+        $code .= ' docketcache_runtime();'.\PHP_EOL;
+        $code .= '}'.\PHP_EOL;
+        $code .= '/*@DOCKETCACHE-RUNTIME-END*/'.\PHP_EOL;
 
         return $code;
     }
@@ -223,7 +223,7 @@ final class WpConfig
 
         self::put_backup();
 
-        return @file_put_contents($file, $content, LOCK_EX);
+        return @file_put_contents($file, $content, \LOCK_EX);
     }
 
     private static function put_backup()
@@ -337,15 +337,15 @@ final class WpConfig
                     }
                 }
 
-                $cons .= "if(!defined('".$v."')){define('".$v."', ".$val.");}else{\$GLOBALS['".$ka."_FALSE']=1;}".PHP_EOL;
+                $cons .= "if(!defined('".$v."')){define('".$v."', ".$val.");}else{\$GLOBALS['".$ka."_FALSE']=1;}".\PHP_EOL;
             }
         }
 
-        $code = '<?php '.PHP_EOL;
-        $code .= "if(!defined('ABSPATH')){return;}".PHP_EOL;
-        $code .= '$runtime=(object)'.var_export($runtime, 1).';'.PHP_EOL;
-        $code .= 'if(!@is_dir($runtime->configpath)){return;}'.PHP_EOL;
-        $code .= 'if(!@is_file($runtime->pluginpath.\'/docket-cache.php\')){return;}'.PHP_EOL;
+        $code = '<?php '.\PHP_EOL;
+        $code .= "if(!defined('ABSPATH')){return;}".\PHP_EOL;
+        $code .= '$runtime=(object)'.var_export($runtime, 1).';'.\PHP_EOL;
+        $code .= 'if(!@is_dir($runtime->configpath)){return;}'.\PHP_EOL;
+        $code .= 'if(!@is_file($runtime->pluginpath.\'/docket-cache.php\')){return;}'.\PHP_EOL;
         if (!empty($cons)) {
             $code .= $cons;
         }
@@ -355,11 +355,11 @@ final class WpConfig
             $data = $code;
         }
 
-        $data = rtrim($data).PHP_EOL.'/*@DOCKET_CACHE_EOF*/'.PHP_EOL;
+        $data = rtrim($data).\PHP_EOL.'/*@DOCKET_CACHE_EOF*/'.\PHP_EOL;
 
         self::canopt()->opcache_flush($file);
 
-        return @file_put_contents($file, $data, LOCK_EX);
+        return @file_put_contents($file, $data, \LOCK_EX);
     }
 
     public static function unlink_runtime()

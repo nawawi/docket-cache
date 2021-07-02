@@ -798,7 +798,7 @@ final class Plugin extends Bepart
                     deactivate_plugins($this->hook);
                     wp_cache_flush();
                 },
-                PHP_INT_MIN
+                \PHP_INT_MIN
             );
 
             if (\defined('WP_CLI') && WP_CLI) {
@@ -964,7 +964,7 @@ final class Plugin extends Bepart
                 // put last
                 $this->critical_version();
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
     }
 
@@ -1005,7 +1005,7 @@ final class Plugin extends Bepart
                     }
                 }
             },
-            PHP_INT_MAX,
+            \PHP_INT_MAX,
             2
         );
 
@@ -1018,7 +1018,7 @@ final class Plugin extends Bepart
                         $this->plugin_upgrade();
                     }
                 },
-                PHP_INT_MAX,
+                \PHP_INT_MAX,
                 3
             );
         }
@@ -1031,7 +1031,7 @@ final class Plugin extends Bepart
                     echo $output;
                 }
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         if (!is_admin() && $this->cf()->is_dctrue('SIGNATURE')) {
@@ -1041,7 +1041,7 @@ final class Plugin extends Bepart
                     $status = $this->cx()->validate() ? 'on' : 'off';
                     header('x-'.$this->slug.': '.$status.'; '.$this->site_meta(true));
                 },
-                PHP_INT_MAX
+                \PHP_INT_MAX
             );
         }
 
@@ -1089,7 +1089,7 @@ final class Plugin extends Bepart
                         }
                     }
                 },
-                PHP_INT_MIN
+                \PHP_INT_MIN
             );
         }
 
@@ -1114,7 +1114,7 @@ final class Plugin extends Bepart
                     $wpdb->suppress_errors($suppress);
                 }
             },
-            PHP_INT_MIN
+            \PHP_INT_MIN
         );
 
         add_filter(
@@ -1126,7 +1126,7 @@ final class Plugin extends Bepart
 
                 return $update;
             },
-            PHP_INT_MAX,
+            \PHP_INT_MAX,
             2
         );
 
@@ -1409,7 +1409,7 @@ final class Plugin extends Bepart
                     }
                 }
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         add_action(
@@ -1456,7 +1456,7 @@ final class Plugin extends Bepart
                     }
                 );
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         add_action(
@@ -1504,10 +1504,10 @@ final class Plugin extends Bepart
                             $this->delete_current_select_siteid($user->ID);
                         }
                     },
-                    PHP_INT_MAX
+                    \PHP_INT_MAX
                 );
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         add_action(
@@ -1588,7 +1588,7 @@ final class Plugin extends Bepart
 
                 return $text;
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         foreach (['update_footer', 'core_update_footer'] as $fn) {
@@ -1602,7 +1602,7 @@ final class Plugin extends Bepart
 
                     return $text;
                 },
-                PHP_INT_MAX
+                \PHP_INT_MAX
             );
         }
 
@@ -1660,7 +1660,7 @@ final class Plugin extends Bepart
                                     wp_cache_flush_group('docketcache-precache');
                                 }
                             },
-                            PHP_INT_MAX
+                            \PHP_INT_MAX
                         );
 
                         break;
@@ -1678,7 +1678,7 @@ final class Plugin extends Bepart
                                     apply_filters('docketcache/filter/active/cronbot', $action);
                                 }
                             },
-                            PHP_INT_MAX
+                            \PHP_INT_MAX
                         );
                         break;
                     case 'rtwpdebug':
@@ -1723,7 +1723,7 @@ final class Plugin extends Bepart
 
                             $this->co()->lockreset('preload');
                         },
-                        PHP_INT_MAX
+                        \PHP_INT_MAX
                     );
 
                     return;
@@ -1807,7 +1807,7 @@ final class Plugin extends Bepart
 
                         $this->co()->lockreset('preload');
                     },
-                    PHP_INT_MAX
+                    \PHP_INT_MAX
                 );
             }
         );
@@ -1824,7 +1824,7 @@ final class Plugin extends Bepart
 
                 $this->co()->lockreset('doing_countcachesize');
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         add_action(
@@ -1851,7 +1851,7 @@ final class Plugin extends Bepart
                 function () {
                     wp_deregister_script('autosave');
                 },
-                PHP_INT_MAX
+                \PHP_INT_MAX
             );
         }
 
@@ -1945,7 +1945,7 @@ final class Plugin extends Bepart
                         $tweaks->post_missed_schedule();
                         $this->co()->lockreset('post_missed_schedule');
                     },
-                    PHP_INT_MAX
+                    \PHP_INT_MAX
                 );
             }
         }
@@ -1975,7 +1975,7 @@ final class Plugin extends Bepart
 
                         return true;
                     },
-                    PHP_INT_MAX,
+                    \PHP_INT_MAX,
                     3
                 );
             }

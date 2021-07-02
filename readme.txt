@@ -4,7 +4,7 @@ Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance
 Requires at least: 5.4
 Tested up to: 5.7
 Requires PHP: 7.2.5
-Stable tag: 21.02.05
+Stable tag: 21.02.06
 License: MIT
 License URI: ./license.txt
 
@@ -164,6 +164,23 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.02.06 =
+
+- Fixed: Plugin::site_url_scheme() -> strip whitespace.
+- Fixed: Tweaks::post_missed_schedule() -> remove sort by date.
+- Fixed: Tweaks::register_tweaks() -> run register_tweaks at shutdown, lock for 3 minutes.
+- Fixed: ReqAction::exit_failed() -> missing args.
+- Fixed: ReqAction::parse_action() -> replace $_GET, $_POST conditional with $_REQUEST.
+- Fixed: Canopt::put_config() -> check file exists before unlink.
+- Fixed: WP_Object_Cache::maybe_expire() -> exclude transient key health-check-site-status-result.
+- Fixed: CronAgent::run_wpcron() -> capture hook output if any.
+- Removed: Plugin::suspend_wp_options_autoload() -> already replace with Filesystem::optimize_alloptions().
+- Added: Filesystem::keys_alloptions() -> list of core alloptions key.
+- Added: Action Hook -> 'docketcache/action/flushcache/object' to flush cache files.
+- Added: Becache::export() -> early cache for transient and alloptions.
+- Improved: Configuration -> change wording at Option label.
+- Improved: CronAgent::send_action() -> disconnect if object cache disabled.
+
 = 21.02.05 =
 
 - Fixed: Normalize a filesystem path on Windows.

@@ -1,5 +1,7 @@
 modsadvpot/
-dist/
+!dist/
+dist/*
+!dist/docket-cache.zip
 wp-plugins-svn/
 composer.lock
 /includes/vendor/bin/

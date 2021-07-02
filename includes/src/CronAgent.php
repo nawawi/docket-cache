@@ -33,7 +33,7 @@ final class CronAgent
             function () {
                 $this->receive_ping();
             },
-            PHP_INT_MIN
+            \PHP_INT_MIN
         );
 
         add_action(
@@ -41,7 +41,7 @@ final class CronAgent
             function () {
                 $this->check_connection();
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         add_filter(
@@ -51,7 +51,7 @@ final class CronAgent
 
                 return $this->send_action($status);
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         add_filter(
@@ -59,7 +59,7 @@ final class CronAgent
             function () {
                 return $this->send_action('on', 'pong');
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         add_filter(
@@ -81,7 +81,7 @@ final class CronAgent
 
                 return $results;
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
     }
 
@@ -127,6 +127,7 @@ final class CronAgent
             'headers' => [
                 'REFERER' => $this->pt->site_url(true, true),
                 'DOCKETID' => $site_id,
+                'DOCKETOB' => $this->pt->cx()->validate() ? 'on' : 'off',
             ],
         ];
 
@@ -155,10 +156,7 @@ final class CronAgent
         if (is_wp_error($results)) {
             $output['error'] = $results->get_error_message();
 
-            if (!$is_pong) {
-                $this->pt->co()->save_part($output, 'cronbot');
-            }
-
+            $this->pt->co()->save_part($output, 'cronbot');
             $this->pt->co()->lookup_set('cronboterror', $output['error']);
 
             $cache[$uip] = false;
@@ -169,14 +167,11 @@ final class CronAgent
         $output['response'] = wp_remote_retrieve_body($results);
         if (!empty($output['response'])) {
             $output['response'] = json_decode($output['response'], true);
-            if (JSON_ERROR_NONE === json_last_error()) {
+            if (\JSON_ERROR_NONE === json_last_error()) {
                 if (!empty($output['response']['error'])) {
                     $output['error'] = $output['response']['error'];
 
-                    if (!$is_pong) {
-                        $this->pt->co()->save_part($output, 'cronbot');
-                    }
-
+                    $this->pt->co()->save_part($output, 'cronbot');
                     $this->pt->co()->lookup_set('cronboterror', $output['error']);
 
                     $cache[$uip] = false;
@@ -222,14 +217,14 @@ final class CronAgent
                     return true;
                 }
             },
-            ARRAY_FILTER_USE_KEY
+            \ARRAY_FILTER_USE_KEY
         );
 
         $output['selfcheck'] = time() + 5400; // 90min
         $this->pt->co()->save_part($output, 'pings');
 
         $this->pt->json_header();
-        $this->pt->close_exit(json_encode($response, JSON_UNESCAPED_SLASHES));
+        $this->pt->close_exit(json_encode($response, \JSON_UNESCAPED_SLASHES));
     }
 
     private function run_wpcron($run_now = false)
@@ -328,13 +323,21 @@ final class CronAgent
                     $schedule = $v['schedule'];
 
                     if ($schedule) {
-                        wp_reschedule_event($timestamp, $schedule, $hook, $v['args']);
+                        if (false === wp_reschedule_event($timestamp, $schedule, $hook, $v['args'])) {
+                            continue;
+                        }
                     }
 
-                    wp_unschedule_event($timestamp, $hook, $v['args']);
+                    if (false === wp_unschedule_event($timestamp, $hook, $v['args'])) {
+                        continue;
+                    }
 
+                    $hcontent = '';
                     try {
+                        ob_start();
                         do_action_ref_array($hook, $v['args']);
+                        $hcontent = trim(ob_get_contents());
+                        ob_end_clean();
                         ++$run_event;
                     } catch (\Throwable $e) {
                         $results['wpcron_error'][$hook] = $e->getMessage();
@@ -346,8 +349,11 @@ final class CronAgent
                             $results['wpcron_uno'] = $uno_ehk;
                             break;
                         }
-
                         --$run_event;
+                    }
+
+                    if ('' !== $hcontent) {
+                        $results['wpcron_output'][$hook] = $hcontent;
                     }
 
                     usleep(100);
@@ -551,6 +557,11 @@ final class CronAgent
 
                     $pingdata['selfcheck'] = time() + 5400; // 90min
                     $this->pt->co()->save_part($pingdata, 'pings');
+
+                    if (!empty($crondata) && !$this->pt->cx()->validate()) {
+                        $crondata['connected'] = false;
+                        $this->pt->co()->save_part($crondata, 'cronbot');
+                    }
 
                     $done = true;
                 }

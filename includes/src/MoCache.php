@@ -53,7 +53,7 @@ final class MoCache
                     wp_cache_set($cache_key, $cache_data, $cache_group);
                 }
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
     }
 

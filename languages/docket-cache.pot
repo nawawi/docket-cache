@@ -2,14 +2,14 @@
 # This file is distributed under the MIT.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 21.02.06-dev3\n"
+"Project-Id-Version: Docket Cache 21.02.06\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-06-18T14:51:52+00:00\n"
+"POT-Creation-Date: 2021-07-02T00:02:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.5.0\n"
 "X-Domain: docket-cache\n"
@@ -264,48 +264,47 @@ msgid "WP Tweaks"
 msgstr ""
 
 #: includes/admin/config.php:186
-#: includes/src/Canopt.php:108
-msgid "Remove XML-RPC / Pingbacks"
+msgid "Remove WP Header Junk"
 msgstr ""
 
 #: includes/admin/config.php:192
-#: includes/src/Canopt.php:109
-msgid "Remove WP Header Junk"
+#: includes/src/Canopt.php:108
+msgid "Deactivate XML-RPC / Pingbacks"
 msgstr ""
 
 #: includes/admin/config.php:198
 #: includes/src/Canopt.php:110
-msgid "Remove WP Emoji"
+msgid "Deactivate WP Emoji"
 msgstr ""
 
 #: includes/admin/config.php:204
 #: includes/src/Canopt.php:112
-msgid "Remove WP Feed"
+msgid "Deactivate WP Feed"
 msgstr ""
 
 #: includes/admin/config.php:210
 #: includes/src/Canopt.php:111
-msgid "Remove WP Embed"
+msgid "Deactivate WP Embed"
 msgstr ""
 
 #: includes/admin/config.php:216
 #: includes/src/Canopt.php:113
-msgid "Remove WP Lazy Load"
+msgid "Deactivate WP Lazy Load"
 msgstr ""
 
 #: includes/admin/config.php:222
 #: includes/src/Canopt.php:114
-msgid "Remove WP Sitemap"
+msgid "Deactivate WP Sitemap"
 msgstr ""
 
 #: includes/admin/config.php:228
 #: includes/src/Canopt.php:115
-msgid "Remove WP Application Passwords"
+msgid "Deactivate WP Application Passwords"
 msgstr ""
 
 #: includes/admin/config.php:234
 #: includes/src/Canopt.php:116
-msgid "Remove WP Events & News Feed Dashboard"
+msgid "Deactivate WP Events & News Feed Dashboard"
 msgstr ""
 
 #: includes/admin/config.php:240
@@ -374,7 +373,7 @@ msgstr ""
 
 #: includes/admin/config.php:291
 #: includes/src/Canopt.php:123
-#: includes/src/ReqAction.php:639
+#: includes/src/ReqAction.php:640
 msgid "Trash Bin"
 msgstr ""
 
@@ -408,17 +407,18 @@ msgid "Enable"
 msgstr ""
 
 #: includes/admin/config.php:324
-msgid "Deactivate WP Auto Update Core"
+#: includes/src/Canopt.php:130
+msgid "Disallows WP Auto Update Core"
 msgstr ""
 
 #: includes/admin/config.php:340
 #: includes/src/Canopt.php:124
-msgid "Deactivate Plugin / Theme Editor"
+msgid "Disallows Plugin / Theme Editor"
 msgstr ""
 
 #: includes/admin/config.php:356
 #: includes/src/Canopt.php:125
-msgid "Deactivate Plugin / Theme Update and Installation"
+msgid "Disallows Plugin / Theme Update and Installation"
 msgstr ""
 
 #: includes/admin/config.php:375
@@ -859,7 +859,7 @@ msgstr ""
 
 #: includes/admin/overview.php:167
 #: includes/src/Command.php:378
-#: includes/src/ReqAction.php:597
+#: includes/src/ReqAction.php:598
 msgid "Cache Disk Limit"
 msgstr ""
 
@@ -989,16 +989,16 @@ msgstr ""
 msgid "Critical Version Checking"
 msgstr ""
 
+#: includes/src/Canopt.php:109
+msgid "Deactivate WP Header Junk"
+msgstr ""
+
 #: includes/src/Canopt.php:117
 msgid "Suspend Object Cache"
 msgstr ""
 
 #: includes/src/Canopt.php:119
 msgid "Limit WP-Admin HTTP requests"
-msgstr ""
-
-#: includes/src/Canopt.php:130
-msgid "WP Auto Update Core"
 msgstr ""
 
 #: includes/src/Command.php:117
@@ -1093,7 +1093,7 @@ msgid "Updating wp-config.php file successful"
 msgstr ""
 
 #: includes/src/Command.php:285
-#: includes/src/ReqAction.php:622
+#: includes/src/ReqAction.php:623
 msgid "Failed to update wp-config.php file."
 msgstr ""
 
@@ -1142,47 +1142,47 @@ msgid "Executing the garbage collector. Please wait.."
 msgstr ""
 
 #: includes/src/Command.php:376
-#: includes/src/ReqAction.php:595
+#: includes/src/ReqAction.php:596
 msgid "Cache MaxTTL"
 msgstr ""
 
 #: includes/src/Command.php:377
-#: includes/src/ReqAction.php:596
+#: includes/src/ReqAction.php:597
 msgid "Cache File Limit"
 msgstr ""
 
 #: includes/src/Command.php:380
-#: includes/src/ReqAction.php:598
+#: includes/src/ReqAction.php:599
 msgid "Cleanup Cache MaxTTL"
 msgstr ""
 
 #: includes/src/Command.php:381
-#: includes/src/ReqAction.php:599
+#: includes/src/ReqAction.php:600
 msgid "Cleanup Cache File Limit"
 msgstr ""
 
 #: includes/src/Command.php:382
-#: includes/src/ReqAction.php:600
+#: includes/src/ReqAction.php:601
 msgid "Cleanup Cache Disk Limit"
 msgstr ""
 
 #: includes/src/Command.php:385
-#: includes/src/ReqAction.php:603
+#: includes/src/ReqAction.php:604
 msgid "Cleanup Precache Limit"
 msgstr ""
 
 #: includes/src/Command.php:389
-#: includes/src/ReqAction.php:606
+#: includes/src/ReqAction.php:607
 msgid "Total Cache Cleanup"
 msgstr ""
 
 #: includes/src/Command.php:390
-#: includes/src/ReqAction.php:607
+#: includes/src/ReqAction.php:608
 msgid "Total Cache Ignored"
 msgstr ""
 
 #: includes/src/Command.php:391
-#: includes/src/ReqAction.php:608
+#: includes/src/ReqAction.php:609
 msgid "Total Cache File"
 msgstr ""
 
@@ -1190,24 +1190,24 @@ msgstr ""
 msgid "Executing the garbage collector completed."
 msgstr ""
 
-#: includes/src/CronAgent.php:245
+#: includes/src/CronAgent.php:240
 msgid "Invalid request for single event"
 msgstr ""
 
 #. translators: %s: Event Hook.
-#: includes/src/CronAgent.php:257
+#: includes/src/CronAgent.php:252
 msgid "Event hook not found %s"
 msgstr ""
 
-#: includes/src/CronAgent.php:277
+#: includes/src/CronAgent.php:272
 msgid "No scheduled event ready to run"
 msgstr ""
 
-#: includes/src/CronAgent.php:284
+#: includes/src/CronAgent.php:279
 msgid "Another cron process is currently running wp-cron.php"
 msgstr ""
 
-#: includes/src/CronAgent.php:431
+#: includes/src/CronAgent.php:437
 msgid "Already received. Try again in a few minutes"
 msgstr ""
 
@@ -1505,125 +1505,125 @@ msgid "Cronbot failed to disconnect."
 msgstr ""
 
 #. translators: %1$s: cronbot endpoint, %2$s = error message
-#: includes/src/ReqAction.php:492
+#: includes/src/ReqAction.php:493
 msgid "Pong from %1$s: %2$s."
 msgstr ""
 
 #. translators: %s: cronbot endpoint
-#: includes/src/ReqAction.php:495
+#: includes/src/ReqAction.php:496
 msgid "Pong from %s : connected."
 msgstr ""
 
-#: includes/src/ReqAction.php:499
+#: includes/src/ReqAction.php:500
 msgid "Running cron successful."
 msgstr ""
 
 #. translators: %s = event hook
-#: includes/src/ReqAction.php:517
+#: includes/src/ReqAction.php:518
 msgid "Executed the %s event successful"
 msgstr ""
 
 #. translators: %d = cron event
-#: includes/src/ReqAction.php:520
+#: includes/src/ReqAction.php:521
 msgid "Executed a total of %d cron events"
 msgstr ""
 
-#: includes/src/ReqAction.php:529
+#: includes/src/ReqAction.php:530
 msgid "Failed to run cron."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:536
+#: includes/src/ReqAction.php:537
 msgid "%s. Enabled."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:540
+#: includes/src/ReqAction.php:541
 msgid "%s. Disabled."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:554
-#: includes/src/ReqAction.php:567
+#: includes/src/ReqAction.php:555
+#: includes/src/ReqAction.php:568
 msgid "%s resets to default."
 msgstr ""
 
 #. translators: %1$s = option name, %2$s = option_value
-#: includes/src/ReqAction.php:557
+#: includes/src/ReqAction.php:558
 msgid "%1$s set to %2$s."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:562
+#: includes/src/ReqAction.php:563
 msgid "%s updated."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:571
+#: includes/src/ReqAction.php:572
 msgid "Failed to update option %s."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:575
+#: includes/src/ReqAction.php:576
 msgid "%s constant already defined or exists in wp-config.php file. This update has no effects."
 msgstr ""
 
-#: includes/src/ReqAction.php:578
+#: includes/src/ReqAction.php:579
 msgid "The physical robots.txt file exists. This update only works with the WordPress robots.txt virtual file."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:582
+#: includes/src/ReqAction.php:583
 msgid "%s requires runtime code to be installed. This update has no effects."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:586
+#: includes/src/ReqAction.php:587
 msgid "Failed to execute the action request. Please try again."
 msgstr ""
 
-#: includes/src/ReqAction.php:589
+#: includes/src/ReqAction.php:590
 msgid "Executing the garbage collector successful"
 msgstr ""
 
-#: includes/src/ReqAction.php:616
+#: includes/src/ReqAction.php:617
 msgid "Failed to run the garbage collector."
 msgstr ""
 
-#: includes/src/ReqAction.php:619
+#: includes/src/ReqAction.php:620
 msgid "Updating wp-config.php file successful."
 msgstr ""
 
-#: includes/src/ReqAction.php:625
+#: includes/src/ReqAction.php:626
 msgid "Reset all configuration successful."
 msgstr ""
 
-#: includes/src/ReqAction.php:628
+#: includes/src/ReqAction.php:629
 msgid "Failed to reset configuration."
 msgstr ""
 
-#: includes/src/ReqAction.php:631
+#: includes/src/ReqAction.php:632
 msgid "Cleanup Post successful"
 msgstr ""
 
-#: includes/src/ReqAction.php:637
+#: includes/src/ReqAction.php:638
 msgid "Revisions"
 msgstr ""
 
-#: includes/src/ReqAction.php:638
+#: includes/src/ReqAction.php:639
 msgid "Auto Drafts"
 msgstr ""
 
 #. translators: %d = sites
-#: includes/src/ReqAction.php:644
+#: includes/src/ReqAction.php:645
 msgid "For %d sites"
 msgstr ""
 
-#: includes/src/ReqAction.php:654
+#: includes/src/ReqAction.php:655
 msgid "Failed to cleanup Post."
 msgstr ""
 
-#: includes/src/ReqAction.php:657
+#: includes/src/ReqAction.php:658
 msgid "Post already cleanup. Try again in a few seconds."
 msgstr ""
 
@@ -1721,7 +1721,7 @@ msgid "Miscellaneous WooCommerce Tweaks. Including performance, security dan use
 msgstr ""
 
 #: includes/src/View.php:581
-msgid "Deactivate WooCommerce Admin feature."
+msgid "WooCommerce Admin or Analytics page is a new JavaScript-driven interface for managing stores. Enable this option to turn off any feature-related."
 msgstr ""
 
 #: includes/src/View.php:582
@@ -1741,7 +1741,7 @@ msgid "This option will add rules to robots.txt to prevent robots from crawling 
 msgstr ""
 
 #: includes/src/View.php:586
-msgid "Remove the WordPress XML-RPC and Pingbacks related features."
+msgid "Deactivate the WordPress XML-RPC and Pingbacks related features."
 msgstr ""
 
 #: includes/src/View.php:587
@@ -1749,31 +1749,31 @@ msgid "Remove WordPress features related to HTML header such as meta generators 
 msgstr ""
 
 #: includes/src/View.php:588
-msgid "Remove the WordPress Emoji feature."
+msgid "Deactivate the WordPress Emoji feature."
 msgstr ""
 
 #: includes/src/View.php:589
-msgid "Remove the WordPress Feed feature."
+msgid "Deactivate the WordPress Feed feature."
 msgstr ""
 
 #: includes/src/View.php:590
-msgid "Remove the WordPress Embed feature."
+msgid "Deactivate the WordPress Embed feature."
 msgstr ""
 
 #: includes/src/View.php:591
-msgid "Remove the WordPress Lazy Load feature."
+msgid "Deactivate the WordPress Lazy Load feature."
 msgstr ""
 
 #: includes/src/View.php:592
-msgid "Remove the WordPress Auto-generate Sitemap feature."
+msgid "Deactivate the WordPress Auto-generate Sitemap feature."
 msgstr ""
 
 #: includes/src/View.php:593
-msgid "Remove the WordPress Application Passwords feature."
+msgid "Deactivate the WordPress Application Passwords feature."
 msgstr ""
 
 #: includes/src/View.php:594
-msgid "Remove the WordPress Events & News feed in Dashboard."
+msgid "Deactivate the WordPress Events & News feed in Dashboard."
 msgstr ""
 
 #: includes/src/View.php:595
@@ -1937,7 +1937,7 @@ msgid "Bad Bot Prevention"
 msgstr ""
 
 #: modsadvpot/includes/admin/advanced.php:94
-#: modsadvpot/includes/src/Bemods.php:529
+#: modsadvpot/includes/src/Bemods.php:530
 msgid "Malicious Attack Prevention"
 msgstr ""
 
@@ -2264,23 +2264,23 @@ msgstr ""
 msgid "Options to handle how to flush the cache files."
 msgstr ""
 
-#: modsadvpot/includes/src/Bemods.php:556
+#: modsadvpot/includes/src/Bemods.php:557
 msgid "days"
 msgstr ""
 
-#: modsadvpot/includes/src/Bemods.php:556
+#: modsadvpot/includes/src/Bemods.php:557
 msgid "day"
 msgstr ""
 
 #. translators: %1$s = option name, %2$s = option_value, %3$s = day(s)
-#: modsadvpot/includes/src/Bemods.php:558
+#: modsadvpot/includes/src/Bemods.php:559
 msgid "%1$s set to %2$s %3$s."
 msgstr ""
 
-#: modsadvpot/includes/src/Bemods.php:562
+#: modsadvpot/includes/src/Bemods.php:563
 msgid "Configuration updated"
 msgstr ""
 
-#: modsadvpot/includes/src/Bemods.php:565
+#: modsadvpot/includes/src/Bemods.php:566
 msgid "Failed to update the configuration"
 msgstr ""

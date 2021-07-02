@@ -60,6 +60,7 @@ final class PostCache
 
         // https://developer.wordpress.org/reference/functions/clean_term_cache/
         add_action('clean_term_cache', [$this, 'flush_cache']);
+        // https://developer.wordpress.org/reference/functions/clean_post_cache/
         add_action('clean_post_cache', [$this, 'flush_cache']);
 
         add_filter(
@@ -224,13 +225,22 @@ final class PostCache
         $this->cache_group = $this->group_prefix.$this->cache_incr;
     }
 
+    private function is_skipposttype($post_type)
+    {
+        if (apply_filters('docketcache/filter/postcache/skipposttype', false, $post_type)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function posts_request($sql, $query)
     {
         if (!nwdcx_wpdb($wpdb)) {
             return $sql;
         }
 
-        if (apply_filters('docketcache/filter/skipposttype/postcache', false, $query->get('post_type'))) {
+        if ($this->is_skipposttype($query->get('post_type'))) {
             return $sql;
         }
 
@@ -281,7 +291,7 @@ final class PostCache
 
     public function posts_results($posts, $query)
     {
-        if (apply_filters('docketcache/filter/skipposttype/postcache', false, $query->get('post_type'))) {
+        if ($this->is_skipposttype($query->get('post_type'))) {
             return $posts;
         }
 
@@ -318,7 +328,7 @@ final class PostCache
 
     public function post_limits_request($limits, $query)
     {
-        if (apply_filters('docketcache/filter/skipposttype/postcache', false, $query->get('post_type'))) {
+        if ($this->is_skipposttype($query->get('post_type'))) {
             return $limits;
         }
 
@@ -333,7 +343,7 @@ final class PostCache
 
     public function found_posts_query($sql, $query)
     {
-        if (apply_filters('docketcache/filter/skipposttype/postcache', false, $query->get('post_type'))) {
+        if ($this->is_skipposttype($query->get('post_type'))) {
             return $sql;
         }
 
@@ -346,7 +356,7 @@ final class PostCache
 
     public function found_posts($found_posts, $query)
     {
-        if (apply_filters('docketcache/filter/skipposttype/postcache', false, $query->get('post_type'))) {
+        if ($this->is_skipposttype($query->get('post_type'))) {
             return $found_posts;
         }
 

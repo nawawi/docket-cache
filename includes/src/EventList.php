@@ -168,10 +168,10 @@ class EventList extends \WP_List_Table
         $json_options = 0;
 
         if (\defined('JSON_UNESCAPED_SLASHES')) {
-            $json_options |= JSON_UNESCAPED_SLASHES;
+            $json_options |= \JSON_UNESCAPED_SLASHES;
         }
         if (\defined('JSON_PRETTY_PRINT')) {
-            $json_options |= JSON_PRETTY_PRINT;
+            $json_options |= \JSON_PRETTY_PRINT;
         }
 
         return wp_json_encode($input, $json_options);
@@ -270,7 +270,7 @@ class EventList extends \WP_List_Table
         $event = (object) $event;
         $until = $event->time - time();
 
-        return  $until < (0 - (10 * MINUTE_IN_SECONDS));
+        return $until < (0 - (10 * MINUTE_IN_SECONDS));
     }
 
     public function prepare_items()

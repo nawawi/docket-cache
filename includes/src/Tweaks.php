@@ -23,7 +23,7 @@ final class Tweaks
             function () {
                 remove_filter('posts_clauses', '_filter_query_attachment_filenames');
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         // vipcom: improve perfomance of the _WP_Editors::wp_link_query method
@@ -34,7 +34,7 @@ final class Tweaks
 
                 return $query;
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         // vipcom: disable custom fields meta box dropdown (very slow)
@@ -55,7 +55,7 @@ final class Tweaks
                     }
                 }
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         // wp: hide update notifications to non-admin users
@@ -66,7 +66,7 @@ final class Tweaks
                     remove_action('admin_notices', 'update_nag', 3);
                 }
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         // jetpack: enables object caching for the response sent by instagram when querying for instagram image html
@@ -81,7 +81,7 @@ final class Tweaks
                 function () {
                     return 12 * HOUR_IN_SECONDS;
                 },
-                PHP_INT_MIN
+                \PHP_INT_MIN
             );
 
             // wp: protected post, expire when browser close
@@ -90,7 +90,7 @@ final class Tweaks
                 function () {
                     return 0;
                 },
-                PHP_INT_MIN
+                \PHP_INT_MIN
             );
         }
     }
@@ -113,11 +113,11 @@ final class Tweaks
                 remove_action('wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0);
                 remove_action('wp_head', 'wp_shortlink_wp_head', 10, 0);
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
-        add_filter('the_generator', '__return_empty_string', PHP_INT_MAX);
-        add_filter('x_redirect_by', '__return_false', PHP_INT_MAX);
+        add_filter('the_generator', '__return_empty_string', \PHP_INT_MAX);
+        add_filter('x_redirect_by', '__return_false', \PHP_INT_MAX);
     }
 
     public function pingback()
@@ -132,7 +132,7 @@ final class Tweaks
                     }
                 }
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         // wp: disable and remove do_pings
@@ -145,7 +145,7 @@ final class Tweaks
                     wp_clear_scheduled_hook('do_pings');
                 }
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         // wp: disable xmlrpc
@@ -190,7 +190,7 @@ final class Tweaks
             function () {
                 header_remove('X-Pingback');
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         add_filter(
@@ -200,7 +200,7 @@ final class Tweaks
 
                 return $headers;
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         add_action(
@@ -217,7 +217,7 @@ final class Tweaks
                     exit('xmlrpc.php not available.');
                 }
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
     }
 
@@ -229,17 +229,17 @@ final class Tweaks
     public function woocommerce_misc()
     {
         // wc: action_scheduler_migration_dependencies_met
-        add_filter('action_scheduler_migration_dependencies_met', '__return_false', PHP_INT_MAX);
+        add_filter('action_scheduler_migration_dependencies_met', '__return_false', \PHP_INT_MAX);
 
         // wc: disable background image regeneration
-        add_filter('woocommerce_background_image_regeneration', '__return_false', PHP_INT_MAX);
+        add_filter('woocommerce_background_image_regeneration', '__return_false', \PHP_INT_MAX);
 
         // wc: remove marketplace suggestions
         // https://rudrastyh.com/woocommerce/remove-marketplace-suggestions.html
-        add_filter('woocommerce_allow_marketplace_suggestions', '__return_false', PHP_INT_MAX);
+        add_filter('woocommerce_allow_marketplace_suggestions', '__return_false', \PHP_INT_MAX);
 
         // wc: remove connect your store to WooCommerce.com admin notice
-        add_filter('woocommerce_helper_suppress_admin_notices', '__return_true', PHP_INT_MAX);
+        add_filter('woocommerce_helper_suppress_admin_notices', '__return_true', \PHP_INT_MAX);
 
         // wc: disable the WooCommere Marketing Hub
         add_filter(
@@ -250,19 +250,19 @@ final class Tweaks
 
                 return $features;
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
-        add_filter('woocommerce_marketing_menu_items', '__return_empty_array', PHP_INT_MAX);
+        add_filter('woocommerce_marketing_menu_items', '__return_empty_array', \PHP_INT_MAX);
 
         // jetpack
-        add_filter('jetpack_just_in_time_msgs', '__return_false', PHP_INT_MAX);
-        add_filter('jetpack_show_promotions', '__return_false', PHP_INT_MAX);
+        add_filter('jetpack_just_in_time_msgs', '__return_false', \PHP_INT_MAX);
+        add_filter('jetpack_show_promotions', '__return_false', \PHP_INT_MAX);
     }
 
     public function woocommerce_admin_disabled()
     {
         // wc: disable the WooCommerce Admin
-        add_filter('woocommerce_admin_disabled', '__return_true', PHP_INT_MAX);
+        add_filter('woocommerce_admin_disabled', '__return_true', \PHP_INT_MAX);
     }
 
     public function woocommerce_dashboard_status_remove()
@@ -278,7 +278,7 @@ final class Tweaks
                 remove_meta_box('woocommerce_dashboard_recent_reviews', 'dashboard', 'normal');
                 remove_meta_box('woocommerce_network_orders', 'dashboard', 'normal');
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
     }
 
@@ -315,7 +315,7 @@ final class Tweaks
                     register_widget($widget, null);
                 }
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
     }
 
@@ -359,7 +359,7 @@ final class Tweaks
                 $code .= '})();';
                 wp_add_inline_script('jquery', $code);
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
     }
 
@@ -404,7 +404,7 @@ final class Tweaks
 
             if (!empty($append)) {
                 $addua = true;
-                if (@preg_match_all('@User-agent:\s+\S+@is', $output, $mm, PREG_SET_ORDER)) {
+                if (@preg_match_all('@User-agent:\s+\S+@is', $output, $mm, \PREG_SET_ORDER)) {
                     $last = end($mm);
                     if (@preg_match('@User-agent:\s+\*@i', $last[0])) {
                         $addua = false;
@@ -421,7 +421,7 @@ final class Tweaks
             }
 
             return $output;
-        }, PHP_INT_MAX, 2);
+        }, \PHP_INT_MAX, 2);
     }
 
     public function post_missed_schedule()
@@ -589,7 +589,7 @@ final class Tweaks
 
                 return $classes;
             },
-            PHP_INT_MAX,
+            \PHP_INT_MAX,
             2
         );
 
@@ -598,7 +598,7 @@ final class Tweaks
             function () {
                 wp_dequeue_script('wp-embed');
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
     }
 
@@ -640,7 +640,7 @@ final class Tweaks
             function () {
                 add_filter('wp_lazy_loading_enabled', '__return_false');
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
     }
 
@@ -652,13 +652,13 @@ final class Tweaks
                 add_filter('wp_sitemaps_enabled', '__return_false');
                 remove_filter('robots_txt', ['WP_Sitemaps', 'add_robots']);
             },
-            PHP_INT_MIN
+            \PHP_INT_MIN
         );
     }
 
     public function wpapppassword()
     {
-        add_filter('wp_is_application_passwords_available', '__return_false', PHP_INT_MAX);
+        add_filter('wp_is_application_passwords_available', '__return_false', \PHP_INT_MAX);
     }
 
     public function wpdashboardnews()
@@ -668,7 +668,7 @@ final class Tweaks
             function () {
                 remove_meta_box('dashboard_primary', 'dashboard', 'side');
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         add_action(
@@ -676,7 +676,7 @@ final class Tweaks
             function () {
                 remove_meta_box('dashboard_primary', 'dashboard-network', 'side');
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
     }
 
@@ -712,8 +712,8 @@ final class Tweaks
                             return false;
                         }
 
-                        $hostme = parse_url(home_url(), PHP_URL_HOST);
-                        $hostname = parse_url($url, PHP_URL_HOST);
+                        $hostme = parse_url(home_url(), \PHP_URL_HOST);
+                        $hostname = parse_url($url, \PHP_URL_HOST);
 
                         if ('127.0.0.1' === $hostname || 'localhost' === $hostname || $hostme === $hostname) {
                             return false;
@@ -761,11 +761,11 @@ final class Tweaks
 
                         return $ok;
                     },
-                    PHP_INT_MIN,
+                    \PHP_INT_MIN,
                     3
                 );
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
     }
 
@@ -786,6 +786,6 @@ final class Tweaks
             }
 
             return $args;
-        }, PHP_INT_MAX);
+        }, \PHP_INT_MAX);
     }
 }

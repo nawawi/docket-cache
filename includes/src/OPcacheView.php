@@ -174,19 +174,19 @@ class OPcacheView extends \WP_List_Table
 
                     if ('desc' === $order) {
                         if ('file' !== $orderby) {
-                            krsort($stats, SORT_NUMERIC);
+                            krsort($stats, \SORT_NUMERIC);
                         } else {
-                            krsort($stats, SORT_STRING);
+                            krsort($stats, \SORT_STRING);
                         }
                     } else {
                         if ('file' !== $orderby) {
-                            ksort($stats, SORT_NUMERIC);
+                            ksort($stats, \SORT_NUMERIC);
                         } else {
-                            ksort($stats, SORT_STRING);
+                            ksort($stats, \SORT_STRING);
                         }
                     }
                 } else {
-                    krsort($stats, SORT_NUMERIC);
+                    krsort($stats, \SORT_NUMERIC);
                 }
             }
         }

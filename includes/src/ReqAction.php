@@ -169,7 +169,7 @@ final class ReqAction
                 break;
             case 'docket-pong-cronbot':
                 $result = apply_filters('docketcache/filter/check/cronbot', false);
-                $response = 'docket-cronbot-pong';
+                $response = $result ? 'docket-cronbot-pong' : 'docket-cronbot-pong-failed';
                 do_action('docketcache/action/pong/cronbot', $result);
                 break;
             case 'docket-runevent-cronbot':
@@ -485,7 +485,8 @@ final class ReqAction
                     $this->pt->notice = esc_html__('Cronbot failed to disconnect.', 'docket-cache');
                     break;
                 case 'docket-cronbot-pong':
-                    $endpoint = parse_url($this->pt->cronbot_endpoint, PHP_URL_HOST);
+                case 'docket-cronbot-pong-failed':
+                    $endpoint = parse_url($this->pt->cronbot_endpoint, \PHP_URL_HOST);
                     $errmsg = $this->pt->co()->lookup_get('cronboterror', true);
                     if (!empty($errmsg)) {
                         /* translators: %1$s: cronbot endpoint, %2$s = error message */

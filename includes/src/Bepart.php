@@ -97,29 +97,29 @@ class Bepart extends Filesystem
 
         $repeat_funcs = [];
 
-        $code = '<script id="docket-cache-worker">'.PHP_EOL;
-        $code .= 'if ( "undefined" !== typeof(jQuery) && "undefined" !== typeof(docket_cache_config) && "function" === typeof(docket_cache_worker) ) {'.PHP_EOL;
-        $code .= '    jQuery( document ).ready( function() {'.PHP_EOL;
-        $code .= '        var config = docket_cache_config;'.PHP_EOL;
+        $code = '<script id="docket-cache-worker">'.\PHP_EOL;
+        $code .= 'if ( "undefined" !== typeof(jQuery) && "undefined" !== typeof(docket_cache_config) && "function" === typeof(docket_cache_worker) ) {'.\PHP_EOL;
+        $code .= '    jQuery( document ).ready( function() {'.\PHP_EOL;
+        $code .= '        var config = docket_cache_config;'.\PHP_EOL;
         foreach ($types as $type) {
             if (false !== strpos($type, 'repeat_')) {
                 $repeat_funcs[] = str_replace('repeat_', '', $type);
                 continue;
             }
-            $code .= '        docket_cache_worker( "'.$type.'", config );'.PHP_EOL;
+            $code .= '        docket_cache_worker( "'.$type.'", config );'.\PHP_EOL;
         }
 
         if (!empty($repeat_funcs)) {
             foreach ($repeat_funcs as $func) {
-                $code .= '        if ( location.href.match(/admin\.php\?page=docket\-cache/) ) {'.PHP_EOL;
-                $code .= '            docket_cache_worker( "'.$func.'", config );'.PHP_EOL;
-                $code .= '            window.setInterval(function() { docket_cache_worker( "'.$func.'", config ); }, 60000);'.PHP_EOL;
-                $code .= '        }'.PHP_EOL;
+                $code .= '        if ( location.href.match(/admin\.php\?page=docket\-cache/) ) {'.\PHP_EOL;
+                $code .= '            docket_cache_worker( "'.$func.'", config );'.\PHP_EOL;
+                $code .= '            window.setInterval(function() { docket_cache_worker( "'.$func.'", config ); }, 60000);'.\PHP_EOL;
+                $code .= '        }'.\PHP_EOL;
             }
         }
 
-        $code .= '    });'.PHP_EOL;
-        $code .= '}'.PHP_EOL;
+        $code .= '    });'.\PHP_EOL;
+        $code .= '}'.\PHP_EOL;
         $code .= '</script>';
 
         return $code;
@@ -145,7 +145,7 @@ class Bepart extends Filesystem
                 $ip = explode(',', $_SERVER[$key]);
                 $ip = end($ip);
 
-                if (false !== filter_var($ip, FILTER_VALIDATE_IP)) {
+                if (false !== filter_var($ip, \FILTER_VALIDATE_IP)) {
                     return $ip;
                 }
             }
@@ -209,7 +209,7 @@ class Bepart extends Filesystem
 
             $ipl = $sipl;
 
-            return  $ipr == $ipl ? true : false;
+            return $ipr == $ipl ? true : false;
         }
 
         return false;

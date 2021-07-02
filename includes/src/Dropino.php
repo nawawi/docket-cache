@@ -250,7 +250,7 @@ final class Dropino extends Bepart
         }
 
         if (null !== $network_id) {
-            @file_put_contents($this->condir.'/.object-cache-network-main.txt', $network_id, LOCK_EX);
+            @file_put_contents($this->condir.'/.object-cache-network-main.txt', $network_id, \LOCK_EX);
         }
 
         $wpdb->suppress_errors($suppress);
@@ -274,7 +274,7 @@ final class Dropino extends Bepart
     private function multinet_list()
     {
         $list = [];
-        $files = @glob($this->condir.'/.object-cache-network-*.txt', GLOB_MARK | GLOB_NOSORT);
+        $files = @glob($this->condir.'/.object-cache-network-*.txt', \GLOB_MARK | \GLOB_NOSORT);
         if (!empty($files) && \is_array($files)) {
             foreach ($files as $file) {
                 $fx = basename($file);
@@ -348,7 +348,7 @@ final class Dropino extends Bepart
 
         $lock_file = $this->condir.'/.object-cache-network-multi.txt';
         if (!@is_file($lock_file)) {
-            @file_put_contents($lock_file, 1, LOCK_EX);
+            @file_put_contents($lock_file, 1, \LOCK_EX);
         }
 
         if (empty($network_id)) {

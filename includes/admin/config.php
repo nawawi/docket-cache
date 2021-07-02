@@ -182,56 +182,56 @@ namespace Nawawi\DocketCache;
                         <?php esc_html_e('WP Tweaks', 'docket-cache'); ?>
                     </td>
                 </tr>
-                <tr id="pingback">
-                    <th><?php echo esc_html__('Remove XML-RPC / Pingbacks', 'docket-cache').$this->tooltip('pingback'); ?></th>
-                    <td>
-                        <?php echo $this->config_select_bool('pingback'); ?>
-                    </td>
-                </tr>
                 <tr id="headerjunk">
                     <th><?php echo esc_html__('Remove WP Header Junk', 'docket-cache').$this->tooltip('headerjunk'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('headerjunk'); ?>
                     </td>
                 </tr>
+                <tr id="pingback">
+                    <th><?php echo esc_html__('Deactivate XML-RPC / Pingbacks', 'docket-cache').$this->tooltip('pingback'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('pingback'); ?>
+                    </td>
+                </tr>
                 <tr id="wpemoji">
-                    <th><?php echo esc_html__('Remove WP Emoji', 'docket-cache').$this->tooltip('wpemoji'); ?></th>
+                    <th><?php echo esc_html__('Deactivate WP Emoji', 'docket-cache').$this->tooltip('wpemoji'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpemoji'); ?>
                     </td>
                 </tr>
                 <tr id="wpfeed">
-                    <th><?php echo esc_html__('Remove WP Feed', 'docket-cache').$this->tooltip('wpfeed'); ?></th>
+                    <th><?php echo esc_html__('Deactivate WP Feed', 'docket-cache').$this->tooltip('wpfeed'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpfeed'); ?>
                     </td>
                 </tr>
                 <tr id="wpembed">
-                    <th><?php echo esc_html__('Remove WP Embed', 'docket-cache').$this->tooltip('wpembed'); ?></th>
+                    <th><?php echo esc_html__('Deactivate WP Embed', 'docket-cache').$this->tooltip('wpembed'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpembed'); ?>
                     </td>
                 </tr>
                 <tr id="wplazyload">
-                    <th><?php echo esc_html__('Remove WP Lazy Load', 'docket-cache').$this->tooltip('wplazyload'); ?></th>
+                    <th><?php echo esc_html__('Deactivate WP Lazy Load', 'docket-cache').$this->tooltip('wplazyload'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wplazyload'); ?>
                     </td>
                 </tr>
                 <tr id="wpsitemap">
-                    <th><?php echo esc_html__('Remove WP Sitemap', 'docket-cache').$this->tooltip('wpsitemap'); ?></th>
+                    <th><?php echo esc_html__('Deactivate WP Sitemap', 'docket-cache').$this->tooltip('wpsitemap'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpsitemap'); ?>
                     </td>
                 </tr>
                 <tr id="wpapppassword">
-                    <th><?php echo esc_html__('Remove WP Application Passwords', 'docket-cache').$this->tooltip('wpapppassword'); ?></th>
+                    <th><?php echo esc_html__('Deactivate WP Application Passwords', 'docket-cache').$this->tooltip('wpapppassword'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpapppassword'); ?>
                     </td>
                 </tr>
                 <tr id="wpdashboardnews">
-                    <th><?php echo esc_html__('Remove WP Events & News Feed Dashboard', 'docket-cache').$this->tooltip('wpdashboardnews'); ?></th>
+                    <th><?php echo esc_html__('Deactivate WP Events & News Feed Dashboard', 'docket-cache').$this->tooltip('wpdashboardnews'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpdashboardnews'); ?>
                     </td>
@@ -321,7 +321,7 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="rtwpcoreupdate">
-                    <th><?php echo esc_html__('Deactivate WP Auto Update Core', 'docket-cache').$this->tooltip('rtwpcoreupdate'); ?></th>
+                    <th><?php echo esc_html__('Disallows WP Auto Update Core', 'docket-cache').$this->tooltip('rtwpcoreupdate'); ?></th>
                     <td>
                         <?php
                             echo $this->config_select_set(
@@ -337,7 +337,7 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="rtpluginthemeeditor">
-                    <th><?php echo esc_html__('Deactivate Plugin / Theme Editor', 'docket-cache').$this->tooltip('rtpluginthemeeditor'); ?></th>
+                    <th><?php echo esc_html__('Disallows Plugin / Theme Editor', 'docket-cache').$this->tooltip('rtpluginthemeeditor'); ?></th>
                     <td>
                         <?php
                             echo $this->config_select_set(
@@ -353,7 +353,7 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="rtpluginthemeinstall">
-                    <th><?php echo esc_html__('Deactivate Plugin / Theme Update and Installation', 'docket-cache').$this->tooltip('rtpluginthemeinstall'); ?></th>
+                    <th><?php echo esc_html__('Disallows Plugin / Theme Update and Installation', 'docket-cache').$this->tooltip('rtpluginthemeinstall'); ?></th>
                     <td>
                         <?php
                             echo $this->config_select_set(

@@ -421,7 +421,7 @@ if (!\function_exists('nwdcx_network_main')) {
         }
 
         if ($cache[$hostname] && !@is_file($lock_file)) {
-            @file_put_contents($lock_file, $hostname, LOCK_EX);
+            @file_put_contents($lock_file, $hostname, \LOCK_EX);
         }
 
         return $cache[$hostname];

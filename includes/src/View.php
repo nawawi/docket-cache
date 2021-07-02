@@ -62,7 +62,7 @@ final class View
             return $object;
         }
 
-        $fileo->seek(PHP_INT_MAX);
+        $fileo->seek(\PHP_INT_MAX);
         $total_lines = $fileo->key();
 
         if ($limit > $total_lines) {
@@ -539,7 +539,7 @@ final class View
             return;
         }
 
-        $code = '<script id="docket-cache-focus">'.PHP_EOL;
+        $code = '<script id="docket-cache-focus">'.\PHP_EOL;
         $code .= '(function($) {';
         $code .= '$(document).ready(function() {';
         $code .= 'var fx = $(document).find("tr#'.$nx.'");';
@@ -556,7 +556,7 @@ final class View
         $code .= '}';
         $code .= '}';
         $code .= '});';
-        $code .= '})(jQuery);'.PHP_EOL;
+        $code .= '})(jQuery);'.\PHP_EOL;
         $code .= '</script>';
 
         return $code;
@@ -578,20 +578,20 @@ final class View
             'postmissedschedule' => esc_html__('Fix the WordPress Missed Schedule Error after scheduling a future blog post.', 'docket-cache'),
             'misc_tweaks' => esc_html__('Miscellaneous WordPress Tweaks. Including performance, security dan user experience.', 'docket-cache'),
             'wootweaks' => esc_html__('Miscellaneous WooCommerce Tweaks. Including performance, security dan user experience.', 'docket-cache'),
-            'wooadminoff' => esc_html__('Deactivate WooCommerce Admin feature.', 'docket-cache'),
+            'wooadminoff' => esc_html__('WooCommerce Admin or Analytics page is a new JavaScript-driven interface for managing stores. Enable this option to turn off any feature-related.', 'docket-cache'),
             'woowidgetoff' => esc_html__('Deactivate WooCommerce Widget feature.', 'docket-cache'),
             'woowpdashboardoff' => esc_html__('Remove the WooCommerce meta box in the WordPress Dashboard.', 'docket-cache'),
             'woocartfragsoff' => esc_html__('Remove the WooCommerce Cart Fragments.', 'docket-cache'),
             'wooaddtochartcrawling' => esc_html__('This option will add rules to robots.txt to prevent robots from crawling add-to-cart links.', 'docket-cache'),
-            'pingback' => esc_html__('Remove the WordPress XML-RPC and Pingbacks related features.', 'docket-cache'),
+            'pingback' => esc_html__('Deactivate the WordPress XML-RPC and Pingbacks related features.', 'docket-cache'),
             'headerjunk' => esc_html__('Remove WordPress features related to HTML header such as meta generators and feed links to reduce the page size.', 'docket-cache'),
-            'wpemoji' => esc_html__('Remove the WordPress Emoji feature.', 'docket-cache'),
-            'wpfeed' => esc_html__('Remove the WordPress Feed feature.', 'docket-cache'),
-            'wpembed' => esc_html__('Remove the WordPress Embed feature.', 'docket-cache'),
-            'wplazyload' => esc_html__('Remove the WordPress Lazy Load feature.', 'docket-cache'),
-            'wpsitemap' => esc_html__('Remove the WordPress Auto-generate Sitemap feature.', 'docket-cache'),
-            'wpapppassword' => esc_html__('Remove the WordPress Application Passwords feature.', 'docket-cache'),
-            'wpdashboardnews' => esc_html__('Remove the WordPress Events & News feed in Dashboard.', 'docket-cache'),
+            'wpemoji' => esc_html__('Deactivate the WordPress Emoji feature.', 'docket-cache'),
+            'wpfeed' => esc_html__('Deactivate the WordPress Feed feature.', 'docket-cache'),
+            'wpembed' => esc_html__('Deactivate the WordPress Embed feature.', 'docket-cache'),
+            'wplazyload' => esc_html__('Deactivate the WordPress Lazy Load feature.', 'docket-cache'),
+            'wpsitemap' => esc_html__('Deactivate the WordPress Auto-generate Sitemap feature.', 'docket-cache'),
+            'wpapppassword' => esc_html__('Deactivate the WordPress Application Passwords feature.', 'docket-cache'),
+            'wpdashboardnews' => esc_html__('Deactivate the WordPress Events & News feed in Dashboard.', 'docket-cache'),
             'preload' => esc_html__('Preload Object Cache by fetching administrator-related pages.', 'docket-cache'),
             'pageloader' => esc_html__('Display page loader when loading administrator pages.', 'docket-cache'),
             'stats' => esc_html__('Display Object Cache stats at Overview page.', 'docket-cache'),

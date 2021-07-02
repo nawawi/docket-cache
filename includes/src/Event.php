@@ -65,7 +65,7 @@ final class Event
 
                 return $schedules;
             },
-            PHP_INT_MAX
+            \PHP_INT_MAX
         );
 
         add_action(
@@ -545,7 +545,7 @@ final class Event
         $output['response'] = wp_remote_retrieve_body($results);
         if (!empty($output['response'])) {
             $output['response'] = json_decode($output['response'], true);
-            if (JSON_ERROR_NONE === json_last_error()) {
+            if (\JSON_ERROR_NONE === json_last_error()) {
                 if (!empty($output['response']['error'])) {
                     $output['error'] = $output['response']['error'];
                     $this->pt->co()->save_part($output, $part);
