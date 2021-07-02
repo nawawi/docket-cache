@@ -1,3 +1,7 @@
+= v21.02.07 (2021-07-02) =
+
+- Fixed: missing Becache.php in wp repo.
+
 = v21.02.06 (2021-07-02) =
 
 - Fixed: Plugin::site_url_scheme() -> strip whitespace.

@@ -4,7 +4,7 @@ Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance
 Requires at least: 5.4
 Tested up to: 5.7
 Requires PHP: 7.2.5
-Stable tag: 21.02.06
+Stable tag: 21.02.07
 License: MIT
 License URI: ./license.txt
 
@@ -164,6 +164,10 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.02.07 =
+
+- Fixed: missing Becache.php in wp repo.
+
 = 21.02.06 =
 
 - Fixed: Plugin::site_url_scheme() -> strip whitespace.
