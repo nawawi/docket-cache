@@ -242,12 +242,14 @@ namespace Nawawi\DocketCache;
                         <?php echo $this->config_select_bool('limithttprequest'); ?>
                     </td>
                 </tr>
+                <?php if (version_compare($GLOBALS['wp_version'], '5.8', '<')) : ?>
                 <tr id="httpheadersexpect">
                     <th class="border-b"><?php echo esc_html__('HTTP Request Expect header tweaks', 'docket-cache').$this->tooltip('httpheadersexpect'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('httpheadersexpect'); ?>
                     </td>
                 </tr>
+                <?php endif; ?>
                 <tr>
                     <td colspan="2" class="stitle">
                         <?php esc_html_e('Runtime Options', 'docket-cache'); ?>

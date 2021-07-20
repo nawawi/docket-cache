@@ -35,7 +35,10 @@ if (!\function_exists('nwdcx_unserialize')) {
     function nwdcx_unserialize($data)
     {
         if (!\function_exists('is_serialized')) {
-            @include_once ABSPATH.WPINC.'/functions.php';
+            // 16072021: rare opcache issue with some hosting ABSPATH not defined.
+            if (\defined('ABSPATH') && \defined('WPINC')) {
+                @include_once ABSPATH.WPINC.'/functions.php';
+            }
         }
 
         if (!\function_exists('is_serialized') || !is_serialized($data)) {

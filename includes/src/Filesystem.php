@@ -22,11 +22,14 @@ class Filesystem
     public function is_request_from_theme_editor()
     {
         if (!empty($_POST)) {
-            if ((!empty($_POST['_wp_http_referer']) && false !== strpos($_POST['_wp_http_referer'], '/theme-editor.php?file=')) && (!empty($_POST['newcontent']) && false !== strpos($_POST['newcontent'], '<?php'))) {
-                return true;
+            if (!empty($_POST['_wp_http_referer'])) {
+                $wp_referer = $_POST['_wp_http_referer'];
+                if ((false !== strpos($wp_referer, '/theme-editor.php?file=') || false !== strpos($wp_referer, '/plugin-editor.php?file=')) && (!empty($_POST['newcontent']) && false !== strpos($_POST['newcontent'], '<?php'))) {
+                    return true;
+                }
             }
 
-            if (!empty($_POST['action']) && 'heartbeat' === $_POST['action'] && !empty($_POST['']) && 'theme-editor' === $_POST['screen_id']) {
+            if (!empty($_POST['action']) && 'heartbeat' === $_POST['action'] && !empty($_POST['screen_id']) && ('theme-editor' === $_POST['screen_id'] || 'plugin-editor' === $_POST['screen_id'])) {
                 return true;
             }
         }

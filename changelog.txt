@@ -1,3 +1,10 @@
+= v21.02.08 (2021-07-20) =
+
+- Fixed: Tweaks::http_headers_expect() -> only visible to wp < 5.8 since already included in core.
+- Fixed: Filesystem::is_request_from_theme_editor() -> checking if from plugin-editor.
+- Fixed: nwdcx_unserialize() -> checking if ABSPATH and WPINC defined.
+- Tested up to 5.8.
+
 = v21.02.07 (2021-07-02) =
 
 - Fixed: missing Becache.php in wp repo.

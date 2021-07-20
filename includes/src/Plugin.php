@@ -1074,12 +1074,20 @@ final class Plugin extends Bepart
                         if (\defined('WP_DEBUG') && WP_DEBUG && \defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
                             $req = $_SERVER['REQUEST_URI'];
                             if ((false !== strpos($req, '?page=docket-cache&idx=config&wplog=0') || false !== strpos($req, '?page=docket-cache-config&idx=config&wplog=0'))
-                                && preg_match('@config\&wplog=\d+$@', $req)) {
+                                && preg_match('@config\&wplog=\d+(\&dd=\d+)?$@', $req)) {
                                 $file = ini_get('error_log');
 
                                 @header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
                                 @header('Content-Type: text/plain; charset=UTF-8');
                                 if (@is_file($file) && @is_readable($file)) {
+                                    if ($this->cf()->is_dctrue('TRYREADWPDEBUGLOG') || !empty($_GET['dd']) && 1 === (int) $_GET['dd']) {
+                                        $log = file_get_contents($file);
+                                        if (!empty($log)) {
+                                            $log = str_replace(['undefined function', 'Stack trace'], ['undefined-function', 'Stack-trace'], $log);
+                                        }
+                                        $this->close_exit($log);
+                                    }
+
                                     @readfile($file);
                                     $this->close_exit();
                                 }
@@ -1930,8 +1938,10 @@ final class Plugin extends Bepart
                 $tweaks->limit_http_request();
             }
 
-            if ($this->cf()->is_dctrue('HTTPHEADERSEXPECT')) {
-                $tweaks->http_headers_expect();
+            if (version_compare($GLOBALS['wp_version'], '5.8', '<')) {
+                if ($this->cf()->is_dctrue('HTTPHEADERSEXPECT')) {
+                    $tweaks->http_headers_expect();
+                }
             }
 
             if ($this->cf()->is_dctrue('POSTMISSEDSCHEDULE')) {

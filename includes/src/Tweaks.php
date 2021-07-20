@@ -769,20 +769,33 @@ final class Tweaks
         );
     }
 
+    // wp < 5.8
     public function http_headers_expect()
     {
+        // https://github.com/WordPress/Requests/pull/454
+        if (version_compare($GLOBALS['wp_version'], '5.8', '<')) {
+            return false;
+        }
+
         add_filter('http_request_args', function ($args) {
-            if (\is_array($args)) {
-                $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
-                $body = $args['body'];
+            if (!isset($args['headers']['expect'])) {
+                $args['headers']['expect'] = '';
 
-                if (\is_array($body) || \is_object($body)) {
-                    $body = json_encode($body);
+                if (\is_array($args['body'])) {
+                    $bytesize = 0;
+                    $iterator = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($args['body']));
+
+                    foreach ($iterator as $datum) {
+                        $bytesize += \strlen((string) $datum);
+
+                        if ($bytesize >= 1048576) {
+                            $args['headers']['expect'] = '100-Continue';
+                            break;
+                        }
+                    }
+                } elseif (!empty($args['body']) && \strlen((string) $args['body']) > 1048576) {
+                    $args['headers']['expect'] = '100-Continue';
                 }
-
-                $args['headers']['expect'] = !empty($body) && \strlen($body) > 1048576 ? '100-Continue' : '';
-
-                nwdcx_suppresserrors($nwdcx_suppresserrors);
             }
 
             return $args;

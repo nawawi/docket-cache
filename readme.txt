@@ -2,9 +2,9 @@
 Contributors: nawawijamili
 Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance, redis, memcached, speed, multisite, server load, docket
 Requires at least: 5.4
-Tested up to: 5.7
+Tested up to: 5.8
 Requires PHP: 7.2.5
-Stable tag: 21.02.07
+Stable tag: 21.02.08
 License: MIT
 License URI: ./license.txt
 
@@ -164,6 +164,13 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.02.08 =
+
+- Fixed: Tweaks::http_headers_expect() -> only visible to wp < 5.8 since already included in core.
+- Fixed: Filesystem::is_request_from_theme_editor() -> checking if from plugin-editor.
+- Fixed: nwdcx_unserialize() -> checking if ABSPATH and WPINC defined.
+- Tested up to 5.8.
+
 = 21.02.07 =
 
 - Fixed: missing Becache.php in wp repo.
