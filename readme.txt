@@ -59,10 +59,6 @@ To adjust the plugin behaviour, installation or manage through a command line, p
 - [Github Repo](https://github.com/nawawi/docket-cache/)
 - [Changelog](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt)
 
-**Extra Tool:**
-
-[Docket CronWP](https://github.com/nawawi/docket-cronwp) - A command-line tool for executing WordPress cron events in parallel.
-
 == Sponsor this project ==
 
 [Fund Docket Cache](https://docketcache.com/sponsorship/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg) one-off or recurring payment to support our open-source development efforts.
@@ -82,6 +78,9 @@ A heartful thanks and appreciation.
 
 Other sponsors are mentioned in the [honourable list](https://github.com/nawawi/docket-cache/issues/5)
 
+== Additional Tool ==
+
+[Docket CronWP](https://github.com/nawawi/docket-cronwp) - A command-line tool for executing WordPress cron events in parallel.
 
 == Installation ==
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
