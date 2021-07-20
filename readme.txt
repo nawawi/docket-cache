@@ -59,6 +59,10 @@ To adjust the plugin behaviour, installation or manage through a command line, p
 - [Github Repo](https://github.com/nawawi/docket-cache/)
 - [Changelog](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt)
 
+**Extra Tool:**
+
+[Docket CronWP](https://github.com/nawawi/docket-cronwp) - A command-line tool for executing WordPress cron events in parallel.
+
 == Sponsor this project ==
 
 [Fund Docket Cache](https://docketcache.com/sponsorship/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg) one-off or recurring payment to support our open-source development efforts.
@@ -70,9 +74,9 @@ All funds will be dedicated to the maintenance, development, and marketing of th
 A heartful thanks and appreciation.
 
 - [Exnano Creative](https://exnano.io/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
-- [Cun Host](https://cunhost.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
-- [DNSVault](https://dnsvault.net/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [Jimat Hosting](https://jimathosting.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
+- [DNSVault](https://dnsvault.net/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
+- [Cun Host](https://cunhost.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [SecurePay](https://www.securepay.my/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 
 
