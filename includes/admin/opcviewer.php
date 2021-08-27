@@ -12,7 +12,7 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 $opcache_view = $this->opcache_view();
-$is_config = !empty($_GET['adx']) && 'cnf' === $_GET['adx'];
+$is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx']);
 ?>
 <div class="section cronbot opcache">
     <div class="flex-container">
@@ -168,12 +168,12 @@ $is_config = !empty($_GET['adx']) && 'cnf' === $_GET['adx'];
             <div class="gridlist grid-opclist border-t">
 
                 <div class="box-left">
-                    <form id="config-filter" method="get" action="<?php echo $this->pt->get_page(); ?>">
+                    <form id="config-filter" method="get" action="<?php echo esc_url($this->pt->get_page()); ?>">
                         <input type="hidden" name="page" value="docket-cache-opcviewer">
                         <input type="hidden" name="idx" value="opcviewer">
                         <select id="statsop" name="sf" class="config-filter">
                             <?php
-                            $sort_sf = !empty($_GET['sf']) ? $_GET['sf'] : 'obc';
+                            $sort_sf = !empty($_GET['sf']) ? sanitize_text_field($_GET['sf']) : 'obc';
 
                             foreach ([
                                 'obc' => __('Object Cache Files', 'docket-cache'),
@@ -188,7 +188,7 @@ $is_config = !empty($_GET['adx']) && 'cnf' === $_GET['adx'];
 
                         <select id="statslm" name="sm" class="config-filter">
                             <?php
-                            $sort_sm = !empty($_GET['sm']) ? $_GET['sm'] : '1k';
+                            $sort_sm = !empty($_GET['sm']) ? sanitize_text_field($_GET['sm']) : '1k';
                             foreach ([
                                 '1k' => __('< 1000 Items', 'docket-cache'),
                                 '5k' => __('< 5000 Items', 'docket-cache'),
@@ -204,11 +204,11 @@ $is_config = !empty($_GET['adx']) && 'cnf' === $_GET['adx'];
 
                 <?php if ($opcache_view->get_pagination_arg('total_pages') > 1 || !empty($_GET['s'])) : ?>
                 <div class="box-right">
-                    <form id="search-filter" method="get" action="<?php echo $this->pt->get_page(); ?>">
+                    <form id="search-filter" method="get" action="<?php echo esc_url($this->pt->get_page()); ?>">
                         <input type="hidden" name="page" value="docket-cache-opcviewer">
                         <input type="hidden" name="idx" value="opcviewer">
-                        <input type="hidden" name="sf" value="<?php echo $sort_sf; ?>">
-                        <input type="hidden" name="sm" value="<?php echo $sort_sm; ?>">
+                        <input type="hidden" name="sf" value="<?php echo esc_attr($sort_sf); ?>">
+                        <input type="hidden" name="sm" value="<?php echo esc_attr($sort_sm); ?>">
                         <?php $opcache_view->search_box(__('Filter Cached Files', 'docket-cache'), 'opclist-info'); ?>
                     </form>
                 </div>
