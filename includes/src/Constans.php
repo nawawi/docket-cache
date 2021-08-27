@@ -343,7 +343,7 @@ final class Constans
         $this->maybe_define($this->px('GCACTION'), false);
 
         // check version
-        $this->maybe_define($this->px('CHECKVERSION'), true);
+        $this->maybe_define($this->px('CHECKVERSION'), false);
 
         // auto update
         $this->maybe_define($this->px('AUTOUPDATE'), true);

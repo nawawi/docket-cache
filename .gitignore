@@ -44,5 +44,6 @@ composer.lock
 !/tests/*.php
 *-phar*.php
 .php_cs
+.php-cs-fixer.php
 CodeSniffer.*
 note.txt
