@@ -1,3 +1,14 @@
+= v21.08.02 (2021-08-27) =
+
+- Fixed: opcacheviewer -> some filter parameters do not escape.
+
+Thanks to Erwan from WPScan.
+
+= v21.08.01 (2021-08-27) =
+
+- Changed: plugin options -> check critical version, disabled by default.
+- Changed: Mark 21.08.1 as a stable release.
+
 = v21.02.08 (2021-07-20) =
 
 - Fixed: Tweaks::http_headers_expect() -> only visible to wp < 5.8 since already included in core.
