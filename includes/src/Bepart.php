@@ -97,7 +97,7 @@ class Bepart extends Filesystem
 
         $repeat_funcs = [];
 
-        $code = '<script id="docket-cache-worker">'.\PHP_EOL;
+        $code = '<script id="docket-cache-worker" data-noptimize="1">'.\PHP_EOL;
         $code .= 'if ( "undefined" !== typeof(jQuery) && "undefined" !== typeof(docket_cache_config) && "function" === typeof(docket_cache_worker) ) {'.\PHP_EOL;
         $code .= '    jQuery( document ).ready( function() {'.\PHP_EOL;
         $code .= '        var config = docket_cache_config;'.\PHP_EOL;

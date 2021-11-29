@@ -29,7 +29,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '0c7b7b9f498659f493a93b9898a0117d55c37679',
+    'reference' => '239ad1824f8c64fda19c88b1a492289494fc353b',
     'name' => 'nawawi/docket-cache',
   ),
   'versions' => 
@@ -41,25 +41,25 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '0c7b7b9f498659f493a93b9898a0117d55c37679',
+      'reference' => '239ad1824f8c64fda19c88b1a492289494fc353b',
     ),
     'symfony/polyfill-php80' => 
     array (
-      'pretty_version' => 'v1.23.0',
-      'version' => '1.23.0.0',
+      'pretty_version' => 'v1.23.1',
+      'version' => '1.23.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'eca0bf41ed421bed1b57c4958bab16aa86b757d0',
+      'reference' => '1100343ed1a92e3a38f9ae122fc0eb21602547be',
     ),
     'symfony/var-exporter' => 
     array (
-      'pretty_version' => 'v5.3.2',
-      'version' => '5.3.2.0',
+      'pretty_version' => 'v5.3.11',
+      'version' => '5.3.11.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'df663fb63bdcd7298373cbd431165ab031706cb2',
+      'reference' => 'b16fcf355b810bcbccc2c6eac1d016725dbf9002',
     ),
   ),
 );

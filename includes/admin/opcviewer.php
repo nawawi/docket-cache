@@ -18,11 +18,11 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
     <div class="flex-container">
         <div class="row">
             <?php
-            if ($is_config) :
+            if ($is_config && $this->pt->is_opcache_enable()) :
                 $this->tab_title(esc_html__('OPcache Config', 'docket-cache'));
                 $config = $opcache_view->get_config();
                 if (empty($config)) :
-                    echo Resc::boxmsg(__('OPcache not available.', 'docket-cache'), 'warning', false, true, false);
+                    echo Resc::boxmsg(__('No data is available. The opcache_get_configuration function disabled in PHP configuration.', 'docket-cache'), 'warning', false, true, false);
                 else :
                     ?>
             <table class="form-table opcconfig">
@@ -90,6 +90,11 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
             elseif (!\is_object($opcache_view)) :
                 echo Resc::boxmsg(__('Failed to load OPcacheList()', 'docket-cache'), 'error', false, true, false);
             else :
+
+                if (!$this->pt->opcache_function_exists('opcache_get_status')) {
+                    echo Resc::boxmsg(__('No data is available. The opcache_get_status function disabled in PHP configuration.', 'docket-cache'), 'warning', false, true, false);
+                }
+
                 $stats = $opcache_view->get_usage();
                 ?>
             <table class="form-table">

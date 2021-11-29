@@ -142,16 +142,21 @@ final class ReqAction
                 do_action('docketcache/action/flush/file/objectcache', $result, $filename);
                 break;
             case 'docket-flush-opcache':
-                if ($this->pt->co()->lockexp('preload_lock_opcache_reset')) {
+                if (!$this->pt->opcache_function_exists('opcache_reset')) {
                     $result = false;
-                    $response = 'docket-opcache-flushed-lock-warn';
+                    $response = 'docket-opcache-flushed-noreset-warn';
                 } else {
-                    if ($this->pt->co()->lockproc('opcache_reset', time() + 30)) {
+                    if ($this->pt->co()->lockexp('preload_lock_opcache_reset')) {
                         $result = false;
-                        $response = 'docket-opcache-flushed-warn';
+                        $response = 'docket-opcache-flushed-lock-warn';
                     } else {
-                        $result = $this->pt->opcache_reset();
-                        $response = $result ? 'docket-opcache-flushed' : 'docket-opcache-flushed-failed';
+                        if ($this->pt->co()->lockproc('opcache_reset', time() + 30)) {
+                            $result = false;
+                            $response = 'docket-opcache-flushed-warn';
+                        } else {
+                            $result = $this->pt->opcache_reset();
+                            $response = $result ? 'docket-opcache-flushed' : 'docket-opcache-flushed-failed';
+                        }
                     }
                 }
 
@@ -464,6 +469,9 @@ final class ReqAction
                     break;
                 case 'docket-opcache-flushed-warn':
                     $this->pt->notice = esc_html__('OPcache already flushed. Try again in a few seconds.', 'docket-cache');
+                    break;
+                case 'docket-opcache-flushed-noreset-warn':
+                    $this->pt->notice = esc_html__('OPcache could not be flushed, opcache_reset function disabled in PHP configuration.', 'docket-cache');
                     break;
                 case 'docket-opcache-flushed-lock-warn':
                     $this->pt->notice = esc_html__('Process locked. Admin Object Cache Preloading is running. Try again in a few seconds.', 'docket-cache');

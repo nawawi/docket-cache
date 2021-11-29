@@ -12,7 +12,7 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 $ocdisabled = 2 === $this->info->status_code ? ' onclick="return false;" disabled' : '';
-$opdisabled = 2 === $this->info->opcache_code || 0 === $this->info->opcache_code ? ' onclick="return false;" disabled' : '';
+$opdisabled = 0 === $this->info->opcache_code ? ' onclick="return false;" disabled' : '';
 ?>
 <?php $this->tab_title(esc_html__('Actions', 'docket-cache')); ?>
 <div class="qact">
@@ -29,7 +29,6 @@ $opdisabled = 2 === $this->info->opcache_code || 0 === $this->info->opcache_code
             <?php esc_html_e('Reset OPcache usage.', 'docket-cache'); ?>
         </p>
         <a href="<?php echo $this->pt->action_query('flush-opcache'); ?>" class="button button-primary button-large btx-spinner" <?php echo $opdisabled; ?>><?php esc_html_e('Flush OPcache', 'docket-cache'); ?></a>
-
         <hr>
         <h4><?php esc_html_e('Object Cache Drop-In', 'docket-cache'); ?></h4>
         <p>

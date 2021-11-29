@@ -33,8 +33,8 @@ endif;
             <?php
             if (!\is_object($event_list)) :
                 echo Resc::boxmsg(__('Failed to load EventList()', 'docket-cache'), 'error', false, true, false);
-else :
-    ?>
+            else :
+                ?>
             <table class="form-table">
                 <tr>
                     <th><?php esc_html_e('Service Status', 'docket-cache'); ?></th>

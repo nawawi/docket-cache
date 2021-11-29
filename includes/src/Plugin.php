@@ -171,10 +171,10 @@ final class Plugin extends Bepart
     public function get_info()
     {
         $status_code = [
-             0 => __('Disabled', 'docket-cache'),
-             1 => __('Enabled', 'docket-cache'),
-             2 => __('Not Available', 'docket-cache'),
-             3 => __('Unknown', 'docket-cache'),
+             0 => esc_html__('Disabled', 'docket-cache'),
+             1 => esc_html__('Enabled', 'docket-cache'),
+             2 => esc_html__('Not Available', 'docket-cache'),
+             3 => esc_html__('Unknown', 'docket-cache'),
          ];
 
         $yesno = [
@@ -206,14 +206,13 @@ final class Plugin extends Bepart
 
         $opcache = $this->get_opcache_status();
         $opcache_text_stats = '';
-        $opcache_status = 2;
+        $opcache_text = '';
 
         $opcache_dc_stats = '';
         $opcache_wp_stats = '';
         if (1 === $opcache->status) {
             /* translators: %1$s = size, %2$s number of file */
             $opcache_text_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->files, 'docket-cache')), $this->normalize_size($opcache->size), $opcache->files);
-            $opcache_status = 1;
 
             if ($opcache->dcfiles > 1) {
                 /* translators: %1$s = size, %2$s number of file */
@@ -222,6 +221,10 @@ final class Plugin extends Bepart
                 /* translators: %1$s = size, %2$s number of file */
                 $opcache_wp_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->wpfiles, 'docket-cache')), $this->normalize_size($opcache->wpsize), $opcache->wpfiles);
             }
+        } elseif (2 === $opcache->status) {
+            $opcache_text = $status_code[1];
+        } else {
+            $opcache_text = $status_code[2];
         }
 
         $log_enable = $this->cf()->is_dctrue('LOG') ? 1 : 0;
@@ -283,7 +286,7 @@ final class Plugin extends Bepart
              'status_text' => $status_text,
              'status_text_stats' => $status_text_stats,
              'opcache_code' => $opcache->status,
-             'opcache_text' => $status_code[$opcache_status],
+             'opcache_text' => $opcache_text,
              'opcache_text_stats' => $opcache_text_stats,
              'opcache_dc_stats' => $opcache_dc_stats,
              'opcache_wp_stats' => $opcache_wp_stats,
@@ -386,39 +389,43 @@ final class Plugin extends Bepart
         $stale = 0;
 
         $data = [];
-        if ($this->is_opcache_enable() && \function_exists('opcache_get_status')) {
-            $data = @opcache_get_status();
-            if (!empty($data) && \is_array($data) && (!empty($data['opcache_enabled']) || !empty($data['file_cache_only']))) {
-                if ($is_raw) {
-                    return $data;
-                }
+        if ($this->is_opcache_enable()) {
+            if (!$this->opcache_function_exists('opcache_get_status')) {
+                $status = 2;
+            } else {
+                $data = @opcache_get_status();
+                if (!empty($data) && \is_array($data) && (!empty($data['opcache_enabled']) || !empty($data['file_cache_only']))) {
+                    if ($is_raw) {
+                        return $data;
+                    }
 
-                $status = 1;
+                    $status = 1;
 
-                if (!empty($data['memory_usage']['used_memory'])) {
-                    $total_bytes = $data['memory_usage']['used_memory'];
-                }
-                if (!empty($data['opcache_statistics']['num_cached_scripts'])) {
-                    $total_files = $data['opcache_statistics']['num_cached_scripts'];
-                }
+                    if (!empty($data['memory_usage']['used_memory'])) {
+                        $total_bytes = $data['memory_usage']['used_memory'];
+                    }
+                    if (!empty($data['opcache_statistics']['num_cached_scripts'])) {
+                        $total_files = $data['opcache_statistics']['num_cached_scripts'];
+                    }
 
-                if (!empty($data['scripts']) && \is_array($data['scripts'])) {
-                    foreach ($data['scripts'] as $script => $arr) {
-                        $cpath = $arr['full_path'];
-                        if (!@is_file($cpath)) {
-                            ++$stale;
-                        }
-                        $cfile = basename($cpath);
-                        $cdir = \dirname($cpath);
-                        if (false !== strpos($script, $this->cache_path) && $this->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', $cfile)) {
-                            ++$dcfiles;
-                            if (isset($arr['memory_consumption'])) {
-                                $dcbytes += $arr['memory_consumption'];
+                    if (!empty($data['scripts']) && \is_array($data['scripts'])) {
+                        foreach ($data['scripts'] as $script => $arr) {
+                            $cpath = $arr['full_path'];
+                            if (!@is_file($cpath)) {
+                                ++$stale;
                             }
-                        } else {
-                            ++$wpfiles;
-                            if (isset($arr['memory_consumption'])) {
-                                $wpbytes += $arr['memory_consumption'];
+                            $cfile = basename($cpath);
+                            $cdir = \dirname($cpath);
+                            if (false !== strpos($script, $this->cache_path) && $this->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', $cfile)) {
+                                ++$dcfiles;
+                                if (isset($arr['memory_consumption'])) {
+                                    $dcbytes += $arr['memory_consumption'];
+                                }
+                            } else {
+                                ++$wpfiles;
+                                if (isset($arr['memory_consumption'])) {
+                                    $wpbytes += $arr['memory_consumption'];
+                                }
                             }
                         }
                     }

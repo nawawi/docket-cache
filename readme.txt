@@ -4,7 +4,7 @@ Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance
 Requires at least: 5.4
 Tested up to: 5.8
 Requires PHP: 7.2.5
-Stable tag: 21.08.02
+Stable tag: 21.08.03
 License: MIT
 License URI: ./license.txt
 
@@ -167,6 +167,15 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.08.03 =
+- Fixed: Filesystem::is_opcache_enable() -> do checking PHP INI disable_functions directive.
+- Fixed: Overview -> if OPcache enable and opcache_get_status function disabled, only show "Enabled".
+- Fixed: Flush OPcache -> show notice if opcache_reset function disabled.
+- Fixed: OPcache Viewer -> show notice if opcache_get_status, opcache_get_configuration function disabled.
+- Fixed: docketcache_runtime() -> only valid for PHP >= 7.2.5.
+
+Thanks to @robderijk.
+
 = 21.08.02 =
 - Fixed: opcacheviewer -> some filter parameters do not escape.
 

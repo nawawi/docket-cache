@@ -46,7 +46,7 @@ class OPcacheView extends \WP_List_Table
         static $data = false;
 
         try {
-            if (\function_exists('opcache_get_configuration') && (empty($data) || !\is_array($data))) {
+            if ($this->pt->opcache_function_exists('opcache_get_configuration') && (empty($data) || !\is_array($data))) {
                 $data = @opcache_get_configuration();
             }
         } catch (\Throwable $e) {

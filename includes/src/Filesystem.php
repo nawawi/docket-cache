@@ -502,16 +502,66 @@ class Filesystem
         return '.php' === substr($file, -4);
     }
 
+    public function is_function_disabled($name)
+    {
+        $disable_functions = @ini_get('disable_functions');
+        if (!empty($disable_functions)) {
+            $funcs = explode(',', $disable_functions);
+            if (\in_array($name, $funcs)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * opcache_function_exists.
+     */
+    public function opcache_function_exists($name = null)
+    {
+        $list = [
+            'opcache_get_status',
+            'opcache_reset',
+            'opcache_compile_file',
+            'opcache_invalidate',
+            'opcache_is_script_cached',
+            'opcache_get_configuration',
+        ];
+
+        if (!empty($name)) {
+            return \in_array($name, $list) && !$this->is_function_disabled($name) && \function_exists($name);
+        }
+
+        foreach ($list as $func) {
+            if (!$this->is_function_disabled($name) && \function_exists($func)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * is_opcache_enable.
      */
     public function is_opcache_enable()
     {
-        try {
-            return @ini_get('opcache.enable') && \function_exists('opcache_reset');
-        } catch (\Throwable $e) {
-            // rare condition on some hosting
-            nwdcx_throwable(__METHOD__, $e);
+        if (@ini_get('opcache.enable')) {
+            if (\function_exists('extension_loaded') && \extension_loaded('Zend OPcache')) {
+                return true;
+            }
+
+            if (\function_exists('get_loaded_extensions')) {
+                $arr = get_loaded_extensions(true);
+                if (\is_array($arr) && \in_array('Zend OPcache', $arr)) {
+                    return true;
+                }
+            }
+
+            if ($this->opcache_function_exists()) {
+                return true;
+            }
         }
 
         return false;

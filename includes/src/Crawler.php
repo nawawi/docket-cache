@@ -14,7 +14,7 @@ namespace Nawawi\DocketCache;
 
 final class Crawler
 {
-    private static $version = '21.08.02';
+    private static $version = '21.08.03';
     public static $send_cookie = false;
 
     private static function default_args($param = [])

@@ -539,7 +539,7 @@ final class View
             return;
         }
 
-        $code = '<script id="docket-cache-focus">'.\PHP_EOL;
+        $code = '<script id="docket-cache-focus" data-noptimize="1">'.\PHP_EOL;
         $code .= '(function($) {';
         $code .= '$(document).ready(function() {';
         $code .= 'var fx = $(document).find("tr#'.$nx.'");';

@@ -138,6 +138,7 @@ final class WpConfig
         $code = '/*@DOCKETCACHE-RUNTIME-BEGIN*/'.\PHP_EOL;
         $code .= "if(!\\function_exists('docketcache_runtime')){".\PHP_EOL;
         $code .= ' function docketcache_runtime(){'.\PHP_EOL;
+        $code .= '  if(!(\PHP_VERSION_ID >= 70205)) {return;}'.\PHP_EOL;
         $code .= '  try{'.\PHP_EOL;
         $code .= '   $path="'.$data_path.'";'.\PHP_EOL;
         $code .= '   $runtime=$path."/runtime.php";'.\PHP_EOL;
