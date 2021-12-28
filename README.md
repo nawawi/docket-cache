@@ -43,9 +43,10 @@ A heartful thanks and appreciation.
 
 <a href="https://dnsvault.net/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/dnsvault.jpg" width="250" height="125" style="margin:10px;"></a>
 <a href="https://exnano.io/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/exnano2-1.jpg" width="250" height="125" style="margin:10px;"></a>
-<a href="https://cunhost.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/cunhosting0.jpg" width="250" height="125" style="margin:10px;"></a>
+<a href="https://www.themecloud.io/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/12/themecloud.jpg" width="250" height="125" style="margin:10px;"></a>
 <a href="https://jimathosting.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/jimathosting.jpg" width="250" height="125" style="margin:10px;"></a>
 <a href="https://www.securepay.my/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/securepay0.jpg" width="250" height="125" style="margin:10px;"></a>
+<a href="https://cunhost.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/cunhosting0.jpg" width="250" height="125" style="margin:10px;"></a>
 
 Other sponsors are mentioned in the [honourable list](https://github.com/nawawi/docket-cache/issues/5).
 
