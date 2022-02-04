@@ -64,6 +64,7 @@ final class ReqAction
              'docket-flush-oclog',
              'docket-flush-ocfile',
              'docket-flush-opcache',
+             'docket-flush-menucache',
              'docket-connect-cronbot',
              'docket-disconnect-cronbot',
              'docket-pong-cronbot',
@@ -161,6 +162,20 @@ final class ReqAction
                 }
 
                 do_action('docketcache/action/flush/opcache', $result);
+                break;
+            case 'docket-flush-menucache':
+                $result = 0;
+                $ok = true;
+                if (\function_exists('wp_cache_flush_group')) {
+                    $result = wp_cache_flush_group('docketcache-menu');
+                    $this->pt->co()->lookup_set('menucacheflushed', $result);
+                    $response = 'docket-menucache-flushed';
+                } else {
+                    $response = 'docket-menucache-flushed-failed';
+                    $ok = false;
+                }
+
+                do_action('docketcache/action/flush/file/menucache', $ok, $result);
                 break;
             case 'docket-connect-cronbot':
                 $result = apply_filters('docketcache/filter/active/cronbot', true);
@@ -664,6 +679,24 @@ final class ReqAction
                     break;
                 case 'docket-cleanuppostok-warn':
                     $this->pt->notice = esc_html__('Post already cleanup. Try again in a few seconds.', 'docket-cache');
+                    break;
+                case 'docket-menucache-flushed':
+                    $this->pt->notice = esc_html__('Menu cache was flushed.', 'docket-cache');
+                    $total = $this->pt->co()->lookup_get('menucacheflushed', true);
+                    if (empty($total)) {
+                        $total = 0;
+                    }
+
+                    $clmsg = '<div class="gc"><ul>';
+                    $clmsg .= '<li><span>'.esc_html__('Total Files', 'docket-cache').'</span>'.$total.'</li>';
+                    $clmsg .= '</ul>';
+                    $clmsg .= '</div>';
+
+                    $this->pt->notice .= $clmsg;
+                    unset($total, $clmsg);
+                    break;
+                case 'docket-menucache-flushed-failed':
+                    $this->pt->notice = esc_html__('Menu cache could not be flushed.', 'docket-cache');
                     break;
             }
         }

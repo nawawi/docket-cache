@@ -39,6 +39,15 @@ namespace Nawawi\DocketCache;
         </select>
         <?php endif; ?>
         <a href="<?php echo $this->pt->action_query('cleanuppost', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner btx-cleanuppost"><?php esc_html_e('Cleanup Post', 'docket-cache'); ?></a>
+
+        <?php if ($this->vcf()->is_dctrue('MENUCACHE')) : ?>
+        <hr>
+        <h4><?php esc_html_e('Menu Cache Files', 'docket-cache'); ?></h4>
+        <p>
+            <?php esc_html_e('Remove menu cache files.', 'docket-cache'); ?>
+        </p>
+        <a href="<?php echo $this->pt->action_query('flush-menucache', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Flush Menu Cache', 'docket-cache'); ?></a>
+        <?php endif; ?>
         <hr>
         <h4><?php esc_html_e('Config Reset', 'docket-cache'); ?></h4>
         <p>

@@ -1157,6 +1157,10 @@ class WP_Object_Cache
                 continue;
             }
 
+            if ('docketcache-menu' === $cache_group) {
+                continue;
+            }
+
             if ('transient' === $cache_group || 'site-transient' === $cache_group) {
                 continue;
             }

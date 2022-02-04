@@ -4,7 +4,7 @@ Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance
 Requires at least: 5.4
 Tested up to: 5.9
 Requires PHP: 7.2.5
-Stable tag: 21.08.03
+Stable tag: 21.08.04
 License: MIT
 License URI: ./license.txt
 
@@ -29,6 +29,7 @@ The Docket Cache is better because it converts the object cache into plain PHP c
 - Object caching + OPcache
 - Advanced Post Caching
 - Object Cache Precaching
+- WordPress Menu Caching
 - WordPress Translation Caching
 - WordPress Core Query Optimisation
 - Term Count Queries Optimisation
@@ -168,6 +169,13 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.08.04 =
+- Added: WordPress Menu Caching.
+- Added: DOCKET_CACHE_MENUCACHE constant.
+- Added: DOCKET_CACHE_MENUCACHE_TTL constant.
+
+Thanks to @alriksson.
+
 = 21.08.03 =
 - Fixed: Filesystem::is_opcache_enable() -> do checking PHP INI disable_functions directive.
 - Fixed: Overview -> if OPcache enable and opcache_get_status function disabled, only show "Enabled".

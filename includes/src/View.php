@@ -569,6 +569,7 @@ final class View
             'log' => esc_html__('The cache log intends to provide information on how the cache works. For performance and security concerns, disable it if no longer needed.', 'docket-cache'),
             'opcviewer' => esc_html__('OPcache Viewer allows you to view OPcache status and usage.', 'docket-cache'),
             'advcpost' => esc_html__('Cache WordPress Post Queries which results in faster data retrieval and reduced database workload.', 'docket-cache'),
+            'menucache' => esc_html__('Cache the WordPress dynamic navigation menu.', 'docket-cache'),
             'precache' => esc_html__('Increase cache performance by early loading cached objects based on the current URL.', 'docket-cache'),
             'mocache' => esc_html__('Improve the performance of the WordPress Translation function.', 'docket-cache'),
             'optwpquery' => esc_html__('Docket Cache will attempt to optimize WordPress core query when this option enabled.', 'docket-cache'),

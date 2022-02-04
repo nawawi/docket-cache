@@ -314,6 +314,12 @@ final class Constans
         // translation mo file cache
         $this->maybe_define($this->px('MOCACHE'), false);
 
+        // menu cache
+        $this->maybe_define($this->px('MENUCACHE'), false);
+
+        // menu cache ttl: 1209600 = 14 days
+        $this->maybe_define($this->px('MENUCACHE_TTL'), 1209600);
+
         // @private
         // wp-cli
         $this->maybe_define($this->px('WPCLI'), (\defined('WP_CLI') && WP_CLI));

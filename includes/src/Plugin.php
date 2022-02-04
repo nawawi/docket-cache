@@ -1703,6 +1703,9 @@ final class Plugin extends Bepart
                             @unlink($error_log);
                         }
                         break;
+                    case 'menucache':
+                        wp_cache_flush_group('docketcache-menu');
+                        break;
                 }
 
                 if (WpConfig::is_runtimeconst($name)) {
@@ -1995,6 +1998,11 @@ final class Plugin extends Bepart
                     \PHP_INT_MAX,
                     3
                 );
+            }
+
+            // wp_cache: menu cache
+            if ($this->cf()->is_dctrue('MENUCACHE') && class_exists('Nawawi\\DocketCache\\MenuCache')) {
+                ( new MenuCache() )->register();
             }
         }
 

@@ -48,6 +48,7 @@ class ComposerStaticInit71169967e8f502f7da209e4236957996
         'Nawawi\\DocketCache\\Event' => __DIR__ . '/../../..' . '/includes/src/Event.php',
         'Nawawi\\DocketCache\\EventList' => __DIR__ . '/../../..' . '/includes/src/EventList.php',
         'Nawawi\\DocketCache\\Filesystem' => __DIR__ . '/../../..' . '/includes/src/Filesystem.php',
+        'Nawawi\\DocketCache\\MenuCache' => __DIR__ . '/../../..' . '/includes/src/MenuCache.php',
         'Nawawi\\DocketCache\\MoCache' => __DIR__ . '/../../..' . '/includes/src/MoCache.php',
         'Nawawi\\DocketCache\\OPcacheView' => __DIR__ . '/../../..' . '/includes/src/OPcacheView.php',
         'Nawawi\\DocketCache\\Plugin' => __DIR__ . '/../../..' . '/includes/src/Plugin.php',

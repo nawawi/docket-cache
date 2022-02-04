@@ -1,3 +1,11 @@
+= v21.08.04 (2022-02-05) =
+
+- Added: WordPress Menu Caching.
+- Added: DOCKET_CACHE_MENUCACHE constant.
+- Added: DOCKET_CACHE_MENUCACHE_TTL constant.
+
+Thanks to @alriksson.
+
 = v21.08.03 (2021-11-29) =
 
 - Fixed: Filesystem::is_opcache_enable() -> do checking PHP INI disable_functions directive.

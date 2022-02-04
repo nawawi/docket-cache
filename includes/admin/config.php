@@ -72,6 +72,12 @@ namespace Nawawi\DocketCache;
                         <?php echo $this->config_select_bool('precache'); ?>
                     </td>
                 </tr>
+                <tr id="menucache">
+                    <th><?php echo esc_html__('WordPress Menu Caching', 'docket-cache').$this->tooltip('menucache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('menucache'); ?>
+                    </td>
+                </tr>
                 <tr id="mocache">
                     <th><?php echo esc_html__('WordPress Translation Caching', 'docket-cache').$this->tooltip('mocache'); ?></th>
                     <td>

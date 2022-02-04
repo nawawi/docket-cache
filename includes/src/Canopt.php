@@ -84,6 +84,7 @@ final class Canopt extends Bepart
             'log_all' => esc_html__('Log All', 'docket-cache'),
             'preload' => esc_html__('Admin Page Cache Preloading', 'docket-cache'),
             'advcpost' => esc_html__('Advanced Post Caching', 'docket-cache'),
+            'menucache' => esc_html__('WordPress Menu Caching', 'docket-cache'),
             'optermcount' => esc_html__('Optimize Term Count Queries', 'docket-cache'),
             'precache' => esc_html__('Object Cache Precaching', 'docket-cache'),
             'mocache' => esc_html__('WordPress Translation Caching', 'docket-cache'),
