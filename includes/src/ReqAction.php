@@ -606,7 +606,6 @@ final class ReqAction
                     $this->pt->notice = sprintf(esc_html__('%s requires runtime code to be installed. This update has no effects.', 'docket-cache'), $option_name);
                     break;
                 case 'docket-action-failed':
-                    /* translators: %s = option name */
                     $this->pt->notice = esc_html__('Failed to execute the action request. Please try again.', 'docket-cache');
                     break;
                 case 'docket-gcrun':

@@ -82,7 +82,7 @@ namespace Nawawi\DocketCache;
             <p>
                 <strong><?php esc_html_e('DOCUMENTATION', 'docket-cache'); ?></strong><br class="break">
                 <?php esc_html_e('To adjust the plugin behaviour and manage through a command line.', 'docket-cache'); ?>
-                <a href="https://docs.docketcache.com/?utm_source=wp-plugins&utm_campaign=docs-uri&utm_medium=dc-config" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Dcoumenation', 'docket-cache'); ?></a>
+                <a href="https://docs.docketcache.com/?utm_source=wp-plugins&utm_campaign=docs-uri&utm_medium=dc-config" class="button button-secondary button-small bt-cx" rel="noopener" target="new"><?php esc_html_e('Documentation', 'docket-cache'); ?></a>
             </p>
             <hr>
             <p>
