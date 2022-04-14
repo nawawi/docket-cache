@@ -1,12 +1,12 @@
 === Docket Cache - Object Cache Accelerator ===
 Contributors: nawawijamili
-Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance, redis, memcached, speed, multisite, server load, docket
+Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance, redis, memcached, speed
 Requires at least: 5.4
 Tested up to: 5.9
 Requires PHP: 7.2.5
 Stable tag: 21.08.04
 License: MIT
-License URI: ./license.txt
+License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 
 Supercharge your website using a persistent object cache, accelerates caching with OPcache backend.
 
@@ -70,10 +70,11 @@ All funds will be dedicated to the maintenance, development, and marketing of th
 
 A heartful thanks and appreciation.
 
-- [Exnano Creative](https://exnano.io/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [Jimat Hosting](https://jimathosting.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [Themecloud](https://www.themecloud.io/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
+- [Websavers Inc](https://websavers.ca/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [DNSVault](https://dnsvault.net/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
+- [Exnano Creative](https://exnano.io/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [SecurePay](https://www.securepay.my/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [Cun Host](https://cunhost.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 
