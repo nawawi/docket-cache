@@ -489,7 +489,7 @@ final class ReqAction
                     $this->pt->notice = esc_html__('OPcache could not be flushed, opcache_reset function disabled in PHP configuration.', 'docket-cache');
                     break;
                 case 'docket-opcache-flushed-lock-warn':
-                    $this->pt->notice = esc_html__('Process locked. Admin Object Cache Preloading is running. Try again in a few seconds.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Process locked. Flushing OPcache is in process. Try again in a few seconds.', 'docket-cache');
                     break;
                 case 'docket-cronbot-connect':
                     $this->pt->notice = esc_html__('Cronbot connected.', 'docket-cache');

@@ -210,22 +210,45 @@ final class Plugin extends Bepart
 
         $opcache_dc_stats = '';
         $opcache_wp_stats = '';
-        if (1 === $opcache->status) {
-            /* translators: %1$s = size, %2$s number of file */
-            $opcache_text_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->files, 'docket-cache')), $this->normalize_size($opcache->size), $opcache->files);
+        switch ($opcache->status) {
+             case 1:
+                 /* translators: %1$s = size, %2$s number of file */
+                 $opcache_text_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->files, 'docket-cache')), $this->normalize_size($opcache->size), $opcache->files);
 
-            if ($opcache->dcfiles > 1) {
-                /* translators: %1$s = size, %2$s number of file */
-                $opcache_dc_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->dcfiles, 'docket-cache')), $this->normalize_size($opcache->dcsize), $opcache->dcfiles);
+                 if ($opcache->dcfiles > 1) {
+                     /* translators: %1$s = size, %2$s number of file */
+                     $opcache_dc_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->dcfiles, 'docket-cache')), $this->normalize_size($opcache->dcsize), $opcache->dcfiles);
 
-                /* translators: %1$s = size, %2$s number of file */
-                $opcache_wp_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->wpfiles, 'docket-cache')), $this->normalize_size($opcache->wpsize), $opcache->wpfiles);
-            }
-        } elseif (2 === $opcache->status) {
-            $opcache_text = $status_code[1];
-        } else {
-            $opcache_text = $status_code[2];
-        }
+                     /* translators: %1$s = size, %2$s number of file */
+                     $opcache_wp_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->wpfiles, 'docket-cache')), $this->normalize_size($opcache->wpsize), $opcache->wpfiles);
+                 }
+                 break;
+             case 2:
+                 $opcache_text = $status_code[1];
+                 break;
+             case 3:
+                 $opcache_text = $status_code[1].' (<a href="https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.file-cache-only" rel="noopener" target="new">'.esc_html__('File cache only', 'docket-cache').'</a>)';
+                 break;
+             case 4:
+                 if ($opcache->files > 0) {
+                     /* translators: %1$s = size, %2$s number of file */
+                     $opcache_text_stats = sprintf(esc_html__(_n('%1$s size of %2$s file', '%1$s size of %2$s files', $opcache->files, 'docket-cache')), $this->normalize_size($opcache->size), $opcache->files);
+
+                     if ($opcache->dcfiles > 1) {
+                         /* translators: %1$s = size, %2$s number of file */
+                         $opcache_dc_stats = sprintf(esc_html__(_n('%1$s size of %2$s file', '%1$s size of %2$s files', $opcache->dcfiles, 'docket-cache')), $this->normalize_size($opcache->dcsize), $opcache->dcfiles);
+
+                         /* translators: %1$s = size, %2$s number of file */
+                         $opcache_wp_stats = sprintf(esc_html__(_n('%1$s size of %2$s file', '%1$s size of %2$s files', $opcache->wpfiles, 'docket-cache')), $this->normalize_size($opcache->wpsize), $opcache->wpfiles);
+                     }
+                 } else {
+                     $opcache_text = $status_code[1].' (<a href="https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.file-cache-only" rel="noopener" target="new">'.esc_html__('File cache only', 'docket-cache').'</a>)';
+                 }
+
+                 break;
+             default:
+                 $opcache_text = $status_code[2];
+         }
 
         $log_enable = $this->cf()->is_dctrue('LOG') ? 1 : 0;
         $log_file = $this->cf()->dcvalue('LOG_FILE');
@@ -394,39 +417,109 @@ final class Plugin extends Bepart
                 $status = 2;
             } else {
                 $data = @opcache_get_status();
-                if (!empty($data) && \is_array($data) && (!empty($data['opcache_enabled']) || !empty($data['file_cache_only']))) {
-                    if ($is_raw) {
-                        return $data;
-                    }
+                if (!empty($data) && \is_array($data)) {
+                    if (!empty($data['opcache_enabled'])) {
+                        if ($is_raw) {
+                            return $data;
+                        }
 
-                    $status = 1;
+                        $status = 1;
 
-                    if (!empty($data['memory_usage']['used_memory'])) {
-                        $total_bytes = $data['memory_usage']['used_memory'];
-                    }
-                    if (!empty($data['opcache_statistics']['num_cached_scripts'])) {
-                        $total_files = $data['opcache_statistics']['num_cached_scripts'];
-                    }
+                        if (!empty($data['memory_usage']['used_memory'])) {
+                            $total_bytes = $data['memory_usage']['used_memory'];
+                        }
+                        if (!empty($data['opcache_statistics']['num_cached_scripts'])) {
+                            $total_files = $data['opcache_statistics']['num_cached_scripts'];
+                        }
 
-                    if (!empty($data['scripts']) && \is_array($data['scripts'])) {
-                        foreach ($data['scripts'] as $script => $arr) {
-                            $cpath = $arr['full_path'];
-                            if (!@is_file($cpath)) {
-                                ++$stale;
-                            }
-                            $cfile = basename($cpath);
-                            $cdir = \dirname($cpath);
-                            if (false !== strpos($script, $this->cache_path) && $this->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', $cfile)) {
-                                ++$dcfiles;
-                                if (isset($arr['memory_consumption'])) {
-                                    $dcbytes += $arr['memory_consumption'];
+                        if (!empty($data['scripts']) && \is_array($data['scripts'])) {
+                            foreach ($data['scripts'] as $script => $arr) {
+                                $cpath = $arr['full_path'];
+                                if (!@is_file($cpath)) {
+                                    ++$stale;
                                 }
-                            } else {
-                                ++$wpfiles;
-                                if (isset($arr['memory_consumption'])) {
-                                    $wpbytes += $arr['memory_consumption'];
+                                $cfile = basename($cpath);
+                                $cdir = \dirname($cpath);
+                                if (false !== strpos($script, $this->cache_path) && $this->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', $cfile)) {
+                                    ++$dcfiles;
+                                    if (isset($arr['memory_consumption'])) {
+                                        $dcbytes += $arr['memory_consumption'];
+                                    }
+                                } else {
+                                    ++$wpfiles;
+                                    if (isset($arr['memory_consumption'])) {
+                                        $wpbytes += $arr['memory_consumption'];
+                                    }
                                 }
                             }
+                        }
+                    } elseif (!empty($data['file_cache_only'])) {
+                        $status = 3;
+
+                        if (!empty($data['file_cache']) && is_dir($data['file_cache']) && is_readable($data['file_cache'])) {
+                            $dir = nwdcx_normalizepath(realpath($data['file_cache']));
+                            $cnt = 0;
+
+                            // dummy
+                            $cdata = [
+                                'opcache_statistics' => [
+                                    'num_cached_scripts' => 0,
+                                ],
+                                'scripts' => [],
+                            ];
+
+                            foreach ($this->opcache_filecache_scanfiles($dir) as $object) {
+                                try {
+                                    if (!$object->isFile() || 'file' !== $object->getType()) {
+                                        continue;
+                                    }
+
+                                    $cpath = nwdcx_normalizepath($object->getPathName());
+                                    if (false === strpos($cpath, nwdcx_normalizepath(ABSPATH))) {
+                                        continue;
+                                    }
+
+                                    $cfile = basename($cpath);
+                                    $cdir = \dirname($cpath);
+                                    $fs = $object->getSize();
+
+                                    if (false !== strpos($cpath, $this->cache_path) && $this->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php\.bin$@', $cfile)) {
+                                        ++$dcfiles;
+                                        $dcbytes += $fs;
+                                    } else {
+                                        ++$wpfiles;
+                                        $wpbytes += $fs;
+                                    }
+
+                                    ++$cnt;
+
+                                    $total_bytes += $fs;
+
+                                    $cdata['scripts'][$cpath] = [
+                                        'full_path' => $cpath,
+                                        'memory_consumption' => $fs,
+                                        'last_used_timestamp' => $object->getMTime(),
+                                        'hits' => 1,
+                                    ];
+                                } catch (\Throwable $e) {
+                                    nwdcx_throwable(__METHOD__, $e);
+                                    continue;
+                                }
+                            }
+
+                            if ($cnt > 0) {
+                                $status = 4;
+                                $total_files = $cnt;
+                            }
+                        }
+
+                        if ($is_raw) {
+                            $cdata['opcache_statistics']['num_cached_scripts'] = $cnt;
+                            $data = array_merge($data, $cdata);
+                            $data['_numfile'] = $cnt;
+                            $data['_sizefile'] = $total_bytes;
+
+                            return $data;
                         }
                     }
                 }
@@ -1904,6 +1997,10 @@ final class Plugin extends Bepart
                 $tweaks->woocommerce_crawling_addtochart_links();
             }
 
+            if ($this->cf()->is_dctrue('WOOEXTENSIONPAGEOFF')) {
+                $tweaks->woocommerce_extensionpage_remove();
+            }
+
             if ($this->cf()->is_dctrue('MISC_TWEAKS')) {
                 $tweaks->misc();
             }
@@ -1942,6 +2039,14 @@ final class Plugin extends Bepart
 
             if ($this->cf()->is_dctrue('WPDASHBOARDNEWS')) {
                 $tweaks->wpdashboardnews();
+            }
+
+            if ($this->cf()->is_dctrue('WPBROWSEHAPPY')) {
+                $tweaks->wpbrowsehappy();
+            }
+
+            if ($this->cf()->is_dctrue('WPSERVEHAPPY')) {
+                $tweaks->wpservehappy();
             }
 
             if ($this->cf()->is_dctrue('LIMITHTTPREQUEST')) {

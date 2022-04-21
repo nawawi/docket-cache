@@ -302,6 +302,9 @@ final class Constans
         // woocommerce robots crawling add-to-cart links
         $this->maybe_define($this->px('WOOADDTOCHARTCRAWLING'), true);
 
+        // woocommerce marketplace / my subscription menu page
+        $this->maybe_define($this->px('WOOEXTENSIONPAGEOFF'), false);
+
         // post missed schedule
         $this->maybe_define($this->px('POSTMISSEDSCHEDULE'), false);
 
@@ -395,6 +398,12 @@ final class Constans
 
         // curl "Expect" header performance tweak
         $this->maybe_define($this->px('HTTPHEADERSEXPECT'), false);
+
+        // wp browse-happy
+        $this->maybe_define($this->px('WPBROWSEHAPPY'), false);
+
+        // wp serve-happy
+        $this->maybe_define($this->px('WPSERVEHAPPY'), false);
 
         // @private: auto save interval.
         $this->maybe_define($this->px('RTPOSTAUTOSAVE'), 1);

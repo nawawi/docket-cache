@@ -90,7 +90,13 @@ class OPcacheView extends \WP_List_Table
 
         $data = $this->get_status();
         if (!empty($data) && \is_array($data)) {
-            $stats = array_merge($data['opcache_statistics'], $data['memory_usage']);
+            if (isset($data['opcache_statistics']) && isset($data['memory_usage']) && \is_array($data['opcache_statistics']) && \is_array($data['memory_usage'])) {
+                $stats = array_merge($data['opcache_statistics'], $data['memory_usage']);
+            } elseif (!empty($data['file_cache_only'])) {
+                $stats['file_cache_only'] = 1;
+                $stats['file_cache'] = $data['file_cache'];
+                $stats['statsfile'] = sprintf(esc_html__(_n('%1$s size of %2$s file', '%1$s size of %2$s files', $data['_numfile'], 'docket-cache')), $this->pt->normalize_size($data['_sizefile']), $data['_numfile']);
+            }
         }
 
         return (object) $stats;
@@ -126,11 +132,11 @@ class OPcacheView extends \WP_List_Table
                         $cfile = basename($cpath);
                         $cdir = \dirname($cpath);
 
-                        if ('obc' === $sftr && (false === strpos($script, $this->pt->cache_path) || !$this->pt->is_docketcachedir($cdir) || !@preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', $cfile))) {
+                        if ('obc' === $sftr && (false === strpos($script, $this->pt->cache_path) || !$this->pt->is_docketcachedir($cdir) || !@preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php(\.bin)?$@', $cfile))) {
                             continue;
                         }
 
-                        if ('wpc' === $sftr && (false !== strpos($script, $this->pt->cache_path) && $this->pt->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', $cfile))) {
+                        if ('wpc' === $sftr && (false !== strpos($script, $this->pt->cache_path) && $this->pt->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php(\.bin)?$@', $cfile))) {
                             continue;
                         }
 
@@ -154,9 +160,15 @@ class OPcacheView extends \WP_List_Table
                         }
                     }
 
+                    $fxfile = $this->pt->sanitize_rootpath($cpath);
+
+                    if (!empty($data['file_cache_only']) && !empty($data['file_cache'])) {
+                        $fxfile = preg_replace('@'.preg_quote(wp_normalize_path($data['file_cache'])).'([0-9a-zA-z]+)@', '[$1] ', $fxfile);
+                    }
+
                     $stats[$sort.$script] = (object) [
                         'is_exists' => @is_file($cpath),
-                        'file' => $this->pt->sanitize_rootpath($cpath),
+                        'file' => $fxfile,
                         'hits' => $arr['hits'],
                         'mem' => $this->pt->normalize_size($arr['memory_consumption']),
                         'stmp' => wp_date('Y-m-d H:i:s', $arr['last_used_timestamp']),
@@ -220,22 +232,35 @@ class OPcacheView extends \WP_List_Table
         /* translators: %s = utc offset */
         $lastused = sprintf(esc_html__('Last Used %s', 'docket-cache'), '('.$this->pt->get_utc_offset().')');
 
-        return [
+        $cols = [
             'opclist_file' => esc_html__('Cached Files', 'docket-cache'),
             'opclist_hits' => esc_html__('Cache Hits', 'docket-cache'),
             'opclist_mem' => esc_html__('Memory Usage', 'docket-cache'),
             'opclist_timestamp' => $lastused,
         ];
+
+        if (@ini_get('opcache.file_cache_only')) {
+            unset($cols['opclist_hits']);
+            $cols['opclist_mem'] = esc_html__('File Size', 'docket-cache');
+        }
+
+        return $cols;
     }
 
     public function get_sortable_columns()
     {
-        return [
+        $cols = [
              'opclist_file' => ['file', false],
              'opclist_hits' => ['hits', false],
              'opclist_mem' => ['mem', false],
              'opclist_timestamp' => ['stmp', false],
          ];
+
+        if (@ini_get('opcache.file_cache_only')) {
+            unset($cols['opclist_hits']);
+        }
+
+        return $cols;
     }
 
     public function get_table_classes()

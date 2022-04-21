@@ -4,7 +4,7 @@ Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance
 Requires at least: 5.4
 Tested up to: 5.9
 Requires PHP: 7.2.5
-Stable tag: 21.08.04
+Stable tag: 21.08.05
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 
@@ -125,8 +125,6 @@ OPcache is a caching engine built into PHP, that improves performance by storing
 
 Docket Cache converts the object cache into plain PHP code. When reading and writing cache, it will use OPcache directly which results in faster data retrieval and better performance.
 
-However, OPcache must operate in shared memory. Docket Cache doesn't work properly if OPcache only caches to a local file by setting PHP configuration "opcache.file_cache_only" to 1.
-
 = What is the Cronbot Service in Docket Cache? =
 The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively. 
 
@@ -173,6 +171,26 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.08.05 =
+- Fixed: object-cache.php -> Checking is file object-cache-delay.txt.
+- Fixed: OPcacheView::get_usage() -> checking if opcache_statistics, memory_usage exists.
+- Fixed: Compability with OPcache File Cache Only (opcache.file_cache_only=1).
+- Added: Woo Tweaks -> Deactivate WooCommerce WP Dashboard -> Disable setup widget.
+- Added: Woo Tweaks -> Misc WooCommerce Tweaks -> Enable WooCommerce no-cache headers.
+- Added: Woo Tweaks -> Misc WooCommerce Tweaks -> Remove the WooCommerce usage tracker cron event.
+- Added: WP Tweaks -> Deactivate Browse Happy Checking.
+- Added: WP Tweaks -> Deactivate Serve Happy Checking.
+- Added: Filesystem::opcache_filecache_only() -> Determine OPcache in File Cache Only.
+- Added: Filesystem::opcache_filecache_scanfiles() -> Listing OPcache file cache.
+- Added: Filesystem::opcache_filecache_flush() -> Remove OPcache single file cache.
+- Added: Filesystem::opcache_filecache_reset() -> Empty OPcache file cache directory.
+- Updated: Symfony component -> symfony/polyfill-php80, symfony/var-exporter.
+- Updated: Advanced Post Caching tooltip description.
+- Updated: WP_Object_Cache::dc_precache() -> Ignore precache for /wp-admin/admin-ajax.php, /wp-cron.php, /xmlrpc.php, /robots.txt, /favicon.ico.
+- Updated: OPcache viewer -> layout for OPcache File Cache Only.
+
+Thanks to @123nadav and @jibsoux for improvement feedback.
+
 = 21.08.04 =
 - Added: WordPress Menu Caching.
 - Added: DOCKET_CACHE_MENUCACHE constant.
@@ -280,27 +298,6 @@ Thanks to Oleg for reporting an issue with Theme Editor https://docketcache.com/
 - Improved action notice at the configuration page.
 
 Thanks to @patrickwgs for reporting an issue on bedrock installation.
-
-= 21.01.01 =
-
-- Fixed: Tweaks::woocommerce_cart_fragments_remove() -> check if "wc-cart-fragments" script exists.
-- Fixed: WP_Object_Cache::dc_precache_set -> ignore transient, site-transient.
-- Added: Configuration Options -> Runtime Options.
-- Added: Configuration Actions -> Config reset.
-- Added: Configuration Actions -> Cleanup Post revisions, auto drafts, trash bin.
-- Added: WP-CLI command -> runtime:install, runtime:reset.
-
-= 20.12.04 =
-
-- Fixed: Limit WP-Admin HTTP Requests -> invalid variable pagenow.
-- Fixed: Cache Log -> use get_utc_offset() instead of date('T').
-- Fixed: Overview Actions -> rename admin/actcmd.php to admin/actions.php.
-- Fixed: Cronbot Events -> display notice if failed to load EventList() .
-- Fixed: nwdcx_throwable() -> only save data if WP_DEBUG defined .
-- Fixed: Tweak::compat_notice() -> move to Plugin::compat_notice(), do check at CLI.
-- Fixed: Plugin::get_subpage() -> add checking for adx variable.
-- Fixed: OPcache flush -> lock for 20 seconds before accept new request.
-- Added: Filesystem() methods -> sanitize_precache_maxfile, sanitize_maxsize, sanitize_maxsizedisk.
 
 
 Kindly refer to [changelog.txt](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt) for previous changes.

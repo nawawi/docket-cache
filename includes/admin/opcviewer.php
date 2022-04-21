@@ -96,7 +96,9 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
                 }
 
                 $stats = $opcache_view->get_usage();
-                ?>
+
+                if (empty($stats->file_cache_only)) :
+                    ?>
             <table class="form-table">
                 <tr>
                     <td colspan="4" class="stitle">
@@ -154,6 +156,24 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
                     <td><?php echo round($stats->current_wasted_percentage, 0); ?>%</td>
                 </tr>
             </table>
+            <?php else : ?>
+
+            <table class="form-table">
+                <tr>
+                    <th><?php esc_html_e('Status', 'docket-cache'); ?></th>
+                    <td><a href="https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.file-cache-only" rel="noopener" target="new"><?php esc_html_e('File Cache Only', 'docket-cache'); ?></a></td>
+                </tr>
+                <tr>
+                    <th><?php esc_html_e('File Cache Path', 'docket-cache'); ?></th>
+                    <td><?php echo $stats->file_cache; ?></td>
+                </tr>
+                <tr>
+                    <th><?php esc_html_e('Stats', 'docket-cache'); ?></th>
+                    <td><?php echo $stats->statsfile; ?></td>
+                </tr>
+            </table>
+
+            <?php endif; ?>
 
             <p id="scrollmark" class="submit">
                 <a href="<?php echo $this->pt->action_query('flush-opcache', ['idx' => 'opcviewer']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Flush OPcache', 'docket-cache'); ?></a>
@@ -179,13 +199,18 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
                         <select id="statsop" name="sf" class="config-filter">
                             <?php
                             $sort_sf = !empty($_GET['sf']) ? sanitize_text_field($_GET['sf']) : 'obc';
-
-                            foreach ([
+                            $opts = [
                                 'obc' => __('Object Cache Files', 'docket-cache'),
                                 'wpc' => __('Other Files', 'docket-cache'),
                                 'dfc' => __('Stale Files', 'docket-cache'),
                                 'all' => __('All', 'docket-cache'),
-                            ] as $k => $n) {
+                            ];
+
+                            if (!empty($stats->file_cache_only)) {
+                                unset($opts['dfc']);
+                            }
+
+                            foreach ($opts as $k => $n) {
                                 echo '<option value="'.$k.'"'.($sort_sf === $k ? ' selected' : '').'>'.$n.'</option>';
                             }
                             ?>

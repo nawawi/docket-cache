@@ -1,3 +1,24 @@
+= v21.08.05 (2022-04-22) =
+
+- Fixed: object-cache.php -> Checking is file object-cache-delay.txt.
+- Fixed: OPcacheView::get_usage() -> checking if opcache_statistics, memory_usage exists.
+- Fixed: Compability with OPcache File Cache Only (opcache.file_cache_only=1).
+- Added: Woo Tweaks -> Deactivate WooCommerce WP Dashboard -> Disable setup widget.
+- Added: Woo Tweaks -> Misc WooCommerce Tweaks -> Enable WooCommerce no-cache headers.
+- Added: Woo Tweaks -> Misc WooCommerce Tweaks -> Remove the WooCommerce usage tracker cron event.
+- Added: WP Tweaks -> Deactivate Browse Happy Checking.
+- Added: WP Tweaks -> Deactivate Serve Happy Checking.
+- Added: Filesystem::opcache_filecache_only() -> Determine OPcache in File Cache Only.
+- Added: Filesystem::opcache_filecache_scanfiles() -> Listing OPcache file cache.
+- Added: Filesystem::opcache_filecache_flush() -> Remove OPcache single file cache.
+- Added: Filesystem::opcache_filecache_reset() -> Empty OPcache file cache directory.
+- Updated: Symfony component -> symfony/polyfill-php80, symfony/var-exporter.
+- Updated: Advanced Post Caching tooltip description.
+- Updated: WP_Object_Cache::dc_precache() -> Ignore precache for /wp-admin/admin-ajax.php, /wp-cron.php, /xmlrpc.php, /robots.txt, /favicon.ico.
+- Updated: OPcache viewer -> layout for OPcache File Cache Only.
+
+Thanks to @123nadav and @jibsoux for improvement feedback.
+
 = v21.08.04 (2022-02-05) =
 
 - Added: WordPress Menu Caching.

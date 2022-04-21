@@ -1197,13 +1197,19 @@ class WP_Object_Cache
             return;
         }
 
+        $logprefix = 'internalproc-'.$this->item_hash(__FUNCTION__);
+        $req_uri = $_SERVER['REQUEST_URI'];
         $dostrip = !empty($_SERVER['QUERY_STRING']);
-        if ($dostrip && !empty($_GET) && isset($_GET['docketcache_ping']) || isset($_GET['doing_wp_cron']) || isset($_GET['_fs_blog_admin']) || !empty($_GET['_wpnonce']) || !empty($_GET['action']) || !empty($_GET['message'])) {
+
+        if ($dostrip && !empty($_GET) && (isset($_GET['docketcache_ping']) || isset($_GET['doing_wp_cron']) || isset($_GET['_fs_blog_admin']) || !empty($_GET['_wpnonce']) || (!empty($_GET['action']) && false === strpos($req_uri, '/wp-admin/post.php?post=')) || !empty($_GET['message']))) {
+            $this->dc_log('info', $logprefix, 'docketcache-precache: skip1');
+
             return;
         }
 
-        $req_uri = $_SERVER['REQUEST_URI'];
-        if (false !== strpos($req_uri, '/wp-json/')) {
+        if (false !== strpos($req_uri, '/wp-json/') || false !== strpos($req_uri, '/wp-admin/admin-ajax.php') || false !== strpos($req_uri, '/xmlrpc.php') || false !== strpos($req_uri, '/wp-cron.php') || false !== strpos($req_uri, '/robots.txt') || false !== strpos($req_uri, '/favicon.ico')) {
+            $this->dc_log('info', $logprefix, 'docketcache-precache: skip2');
+
             return;
         }
 

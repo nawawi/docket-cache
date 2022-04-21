@@ -116,10 +116,14 @@ body {
     min-width: 250px;
 }
 
-#docket-cache .overview .opcache-flush {
-    margin-left: 2px;
-    margin-top: 1px;
-    font-size: 16px;
+#docket-cache .overview td a {
+    text-decoration: none;
+    color: #444444;
+}
+
+#docket-cache .overview td a:hover {
+    text-decoration: underline;
+    color: orangered;
 }
 
 #docket-cache .form-table th,
@@ -786,6 +790,16 @@ body {
     vertical-align: middle;
     min-width: 2px;
     margin-right: 6px;
+}
+
+#docket-cache .opcache td a {
+    text-decoration: none;
+    color: #444444;
+}
+
+#docket-cache .opcache td a:hover {
+    text-decoration: underline;
+    color: orangered;
 }
 
 /* desktop */

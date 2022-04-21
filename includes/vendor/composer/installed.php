@@ -1,42 +1,41 @@
-<?php return array (
-  'root' => 
-  array (
-    'pretty_version' => 'dev-master',
-    'version' => 'dev-master',
-    'aliases' => 
-    array (
+<?php return array(
+    'root' => array(
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'type' => 'wordpress-plugin',
+        'install_path' => __DIR__ . '/../../../',
+        'aliases' => array(),
+        'reference' => 'e031a95dd82b76caee0a4900f622ff624c600e27',
+        'name' => 'nawawi/docket-cache',
+        'dev' => true,
     ),
-    'reference' => '239ad1824f8c64fda19c88b1a492289494fc353b',
-    'name' => 'nawawi/docket-cache',
-  ),
-  'versions' => 
-  array (
-    'nawawi/docket-cache' => 
-    array (
-      'pretty_version' => 'dev-master',
-      'version' => 'dev-master',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '239ad1824f8c64fda19c88b1a492289494fc353b',
+    'versions' => array(
+        'nawawi/docket-cache' => array(
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'type' => 'wordpress-plugin',
+            'install_path' => __DIR__ . '/../../../',
+            'aliases' => array(),
+            'reference' => 'e031a95dd82b76caee0a4900f622ff624c600e27',
+            'dev_requirement' => false,
+        ),
+        'symfony/polyfill-php80' => array(
+            'pretty_version' => 'v1.25.0',
+            'version' => '1.25.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/polyfill-php80',
+            'aliases' => array(),
+            'reference' => '4407588e0d3f1f52efb65fbe92babe41f37fe50c',
+            'dev_requirement' => false,
+        ),
+        'symfony/var-exporter' => array(
+            'pretty_version' => 'v5.4.7',
+            'version' => '5.4.7.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/var-exporter',
+            'aliases' => array(),
+            'reference' => '7eacaa588c9b27f2738575adb4a8457a80d9c807',
+            'dev_requirement' => false,
+        ),
     ),
-    'symfony/polyfill-php80' => 
-    array (
-      'pretty_version' => 'v1.23.1',
-      'version' => '1.23.1.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => '1100343ed1a92e3a38f9ae122fc0eb21602547be',
-    ),
-    'symfony/var-exporter' => 
-    array (
-      'pretty_version' => 'v5.3.11',
-      'version' => '5.3.11.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'b16fcf355b810bcbccc2c6eac1d016725dbf9002',
-    ),
-  ),
 );

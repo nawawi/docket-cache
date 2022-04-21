@@ -446,7 +446,7 @@ class Filesystem
 
         $ok = $this->put($tmpfile, $data, 'cb', true);
         if (true === $ok) {
-            if (@rename($tmpfile, $file)) {
+            if (@is_file($tmpfile) && @rename($tmpfile, $file)) {
                 if ($is_validate && !$this->validate_file($file)) {
                     return false;
                 }
@@ -568,12 +568,108 @@ class Filesystem
     }
 
     /**
+     * opcache_filecache_only.
+     */
+    public function opcache_filecache_only()
+    {
+        if (@ini_get('opcache.file_cache_only') && \function_exists('opcache_get_status')) {
+            $data = @opcache_get_status();
+            if (!empty($data) && \is_array($data) && !empty($data['file_cache_only']) && !empty($data['file_cache']) && is_dir($data['file_cache'])) {
+                return $data;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * opcache_filecache_scanfiles.
+     */
+    public function opcache_filecache_scanfiles($dir)
+    {
+        $dir = nwdcx_normalizepath(realpath($dir));
+        if (false !== $dir && is_dir($dir) && is_readable($dir)) {
+            $diriterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \RecursiveDirectoryIterator::KEY_AS_FILENAME | \RecursiveDirectoryIterator::CURRENT_AS_FILEINFO);
+            $object = new \RegexIterator(new \RecursiveIteratorIterator($diriterator), '@.*\.php\.bin$@', \RegexIterator::MATCH, \RegexIterator::USE_KEY);
+
+            return $object;
+        }
+
+        return [];
+    }
+
+    /**
+     * opcache_filecache_flush.
+     */
+    public function opcache_filecache_flush($file)
+    {
+        if (!($fcdata = $this->opcache_filecache_only()) || false === strpos(nwdcx_normalizepath($file), nwdcx_normalizepath(ABSPATH))) {
+            return false;
+        }
+
+        $filem = nwdcx_normalizepath(rtrim($fcdata['file_cache'], '/\\').'/*/'.ltrim($file, '/\\').'.bin');
+        $match = glob($filem);
+        if (!empty($match) && \is_array($match)) {
+            foreach ($match as $fm) {
+                if (is_file($fm) && is_writable($fm)) {
+                    @unlink($fm);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * opcache_filecache_reset.
+     */
+    public function opcache_filecache_reset()
+    {
+        $fcdata = $this->opcache_filecache_only();
+        if (!empty($fcdata)) {
+            $dir = $fcdata['file_cache'];
+            $cnt = 0;
+            foreach ($this->opcache_filecache_scanfiles($dir) as $object) {
+                try {
+                    if (!$object->isFile() || 'file' !== $object->getType()) {
+                        continue;
+                    }
+
+                    $file = nwdcx_normalizepath($object->getPathName());
+                    if (false === strpos($file, nwdcx_normalizepath(ABSPATH))) {
+                        continue;
+                    }
+
+                    @unlink($file);
+                    ++$cnt;
+                } catch (\Throwable $e) {
+                    nwdcx_throwable(__METHOD__, $e);
+                    continue;
+                }
+            }
+
+            return $cnt;
+        }
+
+        return false;
+    }
+
+    /**
      * opcache_is_cached.
      */
     public function opcache_is_cached($file)
     {
         if (!$this->is_opcache_enable()) {
             return -1;
+        }
+
+        $fcdata = $this->opcache_filecache_only();
+        if (!empty($fcdata) && false !== strpos(nwdcx_normalizepath($file), nwdcx_normalizepath(ABSPATH))) {
+            $filem = nwdcx_normalizepath(rtrim($fcdata['file_cache'], '/\\').'/*/'.ltrim($file, '/\\').'.bin');
+            $match = glob($filem);
+            if (!empty($match) && \is_array($match)) {
+                return true;
+            }
         }
 
         if (\function_exists('opcache_is_script_cached')) {
@@ -590,6 +686,10 @@ class Filesystem
     {
         if (!$this->is_php($file) || !@is_file($file) || !$this->is_opcache_enable()) {
             return false;
+        }
+
+        if ($this->opcache_filecache_flush($file)) {
+            return true;
         }
 
         // wp 5.5
@@ -641,18 +741,8 @@ class Filesystem
 
         try {
             if (!@opcache_reset()) {
-                return false;
+                return $this->opcache_filecache_reset();
             }
-
-            // NOTE: 21052021 memory burst when run admin preloading
-            /*$opcache_status = opcache_get_status();
-            if (!empty($opcache_status) && \is_array($opcache_status) && !empty($opcache_status['scripts'])) {
-                foreach ($opcache_status['scripts'] as $key => $data) {
-                    $fx = $data['full_path'];
-                    $this->opcache_flush($fx);
-                }
-            }
-            unset($opcache_status);*/
         } catch (\Throwable $e) {
             nwdcx_throwable(__METHOD__, $e);
 
@@ -1301,6 +1391,8 @@ class Filesystem
             'auto_update_core_major' => 1,
             /* wp >= 5.7 */
             'https_detection_errors' => 1,
+            /* wp >= 5.8 */
+            'wp_force_deactivated_plugins' => 1,
         ];
     }
 

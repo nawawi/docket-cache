@@ -171,6 +171,12 @@ namespace Nawawi\DocketCache;
                         <?php echo $this->config_select_bool('woowpdashboardoff'); ?>
                     </td>
                 </tr>
+                <tr id="wooextensionpageoff">
+                    <th><?php echo esc_html__('Deactivate WooCommerce Extensions Page', 'docket-cache').$this->tooltip('wooextensionpageoff'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('wooextensionpageoff'); ?>
+                    </td>
+                </tr>
                 <tr id="woocartfragsoff">
                     <th><?php echo esc_html__('Deactivate WooCommerce Cart Fragments', 'docket-cache').$this->tooltip('woocartfragsoff'); ?></th>
                     <td>
@@ -240,6 +246,18 @@ namespace Nawawi\DocketCache;
                     <th><?php echo esc_html__('Deactivate WP Events & News Feed Dashboard', 'docket-cache').$this->tooltip('wpdashboardnews'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('wpdashboardnews'); ?>
+                    </td>
+                </tr>
+                <tr id="wpbrowsehappy">
+                    <th><?php echo esc_html__('Deactivate Browse Happy Checking', 'docket-cache').$this->tooltip('wpbrowsehappy'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('wpbrowsehappy'); ?>
+                    </td>
+                </tr>
+                <tr id="wpservehappy">
+                    <th><?php echo esc_html__('Deactivate Serve Happy Checking', 'docket-cache').$this->tooltip('wpservehappy'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('wpservehappy'); ?>
                     </td>
                 </tr>
                 <tr id="limithttprequest">

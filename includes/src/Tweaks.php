@@ -254,6 +254,13 @@ final class Tweaks
         );
         add_filter('woocommerce_marketing_menu_items', '__return_empty_array', \PHP_INT_MAX);
 
+        // wc: Enable WooCommerce no-cache headers
+        // includes/class-wc-cache-helper.php
+        add_filter('woocommerce_enable_nocache_headers', '__return_false');
+
+        // wc: remove the WooCommerce usage tracker cron event
+        wp_clear_scheduled_hook('woocommerce_tracker_send_event');
+
         // jetpack
         add_filter('jetpack_just_in_time_msgs', '__return_false', \PHP_INT_MAX);
         add_filter('jetpack_show_promotions', '__return_false', \PHP_INT_MAX);
@@ -277,6 +284,7 @@ final class Tweaks
                 remove_meta_box('woocommerce_dashboard_status', 'dashboard', 'normal');
                 remove_meta_box('woocommerce_dashboard_recent_reviews', 'dashboard', 'normal');
                 remove_meta_box('woocommerce_network_orders', 'dashboard', 'normal');
+                remove_meta_box('wc_admin_dashboard_setup', 'dashboard', 'normal');
             },
             \PHP_INT_MAX
         );
@@ -291,7 +299,7 @@ final class Tweaks
                     return;
                 }
 
-                // includes/wc-widget-functions.php
+                // plugins/woocommerce/includes/wc-widget-functions.php
                 $widgets = [
                     'WC_Widget_Cart',
                     'WC_Widget_Layered_Nav_Filters',
@@ -422,6 +430,14 @@ final class Tweaks
 
             return $output;
         }, \PHP_INT_MAX, 2);
+    }
+
+    public function woocommerce_extensionpage_remove()
+    {
+        add_action('admin_menu', function () {
+            remove_submenu_page('woocommerce', 'wc-addons');
+            remove_submenu_page('woocommerce', 'wc-addons&section=helper');
+        }, \PHP_INT_MAX);
     }
 
     public function post_missed_schedule()
@@ -675,6 +691,54 @@ final class Tweaks
             'admin_init',
             function () {
                 remove_meta_box('dashboard_primary', 'dashboard-network', 'side');
+            },
+            \PHP_INT_MAX
+        );
+    }
+
+    // reference:
+    // wp-admin/includes/dashboard.php -> wp_check_browser_version()
+    public function wpbrowsehappy()
+    {
+        add_action(
+            'admin_init',
+            function () {
+                add_filter(
+                    'pre_http_request',
+                    function ($status, $request, $url) {
+                        if (@preg_match('@^https?://api\.wordpress\.org/core/browse-happy/@i', $url)) {
+                            return new \WP_Error('http_request_failed', 'The request is not allowed by Docket Cache Browse Happy.');
+                        }
+
+                        return $status;
+                    },
+                    10,
+                    3
+                );
+            },
+            \PHP_INT_MAX
+        );
+    }
+
+    // reference:
+    // wp-admin/includes/misc.php -> wp_check_php_version()
+    public function wpservehappy()
+    {
+        add_action(
+            'admin_init',
+            function () {
+                add_filter(
+                    'pre_http_request',
+                    function ($status, $request, $url) {
+                        if (@preg_match('@^https?://api\.wordpress\.org/core/serve-happy/@i', $url)) {
+                            return new \WP_Error('http_request_failed', 'The request is not allowed by Docket Cache Serve Happy.');
+                        }
+
+                        return $status;
+                    },
+                    10,
+                    3
+                );
             },
             \PHP_INT_MAX
         );
