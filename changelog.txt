@@ -1,3 +1,9 @@
+= v21.08.07 (2022-05-13) =
+- Fixed: Tweaks::wpembed() -> body_class missing seconds arguments that require by some themes.
+- Fixed: Tweaks::wpembed() -> Disable body_class filter, cause unpredictable syntax error on some themes.
+
+Thanks to @simonhawketts for bug report.
+
 = v21.08.06 (2022-05-13) =
 
 - Fixed: WP_Object_Cache::dc_close() -> Remove stale cache abandoned by WordPress, WooCommerce, Advanced Post Cache after doing cache invalidation.

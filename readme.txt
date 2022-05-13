@@ -4,7 +4,7 @@ Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance
 Requires at least: 5.4
 Tested up to: 6.0
 Requires PHP: 7.2.5
-Stable tag: 21.08.06
+Stable tag: 21.08.07
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 
@@ -171,6 +171,12 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.08.07 =
+- Fixed: Tweaks::wpembed() -> body_class missing seconds arguments that require by some themes.
+- Fixed: Tweaks::wpembed() -> Disable body_class filter, cause unpredictable syntax error on some themes.
+
+Thanks to @simonhawketts for bug report.
+
 = 21.08.06 =
 - Fixed: WP_Object_Cache::dc_close() -> Remove stale cache abandoned by WordPress, WooCommerce, Advanced Post Cache after doing cache invalidation.
 - Fixed: WP_Object_Cache::dc_get() -> The transient should return false if does not have a value or has expired.

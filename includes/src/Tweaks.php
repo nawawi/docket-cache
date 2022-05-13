@@ -551,6 +551,18 @@ final class Tweaks
         );
     }
 
+    // ref: https://wordpress.org/support/topic/syntax-error-222/
+    public function wpembed_bodyclass($classes, $class = [])
+    {
+        foreach ($classes as $num => $name) {
+            if ('wp-embed-responsive' === $name) {
+                unset($classes[$num]);
+            }
+        }
+
+        return $classes;
+    }
+
     public function wpembed()
     {
         if (isset($GLOBALS['wp']) && \is_object($GLOBALS['wp']) && isset($GLOBALS['wp']->public_query_vars)) {
@@ -618,19 +630,13 @@ final class Tweaks
             }
         );
 
-        add_filter(
-            'body_class',
-            function ($classes) {
-                foreach ($classes as $num => $name) {
-                    if ('wp-embed-responsive' === $name) {
-                        unset($classes[$num]);
-                    }
-                }
-
-                return $classes;
-            },
-            \PHP_INT_MAX,
-        );
+        if (\defined('DOCKET_CACHE_WPEMBED_BODYCLASS_FILTER') && DOCKET_CACHE_WPEMBED_BODYCLASS_FILTER) {
+            add_filter(
+                'body_class', [$this, 'wpembed_bodyclass'],
+                \PHP_INT_MAX,
+                2
+            );
+        }
 
         add_action(
             'wp_footer',
