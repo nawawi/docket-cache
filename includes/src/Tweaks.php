@@ -93,6 +93,27 @@ final class Tweaks
                 \PHP_INT_MIN
             );
         }
+
+        if (nwdcx_consfalse('TWEAKS_WPLOGIN_TRANSLATIONAPI_DISABLED')) {
+            add_action(
+                'init',
+                function () {
+                    add_filter(
+                        'translations_api',
+                        function ($type, $args) {
+                            if (false !== strpos($_SERVER['REQUEST_URI'], '/wp-login.php')) {
+                                return true;
+                            }
+
+                            return false;
+                        },
+                        \PHP_INT_MAX,
+                        2
+                    );
+                },
+                \PHP_INT_MAX
+            );
+        }
     }
 
     public function headerjunk()
@@ -270,6 +291,9 @@ final class Tweaks
     {
         // wc: disable the WooCommerce Admin
         add_filter('woocommerce_admin_disabled', '__return_true', \PHP_INT_MAX);
+
+        // 09052022: line 1048 packages/woocommerce-admin/src/Loader.php -> Undefined index: id, value
+        add_filter('woocommerce_admin_preload_settings', '__return_empty_array', \PHP_INT_MAX);
     }
 
     public function woocommerce_dashboard_status_remove()
@@ -596,7 +620,7 @@ final class Tweaks
 
         add_filter(
             'body_class',
-            function ($classes, $class) {
+            function ($classes) {
                 foreach ($classes as $num => $name) {
                     if ('wp-embed-responsive' === $name) {
                         unset($classes[$num]);
@@ -606,7 +630,6 @@ final class Tweaks
                 return $classes;
             },
             \PHP_INT_MAX,
-            2
         );
 
         add_action(
@@ -700,48 +723,29 @@ final class Tweaks
     // wp-admin/includes/dashboard.php -> wp_check_browser_version()
     public function wpbrowsehappy()
     {
-        add_action(
-            'admin_init',
-            function () {
-                add_filter(
-                    'pre_http_request',
-                    function ($status, $request, $url) {
-                        if (@preg_match('@^https?://api\.wordpress\.org/core/browse-happy/@i', $url)) {
-                            return new \WP_Error('http_request_failed', 'The request is not allowed by Docket Cache Browse Happy.');
-                        }
+        if (empty($_SERVER['HTTP_USER_AGENT'])) {
+            return;
+        }
 
-                        return $status;
-                    },
-                    10,
-                    3
-                );
-            },
-            \PHP_INT_MAX
-        );
+        $key = md5($_SERVER['HTTP_USER_AGENT']);
+
+        // reference: wp-includes/option.php -> get_site_transient( $transient )
+        // return an array to implying it always exists and never expires.
+        add_filter('pre_site_transient_browser_'.$key, function () {
+            // return an array instead of true to avoid php error
+            // "Trying to access array offset on value of type bool".
+            return [];
+        }, \PHP_INT_MAX);
     }
 
     // reference:
     // wp-admin/includes/misc.php -> wp_check_php_version()
     public function wpservehappy()
     {
-        add_action(
-            'admin_init',
-            function () {
-                add_filter(
-                    'pre_http_request',
-                    function ($status, $request, $url) {
-                        if (@preg_match('@^https?://api\.wordpress\.org/core/serve-happy/@i', $url)) {
-                            return new \WP_Error('http_request_failed', 'The request is not allowed by Docket Cache Serve Happy.');
-                        }
-
-                        return $status;
-                    },
-                    10,
-                    3
-                );
-            },
-            \PHP_INT_MAX
-        );
+        $key = md5(\PHP_VERSION);
+        add_filter('pre_site_transient_php_check_'.$key, function () {
+            return [];
+        }, \PHP_INT_MAX);
     }
 
     public function limit_http_request()

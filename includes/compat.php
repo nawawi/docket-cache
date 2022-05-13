@@ -31,8 +31,8 @@ if (!\function_exists('nwdcx_arraymap')) {
     }
 }
 
-if (!\function_exists('nwdcx_unserialize')) {
-    function nwdcx_unserialize($data)
+if (!\function_exists('nwdcx_serialized')) {
+    function nwdcx_serialized($data)
     {
         if (!\function_exists('is_serialized')) {
             // 16072021: rare opcache issue with some hosting ABSPATH not defined.
@@ -41,11 +41,25 @@ if (!\function_exists('nwdcx_unserialize')) {
             }
         }
 
-        if (!\function_exists('is_serialized') || !is_serialized($data)) {
+        if (!\function_exists('is_serialized')) {
+            return false;
+        }
+
+        return is_serialized($data);
+    }
+}
+
+if (!\function_exists('nwdcx_unserialize')) {
+    function nwdcx_unserialize($data)
+    {
+        if (!nwdcx_serialized($data)) {
             return $data;
         }
 
         $ok = true;
+
+        // if the string has object format, check it if has stdClass,
+        // other than that set it as false and return the original data
         if (false !== strpos($data, 'O:') && @preg_match_all('@O:\d+:"([^"]+)"@', $data, $mm)) {
             if (!empty($mm) && !empty($mm[1])) {
                 foreach ($mm[1] as $v) {
@@ -216,6 +230,15 @@ if (!\function_exists('nwdcx_throwable')) {
             }
             $GLOBALS['docketcache_throwable'][$name] = $error;
         }
+    }
+}
+
+if (!\function_exists('nwdcx_microtimetofloat')) {
+    function nwdcx_microtimetofloat($second)
+    {
+        list($usec, $sec) = explode(' ', $second);
+
+        return (float) $usec + (float) $sec;
     }
 }
 

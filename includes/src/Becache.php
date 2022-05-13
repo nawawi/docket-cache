@@ -9,6 +9,8 @@
  */
 
 /*
+ * This class is a minimal version of cache.php, only use for object-cache.php.
+ *
  * Reference:
  *  wp-content/plugins/docket-cache/includes/cache.php
  *  wp-content/plugins/docket-cache/includes/object-cache.php
@@ -27,6 +29,7 @@ class Becache
     private $blog_prefix;
     private $qlimit = 5000;
     private static $inst;
+    private $max_execution_time = 0;
 
     public function __construct()
     {
@@ -49,6 +52,8 @@ class Becache
                 $this->cache_maxttl = $this->fs()->sanitize_maxttl($dcvalue);
             }
         }
+
+        $this->max_execution_time = $this->fs()->get_max_execution_time();
     }
 
     public static function export()
@@ -101,9 +106,18 @@ class Becache
 
     private function get_file_path($key, $group)
     {
-        $index = $this->item_hash($group).'-'.$this->item_hash($key);
+        $hash_group = $this->item_hash($group);
+        $hash_key = $this->item_hash($key);
 
-        return $this->cache_path.$index.'.php';
+        $index = $hash_group.'-'.$hash_key;
+
+        if ($this->cf()->is_dcfalse('CHUNKCACHEDIR')) {
+            return $this->cache_path.$index.'.php';
+        }
+
+        $chunk_path = $this->fs()->get_chunk_path($hash_group, $hash_key);
+
+        return $this->cache_path.$chunk_path.$index.'.php';
     }
 
     private function dump_code($file, $arr)
@@ -139,14 +153,21 @@ class Becache
         $maxttl = $this->cache_maxttl;
 
         if (0 === $expire && $maxttl < 2419200) {
-            if (\in_array($group, ['site-transient', 'transient'])) {
+            if ($this->fs()->is_transient($group)) {
                 if ('site-transient' === $group && \in_array($key, ['update_plugins', 'update_themes', 'update_core', '_woocommerce_helper_updates'])) {
                     $expire = $maxttl < 2419200 ? 2419200 : $maxttl; // 28d
+                } elseif ('transient' === $group && 'health-check-site-status-result' === $key) {
+                    $expire = 0; // to check with is_data_uptodate
                 } else {
                     $expire = $maxttl < 604800 ? 604800 : $maxttl; // 7d
                 }
             } elseif (\in_array($group, ['terms', 'posts', 'post_meta', 'options', 'site-options', 'comments'])) {
                 $expire = $maxttl < 1209600 ? 1209600 : $maxttl; // 14d
+
+                // woocommerce stale cache
+                // wc_cache_0.72953700 1651592702
+            } elseif ('wc_cache_' === substr($key, 0, 9) && preg_match('@^wc_cache_([0-9\. ]+)_@', $key)) {
+                $expire = 86400; // 1d
             }
         }
 
@@ -163,6 +184,12 @@ class Becache
 
         $cache_key = $this->cache_key($key, $group);
         $file = $this->get_file_path($cache_key, $group);
+
+        // chunk dir
+        if ($this->cf()->is_dctrue('CHUNKCACHEDIR') && !$this->fs()->mkdir_p(\dirname($file))) {
+            return false;
+        }
+
         $timeout = ($expire > 0 ? time() + $expire : 0);
 
         $type = \gettype($data);
@@ -200,6 +227,16 @@ class Becache
         }
 
         $final_type = \gettype($data);
+        if ('array' === $final_type) {
+            // http remote request
+            // headers => Requests_Utility_CaseInsensitiveDictionary Object
+            if (!empty($data['headers']) && \is_object($data['headers']) && false !== strpos(var_export($data['headers'], 1), 'Requests_Utility_CaseInsensitiveDictionary::__set_state')) {
+                $data = @serialize($data);
+                if (nwdcx_serialized($data)) {
+                    $final_type = 'string';
+                }
+            }
+        }
 
         $meta['site_id'] = get_current_blog_id();
         $meta['group'] = $group;
@@ -222,12 +259,21 @@ class Becache
         }
 
         $suppress = $wpdb->suppress_errors(true);
-
         $collect = [];
 
         $results = $wpdb->get_results('SELECT `option_id`,`option_name`,`option_value` FROM `'.$wpdb->options.'` WHERE `option_name` LIKE "_transient_%" OR `option_name` LIKE "_site_transient_%" ORDER BY `option_id` ASC LIMIT '.$this->qlimit, ARRAY_A);
         if (!empty($results) && \is_array($results)) {
             while ($row = @array_shift($results)) {
+                if ($this->max_execution_time > 0 && \defined('WP_START_TIMESTAMP') && (microtime(true) - WP_START_TIMESTAMP) > $this->max_execution_time) {
+                    $collect = [];
+                    break;
+                }
+
+                // ignore empty value
+                if ('' === $row['option_value']) {
+                    continue;
+                }
+
                 $key = @preg_replace('@^(_site)?(_transient)(_timeout)?_@', '', $row['option_name']);
                 if (!isset($collect[$key])) {
                     $collect[$key] = ['value' => '', 'group' => 'transient', 'timeout' => 0];
@@ -245,6 +291,10 @@ class Becache
 
             if (!empty($collect)) {
                 foreach ($collect as $key => $arr) {
+                    if ($this->max_execution_time > 0 && \defined('WP_START_TIMESTAMP') && (microtime(true) - WP_START_TIMESTAMP) > $this->max_execution_time) {
+                        break;
+                    }
+
                     $timeout = isset($arr['timeout']) ? $arr['timeout'] : 0;
                     $this->store_cache($key, $arr['value'], $arr['group'], $timeout);
                 }
@@ -257,6 +307,16 @@ class Becache
             $results = $wpdb->get_results('SELECT `meta_id`,`meta_key`,`meta_value` FROM `'.$wpdb->sitemeta.'` WHERE `meta_key` LIKE "_site_transient_%" ORDER BY `meta_id` ASC LIMIT '.$this->qlimit, ARRAY_A);
             if (!empty($results) && \is_array($results)) {
                 while ($row = @array_shift($results)) {
+                    if ($this->max_execution_time > 0 && \defined('WP_START_TIMESTAMP') && (microtime(true) - WP_START_TIMESTAMP) > $this->max_execution_time) {
+                        $collect = [];
+                        break;
+                    }
+
+                    // ignore empty value
+                    if ('' === $row['meta_value']) {
+                        continue;
+                    }
+
                     $key = @preg_replace('@^(_site)?(_transient)(_timeout)?_@', '', $row['meta_key']);
                     if (!isset($collect[$key])) {
                         $collect[$key] = ['value' => '', 'group' => 'site-transient', 'expire' => 0];
@@ -303,6 +363,11 @@ class Becache
             $wp_options = $this->fs()->keys_alloptions();
             $is_filter = $this->cf()->is_dctrue('WPOPTALOAD');
             foreach ($alloptions_db as $num => $options) {
+                if ($this->max_execution_time > 0 && \defined('WP_START_TIMESTAMP') && (microtime(true) - WP_START_TIMESTAMP) > $this->max_execution_time) {
+                    $alloptions = [];
+                    break;
+                }
+
                 $key = $options['option_name'];
                 if ($is_filter && \array_key_exists($key, $wp_options)) {
                     continue;

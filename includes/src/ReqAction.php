@@ -65,6 +65,10 @@ final class ReqAction
              'docket-flush-ocfile',
              'docket-flush-opcache',
              'docket-flush-menucache',
+             'docket-flush-transient',
+             'docket-flush-advcpost',
+             'docket-flush-ocprecache',
+             'docket-flush-mocache',
              'docket-connect-cronbot',
              'docket-disconnect-cronbot',
              'docket-pong-cronbot',
@@ -103,8 +107,11 @@ final class ReqAction
 
         switch ($action) {
             case 'docket-flush-occache':
-                $result = $this->pt->flush_cache();
-                $response = $result ? 'docket-occache-flushed' : 'docket-occache-flushed-failed';
+                $is_timeout = false;
+                $result = $this->pt->flush_cache(true, $is_timeout);
+                $response = $is_timeout ? 'docket-occache-flushed-warn' : 'docket-occache-flushed';
+                $this->pt->co()->lookup_set('occacheflushed', $result);
+
                 do_action('docketcache/action/flush/objectcache', $result);
                 break;
             case 'docket-enable-occache':
@@ -176,6 +183,62 @@ final class ReqAction
                 }
 
                 do_action('docketcache/action/flush/file/menucache', $ok, $result);
+                break;
+            case 'docket-flush-mocache':
+                $result = 0;
+                $ok = true;
+                if (\function_exists('wp_cache_flush_group')) {
+                    $result = wp_cache_flush_group('docketcache-mo');
+                    $this->pt->co()->lookup_set('mocacheflushed', $result);
+                    $response = 'docket-mocache-flushed';
+                } else {
+                    $response = 'docket-mocache-flushed-failed';
+                    $ok = false;
+                }
+
+                do_action('docketcache/action/flush/file/mocache', $ok, $result);
+                break;
+            case 'docket-flush-ocprecache':
+                $result = 0;
+                $ok = true;
+                if (\function_exists('wp_cache_flush_group')) {
+                    $result = wp_cache_flush_group('docketcache-precache');
+                    $this->pt->co()->lookup_set('ocprecacheflushed', $result);
+                    $response = 'docket-ocprecache-flushed';
+                } else {
+                    $response = 'docket-ocprecache-flushed-failed';
+                    $ok = false;
+                }
+
+                do_action('docketcache/action/flush/file/ocprecache', $ok, $result);
+                break;
+            case 'docket-flush-advcpost':
+                $result = 0;
+                $ok = true;
+                if (\function_exists('wp_cache_flush_group_match')) {
+                    $result = wp_cache_flush_group_match('docketcache-post');
+                    $this->pt->co()->lookup_set('advcpostflushed', $result);
+                    $response = 'docket-advcpost-flushed';
+                } else {
+                    $response = 'docket-advcpost-flushed-failed';
+                    $ok = false;
+                }
+
+                do_action('docketcache/action/flush/file/advcpost', $ok, $result);
+                break;
+            case 'docket-flush-transient':
+                $result = 0;
+                $ok = true;
+                if (\function_exists('wp_cache_flush_group')) {
+                    $result = wp_cache_flush_group(['transient', 'site-transient']);
+                    $this->pt->co()->lookup_set('transientflushed', $result);
+                    $response = 'docket-transient-flushed';
+                } else {
+                    $response = 'docket-transient-flushed-failed';
+                    $ok = false;
+                }
+
+                do_action('docketcache/action/flush/file/transient', $ok, $result);
                 break;
             case 'docket-connect-cronbot':
                 $result = apply_filters('docketcache/filter/active/cronbot', true);
@@ -310,7 +373,37 @@ final class ReqAction
                         $ok = false;
                         $response = 'docket-option-wpf-warn';
                     } else {
+                        // storage options
+                        if ('maxsize_disk' === $nx) {
+                            $nvo = $nv;
+                            switch ($nv) {
+                                case '1G':
+                                    $nv = 1073741824;
+                                break;
+                                case '2G':
+                                    $nv = 2147483648;
+                                break;
+                                default:
+                                    $nv = 524288000; // 500M
+                            }
+                        } elseif ('maxfile' === $nx) {
+                            switch ($nv) {
+                                case '100K':
+                                    $nv = 100000;
+                                break;
+                                case '200K':
+                                    $nv = 200000;
+                                break;
+                                default:
+                                    $nv = 50000; // 50K
+                            }
+                        }
+
                         $ok = $this->pt->co()->save($nx, $nv);
+                        if (isset($nvo)) {
+                            $nv = $nvo;
+                        }
+
                         $response = $ok ? 'docket-option-save' : 'docket-option-failed';
                     }
                     $option_value = $nv;
@@ -398,6 +491,7 @@ final class ReqAction
         }
     }
 
+    // see: View::action_notice()
     private function screen_notice()
     {
         if (isset($_GET['message'])) {
@@ -453,10 +547,47 @@ final class ReqAction
                     $this->pt->notice = esc_html__('Object cache could not be disabled.', 'docket-cache');
                     break;
                 case 'docket-occache-flushed':
-                    $this->pt->notice = esc_html__('Object cache was flushed.', 'docket-cache');
+                    $total = $this->pt->co()->lookup_get('occacheflushed', true);
+                    if (empty($total)) {
+                        $total = 0;
+                    }
+
+                    if ($total > 0) {
+                        $clmsg = esc_html__('Object cache was flushed.', 'docket-cache');
+                        $clmsg .= '<div class="gc"><ul>';
+                        $clmsg .= '<li><span>'.esc_html__('Total cache flushed', 'docket-cache').'</span>'.$total.'</li>';
+                        $clmsg .= '</ul>';
+                        $clmsg .= '</div>';
+                        $this->pt->notice = $clmsg;
+                    } else {
+                        $this->pt->notice = esc_html__('The cache is empty, no cache needs to be flushed.', 'docket-cache');
+                    }
+
                     break;
-                case 'docket-occache-flushed-failed':
-                    $this->pt->notice = esc_html__('Object cache could not be flushed.', 'docket-cache');
+                case 'docket-occache-flushed-warn':
+                    $total = $this->pt->co()->lookup_get('occacheflushed', true);
+                    if (empty($total)) {
+                        $total = 0;
+                    }
+
+                    $cachedir = $this->pt->sanitize_rootpath($this->pt->cache_path);
+
+                    /* translators: %d = seconds */
+                    $clmsg = sprintf(esc_html__('Process aborted. The object cache is not fully flushed. The maximum execution time of %d seconds was exceeded.', 'docket-cache'), (int) ini_get('max_execution_time'));
+                    $clmsg .= '<div class="gc"><ul>';
+                    $clmsg .= '<li><span class="single">'.esc_html__('Total cache flushed', 'docket-cache').'</span>: '.$total.'</li>';
+                    $clmsg .= '<li><span class="bulllist">'.esc_html__('Alternatively, you may try to flush the cache by doing:', 'docket-cache');
+                    $clmsg .= '<br>&bull; '.esc_html__('Hit the "Disable Object Cache" button.', 'docket-cache');
+                    $clmsg .= '<br>&bull; '.esc_html__('Hit the "Flush Object Cache" button repeatedly until fully flushed.', 'docket-cache');
+                    $clmsg .= '<br>&bull; '.esc_html__('Or run the WP-CLI command "wp cache flush".', 'docket-cache');
+
+                    /* translators: %s = cache path */
+                    $clmsg .= '<br>&bull; '.sprintf(esc_html__('Or manually remove the cache directory: %s', 'docket-cache'), $cachedir);
+                    $clmsg .= '</span></li>';
+                    $clmsg .= '</ul>';
+                    $clmsg .= '</div>';
+                    $this->pt->notice .= $clmsg;
+
                     break;
                 case 'docket-dropino-updated':
                     $this->pt->notice = esc_html__('Updated object cache Drop-In and enabled Docket object cache.', 'docket-cache');
@@ -687,7 +818,7 @@ final class ReqAction
                     }
 
                     $clmsg = '<div class="gc"><ul>';
-                    $clmsg .= '<li><span>'.esc_html__('Total Files', 'docket-cache').'</span>'.$total.'</li>';
+                    $clmsg .= '<li><span>'.esc_html__('Total cache flushed', 'docket-cache').'</span>'.$total.'</li>';
                     $clmsg .= '</ul>';
                     $clmsg .= '</div>';
 
@@ -696,6 +827,78 @@ final class ReqAction
                     break;
                 case 'docket-menucache-flushed-failed':
                     $this->pt->notice = esc_html__('Menu cache could not be flushed.', 'docket-cache');
+                    break;
+                case 'docket-mocache-flushed':
+                    $this->pt->notice = esc_html__('Translation cache was flushed.', 'docket-cache');
+                    $total = $this->pt->co()->lookup_get('mocacheflushed', true);
+                    if (empty($total)) {
+                        $total = 0;
+                    }
+
+                    $clmsg = '<div class="gc"><ul>';
+                    $clmsg .= '<li><span>'.esc_html__('Total cache flushed', 'docket-cache').'</span>'.$total.'</li>';
+                    $clmsg .= '</ul>';
+                    $clmsg .= '</div>';
+
+                    $this->pt->notice .= $clmsg;
+                    unset($total, $clmsg);
+                    break;
+                case 'docket-mocache-flushed-failed':
+                    $this->pt->notice = esc_html__('Translation cache could not be flushed.', 'docket-cache');
+                    break;
+                case 'docket-ocprecache-flushed':
+                    $this->pt->notice = esc_html__('Object Precache was flushed.', 'docket-cache');
+                    $total = $this->pt->co()->lookup_get('ocprecacheflushed', true);
+                    if (empty($total)) {
+                        $total = 0;
+                    }
+
+                    $clmsg = '<div class="gc"><ul>';
+                    $clmsg .= '<li><span>'.esc_html__('Total cache flushed', 'docket-cache').'</span>'.$total.'</li>';
+                    $clmsg .= '</ul>';
+                    $clmsg .= '</div>';
+
+                    $this->pt->notice .= $clmsg;
+                    unset($total, $clmsg);
+                    break;
+                case 'docket-ocprecache-flushed-failed':
+                    $this->pt->notice = esc_html__('Object Precache could not be flushed.', 'docket-cache');
+                    break;
+                case 'docket-advcpost-flushed':
+                    $this->pt->notice = esc_html__('Advanced Post Cache was flushed.', 'docket-cache');
+                    $total = $this->pt->co()->lookup_get('advcpostflushed', true);
+                    if (empty($total)) {
+                        $total = 0;
+                    }
+
+                    $clmsg = '<div class="gc"><ul>';
+                    $clmsg .= '<li><span>'.esc_html__('Total cache flushed', 'docket-cache').'</span>'.$total.'</li>';
+                    $clmsg .= '</ul>';
+                    $clmsg .= '</div>';
+
+                    $this->pt->notice .= $clmsg;
+                    unset($total, $clmsg);
+                    break;
+                case 'docket-advcpost-flushed-failed':
+                    $this->pt->notice = esc_html__('Advanced Post Cache could not be flushed.', 'docket-cache');
+                    break;
+                case 'docket-transient-flushed':
+                    $this->pt->notice = esc_html__('Transient cache was flushed.', 'docket-cache');
+                    $total = $this->pt->co()->lookup_get('transientflushed', true);
+                    if (empty($total)) {
+                        $total = 0;
+                    }
+
+                    $clmsg = '<div class="gc"><ul>';
+                    $clmsg .= '<li><span>'.esc_html__('Total cache flushed', 'docket-cache').'</span>'.$total.'</li>';
+                    $clmsg .= '</ul>';
+                    $clmsg .= '</div>';
+
+                    $this->pt->notice .= $clmsg;
+                    unset($total, $clmsg);
+                    break;
+                case 'docket-transient-flushed-failed':
+                    $this->pt->notice = esc_html__('Transient cache could not be flushed.', 'docket-cache');
                     break;
             }
         }

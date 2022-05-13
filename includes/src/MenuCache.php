@@ -91,7 +91,7 @@ final class MenuCache
         return wp_cache_get($this->get_key($menu_key), 'docketcache-menu');
     }
 
-    private function flush_cache()
+    private function navmenu_flush_cache()
     {
         if (\function_exists('wp_cache_flush_group')) {
             wp_cache_flush_group('docketcache-menu');
@@ -136,12 +136,12 @@ final class MenuCache
 
     public function wp_update_nav_menu($menu_id)
     {
-        $this->flush_cache();
+        $this->navmenu_flush_cache();
     }
 
     public function pre_set_theme_mod_nav_menu_locations($new, $old)
     {
-        $this->flush_cache();
+        $this->navmenu_flush_cache();
 
         return $new;
     }

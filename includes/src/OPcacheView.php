@@ -132,11 +132,11 @@ class OPcacheView extends \WP_List_Table
                         $cfile = basename($cpath);
                         $cdir = \dirname($cpath);
 
-                        if ('obc' === $sftr && (false === strpos($script, $this->pt->cache_path) || !$this->pt->is_docketcachedir($cdir) || !@preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php(\.bin)?$@', $cfile))) {
+                        if ('obc' === $sftr && (false === strpos($script, $this->pt->cache_path) || !$this->pt->is_docketcachedir($cdir) || !@preg_match('@^([a-z0-9]{12})\-([a-z0-9]{12})\.php(\.bin)?$@', $cfile))) {
                             continue;
                         }
 
-                        if ('wpc' === $sftr && (false !== strpos($script, $this->pt->cache_path) && $this->pt->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php(\.bin)?$@', $cfile))) {
+                        if ('wpc' === $sftr && (false !== strpos($script, $this->pt->cache_path) && $this->pt->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9]{12})\-([a-z0-9]{12})\.php(\.bin)?$@', $cfile))) {
                             continue;
                         }
 
@@ -239,7 +239,7 @@ class OPcacheView extends \WP_List_Table
             'opclist_timestamp' => $lastused,
         ];
 
-        if (@ini_get('opcache.file_cache_only')) {
+        if ($this->pt->is_opcache_filecache_only()) {
             unset($cols['opclist_hits']);
             $cols['opclist_mem'] = esc_html__('File Size', 'docket-cache');
         }
@@ -256,7 +256,7 @@ class OPcacheView extends \WP_List_Table
              'opclist_timestamp' => ['stmp', false],
          ];
 
-        if (@ini_get('opcache.file_cache_only')) {
+        if ($this->pt->is_opcache_filecache_only()) {
             unset($cols['opclist_hits']);
         }
 

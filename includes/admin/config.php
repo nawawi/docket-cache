@@ -66,6 +66,15 @@ namespace Nawawi\DocketCache;
                         <?php echo $this->config_select_bool('advcpost'); ?>
                     </td>
                 </tr>
+                <?php if ($this->vcf()->is_dctrue('advcpost')) : ?>
+                <tr id="advpost_posttype_all">
+                    <th><?php echo esc_html__('Post Caching Any Post Type', 'docket-cache').$this->tooltip('advpost_posttype_all'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('advpost_posttype_all'); ?>
+                    </td>
+                </tr>
+                <?php endif; ?>
+
                 <tr id="precache">
                     <th><?php echo esc_html__('Object Cache Precaching', 'docket-cache').$this->tooltip('precache'); ?></th>
                     <td>
@@ -458,6 +467,81 @@ namespace Nawawi\DocketCache;
                 <?php endif; ?>
                 <tr>
                     <td colspan="2" class="stitle">
+                        <?php esc_html_e('Storage Options', 'docket-cache'); ?>
+                    </td>
+                </tr>
+                <tr id="chunkcachedir">
+                    <th><?php echo esc_html__('Chunk Cache Directory', 'docket-cache').$this->tooltip('chunkcachedir'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('chunkcachedir'); ?>
+                    </td>
+                </tr>
+                <tr id="flush_stalecache">
+                    <th><?php echo esc_html__('Auto Remove Stale Cache', 'docket-cache').$this->tooltip('flush_stalecache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('flush_stalecache'); ?>
+                    </td>
+                </tr>
+                <tr id="maxfile">
+                    <th><?php echo esc_html__('Cache Files Limit', 'docket-cache').$this->tooltip('maxfile'); ?></th>
+                    <td>
+                        <?php
+                            $maxfile_default = '50K';
+                        switch ($this->vcf()->dcvalue('maxfile')) {
+                            case '50000':
+                                $maxfile_default = '50K';
+                                break;
+                            case '100000':
+                                $maxfile_default = '100K';
+                                break;
+                            case '200000':
+                                $maxfile_default = '200K';
+                                break;
+                        }
+                            echo $this->config_select_set(
+                                'maxfile',
+                                [
+                                    'default' => __('Default', 'docket-cache'),
+                                    '50K' => '50000',
+                                    '100K' => '100000',
+                                    '200K' => '200000',
+                                ],
+                                $maxfile_default
+                            );
+                            ?>
+                    </td>
+                </tr>
+                <tr id="maxsize_disk">
+                    <th class="border-b"><?php echo esc_html__('Cache Disk Limit', 'docket-cache').$this->tooltip('maxsize_disk'); ?></th>
+                    <td>
+                        <?php
+                            $maxsize_disk_default = '500M';
+                        switch ($this->vcf()->dcvalue('maxsize_disk')) {
+                            case '524288000':
+                                $maxsize_disk_default = '500M';
+                                break;
+                            case '1073741824':
+                                $maxsize_disk_default = '1G';
+                                break;
+                            case '2147483648':
+                                $maxsize_disk_default = '2G';
+                                break;
+                        }
+                            echo $this->config_select_set(
+                                'maxsize_disk',
+                                [
+                                    'default' => __('Default', 'docket-cache'),
+                                    '500M' => '500M',
+                                    '1G' => '1G',
+                                    '2G' => '2G',
+                                ],
+                                $maxsize_disk_default
+                            );
+                            ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="stitle">
                         <?php esc_html_e('Admin Interface', 'docket-cache'); ?>
                     </td>
                 </tr>
@@ -474,9 +558,15 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="gcaction">
-                    <th class="border-b"><?php echo esc_html__('Garbage Collector Action Button', 'docket-cache').$this->tooltip('gcaction'); ?></th>
+                    <th><?php echo esc_html__('Garbage Collector Action Button', 'docket-cache').$this->tooltip('gcaction'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('gcaction'); ?>
+                    </td>
+                </tr>
+                <tr id="flushaction">
+                    <th class="border-b"><?php echo esc_html__('Additional Flush Cache Action Button', 'docket-cache').$this->tooltip('flushaction'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('flushaction'); ?>
                     </td>
                 </tr>
                 <tr>
@@ -494,6 +584,12 @@ namespace Nawawi\DocketCache;
                     <th><?php echo esc_html__('Check Critical Version', 'docket-cache').$this->tooltip('checkversion'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('checkversion'); ?>
+                    </td>
+                </tr>
+                <tr id="flush_shutdown">
+                    <th><?php echo esc_html__('Flush Object Cache During Deactivation', 'docket-cache').$this->tooltip('flush_shutdown'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('flush_shutdown'); ?>
                     </td>
                 </tr>
                 <tr id="opcshutdown">

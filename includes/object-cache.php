@@ -3,7 +3,7 @@
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
  * Plugin URI:          https://wordpress.org/plugins/docket-cache/
- * Version:             21.08.05
+ * Version:             21.08.06
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * Author:              Nawawi Jamili
  * Author URI:          https://docketcache.com
@@ -17,14 +17,7 @@ if (!\defined('ABSPATH')) {
 }
 
 /*
- * Check if doing action.
- */
-if (!empty($_GET['_wpnonce']) && !empty($_GET['action']) && !empty($_GET['page']) && 'docket-cache' === $_GET['page'] && false === strpos($_GET['action'], 'cronbot') && false === strpos($_GET['action'], 'wpoptaload')) {
-    return;
-}
-
-/*
- * Check if caching is not disabled.
+ * Bypass if caching is disabled.
  */
 if (\defined('DOCKET_CACHE_DISABLED') && DOCKET_CACHE_DISABLED) {
     return;
@@ -35,6 +28,22 @@ if (\defined('DOCKET_CACHE_DISABLED') && DOCKET_CACHE_DISABLED) {
  */
 if (version_compare(\PHP_VERSION, '7.2.5', '<')) {
     return;
+}
+
+/*
+ * Bypass if we doing action.
+ */
+if (!empty($_GET['_wpnonce']) && !empty($_GET['action']) && !empty($_GET['page']) && 'docket-cache' === $_GET['page'] && false === strpos($_GET['action'], 'cronbot') && false === strpos($_GET['action'], 'wpoptaload')) {
+    return;
+}
+
+/*
+ * Bypass if match cache key in $_REQUEST.
+ */
+if (\defined('DOCKET_CACHE_IGNORE_REQUEST') && \is_array(DOCKET_CACHE_IGNORE_REQUEST) && !empty($_REQUEST)) {
+    if (array_intersect(DOCKET_CACHE_IGNORE_REQUEST, array_keys($_REQUEST))) {
+        return;
+    }
 }
 
 /*

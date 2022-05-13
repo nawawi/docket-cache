@@ -190,14 +190,26 @@ class Command extends WP_CLI_Command
      */
     public function flush_cache()
     {
-        if (false === $this->pt->flush_cache(true)) {
-            $this->halt_error(__('Object cache could not be flushed.', 'docket-cache'));
-        }
-
         WP_CLI::line(__('Flushing cache. Please wait..', 'docket-cache'));
         sleep(1);
+
+        $is_timeout = false;
+
+        $total = $this->pt->flush_cache(true, $is_timeout);
+
         $this->pt->cx()->undelay();
-        $this->halt_success(__('The cache was flushed.', 'docket-cache'));
+
+        if ($is_timeout) {
+            /* translators: %d = seconds */
+            $this->halt_error(sprintf(__('Process aborted. The object cache is not fully flushed. The maximum execution time of %d seconds was exceeded.', 'docket-cache'), $result));
+        }
+
+        if (empty($total)) {
+            $this->halt_error(__('The cache is empty, no cache needs to be flushed.', 'docket-cache'));
+        }
+
+        /* translators: %d = count */
+        $this->halt_success(sprintf(__('The cache was flushed. Total cache flushed: %d', 'docket-cache'), $total));
     }
 
     /**
@@ -304,8 +316,111 @@ class Command extends WP_CLI_Command
 
         WP_CLI::line(__('Flushing precache. Please wait..', 'docket-cache'));
         sleep(1);
-        wp_cache_flush_group('docketcache-precache');
-        $this->halt_success(__('The precache was flushed.', 'docket-cache'));
+        $total = wp_cache_flush_group('docketcache-precache');
+
+        /* translators: %d = count */
+        $this->halt_success(sprintf(__('The precache was flushed. Total cache flushed: %d', 'docket-cache'), $total));
+    }
+
+    /**
+     * Flushes the transient files.
+     *
+     * Remove the transient files.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache flush:transient
+     *
+     * @subcommand flush:transient
+     */
+    public function flush_transient()
+    {
+        if (!\function_exists('wp_cache_flush_group')) {
+            $this->halt_error(__('Transient could not be flushed.', 'docket-cache'));
+        }
+
+        WP_CLI::line(__('Flushing transient. Please wait..', 'docket-cache'));
+        sleep(1);
+
+        $total = wp_cache_flush_group(['transient', 'site-transient']);
+
+        /* translators: %d = couint */
+        $this->halt_success(sprintf(__('The transient was flushed. Total cache flushed: %d', 'docket-cache'), $total));
+    }
+
+    /**
+     * Flushes the Advanced Post Cache files.
+     *
+     * Remove the Advanced Post Cache files.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache flush:advcpost
+     *
+     * @subcommand flush:advcpost
+     */
+    public function flush_advcpost()
+    {
+        if (!\function_exists('wp_cache_flush_group_match')) {
+            $this->halt_error(__('Advanced Post Cache could not be flushed.', 'docket-cache'));
+        }
+
+        WP_CLI::line(__('Flushing Advanced Post Cache. Please wait..', 'docket-cache'));
+        sleep(1);
+        $total = wp_cache_flush_group_match('docketcache-post');
+
+        /* translators: %d = count */
+        $this->halt_success(sprintf(__('The Advanced Post Cache was flushed. Total cache flushed: %d', 'docket-cache'), $total));
+    }
+
+    /**
+     * Flushes the Menu Cache files.
+     *
+     * Remove the Menu Cache files.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache flush:menucache
+     *
+     * @subcommand flush:menucache
+     */
+    public function flush_menucache()
+    {
+        if (!\function_exists('wp_cache_flush_group')) {
+            $this->halt_error(__('Menu Cache could not be flushed.', 'docket-cache'));
+        }
+
+        WP_CLI::line(__('Flushing Menu Cache. Please wait..', 'docket-cache'));
+        sleep(1);
+        $total = wp_cache_flush_group('docketcache-menu');
+
+        /* translators: %d = count */
+        $this->halt_success(sprintf(__('The Menu Cache was flushed. Total cache flushed: %d', 'docket-cache'), $total));
+    }
+
+    /**
+     * Flushes the Translation Cache files.
+     *
+     * Remove the Translation Cache files.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache flush:mocache
+     *
+     * @subcommand flush:mocache
+     */
+    public function flush_mocache()
+    {
+        if (!\function_exists('wp_cache_flush_group')) {
+            $this->halt_error(__('Translation Cache could not be flushed.', 'docket-cache'));
+        }
+
+        WP_CLI::line(__('Flushing Translation Cache. Please wait..', 'docket-cache'));
+        sleep(1);
+        $total = wp_cache_flush_group('docketcache-mo');
+
+        /* translators: %d = count */
+        $this->halt_success(sprintf(__('The Translation Cache was flushed. Total cache flushed: %d', 'docket-cache'), $total));
     }
 
     /**

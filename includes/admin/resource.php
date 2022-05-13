@@ -40,6 +40,32 @@ namespace Nawawi\DocketCache;
         <?php endif; ?>
         <a href="<?php echo $this->pt->action_query('cleanuppost', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner btx-cleanuppost"><?php esc_html_e('Cleanup Post', 'docket-cache'); ?></a>
 
+        <?php if ($this->vcf()->is_dctrue('FLUSHACTION')) : ?>
+        <?php if ($this->vcf()->is_dctrue('ADVCPOST')) : ?>
+        <hr>
+        <h4><?php esc_html_e('Advanced Post Cache Files', 'docket-cache'); ?></h4>
+        <p>
+            <?php esc_html_e('Remove Advanced Post Cache files.', 'docket-cache'); ?>
+        </p>
+        <a href="<?php echo $this->pt->action_query('flush-advcpost', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Flush Advanced Post Cache', 'docket-cache'); ?></a>
+        <?php endif; ?>
+
+        <?php if ($this->vcf()->is_dctrue('PRECACHE')) : ?>
+        <hr>
+        <h4><?php esc_html_e('Object Precache Files', 'docket-cache'); ?></h4>
+        <p>
+            <?php esc_html_e('Remove Object Cache Precaching files.', 'docket-cache'); ?>
+        </p>
+        <a href="<?php echo $this->pt->action_query('flush-ocprecache', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Flush Object Precache', 'docket-cache'); ?></a>
+        <?php endif; ?>
+
+        <hr>
+        <h4><?php esc_html_e('Transient Cache Files', 'docket-cache'); ?></h4>
+        <p>
+            <?php esc_html_e('Remove transient cache files.', 'docket-cache'); ?>
+        </p>
+        <a href="<?php echo $this->pt->action_query('flush-transient', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Flush Transient Cache', 'docket-cache'); ?></a>
+
         <?php if ($this->vcf()->is_dctrue('MENUCACHE')) : ?>
         <hr>
         <h4><?php esc_html_e('Menu Cache Files', 'docket-cache'); ?></h4>
@@ -48,12 +74,24 @@ namespace Nawawi\DocketCache;
         </p>
         <a href="<?php echo $this->pt->action_query('flush-menucache', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Flush Menu Cache', 'docket-cache'); ?></a>
         <?php endif; ?>
+
+        <?php if ($this->vcf()->is_dctrue('MOCACHE')) : ?>
+        <hr>
+        <h4><?php esc_html_e('Translation Cache Files', 'docket-cache'); ?></h4>
+        <p>
+            <?php esc_html_e('Remove translation cache files.', 'docket-cache'); ?>
+        </p>
+        <a href="<?php echo $this->pt->action_query('flush-mocache', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Flush Translation Cache', 'docket-cache'); ?></a>
+        <?php endif; ?>
+
+        <?php endif; // flushaction?>
         <hr>
         <h4><?php esc_html_e('Config Reset', 'docket-cache'); ?></h4>
         <p>
             <?php esc_html_e('Reset all configuration to default.', 'docket-cache'); ?>
         </p>
         <a href="<?php echo $this->pt->action_query('configreset', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Reset to default', 'docket-cache'); ?></a>
+
         <hr>
         <h4><?php esc_html_e('Runtime Code', 'docket-cache'); ?></h4>
         <p>

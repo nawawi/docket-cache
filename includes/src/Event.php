@@ -235,158 +235,156 @@ final class Event
             'cleanup_failed' => 0,
         ];
 
-        if ($this->pt->co()->lockproc('garbage_collector', time() + 3600)) {
+        $max_execution_time = $this->pt->get_max_execution_time();
+        if ($this->pt->co()->lockproc('garbage_collector', time() + $max_execution_time + 10)) {
             return $collect;
         }
 
+        clearstatcache();
+        if (!$this->pt->is_docketcachedir($this->pt->cache_path) || @is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-flush.txt')) {
+            return $collect;
+        }
+
+        $delay = $force ? 650 : 5000;
         wp_suspend_cache_addition(true);
 
-        $delay = $force ? 650 : 1000;
-        if ($this->pt->is_docketcachedir($this->pt->cache_path)) {
-            clearstatcache();
-            $fsizetotal = 0;
-            $cnt = 0;
-            $pcnt = 0;
-            $slowdown = 0;
-            foreach ($this->pt->scanfiles($this->pt->cache_path) as $object) {
-                try {
-                    $fx = $object->getPathName();
+        $fsizetotal = 0;
+        $cnt = 0;
+        $pcnt = 0;
+        $slowdown = 0;
 
-                    if (!$object->isFile() || 'file' !== $object->getType() || !$this->pt->is_php($fx)) {
-                        ++$collect->cache_ignore;
-                        continue;
-                    }
+        foreach ($this->pt->scanfiles($this->pt->cache_path) as $object) {
+            if ($max_execution_time > 0 && \defined('WP_START_TIMESTAMP') && (microtime(true) - WP_START_TIMESTAMP) > $max_execution_time) {
+                break;
+            }
 
-                    $fn = $object->getFileName();
-                    $fs = $object->getSize();
-                    $fm = time() + 300;
-                    $ft = filemtime($fx);
-                } catch (\Throwable $e) {
-                    nwdcx_throwable(__METHOD__, $e);
+            if ($slowdown > 10) {
+                $slowdown = 0;
+                usleep($delay);
+            }
+
+            ++$slowdown;
+
+            try {
+                if (!$object->isFile()) {
+                    ++$collect->cache_ignore;
                     continue;
                 }
 
-                if ($fm >= $ft && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
+                $fx = $object->getPathName();
+                $fn = $object->getFileName();
+                $fs = $object->getSize();
+                $fm = time() + 300;
+                $ft = filemtime($fx);
+
+                $this->pt->remove_non_chunk_cache($this->pt->cache_path, $fx);
+            } catch (\Throwable $e) {
+                nwdcx_throwable(__METHOD__, $e);
+                continue;
+            }
+
+            if ($fm >= $ft && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
+                $this->pt->unlink($fx, true);
+
+                if ($force && @is_file($fx)) {
+                    ++$collect->cleanup_failed;
+                }
+                continue;
+            }
+
+            // 032e9f2c5b60- = docketcache-precache-
+            if ($maxfile_pre > 0 && '032e9f2c5b60-' === substr($fn, 0, 13)) {
+                ++$pcnt;
+
+                if ($pcnt > $maxfile_pre) {
                     $this->pt->unlink($fx, true);
 
                     if ($force && @is_file($fx)) {
                         ++$collect->cleanup_failed;
                     }
 
-                    usleep(100);
+                    ++$collect->cleanup_precache_maxfile;
                     continue;
                 }
+            }
 
-                // 032e9f2c5b60- = docketcache-precache-
-                if ($maxfile_pre > 0 && '032e9f2c5b60-' === substr($fn, 0, 13)) {
-                    ++$pcnt;
+            if ($cnt >= $maxfile) {
+                $this->pt->unlink($fx, true);
 
-                    if ($pcnt > $maxfile_pre) {
+                if ($force && @is_file($fx)) {
+                    ++$collect->cleanup_failed;
+                }
+
+                ++$collect->cleanup_maxfile;
+                continue;
+            }
+
+            $fsizetotal += $fs;
+            if ($chkmaxdisk && $fsizetotal > $maxsizedisk) {
+                $this->pt->unlink($fx, true);
+
+                if ($force && @is_file($fx)) {
+                    ++$collect->cleanup_failed;
+                }
+
+                ++$collect->cleanup_maxdisk;
+                continue;
+            }
+
+            $data = $this->pt->cache_get($fx);
+            $is_timeout = false;
+            if (false !== $data) {
+                $is_timeout = !empty($data['timeout']) && $this->pt->valid_timestamp($data['timeout']) ? true : false;
+                $docon = false;
+                if ($is_timeout) {
+                    if ($fm >= (int) $data['timeout']) {
                         $this->pt->unlink($fx, true);
 
                         if ($force && @is_file($fx)) {
                             ++$collect->cleanup_failed;
                         }
 
-                        ++$collect->cleanup_precache_maxfile;
-
-                        usleep(100);
-                        continue;
+                        unset($data);
+                        $docon = true;
+                        ++$collect->cleanup_maxttl;
                     }
-                }
+                } else {
+                    if (!empty($data['timestamp']) && $this->pt->valid_timestamp($data['timestamp']) && $maxttl > $data['timestamp']) {
+                        $this->pt->unlink($fx, true);
 
-                if ($cnt >= $maxfile) {
-                    $this->pt->unlink($fx, true);
-
-                    if ($force && @is_file($fx)) {
-                        ++$collect->cleanup_failed;
-                    }
-
-                    ++$collect->cleanup_maxfile;
-
-                    usleep(100);
-                    continue;
-                }
-
-                $fsizetotal += $fs;
-                if ($chkmaxdisk && $fsizetotal > $maxsizedisk) {
-                    $this->pt->unlink($fx, true);
-
-                    if ($force && @is_file($fx)) {
-                        ++$collect->cleanup_failed;
-                    }
-
-                    ++$collect->cleanup_maxdisk;
-
-                    usleep(100);
-                    continue;
-                }
-
-                $data = $this->pt->cache_get($fx);
-                $is_timeout = false;
-                if (false !== $data) {
-                    $is_timeout = !empty($data['timeout']) && $this->pt->valid_timestamp($data['timeout']) ? true : false;
-
-                    if ($is_timeout) {
-                        if ($fm >= (int) $data['timeout']) {
-                            $this->pt->unlink($fx, true);
-
-                            if ($force && @is_file($fx)) {
-                                ++$collect->cleanup_failed;
-                            }
-
-                            unset($data);
-
-                            ++$collect->cleanup_maxttl;
-
-                            usleep(100);
-                            continue;
+                        if ($force && @is_file($fx)) {
+                            ++$collect->cleanup_failed;
                         }
-                    } else {
-                        if (!empty($data['timestamp']) && $this->pt->valid_timestamp($data['timestamp']) && $maxttl > $data['timestamp']) {
-                            $this->pt->unlink($fx, true);
 
-                            if ($force && @is_file($fx)) {
-                                ++$collect->cleanup_failed;
-                            }
-
-                            unset($data);
-                            ++$collect->cleanup_maxttl;
-
-                            usleep(100);
-                            continue;
-                        }
+                        unset($data);
+                        $docon = true;
+                        ++$collect->cleanup_maxttl;
                     }
                 }
-                unset($data);
 
-                // no timeout data or 0
-                if (false === $is_timeout && $maxttl > 0 && $maxttl > $ft) {
-                    $this->pt->unlink($fx, true);
-
-                    if ($force && @is_file($fx)) {
-                        ++$collect->cleanup_failed;
-                    }
-
-                    ++$collect->cleanup_maxttl;
-
-                    usleep(100);
+                if ($docon) {
                     continue;
                 }
+            }
+            unset($data);
 
-                ++$cnt;
-                ++$collect->cache_file;
+            // no timeout data or 0
+            if (false === $is_timeout && $maxttl > 0 && $maxttl > $ft) {
+                $this->pt->unlink($fx, true);
 
-                if ($slowdown > 10) {
-                    $slowdown = 0;
-                    usleep($delay);
+                if ($force && @is_file($fx)) {
+                    ++$collect->cleanup_failed;
                 }
 
-                ++$slowdown;
+                ++$collect->cleanup_maxttl;
+                continue;
             }
 
-            $collect->cache_cleanup = $collect->cleanup_maxttl + $collect->cleanup_maxfile + $collect->cleanup_maxdisk + $collect->cleanup_precache_maxfile;
+            ++$cnt;
+            ++$collect->cache_file;
         }
+
+        $collect->cache_cleanup = $collect->cleanup_maxttl + $collect->cleanup_maxfile + $collect->cleanup_maxdisk + $collect->cleanup_precache_maxfile;
 
         wp_suspend_cache_addition(false);
 
@@ -418,9 +416,17 @@ final class Event
             $dbname = $wpdb->dbname;
             $tables = $wpdb->get_results('SHOW TABLES FROM '.$dbname, ARRAY_A);
             if (!empty($tables) && \is_array($tables)) {
+                $max_execution_time = $this->pt->get_max_execution_time();
+                if ($max_execution_time < 300) {
+                    $max_execution_time = 300;
+                }
                 foreach ($tables as $table) {
                     $tbl = $table['Tables_in_'.$dbname];
                     $wpdb->query('OPTIMIZE TABLE `'.$tbl.'`');
+
+                    if ($max_execution_time > 0 && \defined('WP_START_TIMESTAMP') && (microtime(true) - WP_START_TIMESTAMP) > $max_execution_time) {
+                        break;
+                    }
                 }
             }
             unset($tables);

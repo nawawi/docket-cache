@@ -75,7 +75,7 @@ $has_stats = $this->vcf()->is_dctrue('STATS');
                 <?php else : ?>
                 <tr>
                     <th><?php esc_html_e('Object Cache', 'docket-cache'); ?></th>
-                    <td id="objectcache0-stats">
+                    <td id="objectcache-stats">
                         <?php
                         echo 1 === $this->info->status_code && !empty($this->info->status_text_stats) ? $this->info->status_text_stats : $this->info->status_text;
                         ?>
@@ -169,8 +169,13 @@ $has_stats = $this->vcf()->is_dctrue('STATS');
                 </tr>
 
                 <tr>
-                    <th class="border-b"><?php esc_html_e('Cache Path', 'docket-cache'); ?></th>
+                    <th><?php esc_html_e('Cache Path', 'docket-cache'); ?></th>
                     <td><?php echo $this->info->cache_path; ?></td>
+                </tr>
+
+                <tr>
+                    <th class="border-b"><?php esc_html_e('Chunk Cache Directory', 'docket-cache'); ?></th>
+                    <td><?php echo $this->info->cache_chunkdir; ?></td>
                 </tr>
 
                 <tr>

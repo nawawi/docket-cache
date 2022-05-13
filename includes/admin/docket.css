@@ -6,7 +6,6 @@
  *
  * @see    https://github.com/nawawi/docket-cache
  */
-
 body {
     background-color: #f5f5f5;
 }
@@ -856,6 +855,15 @@ body {
 #docket-cache .gc li span {
     display: inline-block;
     min-width: 200px;
+}
+
+#docket-cache .gc li span.single {
+    min-width: 0;
+}
+
+#docket-cache .gc li span.bulllist {
+    margin-top: 10px;
+    min-width: 0;
 }
 
 /* tooltip */

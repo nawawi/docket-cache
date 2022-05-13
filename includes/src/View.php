@@ -100,6 +100,10 @@ final class View
         if ($this->has_vcache()) {
             $cache_path = $this->pt->cache_path;
             $vache = $this->idx_vcache();
+            if ($this->pt->cf()->is_dctrue('CHUNKCACHEDIR')) {
+                $part = explode('-', $vache);
+                $vache = $this->pt->get_chunk_path($part[0], $part[1]).$vache;
+            }
             $file = $cache_path.$vache.'.php';
             if ($this->pt->filesize($file) > 0) {
                 $data = $this->pt->cache_get($file);
@@ -441,7 +445,7 @@ final class View
     private function config_select_set($name, $options, $default = 'dcdefault', $idx = 'config')
     {
         if (empty($default) || 'dcdefault' === $default) {
-            $default = $this->vcf()->dcvalue(strtoupper($name));
+            $default = $this->vcf()->dcvalue(strtoupper($name), true);
         }
 
         $args = [];
@@ -568,7 +572,8 @@ final class View
             'cronbot' => esc_html__('The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively.', 'docket-cache'),
             'log' => esc_html__('The cache log intends to provide information on how the cache works. For performance and security concerns, disable it if no longer needed.', 'docket-cache'),
             'opcviewer' => esc_html__('OPcache Viewer allows you to view OPcache status and usage.', 'docket-cache'),
-            'advcpost' => esc_html__('Cache WP Queries for "post" that involved counting and only for Post Type "post", which results in faster data retrieval and reduced database workload.', 'docket-cache'),
+            'advcpost' => esc_html__('Cache WP Queries for a post which results in faster data retrieval and reduced database workload. By default only for Post Type post, page and attachment.', 'docket-cache'),
+            'advpost_posttype_all' => esc_html__('Allow Advanced Post Caching to cache any Post Type.', 'docket-cache'),
             'menucache' => esc_html__('Cache the WordPress dynamic navigation menu.', 'docket-cache'),
             'precache' => esc_html__('Increase cache performance by early loading cached objects based on the current URL.', 'docket-cache'),
             'mocache' => esc_html__('Improve the performance of the WordPress Translation function.', 'docket-cache'),
@@ -600,9 +605,15 @@ final class View
             'pageloader' => esc_html__('Display page loader when loading administrator pages.', 'docket-cache'),
             'stats' => esc_html__('Display Object Cache stats at Overview page.', 'docket-cache'),
             'gcaction' => esc_html__('Enable the Garbage Collector action button on the Overview page.', 'docket-cache'),
+            'flushaction' => esc_html__('Enable the additional Flush Cache action button on the Configuration page.', 'docket-cache'),
             'autoupdate' => esc_html__('Enable automatic plugin updates for Docket Cache.', 'docket-cache'),
             'checkversion' => esc_html__('Allows Docket Cache to check any critical future version that requires removing cache files after doing the updates, purposely to avoid error-prone.', 'docket-cache'),
-            'opcshutdown' => esc_html__('Flush OPcache when deactivate / uninstall', 'docket-cache'),
+            'flush_shutdown' => esc_html__('Flush Object Cache when deactivate / uninstall.', 'docket-cache'),
+            'opcshutdown' => esc_html__('Flush OPcache when deactivate / uninstall.', 'docket-cache'),
+            'maxsize_disk' => esc_html__('Maximum size of the cache storage on disk. The garbage collector will remove the cache file to free up storage space.', 'docket-cache'),
+            'maxfile' => esc_html__('The maximum cache file can be stored on a disk. The cache file will free up by the garbage collector when triggered by WP Cron.', 'docket-cache'),
+            'chunkcachedir' => esc_html__('Enable this option to chunk cache files into a smaller directory to avoid an excessive number of cache files in a single directory.', 'docket-cache'),
+            'flush_stalecache' => esc_html__('Enable this option to immediately remove the stale cache abandoned by WordPress, WooCommerce and others after doing cache invalidation.', 'docket-cache'),
             'limithttprequest' => esc_html__('Limit HTTP requests in WP Admin.', 'docket-cache'),
             'httpheadersexpect' => esc_html__('By default, cURL sends the "Expect" header all the time which severely impacts performance. Enable this option, only send it if the body is larger than 1 MB.', 'docket-cache'),
             'rtpostautosave' => esc_html__('WordPress by default automatically saves a draft every 1 minute when editing or create a new post. Changing this behaviour can reduce the usage of server resource.', 'docket-cache'),

@@ -79,14 +79,6 @@
                     .on(
                         'change.dc-select-config-filter',
                         function() {
-                            /*var $self = $( this );
-                            var s = $self.children( 'option:selected' )
-                                .val();
-                            var f = 'all' !== s ? '@filter:' + s : '';
-                            $selector.find( 'input[type=search][name=s]' )
-                                .val( f );
-                            $selector.find( 'form#search-filter' )
-                                .submit();*/
                             $selector.find( 'form#config-filter' )
                                 .submit();
                             return false;

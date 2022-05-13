@@ -291,7 +291,13 @@ final class CronAgent
         $slowdown = 0;
         $delay = $this->is_pingpong ? 850 : 200;
 
+        $max_execution_time = $this->pt->get_max_execution_time();
+
         foreach ($crons as $timestamp => $cronhooks) {
+            if ($max_execution_time > 0 && (microtime(true) - WP_START_TIMESTAMP) > $max_execution_time) {
+                break;
+            }
+
             if (false === $run_now && ($timestamp > $gmt_time)) {
                 continue;
             }

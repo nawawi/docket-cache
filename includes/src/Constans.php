@@ -177,7 +177,7 @@ final class Constans
         $this->maybe_define($this->px('MAXFILE'), 50000);
 
         // cache maxttl: cache lifespan.  Only seconds between 86400 and 2419200 are accepted
-        $this->maybe_define($this->px('MAXTTL'), 345600);
+        $this->maybe_define($this->px('MAXTTL'), 345600); // 4d
 
         // log on/off
         $this->maybe_define($this->px('LOG'), false);
@@ -199,6 +199,15 @@ final class Constans
 
         // truncate or delete cache file
         $this->maybe_define($this->px('FLUSH_DELETE'), false);
+
+        // flush cache when deactivate/uninstall
+        $this->maybe_define($this->px('FLUSH_SHUTDOWN'), true);
+
+        // flush wc_cache / advanced post cache stale cache
+        $this->maybe_define($this->px('FLUSH_STALECACHE'), true);
+
+        // split a cache file into smaller directory
+        $this->maybe_define($this->px('CHUNKCACHEDIR'), true);
 
         // optimize db
         $this->maybe_define($this->px('CRONOPTMZDB'), 'never');
@@ -262,10 +271,13 @@ final class Constans
         $this->maybe_define($this->px('IGNORED_GROUPKEY'), []);
 
         // precache
-        $this->maybe_define($this->px('PRECACHE'), true);
+        $this->maybe_define($this->px('PRECACHE'), false);
 
         // precache maxfile: < 1, false, null = unlimited
         $this->maybe_define($this->px('PRECACHE_MAXFILE'), 0);
+
+        // precache maxlist
+        $this->maybe_define($this->px('PRECACHE_MAXLIST'), 1000);
 
         // @private
         // cache ignored precache
@@ -311,6 +323,12 @@ final class Constans
         // advanced post cache
         $this->maybe_define($this->px('ADVCPOST'), true);
 
+        // advanced post cache allow post type
+        $this->maybe_define($this->px('ADVCPOST_POSTTYPE'), ['post', 'page', 'attachment']);
+
+        // advanced post cache allow all post type
+        $this->maybe_define($this->px('ADVCPOST_POSTTYPE_ALL'), false);
+
         // optimize term count
         $this->maybe_define($this->px('OPTERMCOUNT'), true);
 
@@ -350,6 +368,9 @@ final class Constans
 
         // gc action button
         $this->maybe_define($this->px('GCACTION'), false);
+
+        // additional flush cache button
+        $this->maybe_define($this->px('FLUSHACTION'), false);
 
         // check version
         $this->maybe_define($this->px('CHECKVERSION'), false);

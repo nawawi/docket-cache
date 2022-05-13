@@ -2,9 +2,9 @@
 Contributors: nawawijamili
 Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance, redis, memcached, speed
 Requires at least: 5.4
-Tested up to: 5.9
+Tested up to: 6.0
 Requires PHP: 7.2.5
-Stable tag: 21.08.05
+Stable tag: 21.08.06
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 
@@ -171,6 +171,40 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.08.06 =
+- Fixed: WP_Object_Cache::dc_close() -> Remove stale cache abandoned by WordPress, WooCommerce, Advanced Post Cache after doing cache invalidation.
+- Fixed: WP_Object_Cache::dc_get() -> The transient should return false if does not have a value or has expired.
+- Fixed: WP_Object_Cache::dc_get() -> Run maybe_unserialize to check and unserialize string data when failed to convert into an array.
+- Fixed: WP_Object_Cache::dc_save() -> Reduce cache miss if contain objects of headers remote requests.
+- Fixed: WP_Object_Cache::dc_save() -> Return true and avoid storing on disk if the transient has no value.
+- Fixed: WP_Object_Cache() -> dc_precache_load(), dc_precache_set() -> Do check precache max list.
+- Fixed: Tweaks() -> wpbrowsehappy(),wpservehappy() -> Use the pre_site_transient filter instead of blocking API requests, makes the query monitor happy.
+- Fixed: RecursiveDirectoryIterator -> Do check max_execution_time to avoid a fatal timeout.
+- Fixed: WP_Object_Cache() -> dc_precache_load(), dc_precache_set() -> Do check max_execution_time to avoid a fatal timeout.
+- Fixed: Event() -> optimizedb(), garbage_collector() -> Do check max_execution_time to avoid a fatal timeout.
+- Fixed: CronAgent::run_wpcron() -> Do check max_execution_time to avoid a fatal timeout.
+- Fixed: Tweaks::wpembed() -> Invalid body_class hook arguments.
+- Fixed: Plugin::get_opcache_status() -> OPcache File Cache Only -> Use getATime instead of getMTime to match with in-memory last_used_timestamp.
+- Fixed: Overview -> Object Cache -> Data is not updated when opcache is not available.
+- Fixed: Overview -> Flush Object Cache -> Immediately remove the cache file instead of truncate.
+- Added: WP-CLI command -> flush:transient, flush:advcpost, flush:menucache.
+- Added: wp_cache_flush_runtime(), wp_cache_*_multiple() functions.
+- Added: wp_cache_flush_group_match() -> Remove cache file match with the group name in files.
+- Added: WP_Object_Cache::dc_stalecache_filter() -> Capture cache key pattern match with the stale cache.
+- Added: WP_Object_Cache::add_stalecache() -> Set a list of stale cache to remove when Object Cache shutdown.
+- Added: Configuration -> Admin Interface -> Additional Flush Cache Action Button.
+- Added: Configuration -> Cache Options -> Post Caching Any Post Type.
+- Added: Configuration -> Storage Options -> Chunk Cache Directory, Auto Remove Stale Cache, Cache Files Limit, Cache Disk Limit.
+- Added: Opcache Viewer -> Possible to display a notice if the current site path has been blacklisted in opcache.blacklist_filename directive.
+- Added: DOCKET_CACHE_CHUNKCACHEDIR constant to enable chunk cache files into a smaller directory to avoid an excessive number of cache files in a single directory.
+- Added: DOCKET_CACHE_ADVCPOST_POSTTYPE constant to allow cache other post types.
+- Added: DOCKET_CACHE_ADVCPOST_POSTTYPE_ALL constant to allow cache any post types.
+- Added: DOCKET_CACHE_FLUSH_STALECACHE constant to enable auto remove stale cache.
+- Added: DOCKET_CACHE_PRECACHE_MAXLIST constant to limit cache entries per URL.
+- Added: DOCKET_CACHE_IGNORE_REQUEST constant to bypass object cache match key from POST, GET variables.
+
+Thanks to Jordan from @websavers for improvement feedback.
+
 = 21.08.05 =
 - Fixed: object-cache.php -> Checking is file object-cache-delay.txt.
 - Fixed: OPcacheView::get_usage() -> checking if opcache_statistics, memory_usage exists.

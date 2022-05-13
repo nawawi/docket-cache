@@ -68,11 +68,26 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
                                 }
                                 break;
                         }
+                        $blacklist = [];
+                        if ('opcache.blacklist_filename' === $k) {
+                            $files = glob($v);
+                            if (!empty($files) && \is_array($files)) {
+                                $blacklist = $files;
+                            }
+                            unset($files);
+                        }
                         ?>
                 <tr>
                     <th><a href="<?php echo $opcache_view->get_doc($k); ?>" rel="noopener" target="new"><?php echo $k; ?></a><span class="rsep">:</span></th>
                     <td><?php echo $v; ?></td>
                 </tr>
+                <?php if (!empty($blacklist)) : ?>
+                <tr>
+                    <th></th>
+                    <td><small><?php echo implode('<br>', $blacklist); ?></small></td>
+                </tr>
+                <?php endif; ?>
+
                 <?php endforeach; ?>
             </table>
             <p class="submit">
@@ -93,6 +108,8 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
 
                 if (!$this->pt->opcache_function_exists('opcache_get_status')) {
                     echo Resc::boxmsg(__('No data is available. The opcache_get_status function disabled in PHP configuration.', 'docket-cache'), 'warning', false, true, false);
+                } elseif ($this->pt->is_opcache_blacklisted()) {
+                    echo Resc::boxmsg(__("This site's local path has been blacklisted by OPcache configuration, which prevents it from caching.", 'docket-cache'), 'warning', false, true, false);
                 }
 
                 $stats = $opcache_view->get_usage();
@@ -191,7 +208,6 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
 
             <?php $this->tab_title(esc_html__('OPcache Files', 'docket-cache'), 'title-below'); ?>
             <div class="gridlist grid-opclist border-t">
-
                 <div class="box-left">
                     <form id="config-filter" method="get" action="<?php echo esc_url($this->pt->get_page()); ?>">
                         <input type="hidden" name="page" value="docket-cache-opcviewer">

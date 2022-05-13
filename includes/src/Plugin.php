@@ -324,6 +324,7 @@ final class Plugin extends Bepart
              'dropin_wp_isexist' => $dropin_wp_exist,
              'dropin_wp_exist' => $yesno[$dropin_wp_exist],
              'write_cache' => $yesno[is_writable($this->cache_path)],
+             'cache_chunkdir' => $yesno[$this->cf()->dcvalue('CHUNKCACHEDIR')],
              'cache_size' => $this->normalize_size($cache_stats->size),
              'cache_path_real' => $this->cache_path,
              'cache_path' => $this->sanitize_rootpath($this->cache_path),
@@ -440,7 +441,7 @@ final class Plugin extends Bepart
                                 }
                                 $cfile = basename($cpath);
                                 $cdir = \dirname($cpath);
-                                if (false !== strpos($script, $this->cache_path) && $this->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php$@', $cfile)) {
+                                if (false !== strpos($script, $this->cache_path) && $this->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9]{12})\-([a-z0-9]{12})\.php$@', $cfile)) {
                                     ++$dcfiles;
                                     if (isset($arr['memory_consumption'])) {
                                         $dcbytes += $arr['memory_consumption'];
@@ -470,7 +471,7 @@ final class Plugin extends Bepart
 
                             foreach ($this->opcache_filecache_scanfiles($dir) as $object) {
                                 try {
-                                    if (!$object->isFile() || 'file' !== $object->getType()) {
+                                    if (!$object->isFile()) {
                                         continue;
                                     }
 
@@ -483,7 +484,7 @@ final class Plugin extends Bepart
                                     $cdir = \dirname($cpath);
                                     $fs = $object->getSize();
 
-                                    if (false !== strpos($cpath, $this->cache_path) && $this->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9_]+)\-([a-z0-9]+).*\.php\.bin$@', $cfile)) {
+                                    if (false !== strpos($cpath, $this->cache_path) && $this->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9]{12})\-([a-z0-9]{12})\.php\.bin$@', $cfile)) {
                                         ++$dcfiles;
                                         $dcbytes += $fs;
                                     } else {
@@ -498,7 +499,7 @@ final class Plugin extends Bepart
                                     $cdata['scripts'][$cpath] = [
                                         'full_path' => $cpath,
                                         'memory_consumption' => $fs,
-                                        'last_used_timestamp' => $object->getMTime(),
+                                        'last_used_timestamp' => $object->getATime(),
                                         'hits' => 1,
                                     ];
                                 } catch (\Throwable $e) {
@@ -674,21 +675,21 @@ final class Plugin extends Bepart
     /**
      * flush_cache.
      */
-    public function flush_cache($cleanup = false)
+    public function flush_cache($cleanup = false, &$is_timeout = false)
     {
         $this->co()->clear_part('cachestats');
         $this->cx()->delay();
 
         delete_expired_transients(true);
 
-        $ret = $this->cachedir_flush($this->cache_path, $cleanup);
-        if (false === $ret) {
+        $cnt = $this->cachedir_flush($this->cache_path, $cleanup, $is_timeout);
+        if (false === $cnt) {
             $this->cx()->undelay();
 
-            return false;
+            return $cnt;
         }
 
-        return true;
+        return $cnt;
     }
 
     /**
@@ -803,6 +804,7 @@ final class Plugin extends Bepart
             }
         }
 
+        $max_execution_time = $this->get_max_execution_time();
         $suppress = $wpdb->suppress_errors(true);
         $doflush = false;
         foreach ($sites as $num => $site) {
@@ -847,12 +849,17 @@ final class Plugin extends Bepart
             if ($is_multisite) {
                 restore_current_blog();
             }
+
+            if ($max_execution_time > 0 && \defined('WP_START_TIMESTAMP') && (microtime(true) - WP_START_TIMESTAMP) > $max_execution_time) {
+                $is_timeout = true;
+                break;
+            }
         }
 
         $wpdb->suppress_errors($suppress);
 
         if ($doflush) {
-            $this->flush_cache();
+            $this->flush_cache(false);
         }
 
         return (object) $collect;
@@ -933,7 +940,11 @@ final class Plugin extends Bepart
         }
 
         $this->cx()->undelay();
-        $this->cachedir_flush($this->cache_path, true);
+
+        if ($this->cf()->is_dctrue('FLUSH_SHUTDOWN', true)) {
+            $this->cachedir_flush($this->cache_path, true);
+        }
+
         $this->flush_log();
 
         if ($is_uninstall) {
@@ -988,7 +999,7 @@ final class Plugin extends Bepart
             return;
         }
 
-        $this->flush_cache();
+        $this->flush_cache(false);
 
         if ($this->cf()->is_dcfalse('OBJECTCACHEOFF', true)) {
             $this->cx()->install(true);
@@ -1744,6 +1755,7 @@ final class Plugin extends Bepart
             2
         );
 
+        // reference: Canopt::save()
         add_action(
             'docketcache/action/saveoption',
             function ($name, $value, $status = true) {
@@ -1926,7 +1938,7 @@ final class Plugin extends Bepart
         add_action(
             'docketcache/action/countcachesize',
             function () {
-                if ($this->co()->lockproc('doing_countcachesize', time() + 60)) {
+                if ($this->co()->lockproc('doing_countcachesize', time() + $this->get_max_execution_time())) {
                     return;
                 }
 
@@ -2147,7 +2159,24 @@ final class Plugin extends Bepart
             \WP_CLI::add_command('cache run:stats', [$cli, 'run_stats']);
             \WP_CLI::add_command('cache reset:lock', [$cli, 'reset_lock']);
             \WP_CLI::add_command('cache reset:cron', [$cli, 'reset_cron']);
-            \WP_CLI::add_command('cache flush:precache', [$cli, 'flush_precache']);
+
+            if ($this->cf()->is_dctrue('ADVCPOST')) {
+                \WP_CLI::add_command('cache flush:advcpost', [$cli, 'flush_advcpost']);
+            }
+
+            if ($this->cf()->is_dctrue('PRECACHE')) {
+                \WP_CLI::add_command('cache flush:precache', [$cli, 'flush_precache']);
+            }
+
+            if ($this->cf()->is_dctrue('MENUCACHE')) {
+                \WP_CLI::add_command('cache flush:menucache', [$cli, 'flush_menucache']);
+            }
+
+            if ($this->cf()->is_dctrue('MOCACHE')) {
+                \WP_CLI::add_command('cache flush:mocache', [$cli, 'flush_mocache']);
+            }
+
+            \WP_CLI::add_command('cache flush:transient', [$cli, 'flush_transient']);
             \WP_CLI::add_command('cache flush', [$cli, 'flush_cache']);
             \WP_CLI::add_command('cache runtime:install', [$cli, 'runtime_install']);
             \WP_CLI::add_command('cache runtime:remove', [$cli, 'runtime_remove']);
