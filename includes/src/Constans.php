@@ -207,7 +207,7 @@ final class Constans
         $this->maybe_define($this->px('FLUSH_STALECACHE'), false);
 
         // split a cache file into smaller directory
-        $this->maybe_define($this->px('CHUNKCACHEDIR'), true);
+        $this->maybe_define($this->px('CHUNKCACHEDIR'), false);
 
         // optimize db
         $this->maybe_define($this->px('CRONOPTMZDB'), 'never');

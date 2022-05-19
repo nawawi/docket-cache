@@ -817,7 +817,7 @@ class WP_Object_Cache
 
                 // wp stale cache
                 // prefix:md5hash:microtime
-                if (false !== strpos($key, ':') && @preg_match('@(.*):([a-z0-9]{32}):([0-9\. ]+)$@')) {
+                if (false !== strpos($key, ':') && @preg_match('@(.*):([a-z0-9]{32}):([0-9\. ]+)$@', $key)) {
                     $expire = $maxttl < 345600 ? $maxttl : 345600; // 4d
                 }
 

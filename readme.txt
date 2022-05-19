@@ -4,7 +4,7 @@ Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance
 Requires at least: 5.4
 Tested up to: 6.0
 Requires PHP: 7.2.5
-Stable tag: 21.08.08
+Stable tag: 21.08.10
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 
@@ -171,6 +171,14 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.08.10 =
+- Changed: Disable "Chunk Cache Directory" by default. Let's users choose it depending on their hosting environment.
+
+= 21.08.09 =
+- Fixed: WP_Object_Cache::maybe_expire() -> missing preg_match parameter.
+
+Thanks to @carmpocalypse for bug report.
+
 = 21.08.08 =
 - Fixed: Don't remove cron event without a hook, let's WordPress handles it.
 - Fixed: WP_Object_Cache::dc_close() -> Only run one time per instance.
