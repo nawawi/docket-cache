@@ -177,7 +177,7 @@ final class Event
             $this->delete_expired_transients_db();
         }
 
-        $this->clear_unknown_cron();
+        //$this->clear_unknown_cron();
 
         $this->pt->get_cache_stats(true);
         $this->pt->co()->lockreset('watchproc');
@@ -476,7 +476,7 @@ final class Event
             foreach ($crons as $time => $cron) {
                 foreach ($cron as $hook => $dings) {
                     if (!has_action($hook)) {
-                        wp_clear_scheduled_hook($hook);
+                        //wp_clear_scheduled_hook($hook);
                     }
                 }
             }

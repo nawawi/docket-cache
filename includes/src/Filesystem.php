@@ -47,8 +47,10 @@ class Filesystem
     public function fastcgi_close()
     {
         if (\function_exists('fastcgi_finish_request') && !$this->is_request_from_theme_editor()) {
-            @fastcgi_finish_request();
+            return @fastcgi_finish_request();
         }
+
+        return false;
     }
 
     /**
@@ -57,8 +59,10 @@ class Filesystem
     public function close_buffer()
     {
         if (!@ob_get_level()) {
-            $this->fastcgi_close();
+            return $this->fastcgi_close();
         }
+
+        return false;
     }
 
     /**
@@ -518,11 +522,6 @@ class Filesystem
 
         $ok = $this->put($tmpfile, $data, 'cb', true);
         if (true === $ok) {
-            // makes query monitor happy
-            if (!\defined('WP_DEBUG') || !WP_DEBUG) {
-                $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
-            }
-
             try {
                 clearstatcache();
                 if (@is_file($tmpfile) && @rename($tmpfile, $file)) {
@@ -543,10 +542,6 @@ class Filesystem
                 }
             } catch (\Throwable $e) {
                 nwdcx_throwable(__METHOD__, $e);
-            }
-
-            if (isset($nwdcx_suppresserrors)) {
-                nwdcx_suppresserrors($nwdcx_suppresserrors);
             }
 
             // failed to replace
@@ -1232,9 +1227,10 @@ class Filesystem
             return false;
         }
 
-        if (false === $this->opcache_is_cached($file)) {
+        // 15052022
+        /*if (false === $this->opcache_is_cached($file)) {
             $this->opcache_compile($file);
-        }
+        }*/
 
         return $data;
     }

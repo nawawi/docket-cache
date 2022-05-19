@@ -370,7 +370,7 @@ class Bepart extends Filesystem
 
             foreach ($cronhooks as $hook => $keys) {
                 if (!has_action($hook)) {
-                    wp_clear_scheduled_hook($hook);
+                    //wp_clear_scheduled_hook($hook);
                     unset($crons[$timestamp]);
                     continue;
                 }

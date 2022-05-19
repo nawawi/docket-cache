@@ -24,7 +24,7 @@ final class PostCache
     public $cached_posts = [];
     public $found_posts = false;
     public $cache_func = 'wp_cache_add';
-    public $cache_func_expiry = 86400; //1d
+    public $cache_func_expiry = 0; // let WP_Object_Cache::maybe_expire handles it
     public $stalecache_list = [];
     public $allow_posttype = ['post', 'page', 'attachment'];
     public $allow_posttype_all = false;
@@ -38,10 +38,6 @@ final class PostCache
     {
         $this->setup_for_blog();
         $this->setup_hooks();
-
-        if (nwdcx_construe('FLUSH_STALECACHE')) {
-            $this->cache_func_expiry = 345600; // 4 days
-        }
 
         $this->allow_posttype_all = nwdcx_construe('ADVCPOST_POSTTYPE_ALL');
         if (!$this->allow_posttype_all) {
@@ -229,7 +225,7 @@ final class PostCache
 
         // 03052022: flush
         if (nwdcx_construe('FLUSH_STALECACHE')) {
-            $this->stalecache_list[md5(serialize($this->cache_group))] = $this->cache_group;
+            $this->stalecache_list[md5($this->cache_group)] = $this->cache_group;
         }
 
         $this->cache_incr = wp_cache_incr('cache_incr', 1, $this->prefix);

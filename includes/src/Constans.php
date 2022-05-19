@@ -204,7 +204,7 @@ final class Constans
         $this->maybe_define($this->px('FLUSH_SHUTDOWN'), true);
 
         // flush wc_cache / advanced post cache stale cache
-        $this->maybe_define($this->px('FLUSH_STALECACHE'), true);
+        $this->maybe_define($this->px('FLUSH_STALECACHE'), false);
 
         // split a cache file into smaller directory
         $this->maybe_define($this->px('CHUNKCACHEDIR'), true);
@@ -425,6 +425,18 @@ final class Constans
 
         // wp serve-happy
         $this->maybe_define($this->px('WPSERVEHAPPY'), false);
+
+        // cache http response from wp_remote_request.
+        $this->maybe_define($this->px('CACHEHTTPRESPONSE'), false);
+
+        // cache http response ttl: 300 = 5 minutes.
+        $this->maybe_define($this->px('CACHEHTTPRESPONS_TTL'), 300);
+
+        // cache http include list, if empty any url will include.
+        $this->maybe_define($this->px('CACHEHTTPRESPONS_INCLUDE'), []);
+
+        // cache http exclude list.
+        $this->maybe_define($this->px('CACHEHTTPRESPONS_EXCLUDE'), []);
 
         // @private: auto save interval.
         $this->maybe_define($this->px('RTPOSTAUTOSAVE'), 1);

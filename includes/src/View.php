@@ -102,7 +102,9 @@ final class View
             $vache = $this->idx_vcache();
             if ($this->pt->cf()->is_dctrue('CHUNKCACHEDIR')) {
                 $part = explode('-', $vache);
-                $vache = $this->pt->get_chunk_path($part[0], $part[1]).$vache;
+                if (isset($part[1])) {
+                    $vache = $this->pt->get_chunk_path($part[0], $part[1]).$vache;
+                }
             }
             $file = $cache_path.$vache.'.php';
             if ($this->pt->filesize($file) > 0) {

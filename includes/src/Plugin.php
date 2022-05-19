@@ -1036,6 +1036,16 @@ final class Plugin extends Bepart
         $this->token = '';
         $this->notice = '';
         $this->inruntime = false;
+
+        add_filter(
+            'perflab_oc_site_status_available_object_cache_services',
+            function ($services) {
+                $services[] = 'docket-cache';
+
+                return $services;
+            },
+            \PHP_INT_MAX
+        );
     }
 
     /**
@@ -2084,6 +2094,10 @@ final class Plugin extends Bepart
                     },
                     \PHP_INT_MAX
                 );
+            }
+
+            if ($this->cf()->is_dctrue('CACHEHTTPRESPONSE')) {
+                $tweaks->cache_http_response();
             }
         }
 

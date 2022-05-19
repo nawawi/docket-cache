@@ -875,4 +875,67 @@ final class Tweaks
             return $args;
         }, \PHP_INT_MAX);
     }
+
+    public function cache_http_response()
+    {
+        add_action('init', function () {
+            add_filter('http_response', function ($response, $args, $url) {
+                if (200 !== $response['response']['code']) {
+                    return $response;
+                }
+
+                $site_host = wp_parse_url(site_url(), \PHP_URL_HOST);
+                $hostname = wp_parse_url($url, \PHP_URL_HOST);
+                if ('wordpress.org' === $hostname || '.wordpress.org' === substr($hostname, -\strlen('.wordpress.org'))
+                    || 'docketcache.com' === $hostname || '.docketcache.com' === substr($hostname, -\strlen('.docketcache.com'))
+                    || false !== strpos($hostname, $site_host)) {
+                    return $response;
+                }
+
+                $cache_group = 'docketcache-httpresponse';
+                $cache_key = $url;
+
+                $cache_ttl = (int) nwdcx_constval('CACHEHTTPRESPONSE_TTL');
+                if (!empty($cache_ttl)) {
+                    $cache_ttl = 300;
+                }
+
+                $include_list = nwdcx_constval('CACHEHTTPRESPONSE_INCLUDE');
+                $exclude_list = nwdcx_constval('CACHEHTTPRESPONSE_EXCLUDE');
+
+                if (empty($include_list) && empty($exclude_list)) {
+                    wp_cache_set($cache_key, $response, $cache_group, $cache_ttl);
+
+                    return $response;
+                }
+
+                if (!empty($include_list) && \is_array($include_list) && \in_array($url, $include_list)) {
+                    if (!empty($exclude_list) && \is_array($exclude_list) && !\in_array($url, $exclude_list)) {
+                        wp_cache_set($cache_key, $response, $cache_group, $cache_ttl);
+                    }
+
+                    return $response;
+                }
+
+                if (!empty($exclude_list) && \is_array($exclude_list) && !\in_array($url, $exclude_list)) {
+                    wp_cache_set($cache_key, $response, $cache_group, $cache_ttl);
+
+                    return $response;
+                }
+
+                return $response;
+            }, \PHP_INT_MIN, 3);
+
+            add_filter('pre_http_request', function ($preempt, $parsed_args, $url) {
+                $cache_group = 'docketcache-httpresponse';
+                $cache_key = $url;
+                $data = wp_cache_get($cache_key, $cache_group);
+                if (!empty($data) && \is_array($data)) {
+                    return $data;
+                }
+
+                return $preempt;
+            }, \PHP_INT_MIN, 3);
+        }, \PHP_INT_MAX);
+    }
 }

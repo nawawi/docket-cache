@@ -133,6 +133,13 @@ class WP_Object_Cache
     public $precache = [];
 
     /**
+     * List of loaded keys.
+     *
+     * @var array
+     */
+    public $precache_loaded = [];
+
+    /**
      * Precache status.
      *
      * @var bool
@@ -601,6 +608,7 @@ class WP_Object_Cache
     {
         $this->cache = [];
         $this->precache = [];
+        $this->precache_loaded = [];
 
         return $is_runtime ? true : $this->dc_flush();
     }
@@ -793,12 +801,8 @@ class WP_Object_Cache
         $expire = $this->fs()->sanitize_timestamp($expire);
         $maxttl = $this->cache_maxttl;
 
-        // if 0 let gc handle it by comparing file mtime.
         if (0 === $expire && $maxttl < 2419200) {
-            // if  flush_stalecache enabled, set to 4 days, otherwise 1 day.
-            $stalecache_expire = $this->cf()->is_dctrue('FLUSH_STALECACHE') ? 345600 : 86400;
-
-            if ($this->fs()->is_transient($group)) {
+            if (\in_array($group, ['site-transient', 'transient'])) {
                 if ('site-transient' === $group && \in_array($key, ['update_plugins', 'update_themes', 'update_core', '_woocommerce_helper_updates'])) {
                     $expire = $maxttl < 2419200 ? 2419200 : $maxttl; // 28d
                 } elseif ('transient' === $group && 'health-check-site-status-result' === $key) {
@@ -808,19 +812,28 @@ class WP_Object_Cache
                 }
             } elseif (\in_array($group, ['options', 'site-options'])) {
                 $expire = $maxttl < 1209600 ? 1209600 : $maxttl; // 14d
+            } elseif (\in_array($group, ['terms', 'posts', 'post_meta', 'comments'])) {
+                $expire = $maxttl < 1209600 ? 1209600 : $maxttl; // 14d
 
                 // wp stale cache
                 // prefix:md5hash:microtime
-            } elseif (\in_array($group, ['terms', 'posts', 'post_meta', 'comments'])) {
-                $expire = $stalecache_expire; // 1d / 4d
+                if (false !== strpos($key, ':') && @preg_match('@(.*):([a-z0-9]{32}):([0-9\. ]+)$@')) {
+                    $expire = $maxttl < 345600 ? $maxttl : 345600; // 4d
+                }
+
+                // advcpost
+                // docketcache-post-timestamp
+            } elseif (false !== strpos($group, 'docketcache-post-')) {
+                $expire = $maxttl < 345600 ? $maxttl : 345600; // 4d
 
                 // woocommerce stale cache
                 // wc_cache_0.72953700 1651592702
-            } elseif ('wc_cache_' === substr($key, 0, 9) && preg_match('@^wc_cache_([0-9\. ]+)_@', $key)) {
-                $expire = $stalecache_expire; // 1d / 4d
+            } elseif (false !== strpos($key, 'wc_cache_') && @preg_match('@^wc_cache_([0-9\. ]+)_@', $key)) {
+                $expire = $maxttl < 345600 ? $maxttl : 345600; // 4d
             }
         }
 
+        // if 0 let gc handle it by comparing file mtime.
         return $expire;
     }
 
@@ -882,7 +895,7 @@ class WP_Object_Cache
     /**
      * is_data_uptodate.
      */
-    private function is_data_uptodate($key, $group, $data)
+    private function is_data_uptodate($key, $group, $data, $data_serialized = null)
     {
         $file = $this->get_file_path($key, $group);
         $data_p = $this->fs()->cache_get($file);
@@ -899,13 +912,16 @@ class WP_Object_Cache
             return false;
         }
 
-        if (!$doserialize && (('string' === $data_type && 0 === strcmp($data_p, $data)) || $data_p === $data)) {
+        if (!$doserialize && ((false !== strpos($data_type, 'string') && 0 === strcmp($data_p, $data)) || $data_p === $data)) {
             return true;
         }
 
         // @note 2122: use md5, serialize can be large.
-        if ($doserialize && @md5(@serialize($data_p)) === @md5(@serialize($data))) {
-            return true;
+        if ($doserialize) {
+            $data_ps = !empty($data_serialized) ? $data_serialized : @serialize($data_p);
+            if (@md5($data_serialized) === @md5(@serialize($data))) {
+                return true;
+            }
         }
 
         return false;
@@ -1193,8 +1209,12 @@ class WP_Object_Cache
         foreach ($this->fs()->scanfiles($this->cache_path, null, $pattern) as $object) {
             if ($object->isFile()) {
                 $fx = $object->getPathName();
+                $logprefix = $this->get_item_hash($fx);
+
                 $data = $this->fs()->cache_get($fx);
                 if (!empty($data) && !empty($data['key']) && !empty($data['group'])) {
+                    unset($data['data']);
+
                     foreach ($this->stalecache_list as $id => $key) {
                         $do_flush = false;
 
@@ -1209,6 +1229,8 @@ class WP_Object_Cache
                                     $do_flush = true;
                                 }
                             }
+
+                            // group = from cache file, key = list key
                         } elseif (false !== strpos($data['group'], 'docketcache-post-') && false !== strpos($key, 'docketcache-post-')) {
                             if ($key === $data['group']) {
                                 $do_flush = true;
@@ -1227,7 +1249,6 @@ class WP_Object_Cache
                                 if ($usec1 > $usec2) {
                                     $do_flush = true;
                                 }
-                                $do_flush = true;
                             }
                         } elseif (false !== strpos($key, 'after:') && @preg_match('@(.*):([a-z0-9]{32}):([0-9\. ]+)$@', $data['key'], $mm)) {
                             list($prefix, $group, $usec, $abc) = explode(':', $key);
@@ -1244,7 +1265,7 @@ class WP_Object_Cache
                             $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
                             // use native unlink since it is a junk file.
                             if (@unlink($fx)) {
-                                $this->dc_log('flush', $this->get_item_hash($fx), 'stale-cache: '.$data['group'].':'.$data['key']);
+                                $this->dc_log('flush', $logprefix, 'stale-cache: '.$data['group'].':'.$data['key']);
                             }
                             nwdcx_suppresserrors($nwdcx_suppresserrors);
                             break; // found and break foreach2
@@ -1252,6 +1273,11 @@ class WP_Object_Cache
 
                         if ($this->max_execution_time > 0 && (microtime(true) - $this->wp_start_timestamp) > $this->max_execution_time) {
                             break 2; // stop scanfiles
+                        }
+
+                        if ($slowdown > 10) {
+                            $slowdown = 0;
+                            usleep(1000);
                         }
                     } // foreach2
                 }
@@ -1422,7 +1448,8 @@ class WP_Object_Cache
         }
 
         // abort if object too large
-        $len = \strlen(serialize($data));
+        $data_serialized = serialize($data);
+        $len = \strlen(serialize($data_serialized));
         if ($len >= $this->cache_maxsize) {
             $this->dc_log('err', $fname, 'Object too large: '.$len.'/'.$this->cache_maxsize);
 
@@ -1430,7 +1457,7 @@ class WP_Object_Cache
         }
 
         // since timeout set to timestamp.
-        if (0 === $expire && !empty($key) && @is_file($file) && $this->is_data_uptodate($key, $group, $data)) {
+        if (0 === $expire && !empty($key) && @is_file($file) && $this->is_data_uptodate($key, $group, $data, $data_serialized)) {
             if ($this->is_dev) {
                 $this->dc_log('debug', $fname, __FUNCTION__.'()->nochanges');
             }
@@ -1512,6 +1539,16 @@ class WP_Object_Cache
      */
     private function dc_precache_load($hash)
     {
+        static $is_done = false;
+
+        if ($is_done) {
+            if ($this->is_dev) {
+                $this->dc_log('debug', 'internalproc-'.$this->item_hash(__FUNCTION__), 'Precache Ignored: Already loaded');
+            }
+
+            return;
+        }
+
         $cached = [];
         $group = 'docketcache-precache';
         $keys = $this->get($hash, $group);
@@ -1523,6 +1560,8 @@ class WP_Object_Cache
         if ($this->is_dev) {
             $this->dc_log('debug', 'internalproc-'.$this->item_hash(__FUNCTION__), 'Precache Load: Start');
         }
+
+        $this->precache_loaded[$hash] = $keys;
 
         $slowdown = 0;
         $cnt_max = 0;
@@ -1541,7 +1580,7 @@ class WP_Object_Cache
 
                 if ($slowdown > 10) {
                     $slowdown = 0;
-                    usleep(5000);
+                    usleep(1000);
                 }
 
                 ++$slowdown;
@@ -1557,6 +1596,7 @@ class WP_Object_Cache
         }
 
         unset($keys, $cached);
+        $is_done = true;
     }
 
     /**
@@ -1609,7 +1649,14 @@ class WP_Object_Cache
         }
 
         if (!empty($data)) {
-            if ($this->is_data_uptodate($hash, $group, $data)) {
+            /*if ($this->is_data_uptodate($hash, $group, $data)) {
+                if ($this->is_dev) {
+                    $this->dc_log('debug', $group.':'.$hash, __FUNCTION__.'()->nochanges');
+                }
+                return;
+            }*/
+
+            if (!empty($this->precache_loaded) && md5(serialize($this->precache_loaded[$hash])) === md5(serialize($data))) {
                 if ($this->is_dev) {
                     $this->dc_log('debug', $group.':'.$hash, __FUNCTION__.'()->nochanges');
                 }
@@ -1677,17 +1724,26 @@ class WP_Object_Cache
 
     /**
      * dc_close.
+     * reference:
+     *  wp_cache_close()
+     *  wp-includes/load.php -> shutdown_action_hook().
      */
     public function dc_close()
     {
-        $this->fs()->close_buffer();
-        if ($this->is_precache && !empty($this->precache_hashkey)) {
-            $this->dc_precache_set($this->precache_hashkey);
+        static $is_done = false;
+
+        // only run one time if we can go into background
+        if ($this->fs()->close_buffer() && !$is_done) {
+            if ($this->is_precache && !empty($this->precache_hashkey)) {
+                $this->dc_precache_set($this->precache_hashkey);
+            }
+
+            if ($this->cf()->is_dctrue('FLUSH_STALECACHE') && !empty($this->stalecache_list)) {
+                $this->flush_stalecache();
+            }
         }
 
-        if ($this->cf()->is_dctrue('FLUSH_STALECACHE') && !empty($this->stalecache_list)) {
-            $this->flush_stalecache();
-        }
+        $is_done = true;
     }
 
     /**
@@ -1966,20 +2022,7 @@ function wp_cache_init()
 }
 
 /**
- * Adds data to the cache, if the cache key doesn't already exist.
- *
  * @see WP_Object_Cache::add()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @param int|string $key    the cache key to use for retrieval later
- * @param mixed      $data   the data to add to the cache
- * @param string     $group  Optional. The group to add the cache to. Enables the same key
- *                           to be used across groups. Default empty.
- * @param int        $expire Optional. When the cache data should expire, in seconds.
- *                           Default 0 (no expiration).
- *
- * @return bool true on success, false if cache key and group already exist
  */
 function wp_cache_add($key, $data, $group = '', $expire = 0)
 {
@@ -1989,19 +2032,7 @@ function wp_cache_add($key, $data, $group = '', $expire = 0)
 }
 
 /**
- * Adds multiple values to the cache in one call.
- *
  * @see WP_Object_Cache::add_multiple()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @param array  $data   array of keys and values to be set
- * @param string $group  Optional. Where the cache contents are grouped. Default empty.
- * @param int    $expire Optional. When to expire the cache contents, in seconds.
- *                       Default 0 (no expiration).
- *
- * @return bool[] Array of return values, grouped by key. Each value is either
- *                true on success, or false if cache key and group already exist.
  */
 function wp_cache_add_multiple(array $data, $group = '', $expire = 0)
 {
@@ -2011,20 +2042,7 @@ function wp_cache_add_multiple(array $data, $group = '', $expire = 0)
 }
 
 /**
- * Replaces the contents of the cache with new data.
- *
  * @see WP_Object_Cache::replace()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @param int|string $key    the key for the cache data that should be replaced
- * @param mixed      $data   the new data to store in the cache
- * @param string     $group  Optional. The group for the cache data that should be replaced.
- *                           Default empty.
- * @param int        $expire Optional. When to expire the cache contents, in seconds.
- *                           Default 0 (no expiration).
- *
- * @return bool False if original value does not exist, true if contents were replaced
  */
 function wp_cache_replace($key, $data, $group = '', $expire = 0)
 {
@@ -2034,22 +2052,7 @@ function wp_cache_replace($key, $data, $group = '', $expire = 0)
 }
 
 /**
- * Saves the data to the cache.
- *
- * Differs from wp_cache_add() and wp_cache_replace() in that it will always write data.
- *
  * @see WP_Object_Cache::set()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @param int|string $key    the cache key to use for retrieval later
- * @param mixed      $data   the contents to store in the cache
- * @param string     $group  Optional. Where to group the cache contents. Enables the same key
- *                           to be used across groups. Default empty.
- * @param int        $expire Optional. When to expire the cache contents, in seconds.
- *                           Default 0 (no expiration).
- *
- * @return bool true on success, false on failure
  */
 function wp_cache_set($key, $data, $group = '', $expire = 0)
 {
@@ -2059,19 +2062,7 @@ function wp_cache_set($key, $data, $group = '', $expire = 0)
 }
 
 /**
- * Sets multiple values to the cache in one call.
- *
  * @see WP_Object_Cache::set_multiple()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @param array  $data   array of keys and values to be set
- * @param string $group  Optional. Where the cache contents are grouped. Default empty.
- * @param int    $expire Optional. When to expire the cache contents, in seconds.
- *                       Default 0 (no expiration).
- *
- * @return bool[] Array of return values, grouped by key. Each value is either
- *                true on success, or false on failure.
  */
 function wp_cache_set_multiple(array $data, $group = '', $expire = 0)
 {
@@ -2081,21 +2072,7 @@ function wp_cache_set_multiple(array $data, $group = '', $expire = 0)
 }
 
 /**
- * Retrieves the cache contents from the cache by key and group.
- *
  * @see WP_Object_Cache::get()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @param int|string $key   the key under which the cache contents are stored
- * @param string     $group Optional. Where the cache contents are grouped. Default empty.
- * @param bool       $force Optional. Whether to force an update of the local cache from the persistent
- *                          cache. Default false.
- * @param bool       $found Optional. Whether the key was found in the cache (passed by reference).
- *                          Disambiguates a return of false, a storable value. Default null.
- *
- * @return bool|mixed False on failure to retrieve contents or the cache
- *                    contents on success
  */
 function wp_cache_get($key, $group = '', $force = false, &$found = null)
 {
@@ -2105,18 +2082,7 @@ function wp_cache_get($key, $group = '', $force = false, &$found = null)
 }
 
 /**
- * Retrieves multiple values from the cache in one call.
- *
  * @see WP_Object_Cache::get_multiple()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @param array  $keys  array of keys under which the cache contents are stored
- * @param string $group Optional. Where the cache contents are grouped. Default empty.
- * @param bool   $force Optional. Whether to force an update of the local cache
- *                      from the persistent cache. Default false.
- *
- * @return array array of values organized into groups
  */
 function wp_cache_get_multiple(array $keys, $group = '', $force = false)
 {
@@ -2126,16 +2092,7 @@ function wp_cache_get_multiple(array $keys, $group = '', $force = false)
 }
 
 /**
- * Removes the cache contents matching key and group.
- *
  * @see WP_Object_Cache::delete()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @param int|string $key   what the contents in the cache are called
- * @param string     $group Optional. Where the cache contents are grouped. Default empty.
- *
- * @return bool true on successful removal, false on failure
  */
 function wp_cache_delete($key, $group = '')
 {
@@ -2145,17 +2102,7 @@ function wp_cache_delete($key, $group = '')
 }
 
 /**
- * Deletes multiple values from the cache in one call.
- *
  * @see WP_Object_Cache::delete_multiple()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @param array  $keys  array of keys under which the cache to deleted
- * @param string $group Optional. Where the cache contents are grouped. Default empty.
- *
- * @return bool[] Array of return values, grouped by key. Each value is either
- *                true on success, or false if the contents were not deleted.
  */
 function wp_cache_delete_multiple(array $keys, $group = '')
 {
@@ -2165,17 +2112,7 @@ function wp_cache_delete_multiple(array $keys, $group = '')
 }
 
 /**
- * Increment numeric cache item's value.
- *
  * @see WP_Object_Cache::incr()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @param int|string $key    the key for the cache contents that should be incremented
- * @param int        $offset Optional. The amount by which to increment the item's value. Default 1.
- * @param string     $group  Optional. The group the key is in. Default empty.
- *
- * @return int|false the item's new value on success, false on failure
  */
 function wp_cache_incr($key, $offset = 1, $group = '')
 {
@@ -2185,17 +2122,7 @@ function wp_cache_incr($key, $offset = 1, $group = '')
 }
 
 /**
- * Decrements numeric cache item's value.
- *
  * @see WP_Object_Cache::decr()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @param int|string $key    the cache key to decrement
- * @param int        $offset Optional. The amount by which to decrement the item's value. Default 1.
- * @param string     $group  Optional. The group the key is in. Default empty.
- *
- * @return int|false the item's new value on success, false on failure
  */
 function wp_cache_decr($key, $offset = 1, $group = '')
 {
@@ -2205,13 +2132,7 @@ function wp_cache_decr($key, $offset = 1, $group = '')
 }
 
 /**
- * Removes all cache items.
- *
  * @see WP_Object_Cache::flush()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @return bool true on success, false on failure
  */
 function wp_cache_flush()
 {
@@ -2221,11 +2142,7 @@ function wp_cache_flush()
 }
 
 /**
- * Removes all cache items from the in-memory runtime cache.
- *
  * @see WP_Object_Cache::flush()
- *
- * @return bool true on success, false on failure
  */
 function wp_cache_flush_runtime()
 {
@@ -2235,14 +2152,7 @@ function wp_cache_flush_runtime()
 }
 
 /**
- * Closes the cache.
- *
- * This function has ceased to do anything since WordPress 2.5. The
- * functionality was removed along with the rest of the persistent cache. This
- * does not mean that plugins can't implement this function when they need to
- * make sure that the cache is cleaned up after WordPress no longer needs it.
- *
- * @return bool Always returns True
+ * @see WP_Object_Cache::dc_close()
  */
 function wp_cache_close()
 {
@@ -2254,9 +2164,7 @@ function wp_cache_close()
 }
 
 /**
- * Adds a group or set of groups to the list of non-persistent groups.
- *
- * @param string|array $groups a group or an array of groups to add
+ * @see WP_Object_Cache::add_non_persistent_groups()
  */
 function wp_cache_add_non_persistent_groups($groups)
 {
@@ -2265,15 +2173,7 @@ function wp_cache_add_non_persistent_groups($groups)
 }
 
 /**
- * Switches the internal blog ID.
- *
- * This changes the blog id used to create keys in blog specific groups.
- *
  * @see WP_Object_Cache::switch_to_blog()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @param int $blog_id site ID
  */
 function wp_cache_switch_to_blog($blog_id)
 {
@@ -2283,13 +2183,7 @@ function wp_cache_switch_to_blog($blog_id)
 }
 
 /**
- * Adds a group or set of groups to the list of global groups.
- *
  * @see WP_Object_Cache::add_global_groups()
- *
- * @global WP_Object_Cache $wp_object_cache Object cache global instance.
- *
- * @param string|array $groups a group or an array of groups to add
  */
 function wp_cache_add_global_groups($groups)
 {
@@ -2298,12 +2192,18 @@ function wp_cache_add_global_groups($groups)
     $wp_object_cache->add_global_groups($groups);
 }
 
+/**
+ * @see WP_Object_Cache::stats()
+ */
 function wp_cache_stats()
 {
     global $wp_object_cache;
     $wp_object_cache->stats();
 }
 
+/**
+ * @see WP_Object_Cache::dc_remove_group()
+ */
 function wp_cache_flush_group($group = 'default')
 {
     global $wp_object_cache;
@@ -2311,6 +2211,9 @@ function wp_cache_flush_group($group = 'default')
     return $wp_object_cache->dc_remove_group($group);
 }
 
+/**
+ * @see WP_Object_Cache::dc_remove_group_match()
+ */
 function wp_cache_flush_group_match($group = 'default')
 {
     global $wp_object_cache;
@@ -2318,6 +2221,9 @@ function wp_cache_flush_group_match($group = 'default')
     return $wp_object_cache->dc_remove_group_match($group);
 }
 
+/**
+ * @see WP_Object_Cache::add_stalecache()
+ */
 function wp_cache_add_stalecache($lists)
 {
     global $wp_object_cache;
