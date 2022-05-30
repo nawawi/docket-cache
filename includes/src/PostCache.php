@@ -27,6 +27,7 @@ final class PostCache
     public $cache_func_expiry = 0; // let WP_Object_Cache::maybe_expire handles it
     public $stalecache_list = [];
     public $allow_posttype = ['post', 'page', 'attachment'];
+    public $blacklist_posttype = ['scheduled-action'];
     public $allow_posttype_all = false;
 
     public function __construct()
@@ -239,7 +240,7 @@ final class PostCache
 
     private function allow_post_type($post_type)
     {
-        if ($this->allow_posttype_all) {
+        if ($this->allow_posttype_all && !\in_array($post_type, $this->blacklist_posttype)) {
             return true;
         }
 
@@ -397,7 +398,9 @@ final class PostCache
     public function stalecache_set()
     {
         if (!empty($this->stalecache_list) && \function_exists('wp_cache_add_stalecache')) {
-            wp_cache_add_stalecache($this->stalecache_list);
+            $key_last = array_key_last($this->stalecache_list);
+            $list = [$key_last => $this->stalecache_list[$key_last]];
+            wp_cache_add_stalecache($list);
         }
     }
 }

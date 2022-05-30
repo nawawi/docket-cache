@@ -4,7 +4,7 @@ Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance
 Requires at least: 5.4
 Tested up to: 6.0
 Requires PHP: 7.2.5
-Stable tag: 21.08.10
+Stable tag: 21.08.11
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 
@@ -171,6 +171,12 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 21.08.11 =
+- Fixed: Avoid calling Filesystem::close_buffer() if a process involved accessing a disk.
+- Fixed: Removed handling stale cache on shutdown.
+- Added: Garbage Collector Status -> Cleanup Stale Cache.
+- Improved: Collected stale cache will be handled by Garbage Collector.
+
 = 21.08.10 =
 - Changed: Disable "Chunk Cache Directory" by default. Let's users choose it depending on their hosting environment.
 

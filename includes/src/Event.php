@@ -16,11 +16,15 @@ final class Event
 {
     private $pt;
     private $is_optimizedb;
+    private $max_execution_time = 0;
+    private $wp_start_timestamp = 0;
 
     public function __construct(Plugin $pt)
     {
         $this->pt = $pt;
         $this->is_optimizedb = false;
+        $this->wp_start_timestamp = \defined('WP_START_TIMESTAMP') ? WP_START_TIMESTAMP : microtime(true);
+        $this->max_execution_time = $this->pt->get_max_execution_time();
     }
 
     /**
@@ -190,6 +194,8 @@ final class Event
      */
     public function garbage_collector($force = false)
     {
+        static $is_done = false;
+
         $maxfileo = (int) $this->pt->get_cache_maxfile();
         $maxfile = $maxfileo;
 
@@ -228,33 +234,41 @@ final class Event
             'cleanup_maxfile' => 0,
             'cleanup_precache_maxfile' => 0,
             'cleanup_maxttl' => 0,
+            'cleanup_expire' => 0,
             'cleanup_maxdisk' => 0,
             'cache_file' => 0,
             'cache_cleanup' => 0,
             'cache_ignore' => 0,
             'cleanup_failed' => 0,
+            'cleanup_stalecache' => 0,
         ];
-
-        $max_execution_time = $this->pt->get_max_execution_time();
-        if ($this->pt->co()->lockproc('garbage_collector', time() + $max_execution_time + 10)) {
-            return $collect;
-        }
 
         clearstatcache();
         if (!$this->pt->is_docketcachedir($this->pt->cache_path) || @is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-flush.txt')) {
             return $collect;
         }
 
+        if ($is_done || $this->pt->co()->lockproc('garbage_collector', time() + $this->max_execution_time + 10)) {
+            return $collect;
+        }
+
+        $stalecache_list = [];
+        if ($this->pt->cf()->is_dctrue('FLUSH_STALECACHE')) {
+            $stalecache_list = wp_cache_get('items', 'docketcache-stalecache');
+            wp_cache_delete('items', 'docketcache-stalecache');
+        }
+
         $delay = $force ? 650 : 5000;
         wp_suspend_cache_addition(true);
 
         $fsizetotal = 0;
-        $cnt = 0;
+        $fcnt = 0;
         $pcnt = 0;
         $slowdown = 0;
+        $slowdown2 = 0;
 
         foreach ($this->pt->scanfiles($this->pt->cache_path) as $object) {
-            if ($max_execution_time > 0 && \defined('WP_START_TIMESTAMP') && (microtime(true) - WP_START_TIMESTAMP) > $max_execution_time) {
+            if ($this->max_execution_time > 0 && (microtime(true) - $this->wp_start_timestamp) > $this->max_execution_time) {
                 break;
             }
 
@@ -283,6 +297,10 @@ final class Event
                 continue;
             }
 
+            if ($this->pt->cf()->is_dctrue('DEV') && 'cli' === \PHP_SAPI) {
+                echo 'run-gc: '.$fx."\n";
+            }
+
             if ($fm >= $ft && (0 === $fs || 'dump_' === substr($fn, 0, 5))) {
                 $this->pt->unlink($fx, true);
 
@@ -308,7 +326,10 @@ final class Event
                 }
             }
 
-            if ($cnt >= $maxfile) {
+            if ($fcnt >= $maxfile) {
+                // trigger WP_Object_Cache
+                wp_cache_set('numfile', $fcnt, 'docketcache-gc', 60);
+
                 $this->pt->unlink($fx, true);
 
                 if ($force && @is_file($fx)) {
@@ -334,8 +355,9 @@ final class Event
             $data = $this->pt->cache_get($fx);
             $is_timeout = false;
             if (false !== $data) {
+                unset($data['data']);
+
                 $is_timeout = !empty($data['timeout']) && $this->pt->valid_timestamp($data['timeout']) ? true : false;
-                $docon = false;
                 if ($is_timeout) {
                     if ($fm >= (int) $data['timeout']) {
                         $this->pt->unlink($fx, true);
@@ -345,8 +367,8 @@ final class Event
                         }
 
                         unset($data);
-                        $docon = true;
-                        ++$collect->cleanup_maxttl;
+                        ++$collect->cleanup_expire;
+                        continue;
                     }
                 } else {
                     if (!empty($data['timestamp']) && $this->pt->valid_timestamp($data['timestamp']) && $maxttl > $data['timestamp']) {
@@ -357,16 +379,11 @@ final class Event
                         }
 
                         unset($data);
-                        $docon = true;
                         ++$collect->cleanup_maxttl;
+                        continue;
                     }
                 }
-
-                if ($docon) {
-                    continue;
-                }
             }
-            unset($data);
 
             // no timeout data or 0
             if (false === $is_timeout && $maxttl > 0 && $maxttl > $ft) {
@@ -380,18 +397,117 @@ final class Event
                 continue;
             }
 
-            ++$cnt;
-            ++$collect->cache_file;
-        }
+            // stalecache
+            if ((!empty($stalecache_list) && \is_array($stalecache_list)) && !empty($data) && !empty($data['key']) && !empty($data['group']) && 'docketcache-stalecache' !== $data['group']) {
+                $collect->cleanup_stalecache += $this->flush_stalecache($fx, $data, $stalecache_list);
+                if ($collect->cleanup_stalecache > 0) {
+                    continue;
+                }
+            }
+            unset($data);
 
-        $collect->cache_cleanup = $collect->cleanup_maxttl + $collect->cleanup_maxfile + $collect->cleanup_maxdisk + $collect->cleanup_precache_maxfile;
+            ++$fcnt;
+            ++$collect->cache_file;
+        } // foreach1
+
+        $collect->cache_cleanup = $collect->cleanup_maxttl + $collect->cleanup_expire + $collect->cleanup_maxfile + $collect->cleanup_maxdisk + $collect->cleanup_precache_maxfile + $collect->cleanup_stalecache;
 
         wp_suspend_cache_addition(false);
 
         $this->pt->co()->lockreset('garbage_collector');
         $this->pt->cx()->delay_expire();
 
+        $is_done = true;
+
+        // reset
+        wp_cache_delete('numfile', 'docketcache-gc');
+
         return $collect;
+    }
+
+    /**
+     * flush_stalecache.
+     */
+    public function flush_stalecache($file, $data, $stalecache_list)
+    {
+        $total = 0;
+
+        if (!is_file($file) || empty($data) || empty($data['key']) || empty($data['group']) || empty($stalecache_list) || !\is_array($stalecache_list)) {
+            return $total;
+        }
+
+        $slowdown = 0;
+        foreach ($stalecache_list as $id => $key) {
+            $do_flush = false;
+
+            if (false !== strpos($data['key'], 'wc_cache_') && 'wc_cache:' === substr($key, 0, 9) && preg_match('@^wc_cache_([0-9\. ]+)_.*@', $data['key'], $mm)) {
+                list($prefix, $group, $usec) = explode(':', $key);
+                if ($usec === $mm[1]) {
+                    $do_flush = true;
+                } else {
+                    $usec1 = nwdcx_microtimetofloat($usec);
+                    $usec2 = nwdcx_microtimetofloat($mm[1]);
+                    if ($usec1 > $usec2) {
+                        $do_flush = true;
+                    }
+                }
+
+                // group = from cache file, key = list key
+            } elseif (false !== strpos($data['group'], 'docketcache-post-') && false !== strpos($key, 'docketcache-post-')) {
+                if ($key === $data['group']) {
+                    $do_flush = true;
+                } else {
+                    $usec1 = str_replace('docketcache-post-', '', $key);
+                    $usec2 = str_replace('docketcache-post-', '', $data['group']);
+                    if ($usec1 > $usec2) {
+                        $do_flush = true;
+                    }
+                }
+            } elseif (false !== strpos($key, 'last_changed:') && @preg_match('@(.*):([a-z0-9]{32}):([0-9\. ]+)$@', $data['key'], $mm)) {
+                list($prefix, $group, $usec) = explode(':', $key);
+                if ($group === $data['group']) {
+                    $usec1 = nwdcx_microtimetofloat($usec);
+                    $usec2 = nwdcx_microtimetofloat($mm[3]);
+                    if ($usec1 > $usec2) {
+                        $do_flush = true;
+                    }
+                }
+            } elseif (false !== strpos($key, 'after:') && @preg_match('@(.*):([a-z0-9]{32}):([0-9\. ]+)$@', $data['key'], $mm)) {
+                list($prefix, $group, $usec, $abc) = explode(':', $key);
+                if ($group === $data['group'] && $abc === $mm[1]) {
+                    $usec1 = nwdcx_microtimetofloat($usec);
+                    $usec2 = nwdcx_microtimetofloat($mm[3]);
+                    if ($usec1 > $usec2) {
+                        $do_flush = true;
+                    }
+                }
+            }
+
+            if ($do_flush) {
+                $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+                // use native unlink since it is a junk file.
+                if (@unlink($file)) {
+                    unset($stalecache_list[$id]);
+
+                    if ($this->pt->cf()->is_dctrue('DEV') && 'cli' === \PHP_SAPI) {
+                        echo 'run-gc:stale-cache: '.$file."\n";
+                    }
+
+                    ++$total;
+                }
+                nwdcx_suppresserrors($nwdcx_suppresserrors);
+                break; // found and break foreach
+            }
+
+            if ($slowdown > 10) {
+                $slowdown = 0;
+                usleep(5000);
+            }
+
+            ++$slowdown;
+        }
+
+        return $total;
     }
 
     /**
@@ -416,7 +532,7 @@ final class Event
             $dbname = $wpdb->dbname;
             $tables = $wpdb->get_results('SHOW TABLES FROM '.$dbname, ARRAY_A);
             if (!empty($tables) && \is_array($tables)) {
-                $max_execution_time = $this->pt->get_max_execution_time();
+                $max_execution_time = $this->max_execution_time;
                 if ($max_execution_time < 300) {
                     $max_execution_time = 300;
                 }
@@ -424,7 +540,7 @@ final class Event
                     $tbl = $table['Tables_in_'.$dbname];
                     $wpdb->query('OPTIMIZE TABLE `'.$tbl.'`');
 
-                    if ($max_execution_time > 0 && \defined('WP_START_TIMESTAMP') && (microtime(true) - WP_START_TIMESTAMP) > $max_execution_time) {
+                    if ($this->max_execution_time > 0 && (microtime(true) - $this->wp_start_timestamp) > $this->max_execution_time) {
                         break;
                     }
                 }
@@ -464,6 +580,9 @@ final class Event
      */
     public function clear_unknown_cron()
     {
+        // let's wp handles it.
+        return;
+
         if (!wp_using_ext_object_cache()) {
             return;
         }
@@ -476,7 +595,7 @@ final class Event
             foreach ($crons as $time => $cron) {
                 foreach ($cron as $hook => $dings) {
                     if (!has_action($hook)) {
-                        //wp_clear_scheduled_hook($hook);
+                        wp_clear_scheduled_hook($hook);
                     }
                 }
             }

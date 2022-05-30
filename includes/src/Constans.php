@@ -274,7 +274,7 @@ final class Constans
         $this->maybe_define($this->px('PRECACHE'), false);
 
         // precache maxfile: < 1, false, null = unlimited
-        $this->maybe_define($this->px('PRECACHE_MAXFILE'), 0);
+        $this->maybe_define($this->px('PRECACHE_MAXFILE'), 1000);
 
         // precache maxlist
         $this->maybe_define($this->px('PRECACHE_MAXLIST'), 1000);

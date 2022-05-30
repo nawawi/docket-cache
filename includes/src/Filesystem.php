@@ -58,8 +58,8 @@ class Filesystem
      */
     public function close_buffer()
     {
-        if (!@ob_get_level()) {
-            return $this->fastcgi_close();
+        if (!@ob_get_level() && $this->fastcgi_close()) {
+            return true;
         }
 
         return false;
@@ -392,7 +392,7 @@ class Filesystem
                 $data = var_export($data, 1);
                 $data = str_replace('stdClass::__set_state', '(object)', $data);
             } else {
-                $this->log('err', 'internalproc-internalfunc', 'export_var: '.$error);
+                $this->log('err', '000000000000-000000000000', 'export_var: '.$error);
 
                 return false;
             }
@@ -771,8 +771,10 @@ class Filesystem
      */
     public function opcache_filecache_reset()
     {
+        static $is_done = false;
+
         $fcdata = $this->opcache_filecache_only();
-        if (!empty($fcdata)) {
+        if (!$is_done && !empty($fcdata)) {
             $dir = $fcdata['file_cache'];
             $cnt = 0;
             $max_execution_time = $this->get_max_execution_time();
@@ -801,6 +803,8 @@ class Filesystem
                     break;
                 }
             }
+
+            $is_done = true;
 
             return $cnt;
         }
@@ -915,7 +919,8 @@ class Filesystem
         add_action(
             'shutdown',
             function () {
-                $this->close_buffer();
+                // anything involve disk, don't go into background
+                //$this->close_buffer();
                 $this->opcache_reset();
             },
             \PHP_INT_MAX
@@ -956,6 +961,12 @@ class Filesystem
      */
     public function cachedir_flush($dir, $cleanup = false, &$is_timeout = false)
     {
+        static $is_done = false;
+
+        if ($is_done) {
+            return 0;
+        }
+
         clearstatcache();
 
         $dir = nwdcx_normalizepath(realpath($dir));
@@ -1014,6 +1025,7 @@ class Filesystem
         }
 
         wp_suspend_cache_addition(false);
+        $is_done = true;
 
         return $cnt;
     }
@@ -1023,12 +1035,14 @@ class Filesystem
      */
     public function cache_size($dir)
     {
+        static $is_done = false;
+
         $bytestotal = 0;
         $fsizetotal = 0;
         $filestotal = 0;
 
         clearstatcache();
-        if ($this->is_docketcachedir($dir) && !@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-flush.txt')) {
+        if (!$is_done && $this->is_docketcachedir($dir) && !@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-flush.txt')) {
             // hardmax
             $maxfile = 999000; // 1000000 - 1000;
             $cnt = 0;
@@ -1040,7 +1054,7 @@ class Filesystem
             $pattern = '@^([a-z0-9]{12})\-([a-z0-9]{12})\.php$@';
             foreach ($this->scanfiles($dir, null, $pattern) as $object) {
                 try {
-                    if ($object->isFile() && 'dump_' !== substr($object->getFileName(), 0, 5)) {
+                    if ($object->isFile()) {
                         $fx = $object->getPathName();
 
                         if (!$this->remove_non_chunk_cache($dir, $fx)) {
@@ -1082,6 +1096,10 @@ class Filesystem
                 }
             }
         }
+
+        $is_done = true;
+
+        wp_cache_set('numfile', $filestotal, 'docketcache-gc', 60);
 
         return [
             'timestamp' => time(),
@@ -1215,7 +1233,7 @@ class Filesystem
                     $this->suspend_cache_file($file, $errmsg);
                 }
 
-                $this->log('err', 'internalproc-internalfunc', 'cache_get: '.$error);
+                $this->log('err', '000000000000-000000000000', 'cache_get: '.$error);
                 $data = false;
             }
 

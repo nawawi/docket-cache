@@ -753,8 +753,16 @@ final class ReqAction
                         $gcmsg .= '<li><span>'.esc_html__('Cleanup Cache File Limit', 'docket-cache').'</span>'.$collect->cleanup_maxfile.'</li>';
                         $gcmsg .= '<li><span>'.esc_html__('Cleanup Cache Disk Limit', 'docket-cache').'</span>'.$collect->cleanup_maxdisk.'</li>';
 
-                        if ($this->pt->get_precache_maxfile() > 0) {
+                        if ($collect->cleanup_expire > 0) {
+                            $gcmsg .= '<li><span>'.esc_html__('Cleanup Cache Expire', 'docket-cache').'</span>'.$collect->cleanup_expire.'</li>';
+                        }
+
+                        if ($this->pt->get_precache_maxfile() > 0 && $collect->cleanup_precache_maxfile > 0) {
                             $gcmsg .= '<li><span>'.esc_html__('Cleanup Precache Limit', 'docket-cache').'</span>'.$collect->cleanup_precache_maxfile.'</li>';
+                        }
+
+                        if ($this->pt->cf()->is_dctrue('FLUSH_STALECACHE') && $collect->cleanup_stalecache > 0) {
+                            $gcmsg .= '<li><span>'.esc_html__('Cleanup Stale Cache', 'docket-cache').'</span>'.$collect->cleanup_stalecache.'</li>';
                         }
 
                         $gcmsg .= '<li><span>'.esc_html__('Total Cache Cleanup', 'docket-cache').'</span>'.$collect->cache_cleanup.'</li>';

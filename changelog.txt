@@ -1,3 +1,9 @@
+= v21.08.11 (2022-05-30) =
+- Fixed: Avoid calling Filesystem::close_buffer() if a process involved accessing a disk.
+- Fixed: Removed handling stale cache on shutdown.
+- Added: Garbage Collector Status -> Cleanup Stale Cache.
+- Improved: Collected stale cache will be handled by Garbage Collector.
+
 = v21.08.10 (2022-05-20) =
 - Changed: Disable "CHUNKCACHEDIR" by default. Let's users choose it depending on their hosting environment.
 

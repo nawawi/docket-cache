@@ -470,18 +470,6 @@ namespace Nawawi\DocketCache;
                         <?php esc_html_e('Storage Options', 'docket-cache'); ?>
                     </td>
                 </tr>
-                <tr id="chunkcachedir">
-                    <th><?php echo esc_html__('Chunk Cache Directory', 'docket-cache').$this->tooltip('chunkcachedir'); ?></th>
-                    <td>
-                        <?php echo $this->config_select_bool('chunkcachedir'); ?>
-                    </td>
-                </tr>
-                <tr id="flush_stalecache">
-                    <th><?php echo esc_html__('Auto Remove Stale Cache', 'docket-cache').$this->tooltip('flush_stalecache'); ?></th>
-                    <td>
-                        <?php echo $this->config_select_bool('flush_stalecache'); ?>
-                    </td>
-                </tr>
                 <tr id="maxfile">
                     <th><?php echo esc_html__('Cache Files Limit', 'docket-cache').$this->tooltip('maxfile'); ?></th>
                     <td>
@@ -512,7 +500,7 @@ namespace Nawawi\DocketCache;
                     </td>
                 </tr>
                 <tr id="maxsize_disk">
-                    <th class="border-b"><?php echo esc_html__('Cache Disk Limit', 'docket-cache').$this->tooltip('maxsize_disk'); ?></th>
+                    <th><?php echo esc_html__('Cache Disk Limit', 'docket-cache').$this->tooltip('maxsize_disk'); ?></th>
                     <td>
                         <?php
                             $maxsize_disk_default = '500M';
@@ -538,6 +526,18 @@ namespace Nawawi\DocketCache;
                                 $maxsize_disk_default
                             );
                             ?>
+                    </td>
+                </tr>
+                <tr id="chunkcachedir">
+                    <th><?php echo esc_html__('Chunk Cache Directory', 'docket-cache').$this->tooltip('chunkcachedir'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('chunkcachedir'); ?>
+                    </td>
+                </tr>
+                <tr id="flush_stalecache">
+                    <th class="border-b"><?php echo esc_html__('Auto Remove Stale Cache', 'docket-cache').$this->tooltip('flush_stalecache'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('flush_stalecache'); ?>
                     </td>
                 </tr>
                 <tr>

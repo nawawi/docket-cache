@@ -496,8 +496,16 @@ class Command extends WP_CLI_Command
         WP_CLI::line($this->title(__('Cleanup Cache File Limit', 'docket-cache'), $pad).$collect->cleanup_maxfile);
         WP_CLI::line($this->title(__('Cleanup Cache Disk Limit', 'docket-cache'), $pad).$collect->cleanup_maxdisk);
 
-        if ($this->pt->get_precache_maxfile() > 0) {
+        if ($collect->cleanup_expire > 0) {
+            WP_CLI::line($this->title(__('Cleanup Cache Expire', 'docket-cache'), $pad).$collect->cleanup_expire);
+        }
+
+        if ($this->pt->get_precache_maxfile() > 0 && $collect->cleanup_precache_maxfile > 0) {
             WP_CLI::line($this->title(__('Cleanup Precache Limit', 'docket-cache'), $pad).$collect->cleanup_precache_maxfile);
+        }
+
+        if ($this->pt->cf()->is_dctrue('FLUSH_STALECACHE') && $collect->cleanup_stalecache > 0) {
+            WP_CLI::line($this->title(__('Cleanup Stale Cache', 'docket-cache'), $pad).$collect->cleanup_stalecache);
         }
 
         WP_CLI::line(str_repeat('-', $pad).':'.str_repeat('-', 10));
