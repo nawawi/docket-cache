@@ -21,6 +21,11 @@ final class MoCache
     private $upstream = null;
     private $mofile = null;
 
+    // Avoid warning on get_translations_for_domain.
+    // Reference: wp-includes/pomo/translations.php.
+    public $entries = [];
+    public $headers = [];
+
     public function __construct($mofile, $domain, $override)
     {
         $this->mofile = apply_filters('load_textdomain_mofile', $mofile, $domain);

@@ -265,7 +265,6 @@ final class Event
         $fcnt = 0;
         $pcnt = 0;
         $slowdown = 0;
-        $slowdown2 = 0;
 
         foreach ($this->pt->scanfiles($this->pt->cache_path) as $object) {
             if ($this->max_execution_time > 0 && (microtime(true) - $this->wp_start_timestamp) > $this->max_execution_time) {

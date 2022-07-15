@@ -843,7 +843,7 @@ final class Plugin extends Bepart
                     wp_delete_post($id, true);
                     $doflush = true;
                 }
-                $collect['trash'] += \count($query);
+                $collect['trashbin'] += \count($query);
             }
 
             if ($is_multisite) {
