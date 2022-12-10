@@ -26,7 +26,7 @@ namespace Nawawi\DocketCache;
                     <th>
                         <?php
                         echo esc_html__('Cronbot Service', 'docket-cache').$this->tooltip('cronbot');
-                        ?>
+?>
                     </th>
                     <td>
                         <?php echo $this->config_select_bool('cronbot'); ?>
@@ -35,8 +35,8 @@ namespace Nawawi\DocketCache;
                 <tr id="opcviewer">
                     <th>
                         <?php
-                        echo esc_html__('OPcache Viewer', 'docket-cache').$this->tooltip('opcviewer');
-                        ?>
+echo esc_html__('OPcache Viewer', 'docket-cache').$this->tooltip('opcviewer');
+?>
                     </th>
                     <td>
                         <?php echo $this->config_select_bool('opcviewer'); ?>
@@ -48,8 +48,8 @@ namespace Nawawi\DocketCache;
                 <tr id="log">
                     <th class="border-b">
                         <?php
-                        echo esc_html__('Cache Log', 'docket-cache').$this->tooltip('log');
-                        ?>
+echo esc_html__('Cache Log', 'docket-cache').$this->tooltip('log');
+?>
                     </th>
                     <td>
                         <?php echo $this->config_select_bool('log'); ?>
@@ -120,17 +120,17 @@ namespace Nawawi\DocketCache;
                     <th><?php echo esc_html__('Optimize Database Tables', 'docket-cache').$this->tooltip('cronoptmzdb'); ?></th>
                     <td>
                         <?php
-                            echo $this->config_select_set(
-                                'cronoptmzdb',
-                                [
-                                    'default' => __('Default', 'docket-cache'),
-                                    'daily' => __('Daily', 'docket-cache'),
-                                    'weekly' => __('Weekly', 'docket-cache'),
-                                    'monthly' => __('Monthly', 'docket-cache'),
-                                    'never' => __('Never', 'docket-cache'),
-                                ]
-                            );
-                            ?>
+echo $this->config_select_set(
+    'cronoptmzdb',
+    [
+        'default' => __('Default', 'docket-cache'),
+        'daily' => __('Daily', 'docket-cache'),
+        'weekly' => __('Weekly', 'docket-cache'),
+        'monthly' => __('Monthly', 'docket-cache'),
+        'never' => __('Never', 'docket-cache'),
+    ]
+);
+?>
                     </td>
                 </tr>
                 <tr id="wpoptaload">
@@ -292,134 +292,134 @@ namespace Nawawi\DocketCache;
                     <th><?php echo esc_html__('Auto Save Interval', 'docket-cache').$this->tooltip('rtpostautosave'); ?></th>
                     <td>
                         <?php
-                            echo $this->config_select_set(
-                                'rtpostautosave',
-                                [
-                                    'default' => __('Default', 'docket-cache'),
-                                    '1' => __('Every Minute', 'docket-cache'),
-                                    '5' => __('Every 5 Minutes', 'docket-cache'),
-                                    '15' => __('Every 15 Minutes', 'docket-cache'),
-                                    'off' => __('Disable', 'docket-cache'),
-                                ]
-                            );
-                            ?>
+echo $this->config_select_set(
+    'rtpostautosave',
+    [
+        'default' => __('Default', 'docket-cache'),
+        '1' => __('Every Minute', 'docket-cache'),
+        '5' => __('Every 5 Minutes', 'docket-cache'),
+        '15' => __('Every 15 Minutes', 'docket-cache'),
+        'off' => __('Disable', 'docket-cache'),
+    ]
+);
+?>
                     </td>
                 </tr>
                 <tr id="rtpostrevision">
                     <th><?php echo esc_html__('Post Revisions', 'docket-cache').$this->tooltip('rtpostrevision'); ?></th>
                     <td>
                         <?php
-                            echo $this->config_select_set(
-                                'rtpostrevision',
-                                [
-                                    'default' => __('Default', 'docket-cache'),
-                                    '3' => __('Limit to 3 Revisions', 'docket-cache'),
-                                    '5' => __('Limit to 5 Revisions', 'docket-cache'),
-                                    'on' => __('No Limit', 'docket-cache'),
-                                    'off' => __('Disable', 'docket-cache'),
-                                ]
-                            );
-                            ?>
+echo $this->config_select_set(
+    'rtpostrevision',
+    [
+        'default' => __('Default', 'docket-cache'),
+        '3' => __('Limit to 3 Revisions', 'docket-cache'),
+        '5' => __('Limit to 5 Revisions', 'docket-cache'),
+        'on' => __('No Limit', 'docket-cache'),
+        'off' => __('Disable', 'docket-cache'),
+    ]
+);
+?>
                     </td>
                 </tr>
                 <tr id="rtpostemptytrash">
                     <th><?php echo esc_html__('Trash Bin', 'docket-cache').$this->tooltip('rtpostemptytrash'); ?></th>
                     <td>
                         <?php
-                            echo $this->config_select_set(
-                                'rtpostemptytrash',
-                                [
-                                    'default' => __('Default', 'docket-cache'),
-                                    '7' => __('Empty In 7 Days', 'docket-cache'),
-                                    '14' => __('Empty In 14 Days', 'docket-cache'),
-                                    '30' => __('Empty In 30 Days', 'docket-cache'),
-                                    'off' => __('Disable', 'docket-cache'),
-                                ]
-                            );
-                            ?>
+echo $this->config_select_set(
+    'rtpostemptytrash',
+    [
+        'default' => __('Default', 'docket-cache'),
+        '7' => __('Empty In 7 Days', 'docket-cache'),
+        '14' => __('Empty In 14 Days', 'docket-cache'),
+        '30' => __('Empty In 30 Days', 'docket-cache'),
+        'off' => __('Disable', 'docket-cache'),
+    ]
+);
+?>
                     </td>
                 </tr>
                 <tr id="rtimageoverwrite">
                     <th><?php echo esc_html__('Cleanup Image Edits', 'docket-cache').$this->tooltip('rtimageoverwrite'); ?></th>
                     <td>
                         <?php
-                            echo $this->config_select_set(
-                                'rtimageoverwrite',
-                                [
-                                    'default' => __('Default', 'docket-cache'),
-                                    'on' => __('Enable', 'docket-cache'),
-                                    'off' => __('Disable', 'docket-cache'),
-                                ],
-                                !empty($GLOBALS[$this->vcf()->px('rtimageoverwrite_false')]) && IMAGE_EDIT_OVERWRITE ? 'on' : $this->vcf()->dcvalue('rtimageoverwrite')
-                            );
-                            ?>
+echo $this->config_select_set(
+    'rtimageoverwrite',
+    [
+        'default' => __('Default', 'docket-cache'),
+        'on' => __('Enable', 'docket-cache'),
+        'off' => __('Disable', 'docket-cache'),
+    ],
+    !empty($GLOBALS[$this->vcf()->px('rtimageoverwrite_false')]) && IMAGE_EDIT_OVERWRITE ? 'on' : $this->vcf()->dcvalue('rtimageoverwrite')
+);
+?>
                     </td>
                 </tr>
                 <tr id="rtwpcoreupdate">
                     <th><?php echo esc_html__('Disallows WP Auto Update Core', 'docket-cache').$this->tooltip('rtwpcoreupdate'); ?></th>
                     <td>
                         <?php
-                            echo $this->config_select_set(
-                                'rtwpcoreupdate',
-                                [
-                                    'default' => __('Default', 'docket-cache'),
-                                    'off' => __('Enable', 'docket-cache'),
-                                    'on' => __('Disable', 'docket-cache'),
-                                ],
-                                !empty($GLOBALS[$this->vcf()->px('rtwpcoreupdate_false')]) && !(bool) WP_AUTO_UPDATE_CORE ? 'on' : $this->vcf()->dcvalue('rtwpcoreupdate')
-                            );
-                            ?>
+echo $this->config_select_set(
+    'rtwpcoreupdate',
+    [
+        'default' => __('Default', 'docket-cache'),
+        'off' => __('Enable', 'docket-cache'),
+        'on' => __('Disable', 'docket-cache'),
+    ],
+    !empty($GLOBALS[$this->vcf()->px('rtwpcoreupdate_false')]) && !(bool) WP_AUTO_UPDATE_CORE ? 'on' : $this->vcf()->dcvalue('rtwpcoreupdate')
+);
+?>
                     </td>
                 </tr>
                 <tr id="rtpluginthemeeditor">
                     <th><?php echo esc_html__('Disallows Plugin / Theme Editor', 'docket-cache').$this->tooltip('rtpluginthemeeditor'); ?></th>
                     <td>
                         <?php
-                            echo $this->config_select_set(
-                                'rtpluginthemeeditor',
-                                [
-                                    'default' => __('Default', 'docket-cache'),
-                                    'on' => __('Enable', 'docket-cache'),
-                                    'off' => __('Disable', 'docket-cache'),
-                                ],
-                                !empty($GLOBALS[$this->vcf()->px('rtpluginthemeeditor_false')]) && DISALLOW_FILE_EDIT ? 'on' : $this->vcf()->dcvalue('rtpluginthemeeditor')
-                            );
-                            ?>
+echo $this->config_select_set(
+    'rtpluginthemeeditor',
+    [
+        'default' => __('Default', 'docket-cache'),
+        'on' => __('Enable', 'docket-cache'),
+        'off' => __('Disable', 'docket-cache'),
+    ],
+    !empty($GLOBALS[$this->vcf()->px('rtpluginthemeeditor_false')]) && DISALLOW_FILE_EDIT ? 'on' : $this->vcf()->dcvalue('rtpluginthemeeditor')
+);
+?>
                     </td>
                 </tr>
                 <tr id="rtpluginthemeinstall">
                     <th><?php echo esc_html__('Disallows Plugin / Theme Update and Installation', 'docket-cache').$this->tooltip('rtpluginthemeinstall'); ?></th>
                     <td>
                         <?php
-                            echo $this->config_select_set(
-                                'rtpluginthemeinstall',
-                                [
-                                    'default' => __('Default', 'docket-cache'),
-                                    'on' => __('Enable', 'docket-cache'),
-                                    'off' => __('Disable', 'docket-cache'),
-                                ],
-                                !empty($GLOBALS[$this->vcf()->px('rtpluginthemeinstall_false')]) && DISALLOW_FILE_MODS ? 'on' : $this->vcf()->dcvalue('rtpluginthemeinstall')
-                            );
-                            ?>
+echo $this->config_select_set(
+    'rtpluginthemeinstall',
+    [
+        'default' => __('Default', 'docket-cache'),
+        'on' => __('Enable', 'docket-cache'),
+        'off' => __('Disable', 'docket-cache'),
+    ],
+    !empty($GLOBALS[$this->vcf()->px('rtpluginthemeinstall_false')]) && DISALLOW_FILE_MODS ? 'on' : $this->vcf()->dcvalue('rtpluginthemeinstall')
+);
+?>
                     </td>
                 </tr>
                 <?php
                     $rtwpdebug_default = !empty($GLOBALS[$this->vcf()->px('rtwpdebug_false')]) && WP_DEBUG ? 'on' : $this->vcf()->dcvalue('rtwpdebug');
-                ?>
+?>
                 <tr id="rtwpdebug">
                     <th<?php echo  'off' === $rtwpdebug_default ? ' class="border-b"' : ''; ?>><?php echo esc_html__('WP Debug', 'docket-cache').$this->tooltip('rtwpdebug'); ?></th>
                         <td>
                             <?php
-                            echo $this->config_select_set(
-                                'rtwpdebug',
-                                [
-                                    'default' => __('Default', 'docket-cache'),
-                                    'on' => __('Enable', 'docket-cache'),
-                                    'off' => __('Disable', 'docket-cache'),
-                                ],
-                                $rtwpdebug_default
-                            );
-                            ?>
+            echo $this->config_select_set(
+                'rtwpdebug',
+                [
+                    'default' => __('Default', 'docket-cache'),
+                    'on' => __('Enable', 'docket-cache'),
+                    'off' => __('Disable', 'docket-cache'),
+                ],
+                $rtwpdebug_default
+            );
+?>
                         </td>
                 </tr>
                 <?php if ('on' === $rtwpdebug_default) : ?>
@@ -427,21 +427,21 @@ namespace Nawawi\DocketCache;
                     <th><?php echo esc_html__('WP Debug Display', 'docket-cache').$this->tooltip('rtwpdebugdisplay'); ?></th>
                     <td>
                         <?php
-                            echo $this->config_select_set(
-                                'rtwpdebugdisplay',
-                                [
-                                    'default' => __('Default', 'docket-cache'),
-                                    'on' => __('Enable', 'docket-cache'),
-                                    'off' => __('Disable', 'docket-cache'),
-                                ],
-                                !empty($GLOBALS[$this->vcf()->px('rtwpdebugdisplay_false')]) && WP_DEBUG_DISPLAY ? 'on' : $this->vcf()->dcvalue('rtwpdebugdisplay')
-                            );
-                        ?>
+                        echo $this->config_select_set(
+                            'rtwpdebugdisplay',
+                            [
+                                'default' => __('Default', 'docket-cache'),
+                                'on' => __('Enable', 'docket-cache'),
+                                'off' => __('Disable', 'docket-cache'),
+                            ],
+                            !empty($GLOBALS[$this->vcf()->px('rtwpdebugdisplay_false')]) && WP_DEBUG_DISPLAY ? 'on' : $this->vcf()->dcvalue('rtwpdebugdisplay')
+                        );
+                    ?>
                     </td>
                 </tr>
                 <?php
                     $rtwpdebuglog_default = !empty($GLOBALS[$this->vcf()->px('rtwpdebuglog_false')]) && WP_DEBUG_LOG ? 'on' : $this->vcf()->dcvalue('rtwpdebuglog');
-                    $error_log = ini_get('error_log');
+                    $error_log = \ini_get('error_log');
                     ?>
                 <tr id="rtwpdebuglog">
                     <th class="border-b"><?php echo esc_html__('WP Debug Log', 'docket-cache').$this->tooltip('rtwpdebuglog'); ?></th>
@@ -457,11 +457,11 @@ namespace Nawawi\DocketCache;
                                 $rtwpdebuglog_default
                             );
 
-                        if (\defined('WP_DEBUG') && WP_DEBUG && \defined('WP_DEBUG_LOG') && WP_DEBUG_LOG && @is_file($error_log) && is_readable($error_log)) {
-                            $error_log = basename($error_log);
-                            echo '<span class="wpdebuglog"><a class="btxo" title="'.$error_log.'" href="'.$this->tab_query('config', ['wplog' => '0'.time()]).'" rel="noopener" target="new"><span class="dashicons dashicons-external"></span>View Log</a></span>';
-                        }
-                        ?>
+                    if (\defined('WP_DEBUG') && WP_DEBUG && \defined('WP_DEBUG_LOG') && WP_DEBUG_LOG && @is_file($error_log) && is_readable($error_log)) {
+                        $error_log = basename($error_log);
+                        echo '<span class="wpdebuglog"><a class="btxo" title="'.$error_log.'" href="'.$this->tab_query('config', ['wplog' => '0'.time()]).'" rel="noopener" target="new"><span class="dashicons dashicons-external"></span>View Log</a></span>';
+                    }
+                    ?>
                     </td>
                 </tr>
                 <?php endif; ?>
@@ -474,58 +474,58 @@ namespace Nawawi\DocketCache;
                     <th><?php echo esc_html__('Cache Files Limit', 'docket-cache').$this->tooltip('maxfile'); ?></th>
                     <td>
                         <?php
-                            $maxfile_default = '50K';
-                        switch ($this->vcf()->dcvalue('maxfile')) {
-                            case '50000':
-                                $maxfile_default = '50K';
-                                break;
-                            case '100000':
-                                $maxfile_default = '100K';
-                                break;
-                            case '200000':
-                                $maxfile_default = '200K';
-                                break;
-                        }
-                            echo $this->config_select_set(
-                                'maxfile',
-                                [
-                                    'default' => __('Default', 'docket-cache'),
-                                    '50K' => '50000',
-                                    '100K' => '100000',
-                                    '200K' => '200000',
-                                ],
-                                $maxfile_default
-                            );
-                            ?>
+                    $maxfile_default = '50K';
+switch ($this->vcf()->dcvalue('maxfile')) {
+    case '50000':
+        $maxfile_default = '50K';
+        break;
+    case '100000':
+        $maxfile_default = '100K';
+        break;
+    case '200000':
+        $maxfile_default = '200K';
+        break;
+}
+echo $this->config_select_set(
+    'maxfile',
+    [
+        'default' => __('Default', 'docket-cache'),
+        '50K' => '50000',
+        '100K' => '100000',
+        '200K' => '200000',
+    ],
+    $maxfile_default
+);
+?>
                     </td>
                 </tr>
                 <tr id="maxsize_disk">
                     <th><?php echo esc_html__('Cache Disk Limit', 'docket-cache').$this->tooltip('maxsize_disk'); ?></th>
                     <td>
                         <?php
-                            $maxsize_disk_default = '500M';
-                        switch ($this->vcf()->dcvalue('maxsize_disk')) {
-                            case '524288000':
-                                $maxsize_disk_default = '500M';
-                                break;
-                            case '1073741824':
-                                $maxsize_disk_default = '1G';
-                                break;
-                            case '2147483648':
-                                $maxsize_disk_default = '2G';
-                                break;
-                        }
-                            echo $this->config_select_set(
-                                'maxsize_disk',
-                                [
-                                    'default' => __('Default', 'docket-cache'),
-                                    '500M' => '500M',
-                                    '1G' => '1G',
-                                    '2G' => '2G',
-                                ],
-                                $maxsize_disk_default
-                            );
-                            ?>
+$maxsize_disk_default = '500M';
+switch ($this->vcf()->dcvalue('maxsize_disk')) {
+    case '524288000':
+        $maxsize_disk_default = '500M';
+        break;
+    case '1073741824':
+        $maxsize_disk_default = '1G';
+        break;
+    case '2147483648':
+        $maxsize_disk_default = '2G';
+        break;
+}
+echo $this->config_select_set(
+    'maxsize_disk',
+    [
+        'default' => __('Default', 'docket-cache'),
+        '500M' => '500M',
+        '1G' => '1G',
+        '2G' => '2G',
+    ],
+    $maxsize_disk_default
+);
+?>
                     </td>
                 </tr>
                 <tr id="chunkcachedir">

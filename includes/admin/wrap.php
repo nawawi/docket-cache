@@ -11,7 +11,7 @@
 namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
-settings_errors((is_multisite() && is_network_admin() ? 'general' : ''));
+settings_errors(is_multisite() && is_network_admin() ? 'general' : '');
 
 if (1 === $this->info->status_code && isset($this->pt->token)) {
     switch ($this->pt->token) {
@@ -39,7 +39,7 @@ if (1 === $this->info->status_code && isset($this->pt->token)) {
     <div class="tab-content">
         <?php
             $this->tab_content();
-        ?>
+?>
     </div>
     <h1 style="display:none;">
         <!-- notice message -->

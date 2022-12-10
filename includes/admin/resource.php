@@ -21,21 +21,21 @@ namespace Nawawi\DocketCache;
         </p>
         <?php
             $sites = $this->pt->get_network_sites();
-        if (is_multisite() && !empty($sites) && \is_array($sites) && \count($sites) > 1) :
-            $current_siteid = (int) $this->pt->get_current_select_siteid();
-            ?>
+if (is_multisite() && !empty($sites) && \is_array($sites) && \count($sites) > 1) :
+    $current_siteid = (int) $this->pt->get_current_select_siteid();
+    ?>
         <label for="siteid"><?php esc_html_e('For Site:', 'docket-cache'); ?></label>
         <select id="siteid">
             <option value='0' <?php echo 0 === $current_siteid ? ' selected' : ''; ?>><?php esc_html_e('all', 'docket-cache'); ?></option>
             <?php
-            foreach ($sites as $site) {
-                $site_id = (int) $site['id'];
-                $site_url = $site['url'];
-                $v = nwdcx_noscheme($site_url);
-                $selected = $site_id > 0 && $site_id === $current_siteid ? ' selected' : '';
-                echo '<option value="'.$site_id.'"'.$selected.'>'.$v.'</option>';
-            }
-            ?>
+    foreach ($sites as $site) {
+        $site_id = (int) $site['id'];
+        $site_url = $site['url'];
+        $v = nwdcx_noscheme($site_url);
+        $selected = $site_id > 0 && $site_id === $current_siteid ? ' selected' : '';
+        echo '<option value="'.$site_id.'"'.$selected.'>'.$v.'</option>';
+    }
+    ?>
         </select>
         <?php endif; ?>
         <a href="<?php echo $this->pt->action_query('cleanuppost', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner btx-cleanuppost"><?php esc_html_e('Cleanup Post', 'docket-cache'); ?></a>
@@ -100,16 +100,16 @@ namespace Nawawi\DocketCache;
         <a href="
         <?php
         $is_install = WpConfig::is_runtimefalse();
-        $act = $is_install ? esc_html__('Install Runtime Code', 'docket-cache') : esc_html__('Update Runtime Code', 'docket-cache');
-        $actc = $is_install ? 'button-primary' : 'button-secondary';
-        echo $this->pt->get_page(
-            [
-                'idx' => 'config',
-                'adx' => 'rtcnf',
-                'st' => time(),
-            ]
-        );
-        ?>
+$act = $is_install ? esc_html__('Install Runtime Code', 'docket-cache') : esc_html__('Update Runtime Code', 'docket-cache');
+$actc = $is_install ? 'button-primary' : 'button-secondary';
+echo $this->pt->get_page(
+    [
+        'idx' => 'config',
+        'adx' => 'rtcnf',
+        'st' => time(),
+    ]
+);
+?>
         " class="button <?php echo $actc; ?> button-large btx-spinner"><?php echo $act; ?></a>
     </div>
 </div>

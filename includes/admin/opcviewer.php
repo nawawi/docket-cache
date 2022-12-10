@@ -42,7 +42,7 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
                 </tr>
                 <?php
                         ++$lcnt;
-                endforeach;
+                    endforeach;
                     ?>
 
                 <tr>
@@ -94,14 +94,14 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
                 <a href="<?php echo $this->pt->get_page(['idx' => 'opcviewer']); ?>" class="button button-primary"><?php esc_html_e('Dismiss', 'docket-cache'); ?></a>
             </p>
             <?php
-                endif; // empty config
-                else :
-                    ?>
+            endif; // empty config
+else :
+    ?>
 
             <?php $this->tab_title(esc_html__('OPcache Usage', 'docket-cache')); ?>
             <?php
-                    if (!$this->pt->is_opcache_enable()) :
-                        echo Resc::boxmsg(__('OPcache not available.', 'docket-cache'), 'warning', false, true, false);
+            if (!$this->pt->is_opcache_enable()) :
+                echo Resc::boxmsg(__('OPcache not available.', 'docket-cache'), 'warning', false, true, false);
             elseif (!\is_object($opcache_view)) :
                 echo Resc::boxmsg(__('Failed to load OPcacheList()', 'docket-cache'), 'error', false, true, false);
             else :
@@ -196,12 +196,12 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
                 <a href="<?php echo $this->pt->action_query('flush-opcache', ['idx' => 'opcviewer']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Flush OPcache', 'docket-cache'); ?></a>
                 <a href="
                 <?php
-                echo $this->pt->get_page(
-                    [
-                        'idx' => 'opcviewer',
-                        'adx' => 'cnf',
-                    ]
-                );
+                        echo $this->pt->get_page(
+                            [
+                                'idx' => 'opcviewer',
+                                'adx' => 'cnf',
+                            ]
+                        );
                 ?>
                 " class="button button-secondary button-large btx-spinner"><?php esc_html_e('Display Config', 'docket-cache'); ?></a>
             </p>
@@ -215,35 +215,35 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
                         <select id="statsop" name="sf" class="config-filter">
                             <?php
                             $sort_sf = !empty($_GET['sf']) ? sanitize_text_field($_GET['sf']) : 'obc';
-                            $opts = [
-                                'obc' => __('Object Cache Files', 'docket-cache'),
-                                'wpc' => __('Other Files', 'docket-cache'),
-                                'dfc' => __('Stale Files', 'docket-cache'),
-                                'all' => __('All', 'docket-cache'),
-                            ];
+                $opts = [
+                    'obc' => __('Object Cache Files', 'docket-cache'),
+                    'wpc' => __('Other Files', 'docket-cache'),
+                    'dfc' => __('Stale Files', 'docket-cache'),
+                    'all' => __('All', 'docket-cache'),
+                ];
 
-                            if (!empty($stats->file_cache_only)) {
-                                unset($opts['dfc']);
-                            }
+                if (!empty($stats->file_cache_only)) {
+                    unset($opts['dfc']);
+                }
 
-                            foreach ($opts as $k => $n) {
-                                echo '<option value="'.$k.'"'.($sort_sf === $k ? ' selected' : '').'>'.$n.'</option>';
-                            }
-                            ?>
+                foreach ($opts as $k => $n) {
+                    echo '<option value="'.$k.'"'.($sort_sf === $k ? ' selected' : '').'>'.$n.'</option>';
+                }
+                ?>
                         </select>
 
                         <select id="statslm" name="sm" class="config-filter">
                             <?php
-                            $sort_sm = !empty($_GET['sm']) ? sanitize_text_field($_GET['sm']) : '1k';
-                            foreach ([
-                                '1k' => __('< 1000 Items', 'docket-cache'),
-                                '5k' => __('< 5000 Items', 'docket-cache'),
-                                '10k' => __('< 10000 Items', 'docket-cache'),
-                                'all' => __('> All Items', 'docket-cache'),
-                            ] as $k => $n) {
-                                echo '<option value="'.$k.'"'.($sort_sm === $k ? ' selected' : '').'>'.$n.'</option>';
-                            }
-                            ?>
+                $sort_sm = !empty($_GET['sm']) ? sanitize_text_field($_GET['sm']) : '1k';
+                foreach ([
+                    '1k' => __('< 1000 Items', 'docket-cache'),
+                    '5k' => __('< 5000 Items', 'docket-cache'),
+                    '10k' => __('< 10000 Items', 'docket-cache'),
+                    'all' => __('> All Items', 'docket-cache'),
+                ] as $k => $n) {
+                    echo '<option value="'.$k.'"'.($sort_sm === $k ? ' selected' : '').'>'.$n.'</option>';
+                }
+                ?>
                         </select>
                     </form>
                 </div>

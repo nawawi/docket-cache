@@ -66,30 +66,30 @@ endif;
             <table class="form-table">
                 <?php
                 $title = esc_html__('Cron Events For Site', 'docket-cache');
-                $sites = $this->pt->get_network_sites();
-                if (is_multisite() && !empty($sites) && \is_array($sites) && \count($sites) > 1) :
-                    ?>
+$sites = $this->pt->get_network_sites();
+if (is_multisite() && !empty($sites) && \is_array($sites) && \count($sites) > 1) :
+    ?>
                 <tr class="form-table-selection">
                     <th><?php echo $title; ?></th>
                     <td><select id="siteid" class="config-select">
                             <?php
-                            $cronbot_siteid = (int) $this->pt->get_cron_siteid();
+            $cronbot_siteid = (int) $this->pt->get_cron_siteid();
 
-                            foreach ($sites as $site) {
-                                $site_id = (int) $site['id'];
-                                $site_url = $site['url'];
-                                $v = '['.$site_id.'] '.nwdcx_noscheme($site_url);
-                                $url = $this->pt->action_query(
-                                    'selectsite-cronbot',
-                                    [
-                                        'idx' => 'cronbot',
-                                        'nv' => $site_id,
-                                    ]
-                                );
-                                $selected = $site_id === $cronbot_siteid ? ' selected' : '';
-                                echo '<option value="'.$site_id.'" data-action-link="'.$url.'"'.$selected.'>'.$v.'</option>';
-                            }
-                            ?>
+    foreach ($sites as $site) {
+        $site_id = (int) $site['id'];
+        $site_url = $site['url'];
+        $v = '['.$site_id.'] '.nwdcx_noscheme($site_url);
+        $url = $this->pt->action_query(
+            'selectsite-cronbot',
+            [
+                'idx' => 'cronbot',
+                'nv' => $site_id,
+            ]
+        );
+        $selected = $site_id === $cronbot_siteid ? ' selected' : '';
+        echo '<option value="'.$site_id.'" data-action-link="'.$url.'"'.$selected.'>'.$v.'</option>';
+    }
+    ?>
                         </select>
                         <small>[SiteId] Hostname</small>
                     </td>
@@ -112,17 +112,17 @@ endif;
                             'idx' => 'cronbot',
                         ]
                     );
-                    ?>
+?>
                     " class="button button-secondary button-large btx-spinner"><?php esc_html_e('Run Scheduled Event', 'docket-cache'); ?></a>
                     <a href="
                     <?php
-                    echo $this->pt->action_query(
-                        'runeventnow-cronbot',
-                        [
-                            'idx' => 'cronbot',
-                        ]
-                    );
-                    ?>
+echo $this->pt->action_query(
+    'runeventnow-cronbot',
+    [
+        'idx' => 'cronbot',
+    ]
+);
+?>
                     " class="button button-secondary  button-large btx-spinner"><?php esc_html_e('Run All Now', 'docket-cache'); ?></a>
                 </div>
 

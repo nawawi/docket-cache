@@ -265,12 +265,12 @@ class WP_Object_Cache
             return false;
         }
 
-        if (empty($group)) {
-            $group = 'default';
-        }
-
         if (!$this->is_valid_key($key)) {
             return false;
+        }
+
+        if (empty($group)) {
+            $group = 'default';
         }
 
         $cache_key = $this->dc_key($key, $group);
@@ -317,12 +317,12 @@ class WP_Object_Cache
      */
     public function replace($key, $data, $group = 'default', $expire = 0)
     {
-        if (empty($group)) {
-            $group = 'default';
-        }
-
         if (!$this->is_valid_key($key)) {
             return false;
+        }
+
+        if (empty($group)) {
+            $group = 'default';
         }
 
         $cache_key = $this->dc_key($key, $group);
@@ -351,12 +351,12 @@ class WP_Object_Cache
      */
     public function set($key, $data, $group = 'default', $expire = 0)
     {
-        if (empty($group)) {
-            $group = 'default';
-        }
-
         if (!$this->is_valid_key($key)) {
             return false;
+        }
+
+        if (empty($group)) {
+            $group = 'default';
         }
 
         // from invalidate cache
@@ -421,12 +421,12 @@ class WP_Object_Cache
      */
     public function get($key, $group = 'default', $force = false, &$found = null)
     {
-        if (empty($group)) {
-            $group = 'default';
-        }
-
         if (!$this->is_valid_key($key)) {
             return false;
+        }
+
+        if (empty($group)) {
+            $group = 'default';
         }
 
         $cache_key = $this->dc_key($key, $group);
@@ -481,12 +481,12 @@ class WP_Object_Cache
      */
     public function delete($key, $group = 'default', $deprecated = false)
     {
-        if (empty($group)) {
-            $group = 'default';
-        }
-
         if (!$this->is_valid_key($key)) {
             return false;
+        }
+
+        if (empty($group)) {
+            $group = 'default';
         }
 
         $key = $this->dc_key($key, $group);
@@ -531,12 +531,12 @@ class WP_Object_Cache
      */
     public function incr($key, $offset = 1, $group = 'default')
     {
-        if (empty($group)) {
-            $group = 'default';
-        }
-
         if (!$this->is_valid_key($key)) {
             return false;
+        }
+
+        if (empty($group)) {
+            $group = 'default';
         }
 
         $cache_key = $this->dc_key($key, $group);
@@ -573,12 +573,12 @@ class WP_Object_Cache
      */
     public function decr($key, $offset = 1, $group = 'default')
     {
-        if (empty($group)) {
-            $group = 'default';
-        }
-
         if (!$this->is_valid_key($key)) {
             return false;
+        }
+
+        if (empty($group)) {
+            $group = 'default';
         }
 
         $cache_key = $this->dc_key($key, $group);
@@ -738,7 +738,19 @@ class WP_Object_Cache
      */
     private function is_valid_key($key)
     {
-        return \is_string($key) || \is_int($key);
+        if (\is_int($key)) {
+            return true;
+        }
+
+        if (\is_string($key) && '' !== trim($key)) {
+            return true;
+        }
+
+        if (!\function_exists('__') && \function_exists('wp_load_translations_early')) {
+            wp_load_translations_early();
+        }
+
+        return false;
     }
 
     /**
@@ -827,15 +839,15 @@ class WP_Object_Cache
                 if (false !== strpos($key, ':') && @preg_match('@(.*):([a-z0-9]{32}):([0-9\. ]+)$@', $key)) {
                     $expire = $maxttl < 345600 ? $maxttl : 345600; // 4d
                 }
-
-                // advcpost
-                // docketcache-post-timestamp
-            } elseif (false !== strpos($group, 'docketcache-post-')) {
+            }
+            // advcpost
+            // docketcache-post-timestamp
+            elseif (false !== strpos($group, 'docketcache-post-')) {
                 $expire = $maxttl < 345600 ? $maxttl : 345600; // 4d
-
-                // woocommerce stale cache
-                // wc_cache_0.72953700 1651592702
-            } elseif (false !== strpos($key, 'wc_cache_') && @preg_match('@^wc_cache_([0-9\. ]+)_@', $key)) {
+            }
+            // woocommerce stale cache
+            // wc_cache_0.72953700 1651592702
+            elseif (false !== strpos($key, 'wc_cache_') && @preg_match('@^wc_cache_([0-9\. ]+)_@', $key)) {
                 $expire = $maxttl < 345600 ? $maxttl : 345600; // 4d
             }
         }
@@ -1180,10 +1192,10 @@ class WP_Object_Cache
                 $val = 'last_changed:'.$group.':'.$usec;
                 $this->stalecache_list[md5($val)] = $val;
             }
-
-            // can't capture by last_changed.
-            // we compare key prefix and timestamp.
-        } elseif (false !== strpos($key, ':') && @preg_match('@(.*):([a-z0-9]{32}):([0-9\. ]+)$@', $key, $mm)) {
+        }
+        // can't capture by last_changed.
+        // we compare key prefix and timestamp.
+        elseif (false !== strpos($key, ':') && @preg_match('@(.*):([a-z0-9]{32}):([0-9\. ]+)$@', $key, $mm)) {
             $val = 'after:'.$group.':'.$mm[3].':'.$mm[1];
             $this->stalecache_list[md5($val)] = $val;
         }
@@ -2072,6 +2084,33 @@ function wp_cache_flush_runtime()
     global $wp_object_cache;
 
     return $wp_object_cache->flush(true);
+}
+
+/**
+ * Determines whether the object cache implementation supports a particular feature.
+ *
+ * @since 6.1.0
+ *
+ * @param string $feature Name of the feature to check for. Possible values include:
+ *                        'add_multiple', 'set_multiple', 'get_multiple', 'delete_multiple',
+ *                        'flush_runtime', 'flush_group'.
+ *
+ * @return bool true if the feature is supported, false otherwise
+ */
+function wp_cache_supports($feature)
+{
+    switch ($feature) {
+        case 'add_multiple':
+        case 'set_multiple':
+        case 'get_multiple':
+        case 'delete_multiple':
+        case 'flush_runtime':
+        case 'flush_group':
+            return true;
+
+        default:
+            return false;
+    }
 }
 
 /**

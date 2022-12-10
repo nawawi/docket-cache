@@ -1,3 +1,12 @@
+= v22.07.02 (2022-12-10) =
+- Fixed: Tweaks::cache_http_response() -> Default TTL.
+- Fixed: Tweaks::wpservehappy() -> missing array key.
+- Added: wp_cache_supports() function.
+- Changed: Tweaks::cache_http_response() -> Use transient instead of wp_cache.
+- Changed: Disable Auto update by default.
+- Changed: Disable Advanced Post Cache by default.
+- Tested up to 6.1.
+
 = v22.07.01 (2022-07-15) =
 - Fixed: Plugin:cleanuppost() -> Invalid index for trashbin.
 - Fixed: MoCache() -> Add $entries, $headers properties to avoid warning on get_translations_for_domain.

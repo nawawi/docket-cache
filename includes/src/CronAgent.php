@@ -311,7 +311,7 @@ final class CronAgent
 
             foreach ($cronhooks as $hook => $keys) {
                 if (!has_action($hook)) {
-                    //wp_clear_scheduled_hook($hook);
+                    // wp_clear_scheduled_hook($hook);
                     continue;
                 }
 
@@ -347,7 +347,7 @@ final class CronAgent
                         ++$run_event;
                     } catch (\Throwable $e) {
                         $results['wpcron_error'][$hook] = $e->getMessage();
-                        //wp_clear_scheduled_hook($hook);
+                        // wp_clear_scheduled_hook($hook);
 
                         if ($run_uno) {
                             $results['wpcron_return'] = 0;

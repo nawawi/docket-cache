@@ -159,7 +159,7 @@ class Filesystem
      */
     public function get_max_execution_time()
     {
-        $max_execution_time = (int) ini_get('max_execution_time');
+        $max_execution_time = (int) \ini_get('max_execution_time');
         if ($max_execution_time > 10) {
             --$max_execution_time;
         }
@@ -589,7 +589,7 @@ class Filesystem
 
     public function is_function_disabled($name)
     {
-        $disable_functions = @ini_get('disable_functions');
+        $disable_functions = @\ini_get('disable_functions');
         if (!empty($disable_functions)) {
             $funcs = explode(',', $disable_functions);
             if (\in_array($name, $funcs)) {
@@ -655,7 +655,7 @@ class Filesystem
      */
     public function is_opcache_enable()
     {
-        if (@ini_get('opcache.enable')) {
+        if (@\ini_get('opcache.enable')) {
             if (\function_exists('extension_loaded') && \extension_loaded('Zend OPcache')) {
                 return true;
             }
@@ -680,7 +680,7 @@ class Filesystem
      */
     public function is_opcache_blacklisted()
     {
-        $conf = ini_get('opcache.blacklist_filename');
+        $conf = \ini_get('opcache.blacklist_filename');
         if (empty($conf)) {
             return false;
         }
@@ -718,7 +718,7 @@ class Filesystem
      */
     public function is_opcache_filecache_only()
     {
-        return @ini_get('opcache.file_cache_only');
+        return @\ini_get('opcache.file_cache_only');
     }
 
     /**
@@ -920,7 +920,7 @@ class Filesystem
             'shutdown',
             function () {
                 // anything involve disk, don't go into background
-                //$this->close_buffer();
+                // $this->close_buffer();
                 $this->opcache_reset();
             },
             \PHP_INT_MAX

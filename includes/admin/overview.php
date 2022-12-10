@@ -57,7 +57,7 @@ $has_stats = $this->vcf()->is_dctrue('STATS');
                     <td id="objectcache-stats">
                         <?php
                         echo $this->info->status_text_stats;
-                        ?>
+                    ?>
                     </td>
                 </tr>
                 <tr>
@@ -77,16 +77,16 @@ $has_stats = $this->vcf()->is_dctrue('STATS');
                     <th><?php esc_html_e('Object Cache', 'docket-cache'); ?></th>
                     <td id="objectcache-stats">
                         <?php
-                        echo 1 === $this->info->status_code && !empty($this->info->status_text_stats) ? $this->info->status_text_stats : $this->info->status_text;
-                        ?>
+                    echo 1 === $this->info->status_code && !empty($this->info->status_text_stats) ? $this->info->status_text_stats : $this->info->status_text;
+                    ?>
                     </td>
                 </tr>
                 <tr>
                     <th class="border-b"><?php esc_html_e('Zend OPcache', 'docket-cache'); ?></th>
                     <td id="opcache-stats0">
                         <?php
-                        echo 1 === $this->info->opcache_code && !empty($this->info->opcache_text_stats) ? $this->info->opcache_text_stats : $this->info->opcache_text;
-                        ?>
+                    echo 1 === $this->info->opcache_code && !empty($this->info->opcache_text_stats) ? $this->info->opcache_text_stats : $this->info->opcache_text;
+                    ?>
                     </td>
                 </tr>
                 <?php endif; ?>

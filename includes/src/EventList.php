@@ -79,7 +79,7 @@ class EventList extends \WP_List_Table
         foreach ($crons as $time => $cron) {
             foreach ($cron as $hook => $dings) {
                 if (!has_action($hook)) {
-                    //wp_clear_scheduled_hook($hook);
+                    // wp_clear_scheduled_hook($hook);
                     continue;
                 }
                 foreach ($dings as $sig => $data) {

@@ -72,7 +72,7 @@ final class Tweaks
         // jetpack: enables object caching for the response sent by instagram when querying for instagram image html
         // https://developer.jetpack.com/hooks/instagram_cache_oembed_api_response_body/
         // Removed in Jetpack 9.1.0
-        //add_filter('instagram_cache_oembed_api_response_body', '__return_true');
+        // add_filter('instagram_cache_oembed_api_response_body', '__return_true');
 
         if (nwdcx_consfalse('TWEAKS_WPCOOKIE_DISABLED')) {
             // wp: comment cookie lifetime, default to 30000000 second = 12 months
@@ -750,7 +750,22 @@ final class Tweaks
     {
         $key = md5(\PHP_VERSION);
         add_filter('pre_site_transient_php_check_'.$key, function () {
-            return [];
+            /*
+             * Response should be an array with:
+             *  'recommended_version' - string - The PHP version recommended by WordPress.
+             *  'is_supported' - boolean - Whether the PHP version is actively supported.
+             *  'is_secure' - boolean - Whether the PHP version receives security updates.
+             *  'is_acceptable' - boolean - Whether the PHP version is still acceptable or warnings
+             *                              should be shown and an update recommended.
+             */
+
+            return [
+                'recommended_version' => '',
+                'is_supported' => '',
+                'is_secure' => '',
+                'is_lower_than_future_minimum' => '',
+                'is_acceptable' => '',
+            ];
         }, \PHP_INT_MAX);
     }
 
@@ -892,11 +907,10 @@ final class Tweaks
                     return $response;
                 }
 
-                $cache_group = 'docketcache-httpresponse';
-                $cache_key = $url;
+                $cache_key = 'docketcache-httpresponse_'.md5($url);
 
                 $cache_ttl = (int) nwdcx_constval('CACHEHTTPRESPONSE_TTL');
-                if (!empty($cache_ttl)) {
+                if (empty($cache_ttl)) {
                     $cache_ttl = 300;
                 }
 
@@ -904,21 +918,21 @@ final class Tweaks
                 $exclude_list = nwdcx_constval('CACHEHTTPRESPONSE_EXCLUDE');
 
                 if (empty($include_list) && empty($exclude_list)) {
-                    wp_cache_set($cache_key, $response, $cache_group, $cache_ttl);
+                    set_transient($cache_key, $response, $cache_ttl);
 
                     return $response;
                 }
 
                 if (!empty($include_list) && \is_array($include_list) && \in_array($url, $include_list)) {
                     if (!empty($exclude_list) && \is_array($exclude_list) && !\in_array($url, $exclude_list)) {
-                        wp_cache_set($cache_key, $response, $cache_group, $cache_ttl);
+                        set_transient($cache_key, $response, $cache_ttl);
                     }
 
                     return $response;
                 }
 
                 if (!empty($exclude_list) && \is_array($exclude_list) && !\in_array($url, $exclude_list)) {
-                    wp_cache_set($cache_key, $response, $cache_group, $cache_ttl);
+                    set_transient($cache_key, $response, $cache_ttl);
 
                     return $response;
                 }
@@ -927,9 +941,8 @@ final class Tweaks
             }, \PHP_INT_MIN, 3);
 
             add_filter('pre_http_request', function ($preempt, $parsed_args, $url) {
-                $cache_group = 'docketcache-httpresponse';
-                $cache_key = $url;
-                $data = wp_cache_get($cache_key, $cache_group);
+                $cache_key = 'docketcache-httpresponse_'.md5($url);
+                $data = get_transient($cache_key);
                 if (!empty($data) && \is_array($data)) {
                     return $data;
                 }

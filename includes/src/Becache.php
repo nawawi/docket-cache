@@ -163,10 +163,10 @@ class Becache
                 }
             } elseif (\in_array($group, ['terms', 'posts', 'post_meta', 'options', 'site-options', 'comments'])) {
                 $expire = $maxttl < 1209600 ? 1209600 : $maxttl; // 14d
-
-                // woocommerce stale cache
-                // wc_cache_0.72953700 1651592702
-            } elseif ('wc_cache_' === substr($key, 0, 9) && preg_match('@^wc_cache_([0-9\. ]+)_@', $key)) {
+            }
+            // woocommerce stale cache
+            // wc_cache_0.72953700 1651592702
+            elseif ('wc_cache_' === substr($key, 0, 9) && preg_match('@^wc_cache_([0-9\. ]+)_@', $key)) {
                 $expire = 86400; // 1d
             }
         }

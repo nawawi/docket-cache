@@ -171,16 +171,16 @@ final class Plugin extends Bepart
     public function get_info()
     {
         $status_code = [
-             0 => esc_html__('Disabled', 'docket-cache'),
-             1 => esc_html__('Enabled', 'docket-cache'),
-             2 => esc_html__('Not Available', 'docket-cache'),
-             3 => esc_html__('Unknown', 'docket-cache'),
-         ];
+            0 => esc_html__('Disabled', 'docket-cache'),
+            1 => esc_html__('Enabled', 'docket-cache'),
+            2 => esc_html__('Not Available', 'docket-cache'),
+            3 => esc_html__('Unknown', 'docket-cache'),
+        ];
 
         $yesno = [
-             0 => esc_html__('No', 'docket-cache'),
-             1 => esc_html__('Yes', 'docket-cache'),
-         ];
+            0 => esc_html__('No', 'docket-cache'),
+            1 => esc_html__('Yes', 'docket-cache'),
+        ];
 
         $force_stats = $this->cf()->is_dctrue('WPCLI');
         $cache_stats = $this->get_cache_stats($force_stats);
@@ -190,19 +190,19 @@ final class Plugin extends Bepart
         $status_text = '';
 
         switch ($status) {
-             case 1:
-                 if ($this->cf()->is_dctrue('STATS')) {
-                     /* translators: %1$s = size, %2$s number of file */
-                     $status_text_stats = sprintf(esc_html__(_n('%1$s object of %2$s file', '%1$s object of %2$s files', $cache_stats->files < 1 ? 1 : $cache_stats->files, 'docket-cache')), $this->normalize_size($cache_stats->size), $cache_stats->files);
-                 }
-                 $status_text = $status_code[1];
-                 break;
-             case 2:
-                 $status_text = esc_html__('Disabled at runtime.', 'docket-cache');
-                 break;
-             default:
-                 $status_text = $status_code[$status];
-         }
+            case 1:
+                if ($this->cf()->is_dctrue('STATS')) {
+                    /* translators: %1$s = size, %2$s number of file */
+                    $status_text_stats = sprintf(esc_html__(_n('%1$s object of %2$s file', '%1$s object of %2$s files', $cache_stats->files < 1 ? 1 : $cache_stats->files, 'docket-cache')), $this->normalize_size($cache_stats->size), $cache_stats->files);
+                }
+                $status_text = $status_code[1];
+                break;
+            case 2:
+                $status_text = esc_html__('Disabled at runtime.', 'docket-cache');
+                break;
+            default:
+                $status_text = $status_code[$status];
+        }
 
         $opcache = $this->get_opcache_status();
         $opcache_text_stats = '';
@@ -211,44 +211,44 @@ final class Plugin extends Bepart
         $opcache_dc_stats = '';
         $opcache_wp_stats = '';
         switch ($opcache->status) {
-             case 1:
-                 /* translators: %1$s = size, %2$s number of file */
-                 $opcache_text_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->files, 'docket-cache')), $this->normalize_size($opcache->size), $opcache->files);
+            case 1:
+                /* translators: %1$s = size, %2$s number of file */
+                $opcache_text_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->files, 'docket-cache')), $this->normalize_size($opcache->size), $opcache->files);
 
-                 if ($opcache->dcfiles > 1) {
-                     /* translators: %1$s = size, %2$s number of file */
-                     $opcache_dc_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->dcfiles, 'docket-cache')), $this->normalize_size($opcache->dcsize), $opcache->dcfiles);
+                if ($opcache->dcfiles > 1) {
+                    /* translators: %1$s = size, %2$s number of file */
+                    $opcache_dc_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->dcfiles, 'docket-cache')), $this->normalize_size($opcache->dcsize), $opcache->dcfiles);
 
-                     /* translators: %1$s = size, %2$s number of file */
-                     $opcache_wp_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->wpfiles, 'docket-cache')), $this->normalize_size($opcache->wpsize), $opcache->wpfiles);
-                 }
-                 break;
-             case 2:
-                 $opcache_text = $status_code[1];
-                 break;
-             case 3:
-                 $opcache_text = $status_code[1].' (<a href="https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.file-cache-only" rel="noopener" target="new">'.esc_html__('File cache only', 'docket-cache').'</a>)';
-                 break;
-             case 4:
-                 if ($opcache->files > 0) {
-                     /* translators: %1$s = size, %2$s number of file */
-                     $opcache_text_stats = sprintf(esc_html__(_n('%1$s size of %2$s file', '%1$s size of %2$s files', $opcache->files, 'docket-cache')), $this->normalize_size($opcache->size), $opcache->files);
+                    /* translators: %1$s = size, %2$s number of file */
+                    $opcache_wp_stats = sprintf(esc_html__(_n('%1$s memory of %2$s file', '%1$s memory of %2$s files', $opcache->wpfiles, 'docket-cache')), $this->normalize_size($opcache->wpsize), $opcache->wpfiles);
+                }
+                break;
+            case 2:
+                $opcache_text = $status_code[1];
+                break;
+            case 3:
+                $opcache_text = $status_code[1].' (<a href="https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.file-cache-only" rel="noopener" target="new">'.esc_html__('File cache only', 'docket-cache').'</a>)';
+                break;
+            case 4:
+                if ($opcache->files > 0) {
+                    /* translators: %1$s = size, %2$s number of file */
+                    $opcache_text_stats = sprintf(esc_html__(_n('%1$s size of %2$s file', '%1$s size of %2$s files', $opcache->files, 'docket-cache')), $this->normalize_size($opcache->size), $opcache->files);
 
-                     if ($opcache->dcfiles > 1) {
-                         /* translators: %1$s = size, %2$s number of file */
-                         $opcache_dc_stats = sprintf(esc_html__(_n('%1$s size of %2$s file', '%1$s size of %2$s files', $opcache->dcfiles, 'docket-cache')), $this->normalize_size($opcache->dcsize), $opcache->dcfiles);
+                    if ($opcache->dcfiles > 1) {
+                        /* translators: %1$s = size, %2$s number of file */
+                        $opcache_dc_stats = sprintf(esc_html__(_n('%1$s size of %2$s file', '%1$s size of %2$s files', $opcache->dcfiles, 'docket-cache')), $this->normalize_size($opcache->dcsize), $opcache->dcfiles);
 
-                         /* translators: %1$s = size, %2$s number of file */
-                         $opcache_wp_stats = sprintf(esc_html__(_n('%1$s size of %2$s file', '%1$s size of %2$s files', $opcache->wpfiles, 'docket-cache')), $this->normalize_size($opcache->wpsize), $opcache->wpfiles);
-                     }
-                 } else {
-                     $opcache_text = $status_code[1].' (<a href="https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.file-cache-only" rel="noopener" target="new">'.esc_html__('File cache only', 'docket-cache').'</a>)';
-                 }
+                        /* translators: %1$s = size, %2$s number of file */
+                        $opcache_wp_stats = sprintf(esc_html__(_n('%1$s size of %2$s file', '%1$s size of %2$s files', $opcache->wpfiles, 'docket-cache')), $this->normalize_size($opcache->wpsize), $opcache->wpfiles);
+                    }
+                } else {
+                    $opcache_text = $status_code[1].' (<a href="https://www.php.net/manual/en/opcache.configuration.php#ini.opcache.file-cache-only" rel="noopener" target="new">'.esc_html__('File cache only', 'docket-cache').'</a>)';
+                }
 
-                 break;
-             default:
-                 $opcache_text = $status_code[2];
-         }
+                break;
+            default:
+                $opcache_text = $status_code[2];
+        }
 
         $log_enable = $this->cf()->is_dctrue('LOG') ? 1 : 0;
         $log_file = $this->cf()->dcvalue('LOG_FILE');
@@ -305,43 +305,43 @@ final class Plugin extends Bepart
         }
 
         return [
-             'status_code' => $status,
-             'status_text' => $status_text,
-             'status_text_stats' => $status_text_stats,
-             'opcache_code' => $opcache->status,
-             'opcache_text' => $opcache_text,
-             'opcache_text_stats' => $opcache_text_stats,
-             'opcache_dc_stats' => $opcache_dc_stats,
-             'opcache_wp_stats' => $opcache_wp_stats,
-             'php_memory_limit' => $this->normalize_size(@ini_get('memory_limit')),
-             'wp_memory_limit' => $this->normalize_size(WP_MEMORY_LIMIT),
-             'wp_max_memory_limit' => $this->normalize_size(WP_MAX_MEMORY_LIMIT),
-             'write_dropin' => $yesno[$write_dropin],
-             'dropin_path' => $this->sanitize_rootpath($file_dropin),
-             'dropin_isalt' => $is_dropin_alternative,
-             'dropin_alt' => $yesno[$is_dropin_alternative],
-             'dropin_wp' => $this->sanitize_rootpath($file_dropin_wp),
-             'dropin_wp_isexist' => $dropin_wp_exist,
-             'dropin_wp_exist' => $yesno[$dropin_wp_exist],
-             'write_cache' => $yesno[is_writable($this->cache_path)],
-             'cache_chunkdir' => $yesno[$this->cf()->dcvalue('CHUNKCACHEDIR')],
-             'cache_size' => $this->normalize_size($cache_stats->size),
-             'cache_path_real' => $this->cache_path,
-             'cache_path' => $this->sanitize_rootpath($this->cache_path),
-             'cache_maxfile' => $file_max,
-             'cache_file_stats' => $file_stats,
-             'cache_maxsize_disk' => $this->normalize_size($this->get_cache_maxsize_disk()),
-             'cache_disk_stats' => $disk_stats,
-             'log_file_real' => $log_file,
-             'log_file' => $this->sanitize_rootpath($log_file),
-             'log_enable' => $log_enable,
-             'log_enable_text' => $status_code[$log_enable],
-             'config_path' => $this->sanitize_rootpath($this->co()->path),
-             'write_config' => $yesno[$this->co()->is_options_writable()],
-             'wp_multisite' => $multisite_text,
-             'wp_multinetlock' => $multinets_lock,
-             'wp_multinetmain' => $yesno[is_main_network()],
-         ];
+            'status_code' => $status,
+            'status_text' => $status_text,
+            'status_text_stats' => $status_text_stats,
+            'opcache_code' => $opcache->status,
+            'opcache_text' => $opcache_text,
+            'opcache_text_stats' => $opcache_text_stats,
+            'opcache_dc_stats' => $opcache_dc_stats,
+            'opcache_wp_stats' => $opcache_wp_stats,
+            'php_memory_limit' => $this->normalize_size(@\ini_get('memory_limit')),
+            'wp_memory_limit' => $this->normalize_size(WP_MEMORY_LIMIT),
+            'wp_max_memory_limit' => $this->normalize_size(WP_MAX_MEMORY_LIMIT),
+            'write_dropin' => $yesno[$write_dropin],
+            'dropin_path' => $this->sanitize_rootpath($file_dropin),
+            'dropin_isalt' => $is_dropin_alternative,
+            'dropin_alt' => $yesno[$is_dropin_alternative],
+            'dropin_wp' => $this->sanitize_rootpath($file_dropin_wp),
+            'dropin_wp_isexist' => $dropin_wp_exist,
+            'dropin_wp_exist' => $yesno[$dropin_wp_exist],
+            'write_cache' => $yesno[is_writable($this->cache_path)],
+            'cache_chunkdir' => $yesno[$this->cf()->dcvalue('CHUNKCACHEDIR')],
+            'cache_size' => $this->normalize_size($cache_stats->size),
+            'cache_path_real' => $this->cache_path,
+            'cache_path' => $this->sanitize_rootpath($this->cache_path),
+            'cache_maxfile' => $file_max,
+            'cache_file_stats' => $file_stats,
+            'cache_maxsize_disk' => $this->normalize_size($this->get_cache_maxsize_disk()),
+            'cache_disk_stats' => $disk_stats,
+            'log_file_real' => $log_file,
+            'log_file' => $this->sanitize_rootpath($log_file),
+            'log_enable' => $log_enable,
+            'log_enable_text' => $status_code[$log_enable],
+            'config_path' => $this->sanitize_rootpath($this->co()->path),
+            'write_config' => $yesno[$this->co()->is_options_writable()],
+            'wp_multisite' => $multisite_text,
+            'wp_multinetlock' => $multinets_lock,
+            'wp_multinetmain' => $yesno[is_main_network()],
+        ];
     }
 
     /**
@@ -1196,7 +1196,7 @@ final class Plugin extends Bepart
                             $req = $_SERVER['REQUEST_URI'];
                             if ((false !== strpos($req, '?page=docket-cache&idx=config&wplog=0') || false !== strpos($req, '?page=docket-cache-config&idx=config&wplog=0'))
                                 && preg_match('@config\&wplog=\d+(\&dd=\d+)?$@', $req)) {
-                                $file = ini_get('error_log');
+                                $file = \ini_get('error_log');
 
                                 @header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
                                 @header('Content-Type: text/plain; charset=UTF-8');
@@ -1765,6 +1765,18 @@ final class Plugin extends Bepart
             2
         );
 
+        add_filter(
+            'plugin_auto_update_setting_html',
+            function ($html, $plugin_file, $plugin_data) {
+                if ($plugin_file === $this->hook) {
+                    $html .= sprintf('<p><a href="%s"><span class="label">%s</label></a></p>', network_admin_url($this->page.'-config&idx=config&nx=autoupdate'), __('Configure auto-updates', 'docket-cache'));
+                }
+
+                return $html;
+            },
+            10,
+            3
+        );
         // reference: Canopt::save()
         add_action(
             'docketcache/action/saveoption',
@@ -1813,7 +1825,7 @@ final class Plugin extends Bepart
                         break;
                     case 'rtwpdebug':
                     case 'rtwpdebuglog':
-                        $error_log = ini_get('error_log');
+                        $error_log = \ini_get('error_log');
                         if ('off' === $value && @is_file($error_log) && @is_writable($error_log)) {
                             @unlink($error_log);
                         }
@@ -1849,7 +1861,7 @@ final class Plugin extends Bepart
                             if ($this->co()->lockproc('preload', time() + 3600)) {
                                 return false;
                             }
-                            //wp_load_alloptions();
+                            // wp_load_alloptions();
                             wp_count_comments(0);
                             wp_count_posts();
                             @Crawler::fetch_home(['blocking' => true]);

@@ -181,7 +181,7 @@ final class Event
             $this->delete_expired_transients_db();
         }
 
-        //$this->clear_unknown_cron();
+        // $this->clear_unknown_cron();
 
         $this->pt->get_cache_stats(true);
         $this->pt->co()->lockreset('watchproc');
@@ -450,9 +450,9 @@ final class Event
                         $do_flush = true;
                     }
                 }
-
-                // group = from cache file, key = list key
-            } elseif (false !== strpos($data['group'], 'docketcache-post-') && false !== strpos($key, 'docketcache-post-')) {
+            }
+            // group = from cache file, key = list key
+            elseif (false !== strpos($data['group'], 'docketcache-post-') && false !== strpos($key, 'docketcache-post-')) {
                 if ($key === $data['group']) {
                     $do_flush = true;
                 } else {

@@ -183,7 +183,7 @@ final class Constans
         $this->maybe_define($this->px('LOG'), false);
 
         // log all on/off
-        $this->maybe_define($this->px('LOG_ALL'), (\defined('WP_DEBUG') ? WP_DEBUG : false));
+        $this->maybe_define($this->px('LOG_ALL'), \defined('WP_DEBUG') ? WP_DEBUG : false);
 
         // log file
         $this->maybe_define($this->px('LOG_FILE'), DOCKET_CACHE_CONTENT_PATH.'/.object-cache.log');
@@ -321,7 +321,7 @@ final class Constans
         $this->maybe_define($this->px('POSTMISSEDSCHEDULE'), false);
 
         // advanced post cache
-        $this->maybe_define($this->px('ADVCPOST'), true);
+        $this->maybe_define($this->px('ADVCPOST'), false);
 
         // advanced post cache allow post type
         $this->maybe_define($this->px('ADVCPOST_POSTTYPE'), ['post', 'page', 'attachment']);
@@ -343,7 +343,7 @@ final class Constans
 
         // @private
         // wp-cli
-        $this->maybe_define($this->px('WPCLI'), (\defined('WP_CLI') && WP_CLI));
+        $this->maybe_define($this->px('WPCLI'), \defined('WP_CLI') && WP_CLI);
 
         // banner
         $this->maybe_define($this->px('SIGNATURE'), true);
@@ -376,7 +376,7 @@ final class Constans
         $this->maybe_define($this->px('CHECKVERSION'), false);
 
         // auto update
-        $this->maybe_define($this->px('AUTOUPDATE'), true);
+        $this->maybe_define($this->px('AUTOUPDATE'), false);
 
         // flush opcache when deactivate
         $this->maybe_define($this->px('OPCSHUTDOWN'), false);
@@ -415,7 +415,7 @@ final class Constans
         $this->maybe_define($this->px('LIMITHTTPREQUEST'), false);
 
         // whitelist host from limit http request.
-        $this->maybe_define($this->px('LIMITHTTPREQUEST_WHITELIST'), []/*['feeds.feedburner.com']*/);
+        $this->maybe_define($this->px('LIMITHTTPREQUEST_WHITELIST'), []/* ['feeds.feedburner.com'] */);
 
         // curl "Expect" header performance tweak
         $this->maybe_define($this->px('HTTPHEADERSEXPECT'), false);
@@ -448,25 +448,25 @@ final class Constans
         $this->maybe_define($this->px('RTPOSTEMPTYTRASH'), 30);
 
         // @private: plugin / theme editor.
-        $this->maybe_define($this->px('RTPLUGINTHEMEEDITOR'), (\defined('DISALLOW_FILE_EDIT') && DISALLOW_FILE_EDIT ? 'on' : 'off'));
+        $this->maybe_define($this->px('RTPLUGINTHEMEEDITOR'), \defined('DISALLOW_FILE_EDIT') && DISALLOW_FILE_EDIT ? 'on' : 'off');
 
         // @private: plugin / theme install.
-        $this->maybe_define($this->px('RTPLUGINTHEMEINSTALL'), (\defined('DISALLOW_FILE_MODS') && DISALLOW_FILE_MODS ? 'on' : 'off'));
+        $this->maybe_define($this->px('RTPLUGINTHEMEINSTALL'), \defined('DISALLOW_FILE_MODS') && DISALLOW_FILE_MODS ? 'on' : 'off');
 
         // @private: overwrite image after edit.
-        $this->maybe_define($this->px('RTIMAGEOVERWRITE'), (\defined('IMAGE_EDIT_OVERWRITE') && IMAGE_EDIT_OVERWRITE ? 'on' : 'off'));
+        $this->maybe_define($this->px('RTIMAGEOVERWRITE'), \defined('IMAGE_EDIT_OVERWRITE') && IMAGE_EDIT_OVERWRITE ? 'on' : 'off');
 
         // @private: wp debug.
-        $this->maybe_define($this->px('RTWPDEBUG'), (\defined('WP_DEBUG') && WP_DEBUG ? 'on' : 'off'));
+        $this->maybe_define($this->px('RTWPDEBUG'), \defined('WP_DEBUG') && WP_DEBUG ? 'on' : 'off');
 
         // @private: wp debug display.
-        $this->maybe_define($this->px('RTWPDEBUGDISPLAY'), (\defined('WP_DEBUG_DISPLAY') && WP_DEBUG_DISPLAY ? 'on' : 'off'));
+        $this->maybe_define($this->px('RTWPDEBUGDISPLAY'), \defined('WP_DEBUG_DISPLAY') && WP_DEBUG_DISPLAY ? 'on' : 'off');
 
         // @private: wp debug log.
-        $this->maybe_define($this->px('RTWPDEBUGLOG'), (\defined('WP_DEBUG_LOG') && WP_DEBUG_LOG ? 'on' : 'off'));
+        $this->maybe_define($this->px('RTWPDEBUGLOG'), \defined('WP_DEBUG_LOG') && WP_DEBUG_LOG ? 'on' : 'off');
 
         // @private: deactivate wp auto update core.
-        $this->maybe_define($this->px('RTWPCOREUPDATE'), (\defined('WP_AUTO_UPDATE_CORE') && WP_AUTO_UPDATE_CORE ? 'off' : 'on'));
+        $this->maybe_define($this->px('RTWPCOREUPDATE'), \defined('WP_AUTO_UPDATE_CORE') && WP_AUTO_UPDATE_CORE ? 'off' : 'on');
 
         // @private
         // capture fatal error rarely incase non-throwable

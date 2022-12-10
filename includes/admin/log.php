@@ -40,7 +40,7 @@ $log = $this->parse_log_query();
                                 'quiet' => 1,
                             ]
                         );
-                        ?>
+                    ?>
                     </td>
                 </tr>
                 <tr>
@@ -72,8 +72,8 @@ $log = $this->parse_log_query();
                     <th class="border-b"><?php echo  $this->has_vcache() ? esc_html__('Cache Size', 'docket-cache') : esc_html__('Log Size', 'docket-cache'); ?></th>
                     <td>
                         <?php
-                        echo $log->log_size.' / '.($this->has_vcache() ? $this->cache_max_size : $this->log_max_size);
-                        ?>
+                    echo $log->log_size.' / '.($this->has_vcache() ? $this->cache_max_size : $this->log_max_size);
+                    ?>
                     </td>
                 </tr>
                 <tr>
@@ -81,13 +81,13 @@ $log = $this->parse_log_query();
                         <?php if ($this->has_vcache()) : ?>
                         <a href="
 							<?php
-                            echo $this->pt->action_query(
-                                'flush-ocfile',
-                                [
-                                    'idx' => 'log',
-                                    'idxv' => $this->idx_vcache(),
-                                ]
-                            );
+                        echo $this->pt->action_query(
+                            'flush-ocfile',
+                            [
+                                'idx' => 'log',
+                                'idxv' => $this->idx_vcache(),
+                            ]
+                        );
                             ?>
                     " class="button button-primary button-small bt-fx"><?php esc_html_e('Flush', 'docket-cache'); ?></a>
                         <a href="<?php echo $this->tab_query('log'); ?>" class="button button-primary button-small bt-fx"><?php esc_html_e('Close', 'docket-cache'); ?></a>

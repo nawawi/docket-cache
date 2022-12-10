@@ -379,10 +379,10 @@ final class ReqAction
                             switch ($nv) {
                                 case '1G':
                                     $nv = 1073741824;
-                                break;
+                                    break;
                                 case '2G':
                                     $nv = 2147483648;
-                                break;
+                                    break;
                                 default:
                                     $nv = 524288000; // 500M
                             }
@@ -390,10 +390,10 @@ final class ReqAction
                             switch ($nv) {
                                 case '100K':
                                     $nv = 100000;
-                                break;
+                                    break;
                                 case '200K':
                                     $nv = 200000;
-                                break;
+                                    break;
                                 default:
                                     $nv = 50000; // 50K
                             }
@@ -573,7 +573,7 @@ final class ReqAction
                     $cachedir = $this->pt->sanitize_rootpath($this->pt->cache_path);
 
                     /* translators: %d = seconds */
-                    $clmsg = sprintf(esc_html__('Process aborted. The object cache is not fully flushed. The maximum execution time of %d seconds was exceeded.', 'docket-cache'), (int) ini_get('max_execution_time'));
+                    $clmsg = sprintf(esc_html__('Process aborted. The object cache is not fully flushed. The maximum execution time of %d seconds was exceeded.', 'docket-cache'), (int) \ini_get('max_execution_time'));
                     $clmsg .= '<div class="gc"><ul>';
                     $clmsg .= '<li><span class="single">'.esc_html__('Total cache flushed', 'docket-cache').'</span>: '.$total.'</li>';
                     $clmsg .= '<li><span class="bulllist">'.esc_html__('Alternatively, you may try to flush the cache by doing:', 'docket-cache');

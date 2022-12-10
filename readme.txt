@@ -2,9 +2,9 @@
 Contributors: nawawijamili
 Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance, redis, memcached, speed
 Requires at least: 5.4
-Tested up to: 6.0
+Tested up to: 6.1
 Requires PHP: 7.2.5
-Stable tag: 22.07.01
+Stable tag: 22.07.02
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 
@@ -171,7 +171,16 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
-= 22.07.01 (2022-07-15) =
+= 22.07.02 =
+- Fixed: Tweaks::cache_http_response() -> Default TTL.
+- Fixed: Tweaks::wpservehappy() -> missing array key.
+- Added: wp_cache_supports() function.
+- Changed: Tweaks::cache_http_response() -> Use transient instead of wp_cache.
+- Changed: Disable Auto update by default.
+- Changed: Disable Advanced Post Cache by default.
+- Tested up to 6.1.
+
+= 22.07.01 =
 - Fixed: Plugin:cleanuppost() -> Invalid index for trashbin.
 - Fixed: MoCache() -> Add $entries, $headers properties to avoid warning on get_translations_for_domain.
 - Updated: Symfony component -> symfony/var-exporter.

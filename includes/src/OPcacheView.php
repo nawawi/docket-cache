@@ -69,24 +69,24 @@ class OPcacheView extends \WP_List_Table
     public function get_usage()
     {
         $stats = [
-             'num_cached_scripts' => 0,
-             'num_cached_keys' => 0,
-             'max_cached_keys' => 0,
-             'hits' => 0,
-             'start_time' => 0,
-             'last_restart_time' => 0,
-             'oom_restarts' => 0,
-             'hash_restarts' => 0,
-             'manual_restarts' => 0,
-             'misses' => 0,
-             'blacklist_misses' => 0,
-             'blacklist_miss_ratio' => 0,
-             'opcache_hit_rate' => 0,
-             'used_memory' => 0,
-             'free_memory' => 0,
-             'wasted_memory' => 0,
-             'current_wasted_percentage' => 0,
-         ];
+            'num_cached_scripts' => 0,
+            'num_cached_keys' => 0,
+            'max_cached_keys' => 0,
+            'hits' => 0,
+            'start_time' => 0,
+            'last_restart_time' => 0,
+            'oom_restarts' => 0,
+            'hash_restarts' => 0,
+            'manual_restarts' => 0,
+            'misses' => 0,
+            'blacklist_misses' => 0,
+            'blacklist_miss_ratio' => 0,
+            'opcache_hit_rate' => 0,
+            'used_memory' => 0,
+            'free_memory' => 0,
+            'wasted_memory' => 0,
+            'current_wasted_percentage' => 0,
+        ];
 
         $data = $this->get_status();
         if (!empty($data) && \is_array($data)) {
@@ -250,11 +250,11 @@ class OPcacheView extends \WP_List_Table
     public function get_sortable_columns()
     {
         $cols = [
-             'opclist_file' => ['file', false],
-             'opclist_hits' => ['hits', false],
-             'opclist_mem' => ['mem', false],
-             'opclist_timestamp' => ['stmp', false],
-         ];
+            'opclist_file' => ['file', false],
+            'opclist_hits' => ['hits', false],
+            'opclist_mem' => ['mem', false],
+            'opclist_timestamp' => ['stmp', false],
+        ];
 
         if ($this->pt->is_opcache_filecache_only()) {
             unset($cols['opclist_hits']);
