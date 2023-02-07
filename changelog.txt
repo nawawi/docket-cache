@@ -1,3 +1,33 @@
+= v22.07.03 (2023-02-07) =
+- Fixed: Tweaks::woocommerce_misc() -> Check if action_scheduler_migration_status is complete to prevent the list on the Scheduled Actions page from disappearing.
+- Fixed: Tweaks::woocommerce_widget_remove() -> The classic widget is not disabled.
+- Fixed: Plugin::get_precache_maxfile() -> Invalid constant, replace maxfile with precache_maxfile.
+- Fixed: Filesystem::sanitize_precache_maxfile() -> Set the limit to 100 by default.
+- Fixed: Becache::export() -> Invalid expiration time. Already in timestamp format not in seconds.
+- Fixed: WP_Object_Cache::dc_save() -> Serialize twice when checking object size.
+- Fixed: Configuration -> A notice is not shown when the constant is already defined.
+- Added: Configuration -> Storage Options, Check file limits in real-time and Exclude Empty Object Data.
+- Added: Configuration -> Runtime Options, Deactivate Concatenate WP-Admin Scripts and Deactivate WP Cron.
+- Added: WP-CLI command -> run:optimizedb.
+- Added: DOCKET_CACHE_MAXFILE_LIVECHECK constant to enable checking file limits in real-time.
+- Added: DOCKET_CACHE_PRECACHE_MAXKEY, DOCKET_CACHE_PRECACHE_MAXGROUP constant to limit cache keys and groups.
+- Added: DOCKET_CACHE_STALECACHE_IGNORE constant to enable excluding stale cache from being stored on disk.
+- Added: DOCKET_CACHE_EMPTYCACHE constant to enable excluding empty caches from being stored on disk.
+- Added: DOCKET_CACHE_AUTOUPDATE_TOGGLE constant, only to sync with WordPress auto_update_plugins option.
+- Added: DOCKET_CACHE_GCRON_DISABLED constant to disable garbage collector cron event.
+- Added: Filesystem::suspend_cache_write() -> Temporarily suspends new cache from being stored on disk.
+- Changed: DOCKET_CACHE_AUTOUPDATE constant can only be defined manually to force an automatic update.
+- Improved: Increase timeout limit if lower than 180 seconds.
+- Improved: Constans::maybe_define() -> Keep track of constants that have been defined in the $GLOBAL['DOCKET_CACHE_RUNTIME'] list.
+- Improved: WP_Object_Cache::maybe_expire() -> Set expiration to 1 day for key/group matches with the stale cache.
+- Improved: Event::garbage_collector() -> Improve wc_cache filtering and other possible stale caches.
+- Improved: WP_Object_Cache::dc_code() -> Use native var_export for data type objects and arrays if only have stdClass.
+- Removed: Event::watchproc() -> No longer needed.
+- Updated: DOCKET_CACHE_ADVCPOST_POSTTYPE -> Set the built-in Post Type as the default.
+- Updated: Filesystem::get_max_execution_time() -> Accept value to set time limit.
+
+Thanks to Kevin Shenk of Avunu LLC for providing access to the staging server for testing purposes.
+
 = v22.07.02 (2022-12-10) =
 - Fixed: Tweaks::cache_http_response() -> Default TTL.
 - Fixed: Tweaks::wpservehappy() -> missing array key.

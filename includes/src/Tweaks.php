@@ -250,7 +250,9 @@ final class Tweaks
     public function woocommerce_misc()
     {
         // wc: action_scheduler_migration_dependencies_met
-        add_filter('action_scheduler_migration_dependencies_met', '__return_false', \PHP_INT_MAX);
+        if ('complete' === get_option('action_scheduler_migration_status')) {
+            add_filter('action_scheduler_migration_dependencies_met', '__return_false', \PHP_INT_MAX);
+        }
 
         // wc: disable background image regeneration
         add_filter('woocommerce_background_image_regeneration', '__return_false', \PHP_INT_MAX);
@@ -349,6 +351,13 @@ final class Tweaks
             },
             \PHP_INT_MAX
         );
+
+        add_action('plugins_loaded', function () {
+            if (!$this->has_woocommerce()) {
+                return;
+            }
+            remove_action('widgets_init', 'wc_register_widgets');
+        }, \PHP_INT_MAX);
     }
 
     public function woocommerce_cart_fragments_remove()
@@ -404,7 +413,7 @@ final class Tweaks
 
             $append = '';
             if (!@preg_match('@^Disallow:\s+/\*add\-to\-cart=\*@is', $output)) {
-                $append .= "Disallow: /*add-to-cart=*\n";
+                $append .= 'Disallow: /*'."add-to-cart=*\n";
             }
 
             if (!@preg_match('@^Disallow:\s+/cart/@is', $output)) {
@@ -769,100 +778,11 @@ final class Tweaks
         }, \PHP_INT_MAX);
     }
 
-    public function limit_http_request()
-    {
-        add_action(
-            'admin_init',
-            function () {
-                add_filter(
-                    'pre_http_request',
-                    function ($preempt, $parsed_args, $url) {
-                        if (!is_admin()) {
-                            return false;
-                        }
-
-                        if (empty($GLOBALS['pagenow'])) {
-                            return false;
-                        }
-
-                        $pagenow = $GLOBALS['pagenow'];
-                        $pageok = [
-                            'index.php' => 1,
-                            'plugins.php' => 1,
-                            'plugin-install.php' => 1,
-                            'update.php' => 1,
-                            'themes.php' => 1,
-                            'admin.php' => 1,
-                            'update-core.php' => 1,
-                            'admin-ajax.php' => 1,
-                        ];
-
-                        if (\array_key_exists($pagenow, $pageok)) {
-                            return false;
-                        }
-
-                        $hostme = parse_url(home_url(), \PHP_URL_HOST);
-                        $hostname = parse_url($url, \PHP_URL_HOST);
-
-                        if ('127.0.0.1' === $hostname || 'localhost' === $hostname || $hostme === $hostname) {
-                            return false;
-                        }
-
-                        if ('.local' === substr($hostme, -\strlen('.local')) || '.test' === substr($hostme, -\strlen('.test'))) {
-                            return false;
-                        }
-
-                        if ('wordpress.org' === $hostname || 'api.wordpress.org' === $hostname || 'docketcache.com' === $hostname) {
-                            return false;
-                        }
-
-                        if ('.wordpress.org' === substr($hostname, -\strlen('.wordpress.org'))) {
-                            return false;
-                        }
-
-                        if ('.docketcache.com' === substr($hostname, -\strlen('.docketcache.com'))) {
-                            return false;
-                        }
-
-                        $ok = true;
-                        $wkey = nwdcx_constfx('LIMITHTTPREQUEST_WHITELIST');
-                        if (\defined($wkey)) {
-                            $whitelist = \constant($wkey);
-                            if (!empty($whitelist) && \is_array($whitelist)) {
-                                while ($hosta = @array_shift($whitelist)) {
-                                    $hostb = nwdcx_noscheme($hosta);
-                                    if ($hostname === $hostb) {
-                                        $ok = false;
-                                        break;
-                                    }
-
-                                    if ('.' === $hostb[0] && $hostb === substr($hostname, -\strlen($hostb))) {
-                                        $ok = false;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        /*if ( $ok ) {
-                            error_log('docket-cache: Tweaks::limit_http_request(): Drop -> '.$hostname);
-                        }*/
-
-                        return $ok;
-                    },
-                    \PHP_INT_MIN,
-                    3
-                );
-            },
-            \PHP_INT_MAX
-        );
-    }
-
     // wp < 5.8
     public function http_headers_expect()
     {
         // https://github.com/WordPress/Requests/pull/454
-        if (version_compare($GLOBALS['wp_version'], '5.8', '<')) {
+        if (version_compare($GLOBALS['wp_version'], '5.8', '>')) {
             return false;
         }
 
@@ -891,23 +811,98 @@ final class Tweaks
         }, \PHP_INT_MAX);
     }
 
+    public function limit_http_request()
+    {
+        add_action(
+            'admin_init',
+            function () {
+                add_filter(
+                    'pre_http_request',
+                    function ($preempt, $parsed_args, $url) {
+                        if (!is_admin()) {
+                            return false;
+                        }
+
+                        if (/* 'GET' !== $parsed_args['method'] || */ $this->http_filter_bypass_url($url)) {
+                            return false;
+                        }
+
+                        if (empty($GLOBALS['pagenow'])) {
+                            return false;
+                        }
+
+                        $pagenow = $GLOBALS['pagenow'];
+                        $pageok = [
+                            'index.php' => 1,
+                            'plugins.php' => 1,
+                            'plugin-install.php' => 1,
+                            'update.php' => 1,
+                            'themes.php' => 1,
+                            'admin.php' => 1,
+                            'update-core.php' => 1,
+                            'admin-ajax.php' => 1,
+                        ];
+
+                        if (\array_key_exists($pagenow, $pageok)) {
+                            return false;
+                        }
+
+                        /*$site_host = parse_url(site_url(), \PHP_URL_HOST);
+                        if ('.local' === substr($site_host, -\strlen('.local')) || '.test' === substr($site_host, -\strlen('.test'))) {
+                            return false;
+                        }*/
+
+                        $url_host = parse_url($url, \PHP_URL_HOST);
+
+                        $is_block = true;
+                        $wkey = nwdcx_constfx('LIMITHTTPREQUEST_WHITELIST');
+                        if (\defined($wkey)) {
+                            $whitelist = \constant($wkey);
+                            if (!empty($whitelist) && \is_array($whitelist)) {
+                                foreach ($whitelist as $host) {
+                                    $host = nwdcx_noscheme($host);
+                                    if ($url_host === $host) {
+                                        $is_block = false;
+                                        break;
+                                    }
+
+                                    if ('.' === $host[0] && $host === substr($url_host, -\strlen($host))) {
+                                        $is_block = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if ($is_block) {
+                            nwdcx_debuglog('Tweaks::limit_http_request(): Blocked -> '.$url_host);
+                        }
+
+                        return $is_block;
+                    },
+                    \PHP_INT_MIN,
+                    3
+                );
+            },
+            \PHP_INT_MAX
+        );
+    }
+
     public function cache_http_response()
     {
         add_action('init', function () {
-            add_filter('http_response', function ($response, $args, $url) {
-                if (200 !== $response['response']['code']) {
-                    return $response;
-                }
-
-                $site_host = wp_parse_url(site_url(), \PHP_URL_HOST);
-                $hostname = wp_parse_url($url, \PHP_URL_HOST);
-                if ('wordpress.org' === $hostname || '.wordpress.org' === substr($hostname, -\strlen('.wordpress.org'))
-                    || 'docketcache.com' === $hostname || '.docketcache.com' === substr($hostname, -\strlen('.docketcache.com'))
-                    || false !== strpos($hostname, $site_host)) {
+            add_filter('http_response', function ($response, $parsed_args, $url) {
+                if (/* 'GET' !== $parsed_args['method'] || */ $this->http_filter_bypass_url($url)) {
                     return $response;
                 }
 
                 $cache_key = 'docketcache-httpresponse_'.md5($url);
+
+                if (200 !== $response['response']['code']) {
+                    delete_transient($cache_key);
+
+                    return $response;
+                }
 
                 $cache_ttl = (int) nwdcx_constval('CACHEHTTPRESPONSE_TTL');
                 if (empty($cache_ttl)) {
@@ -941,14 +936,50 @@ final class Tweaks
             }, \PHP_INT_MIN, 3);
 
             add_filter('pre_http_request', function ($preempt, $parsed_args, $url) {
+                if (/* 'GET' !== $parsed_args['method'] || */ $this->http_filter_bypass_url($url)) {
+                    return $preempt;
+                }
+
                 $cache_key = 'docketcache-httpresponse_'.md5($url);
                 $data = get_transient($cache_key);
                 if (!empty($data) && \is_array($data)) {
+                    nwdcx_debuglog('Tweaks::cache_http_response(): Cached -> '.$url);
+
                     return $data;
                 }
 
                 return $preempt;
             }, \PHP_INT_MIN, 3);
         }, \PHP_INT_MAX);
+    }
+
+    private function http_filter_bypass_url($url)
+    {
+        $hosts = [
+            'wordpress.org',
+            'docketcache.com',
+            'paypal.com',
+            'braintree-api.com',
+            'stripe.com',
+            'cloudflare.com',
+            'woocommerce.com',
+        ];
+
+        $hosts = apply_filters('docketcache/filter/cache_http_response_bypass_url', $hosts);
+
+        $site_host = wp_parse_url(site_url(), \PHP_URL_HOST);
+        $url_host = wp_parse_url($url, \PHP_URL_HOST);
+
+        if ('127.0.0.1' === $url_host || 'localhost' === $url_host || $site_host === $url_host) {
+            return true;
+        }
+
+        foreach ($hosts as $host) {
+            if ($host === $url_host || '.'.$host === substr($url_host, -\strlen('.'.$host))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

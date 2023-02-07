@@ -4,7 +4,7 @@ Tags: object cache, OPcache, fastcgi, cache, database, Optimisation, performance
 Requires at least: 5.4
 Tested up to: 6.1
 Requires PHP: 7.2.5
-Stable tag: 22.07.02
+Stable tag: 22.07.03
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 
@@ -73,10 +73,11 @@ A heartful thanks and appreciation.
 - [Jimat Hosting](https://jimathosting.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [Themecloud](https://www.themecloud.io/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [Websavers Inc](https://websavers.ca/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
+- [Avunu LLC](https://avu.nu/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [Linqru](https://linqru.jp/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
+- [SecurePay](https://www.securepay.my/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [DNSVault](https://dnsvault.net/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [Exnano Creative](https://exnano.io/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
-- [SecurePay](https://www.securepay.my/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [Cun Host](https://cunhost.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 
 
@@ -131,7 +132,7 @@ The Cronbot is an external service that pings your website every hour to keep Wo
 This service offered as an alternative option and is not compulsory to use. By default, this service not connected to the [end-point server](https://cronbot.docketcache.com/). You can completely disable it at the configuration page.
 
 = What is Garbage Collector in Docket Cache? =
-Garbage Collector is a Cron Events than run every 5 minutes to monitoring cache file purposely for cleanup and collecting stats.
+Garbage Collector is a Cron Event that runs every 5 minutes to monitor cache files purposely for cleanup and collecting stats.
 
 = What is a RAM disk in Docket Cache? =
 A RAM disk is a representation of a hard disk using RAM resources, and it can take the form of a hardware device or a virtual disk. 
@@ -158,11 +159,17 @@ To use it in Windows OS, create RAM Disk and change [DOCKET_CACHE_PATH](https://
 = What is the minimum RAM required to use with shared hosting? =
 By default, WordPress allocates the memory limit to 256 MB. Combined with MySQL and Web Server, you need more than 256 MB. If you're using a cheap hosting plan that allocates only 256 MB for totals usage. It is not enough, and Docket Cache can't improve your website performance.
 
-= What’s the difference with the other object cache plugins? =
+= What's the difference with the other object cache plugins? =
 Docket Cache is an Object Cache Accelerator. It does some optimization of caching like cache post queries, comments counting, WordPress translation and more before storing the object caches.
 
 = Can I pair using it with other cache plugin? =
 Yes and No. You can pair using it with page caching plugin, but not with the object cache plugin.
+
+= Can I pair using it with LiteSpeed Cache? =
+Yes, you can. The LiteSpeed Cache plugin has an Object Cache feature. Currently, by default, it will prompt a notice asking to disable Docket Cache. You only need to turn off LiteSpeed Cache Object Cache in order to use Docket Cache.
+
+= Can I use Docket Cache for heavy WooCommerce stores? =
+Yes and No. As suggested, Docket Cache is an alternative to in-memory caches like Redis and Memcached. It depends on how your store has been setups. It may require further tuning to the configuration and may involve other optimisation.
 
 = I'm using a VPS server. Can I use Docket Cache to replace Redis? =
 Yes, you can. It can boost more your WordPress performance since there is no network connection need to makes and no worry about memory burst, cache-key conflict and error-prone caused by the improper settings.
@@ -171,6 +178,36 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 22.07.03 =
+- Fixed: Tweaks::woocommerce_misc() -> Check if action_scheduler_migration_status is complete to prevent the list on the Scheduled Actions page from disappearing.
+- Fixed: Tweaks::woocommerce_widget_remove() -> The classic widget is not disabled.
+- Fixed: Plugin::get_precache_maxfile() -> Invalid constant, replace maxfile with precache_maxfile.
+- Fixed: Filesystem::sanitize_precache_maxfile() -> Set the limit to 100 by default.
+- Fixed: Becache::export() -> Invalid expiration time. Already in timestamp format not in seconds.
+- Fixed: WP_Object_Cache::dc_save() -> Serialize twice when checking object size.
+- Fixed: Configuration -> A notice is not shown when the constant is already defined.
+- Added: Configuration -> Storage Options, Check file limits in real-time and Exclude Empty Object Data.
+- Added: Configuration -> Runtime Options, Deactivate Concatenate WP-Admin Scripts and Deactivate WP Cron.
+- Added: WP-CLI command -> run:optimizedb.
+- Added: DOCKET_CACHE_MAXFILE_LIVECHECK constant to enable checking file limits in real-time.
+- Added: DOCKET_CACHE_PRECACHE_MAXKEY, DOCKET_CACHE_PRECACHE_MAXGROUP constant to limit cache keys and groups.
+- Added: DOCKET_CACHE_STALECACHE_IGNORE constant to enable excluding stale cache from being stored on disk.
+- Added: DOCKET_CACHE_EMPTYCACHE constant to enable excluding empty caches from being stored on disk.
+- Added: DOCKET_CACHE_AUTOUPDATE_TOGGLE constant, only to sync with WordPress auto_update_plugins option.
+- Added: DOCKET_CACHE_GCRON_DISABLED constant to disable garbage collector cron event.
+- Added: Filesystem::suspend_cache_write() -> Temporarily suspends new cache from being stored on disk.
+- Changed: DOCKET_CACHE_AUTOUPDATE constant can only be defined manually to force an automatic update.
+- Improved: Increase timeout limit if lower than 180 seconds.
+- Improved: Constans::maybe_define() -> Keep track of constants that have been defined in the $GLOBAL['DOCKET_CACHE_RUNTIME'] list.
+- Improved: WP_Object_Cache::maybe_expire() -> Set expiration to 1 day for key/group matches with the stale cache.
+- Improved: Event::garbage_collector() -> Improve wc_cache filtering and other possible stale caches.
+- Improved: WP_Object_Cache::dc_code() -> Use native var_export for data type objects and arrays if only have stdClass.
+- Removed: Event::watchproc() -> No longer needed.
+- Updated: DOCKET_CACHE_ADVCPOST_POSTTYPE -> Set the built-in Post Type as the default.
+- Updated: Filesystem::get_max_execution_time() -> Accept value to set time limit.
+
+Thanks to Kevin Shenk of Avunu LLC for providing access to the staging server for testing purposes.
+
 = 22.07.02 =
 - Fixed: Tweaks::cache_http_response() -> Default TTL.
 - Fixed: Tweaks::wpservehappy() -> missing array key.

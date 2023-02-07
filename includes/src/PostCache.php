@@ -12,6 +12,7 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 
+#[AllowDynamicProperties]
 final class PostCache
 {
     public $prefix = 'docketcache-post';
@@ -24,15 +25,32 @@ final class PostCache
     public $cached_posts = [];
     public $found_posts = false;
     public $cache_func = 'wp_cache_add';
-    public $cache_func_expiry = 0; // let WP_Object_Cache::maybe_expire handles it
-    public $stalecache_list = [];
-    public $allow_posttype = ['post', 'page', 'attachment'];
-    public $blacklist_posttype = ['scheduled-action'];
+    public $cache_func_expiry = 86400; // 1d
+    public $allow_posttype = [];
+    public $blacklist_posttype = [];
     public $allow_posttype_all = false;
 
     public function __construct()
     {
         $this->group_prefix = $this->prefix.'-';
+        $this->allow_posttype = [
+            'post',
+            'page',
+            'attachment',
+            'revision',
+            'nav_menu_item',
+            'custom_css',
+            'customize_changeset',
+            'oembed_cache',
+            'user_request',
+            'wp_block',
+            'wp_template',
+            'wp_template_part',
+            'wp_global_styles',
+            'wp_navigation',
+        ];
+
+        $this->blacklist_posttype = ['scheduled-action'];
     }
 
     public function register()
@@ -103,14 +121,14 @@ final class PostCache
                     $stats = get_comment_count(0);
                     $stats['moderated'] = $stats['awaiting_moderation'];
                     unset($stats['awaiting_moderation']);
-                    $stats_object = (object) $stats;
+                    $stats_object = $stats;
 
                     wp_cache_set($cache_key, $stats_object, $this->prefix, 1800); // 1800 = 30min
                 }
 
-                return $stats_object;
+                return (object) $stats_object;
             },
-            10,
+            \PHP_INT_MAX,
             2
         );
 
@@ -193,10 +211,6 @@ final class PostCache
                 }
             }
         );
-
-        if (nwdcx_construe('FLUSH_STALECACHE')) {
-            add_action('shutdown', [$this, 'stalecache_set'], \PHP_INT_MAX);
-        }
     }
 
     public function setup_for_blog($new_blog_id = false, $previous_blog_id = false)
@@ -222,11 +236,6 @@ final class PostCache
 
         if (\defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
-        }
-
-        // 03052022: flush
-        if (nwdcx_construe('FLUSH_STALECACHE')) {
-            $this->stalecache_list[md5($this->cache_group)] = $this->cache_group;
         }
 
         $this->cache_incr = wp_cache_incr('cache_incr', 1, $this->prefix);
@@ -262,11 +271,12 @@ final class PostCache
             return $sql;
         }
 
-        if (!$this->allow_post_type($query->get('post_type'))) {
+        $post_type = $query->get('post_type');
+        if (!$this->allow_post_type($post_type)) {
             return $sql;
         }
 
-        $this->cache_key = 'query-'.md5($sql);
+        $this->cache_key = 'query-'.$post_type.'-'.md5($sql);
         $this->all_post_ids = wp_cache_get($this->cache_key, $this->cache_group);
 
         if ('NA' !== $this->found_posts) {
@@ -392,15 +402,5 @@ final class PostCache
         \call_user_func($this->cache_func, $cache_key, (int) $found_posts, $this->cache_group, $this->cache_func_expiry);
 
         return $found_posts;
-    }
-
-    // send cache list to WP_Object_Cache and flush it at wp_cache_close right after "shutdown" hook.
-    public function stalecache_set()
-    {
-        if (!empty($this->stalecache_list) && \function_exists('wp_cache_add_stalecache')) {
-            $key_last = array_key_last($this->stalecache_list);
-            $list = [$key_last => $this->stalecache_list[$key_last]];
-            wp_cache_add_stalecache($list);
-        }
     }
 }

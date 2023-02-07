@@ -31,9 +31,42 @@ if (!\function_exists('nwdcx_arraymap')) {
     }
 }
 
+if (!\function_exists('nwdcx_arraysimilar')) {
+    function nwdcx_arraysimilar($actual, $expected)
+    {
+        if (!\is_array($expected) || !\is_array($actual)) {
+            return $actual === $expected;
+        }
+        foreach ($expected as $key => $value) {
+            if (!isset($actual[$key]) || !isset($expected[$key])) {
+                return false;
+            }
+
+            if (!nwdcx_arraysimilar($actual[$key], $expected[$key])) {
+                return false;
+            }
+        }
+        foreach ($actual as $key => $value) {
+            if (!isset($actual[$key]) || !isset($expected[$key])) {
+                return false;
+            }
+            if (!nwdcx_arraysimilar($actual[$key], $expected[$key])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
 if (!\function_exists('nwdcx_serialized')) {
     function nwdcx_serialized($data)
     {
+        // short-circuit the checking.
+        if (!\is_string($data) || false === strpbrk($data, '{:;}')) {
+            return false;
+        }
+
         if (!\function_exists('is_serialized')) {
             // 16072021: rare opcache issue with some hosting ABSPATH not defined.
             if (\defined('ABSPATH') && \defined('WPINC')) {
@@ -56,23 +89,27 @@ if (!\function_exists('nwdcx_unserialize')) {
             return $data;
         }
 
-        $ok = true;
-
-        // if the string has object format, check it if has stdClass,
-        // other than that set it as false and return the original data
+        // If the string has an object format, check if it has a stdClass, otherwise return the original data.
+        // The logic here is, if we "unserialize" it, we can't use the cache since the VarExporter can't detect
+        // the Class instance in objects which may lead to "class not found".
         if (false !== strpos($data, 'O:') && @preg_match_all('@O:\d+:"([^"]+)"@', $data, $mm)) {
             if (!empty($mm) && !empty($mm[1])) {
                 foreach ($mm[1] as $v) {
                     if ('stdClass' !== $v) {
-                        $ok = false;
-                        break;
+                        return $data;
                     }
                 }
                 unset($mm);
             }
         }
 
-        return !$ok ? $data : @unserialize(trim($data));
+        // make query-monitor happy.
+        $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+        $data = @unserialize(trim($data));
+
+        nwdcx_suppresserrors($nwdcx_suppresserrors);
+
+        return $data;
     }
 }
 
@@ -154,7 +191,9 @@ if (!\function_exists('nwdcx_cleanuptransient')) {
 
         $collect = [];
 
-        $results = $wpdb->get_results('SELECT `option_id`,`option_name`,`option_value` FROM `'.$wpdb->options.'` WHERE `option_name` LIKE "_transient_%" OR `option_name` LIKE "_site_transient_%" ORDER BY `option_id` ASC LIMIT 1000', ARRAY_A);
+        // $results = $wpdb->get_results('SELECT `option_id`,`option_name`,`option_value` FROM `'.$wpdb->options.'` WHERE `option_name` LIKE "_transient_%" OR `option_name` LIKE "_site_transient_%" ORDER BY `option_id` ASC LIMIT 1000', ARRAY_A);
+        $results = $wpdb->get_results('SELECT `option_id`,`option_name`,`option_value` FROM `'.$wpdb->options.'` WHERE `option_name` RLIKE "^(_site)?(_transient)(_timeout)?_.*?" ORDER BY `option_id` ASC LIMIT 5000', ARRAY_A);
+
         if (!empty($results) && \is_array($results)) {
             while ($row = @array_shift($results)) {
                 $key = @preg_replace('@^(_site)?(_transient)(_timeout)?_@', '', $row['option_name']);
@@ -180,7 +219,8 @@ if (!\function_exists('nwdcx_cleanuptransient')) {
         $collect = [];
 
         if (is_multisite() && isset($wpdb->sitemeta)) {
-            $results = $wpdb->get_results('SELECT `meta_id`,`meta_key`,`meta_value` FROM `'.$wpdb->sitemeta.'` WHERE `meta_key` LIKE "_site_transient_%" ORDER BY `meta_id` ASC LIMIT 1000', ARRAY_A);
+            // $results = $wpdb->get_results('SELECT `meta_id`,`meta_key`,`meta_value` FROM `'.$wpdb->sitemeta.'` WHERE `meta_key` LIKE "_site_transient_%" ORDER BY `meta_id` ASC LIMIT 1000', ARRAY_A);
+            $results = $wpdb->get_results('SELECT `meta_id`,`meta_key`,`meta_value` FROM `'.$wpdb->sitemeta.'` WHERE `meta_key` RLIKE "^(_site_transient)(_timeout)?_.*?" ORDER BY `meta_id` ASC LIMIT 5000', ARRAY_A);
             if (!empty($results) && \is_array($results)) {
                 while ($row = @array_shift($results)) {
                     $key = @preg_replace('@^(_site)?(_transient)(_timeout)?_@', '', $row['meta_key']);
@@ -229,6 +269,31 @@ if (!\function_exists('nwdcx_throwable')) {
                 $GLOBALS['docketcache_throwable'] = [];
             }
             $GLOBALS['docketcache_throwable'][$name] = $error;
+        }
+    }
+}
+
+if (!\function_exists('nwdcx_debuglog')) {
+    function nwdcx_debuglog($text)
+    {
+        if (\defined('DOCKET_CACHE_DEV') && DOCKET_CACHE_DEV) {
+            $logfile = WP_CONTENT_DIR.'/dcdev-debug.log';
+            error_log('['.date('Y-m-d H:i:s').'] '.$text."\n", 3, $logfile);
+        }
+    }
+}
+
+if (!\function_exists('nwdcx_cliverbose')) {
+    function nwdcx_cliverbose($text)
+    {
+        static $is_verbose = false;
+
+        if (!$is_verbose) {
+            $is_verbose = 'cli' === \PHP_SAPI && !empty($_SERVER['argv']) && \in_array('--verbose', $_SERVER['argv']) && !\in_array('--quiet', $_SERVER['argv']);
+        }
+
+        if ($is_verbose) {
+            fwrite(\STDOUT, $text);
         }
     }
 }

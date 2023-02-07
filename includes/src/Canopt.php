@@ -93,7 +93,7 @@ final class Canopt extends Bepart
             'postmissedschedule' => esc_html__('Post Missed Schedule Tweaks', 'docket-cache'),
             'wootweaks' => esc_html__('Misc WooCommerce Tweaks', 'docket-cache'),
             'wooadminoff' => esc_html__('Deactivate WooCommerce Admin', 'docket-cache'),
-            'woowidgetoff' => esc_html__('Deactivate WooCommerce Widget', 'docket-cache'),
+            'woowidgetoff' => esc_html__('Deactivate WooCommerce Classic Widget', 'docket-cache'),
             'woowpdashboardoff' => esc_html__('Deactivate WooCommerce WP Dashboard', 'docket-cache'),
             'wooextensionpageoff' => esc_html__('Deactivate WooCommerce Extensions Page', 'docket-cache'),
             'woocartfragsoff' => esc_html__('Deactivate WooCommerce Cart Fragments', 'docket-cache'),
@@ -106,7 +106,8 @@ final class Canopt extends Bepart
             'stats' => esc_html__('Object Cache Data Stats', 'docket-cache'),
             'gcaction' => esc_html__('Garbage Collector Action Button', 'docket-cache'),
             'flushaction' => esc_html__('Additional Flush Cache Action Button', 'docket-cache'),
-            'autoupdate' => esc_html__('Docket Cache Auto Update', 'docket-cache'),
+            /* 'autoupdate' => esc_html__('Docket Cache Auto Update', 'docket-cache'), */
+            'autoupdate_toggle' => esc_html__('Docket Cache Auto Update', 'docket-cache'),
             'checkversion' => esc_html__('Critical Version Checking', 'docket-cache'),
             'optwpquery' => esc_html__('Optimize WP Query', 'docket-cache'),
             'pingback' => esc_html__('Deactivate XML-RPC / Pingbacks', 'docket-cache'),
@@ -125,8 +126,11 @@ final class Canopt extends Bepart
             'opcshutdown' => esc_html__('Flush OPcache During Deactivation', 'docket-cache'),
             'maxsize_disk' => esc_html__('Cache Disk Limit', 'docket-cache'),
             'maxfile' => esc_html__('Cache Files Limit', 'docket-cache'),
+            'maxfile_livecheck' => esc_html__('Real-time File Limit Checking', 'docket-cache'),
             'chunkcachedir' => esc_html__('Chunk Cache Directory', 'docket-cache'),
             'flush_stalecache' => esc_html__('Auto Remove Stale Cache', 'docket-cache'),
+            'stalecache_ignore' => esc_html__('Exclude Stale Cache', 'docket-cache'),
+            'emptycache_ignore' => esc_html__('Exclude Empty Object Data', 'docket-cache'),
             'limithttprequest' => esc_html__('Limit WP-Admin HTTP requests', 'docket-cache'),
             'httpheadersexpect' => esc_html__('HTTP Request Expect header tweaks', 'docket-cache'),
             'rtpostautosave' => esc_html__('Auto Save Interval', 'docket-cache'),
@@ -139,6 +143,8 @@ final class Canopt extends Bepart
             'rtwpdebugdisplay' => esc_html__('WP Debug Display', 'docket-cache'),
             'rtwpdebuglog' => esc_html__('WP Debug Log', 'docket-cache'),
             'rtwpcoreupdate' => esc_html__('Disallows WP Auto Update Core', 'docket-cache'),
+            'rtconcatenatescripts' => esc_html__('Deactivate Concatenate WP-Admin Scripts', 'docket-cache'),
+            'rtdisablewpcron' => esc_html__('Deactivate WP Cron', 'docket-cache'),
         ];
 
         $data = apply_filters('docketcache/filter/optionkeys', $data);
@@ -219,7 +225,7 @@ final class Canopt extends Bepart
         return false;
     }
 
-    public function save($name, $value)
+    public function save($name, $value, $do_action = true)
     {
         if (!$this->mkdir_p($this->path)) {
             return false;
@@ -241,7 +247,10 @@ final class Canopt extends Bepart
         }
 
         $ret = $this->put_config($config);
-        do_action('docketcache/action/saveoption', $name, $value, $ret);
+
+        if ($do_action) {
+            do_action('docketcache/action/saveoption', $name, $value, $ret);
+        }
 
         return $ret;
     }
@@ -284,9 +293,7 @@ final class Canopt extends Bepart
         if (!empty($files) && \is_array($files)) {
             foreach ($files as $file) {
                 if (@is_file($file) && @is_writable($file)) {
-                    if (\defined('DocketCache_CLI') && DocketCache_CLI) {
-                        @fwrite(\STDOUT, basename($file).\PHP_EOL);
-                    }
+                    nwdcx_cliverbose(basename($file)."\n");
                     @unlink($file);
                 }
             }

@@ -12,6 +12,7 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 
+#[AllowDynamicProperties]
 final class MoCache
 {
     private $domain = null;

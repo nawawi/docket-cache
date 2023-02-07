@@ -135,6 +135,7 @@ body {
 #docket-cache .button {
     min-width: 150px;
     text-align: center;
+    margin-left: 0 !important;
 }
 
 #docket-cache .bt-fx {

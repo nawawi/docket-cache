@@ -3,7 +3,7 @@
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
  * Plugin URI:          https://wordpress.org/plugins/docket-cache/
- * Version:             22.07.02
+ * Version:             22.07.03
  * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
  * Author:              Nawawi Jamili
  * Author URI:          https://docketcache.com
@@ -31,7 +31,7 @@ if (version_compare(\PHP_VERSION, '7.2.5', '<')) {
 }
 
 /*
- * Bypass if we doing action.
+ * Bypass if we doing action. It happen on redirection.
  */
 if (!empty($_GET['_wpnonce']) && !empty($_GET['action']) && !empty($_GET['page']) && 'docket-cache' === $_GET['page'] && false === strpos($_GET['action'], 'cronbot') && false === strpos($_GET['action'], 'wpoptaload')) {
     return;
@@ -39,6 +39,7 @@ if (!empty($_GET['_wpnonce']) && !empty($_GET['action']) && !empty($_GET['page']
 
 /*
  * Bypass if match cache key in $_REQUEST.
+ * Just for development, it may cause uncertain results.
  */
 if (\defined('DOCKET_CACHE_IGNORE_REQUEST') && \is_array(DOCKET_CACHE_IGNORE_REQUEST) && !empty($_REQUEST)) {
     if (array_intersect(DOCKET_CACHE_IGNORE_REQUEST, array_keys($_REQUEST))) {

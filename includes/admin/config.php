@@ -169,7 +169,7 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="woowidgetoff">
-                    <th><?php echo esc_html__('Deactivate WooCommerce Widget', 'docket-cache').$this->tooltip('woowidgetoff'); ?></th>
+                    <th><?php echo esc_html__('Deactivate WooCommerce Classic Widget', 'docket-cache').$this->tooltip('woowidgetoff'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('woowidgetoff'); ?>
                     </td>
@@ -283,6 +283,7 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <?php endif; ?>
+                <?php if (is_main_network()) : ?>
                 <tr>
                     <td colspan="2" class="stitle">
                         <?php esc_html_e('Runtime Options', 'docket-cache'); ?>
@@ -302,124 +303,156 @@ echo $this->config_select_set(
         'off' => __('Disable', 'docket-cache'),
     ]
 );
-?>
+                    ?>
                     </td>
                 </tr>
                 <tr id="rtpostrevision">
                     <th><?php echo esc_html__('Post Revisions', 'docket-cache').$this->tooltip('rtpostrevision'); ?></th>
                     <td>
                         <?php
-echo $this->config_select_set(
-    'rtpostrevision',
-    [
-        'default' => __('Default', 'docket-cache'),
-        '3' => __('Limit to 3 Revisions', 'docket-cache'),
-        '5' => __('Limit to 5 Revisions', 'docket-cache'),
-        'on' => __('No Limit', 'docket-cache'),
-        'off' => __('Disable', 'docket-cache'),
-    ]
-);
-?>
+                    echo $this->config_select_set(
+                        'rtpostrevision',
+                        [
+                            'default' => __('Default', 'docket-cache'),
+                            '3' => __('Limit to 3 Revisions', 'docket-cache'),
+                            '5' => __('Limit to 5 Revisions', 'docket-cache'),
+                            'on' => __('No Limit', 'docket-cache'),
+                            'off' => __('Disable', 'docket-cache'),
+                        ]
+                    );
+                    ?>
                     </td>
                 </tr>
                 <tr id="rtpostemptytrash">
                     <th><?php echo esc_html__('Trash Bin', 'docket-cache').$this->tooltip('rtpostemptytrash'); ?></th>
                     <td>
                         <?php
-echo $this->config_select_set(
-    'rtpostemptytrash',
-    [
-        'default' => __('Default', 'docket-cache'),
-        '7' => __('Empty In 7 Days', 'docket-cache'),
-        '14' => __('Empty In 14 Days', 'docket-cache'),
-        '30' => __('Empty In 30 Days', 'docket-cache'),
-        'off' => __('Disable', 'docket-cache'),
-    ]
-);
-?>
+                    echo $this->config_select_set(
+                        'rtpostemptytrash',
+                        [
+                            'default' => __('Default', 'docket-cache'),
+                            '7' => __('Empty In 7 Days', 'docket-cache'),
+                            '14' => __('Empty In 14 Days', 'docket-cache'),
+                            '30' => __('Empty In 30 Days', 'docket-cache'),
+                            'off' => __('Disable', 'docket-cache'),
+                        ]
+                    );
+                    ?>
                     </td>
                 </tr>
                 <tr id="rtimageoverwrite">
                     <th><?php echo esc_html__('Cleanup Image Edits', 'docket-cache').$this->tooltip('rtimageoverwrite'); ?></th>
                     <td>
                         <?php
-echo $this->config_select_set(
-    'rtimageoverwrite',
-    [
-        'default' => __('Default', 'docket-cache'),
-        'on' => __('Enable', 'docket-cache'),
-        'off' => __('Disable', 'docket-cache'),
-    ],
-    !empty($GLOBALS[$this->vcf()->px('rtimageoverwrite_false')]) && IMAGE_EDIT_OVERWRITE ? 'on' : $this->vcf()->dcvalue('rtimageoverwrite')
-);
-?>
+                    echo $this->config_select_set(
+                        'rtimageoverwrite',
+                        [
+                            'default' => __('Default', 'docket-cache'),
+                            'on' => __('Enable', 'docket-cache'),
+                            'off' => __('Disable', 'docket-cache'),
+                        ],
+                        !empty($GLOBALS[$this->vcf()->px('rtimageoverwrite_false')]) && IMAGE_EDIT_OVERWRITE ? 'on' : $this->vcf()->dcvalue('rtimageoverwrite')
+                    );
+                    ?>
                     </td>
                 </tr>
                 <tr id="rtwpcoreupdate">
                     <th><?php echo esc_html__('Disallows WP Auto Update Core', 'docket-cache').$this->tooltip('rtwpcoreupdate'); ?></th>
                     <td>
                         <?php
-echo $this->config_select_set(
-    'rtwpcoreupdate',
-    [
-        'default' => __('Default', 'docket-cache'),
-        'off' => __('Enable', 'docket-cache'),
-        'on' => __('Disable', 'docket-cache'),
-    ],
-    !empty($GLOBALS[$this->vcf()->px('rtwpcoreupdate_false')]) && !(bool) WP_AUTO_UPDATE_CORE ? 'on' : $this->vcf()->dcvalue('rtwpcoreupdate')
-);
-?>
+                    echo $this->config_select_set(
+                        'rtwpcoreupdate',
+                        [
+                            'default' => __('Default', 'docket-cache'),
+                            'off' => __('Enable', 'docket-cache'),
+                            'on' => __('Disable', 'docket-cache'),
+                        ],
+                        !empty($GLOBALS[$this->vcf()->px('rtwpcoreupdate_false')]) && !(bool) WP_AUTO_UPDATE_CORE ? 'on' : $this->vcf()->dcvalue('rtwpcoreupdate')
+                    );
+                    ?>
                     </td>
                 </tr>
                 <tr id="rtpluginthemeeditor">
                     <th><?php echo esc_html__('Disallows Plugin / Theme Editor', 'docket-cache').$this->tooltip('rtpluginthemeeditor'); ?></th>
                     <td>
                         <?php
-echo $this->config_select_set(
-    'rtpluginthemeeditor',
-    [
-        'default' => __('Default', 'docket-cache'),
-        'on' => __('Enable', 'docket-cache'),
-        'off' => __('Disable', 'docket-cache'),
-    ],
-    !empty($GLOBALS[$this->vcf()->px('rtpluginthemeeditor_false')]) && DISALLOW_FILE_EDIT ? 'on' : $this->vcf()->dcvalue('rtpluginthemeeditor')
-);
-?>
+                    echo $this->config_select_set(
+                        'rtpluginthemeeditor',
+                        [
+                            'default' => __('Default', 'docket-cache'),
+                            'on' => __('Enable', 'docket-cache'),
+                            'off' => __('Disable', 'docket-cache'),
+                        ],
+                        !empty($GLOBALS[$this->vcf()->px('rtpluginthemeeditor_false')]) && DISALLOW_FILE_EDIT ? 'on' : $this->vcf()->dcvalue('rtpluginthemeeditor')
+                    );
+                    ?>
                     </td>
                 </tr>
                 <tr id="rtpluginthemeinstall">
                     <th><?php echo esc_html__('Disallows Plugin / Theme Update and Installation', 'docket-cache').$this->tooltip('rtpluginthemeinstall'); ?></th>
                     <td>
                         <?php
-echo $this->config_select_set(
-    'rtpluginthemeinstall',
-    [
-        'default' => __('Default', 'docket-cache'),
-        'on' => __('Enable', 'docket-cache'),
-        'off' => __('Disable', 'docket-cache'),
-    ],
-    !empty($GLOBALS[$this->vcf()->px('rtpluginthemeinstall_false')]) && DISALLOW_FILE_MODS ? 'on' : $this->vcf()->dcvalue('rtpluginthemeinstall')
-);
-?>
+                    echo $this->config_select_set(
+                        'rtpluginthemeinstall',
+                        [
+                            'default' => __('Default', 'docket-cache'),
+                            'on' => __('Enable', 'docket-cache'),
+                            'off' => __('Disable', 'docket-cache'),
+                        ],
+                        !empty($GLOBALS[$this->vcf()->px('rtpluginthemeinstall_false')]) && DISALLOW_FILE_MODS ? 'on' : $this->vcf()->dcvalue('rtpluginthemeinstall')
+                    );
+                    ?>
+                    </td>
+                </tr>
+                <tr id="rtconcatenatescripts">
+                    <th><?php echo esc_html__('Deactivate Concatenate WP-Admin Scripts', 'docket-cache').$this->tooltip('rtconcatenatescripts'); ?></th>
+                    <td>
+                        <?php
+                    echo $this->config_select_set(
+                        'rtconcatenatescripts',
+                        [
+                            'default' => __('Default', 'docket-cache'),
+                            'on' => __('Enable', 'docket-cache'),
+                            'off' => __('Disable', 'docket-cache'),
+                        ],
+                        !empty($GLOBALS[$this->vcf()->px('rtconcatenatescripts_false')]) && !(bool) CONCATENATE_SCRIPTS ? 'on' : $this->vcf()->dcvalue('rtconcatenatescripts')
+                    );
+                    ?>
+                    </td>
+                </tr>
+                <tr id="rtdisablewpcron">
+                    <th><?php echo esc_html__('Deactivate WP Cron', 'docket-cache').$this->tooltip('rtdisablewpcron'); ?></th>
+                    <td>
+                        <?php
+                    echo $this->config_select_set(
+                        'rtdisablewpcron',
+                        [
+                            'default' => __('Default', 'docket-cache'),
+                            'on' => __('Enable', 'docket-cache'),
+                            'off' => __('Disable', 'docket-cache'),
+                        ],
+                        !empty($GLOBALS[$this->vcf()->px('rtdisablewpcron_false')]) && DISABLE_WP_CRON ? 'on' : $this->vcf()->dcvalue('rtdisablewpcron')
+                    );
+                    ?>
                     </td>
                 </tr>
                 <?php
                     $rtwpdebug_default = !empty($GLOBALS[$this->vcf()->px('rtwpdebug_false')]) && WP_DEBUG ? 'on' : $this->vcf()->dcvalue('rtwpdebug');
-?>
+                    ?>
                 <tr id="rtwpdebug">
                     <th<?php echo  'off' === $rtwpdebug_default ? ' class="border-b"' : ''; ?>><?php echo esc_html__('WP Debug', 'docket-cache').$this->tooltip('rtwpdebug'); ?></th>
                         <td>
                             <?php
-            echo $this->config_select_set(
-                'rtwpdebug',
-                [
-                    'default' => __('Default', 'docket-cache'),
-                    'on' => __('Enable', 'docket-cache'),
-                    'off' => __('Disable', 'docket-cache'),
-                ],
-                $rtwpdebug_default
-            );
-?>
+                                echo $this->config_select_set(
+                                    'rtwpdebug',
+                                    [
+                                        'default' => __('Default', 'docket-cache'),
+                                        'on' => __('Enable', 'docket-cache'),
+                                        'off' => __('Disable', 'docket-cache'),
+                                    ],
+                                    $rtwpdebug_default
+                                );
+                    ?>
                         </td>
                 </tr>
                 <?php if ('on' === $rtwpdebug_default) : ?>
@@ -436,35 +469,37 @@ echo $this->config_select_set(
                             ],
                             !empty($GLOBALS[$this->vcf()->px('rtwpdebugdisplay_false')]) && WP_DEBUG_DISPLAY ? 'on' : $this->vcf()->dcvalue('rtwpdebugdisplay')
                         );
-                    ?>
+					    ?>
                     </td>
                 </tr>
                 <?php
-                    $rtwpdebuglog_default = !empty($GLOBALS[$this->vcf()->px('rtwpdebuglog_false')]) && WP_DEBUG_LOG ? 'on' : $this->vcf()->dcvalue('rtwpdebuglog');
-                    $error_log = \ini_get('error_log');
-                    ?>
+					    $rtwpdebuglog_default = !empty($GLOBALS[$this->vcf()->px('rtwpdebuglog_false')]) && WP_DEBUG_LOG ? 'on' : $this->vcf()->dcvalue('rtwpdebuglog');
+					    $error_log = \ini_get('error_log');
+					    ?>
                 <tr id="rtwpdebuglog">
                     <th class="border-b"><?php echo esc_html__('WP Debug Log', 'docket-cache').$this->tooltip('rtwpdebuglog'); ?></th>
                     <td>
                         <?php
-                            echo $this->config_select_set(
-                                'rtwpdebuglog',
-                                [
-                                    'default' => __('Default', 'docket-cache'),
-                                    'on' => __('Enable', 'docket-cache'),
-                                    'off' => __('Disable', 'docket-cache'),
-                                ],
-                                $rtwpdebuglog_default
-                            );
+					        echo $this->config_select_set(
+					            'rtwpdebuglog',
+					            [
+					                'default' => __('Default', 'docket-cache'),
+					                'on' => __('Enable', 'docket-cache'),
+					                'off' => __('Disable', 'docket-cache'),
+					            ],
+					            $rtwpdebuglog_default
+					        );
 
-                    if (\defined('WP_DEBUG') && WP_DEBUG && \defined('WP_DEBUG_LOG') && WP_DEBUG_LOG && @is_file($error_log) && is_readable($error_log)) {
-                        $error_log = basename($error_log);
-                        echo '<span class="wpdebuglog"><a class="btxo" title="'.$error_log.'" href="'.$this->tab_query('config', ['wplog' => '0'.time()]).'" rel="noopener" target="new"><span class="dashicons dashicons-external"></span>View Log</a></span>';
-                    }
-                    ?>
+					    if (\defined('WP_DEBUG') && WP_DEBUG && \defined('WP_DEBUG_LOG') && WP_DEBUG_LOG && @is_file($error_log) && is_readable($error_log)) {
+					        $error_log = basename($error_log);
+					        echo '<span class="wpdebuglog"><a class="btxo" title="'.$error_log.'" href="'.$this->tab_query('config', ['wplog' => '0'.time()]).'" rel="noopener" target="new"><span class="dashicons dashicons-external"></span>View Log</a></span>';
+					    }
+					    ?>
                     </td>
                 </tr>
                 <?php endif; ?>
+                <?php endif; // is_main_network?>
+
                 <tr>
                     <td colspan="2" class="stitle">
                         <?php esc_html_e('Storage Options', 'docket-cache'); ?>
@@ -474,7 +509,7 @@ echo $this->config_select_set(
                     <th><?php echo esc_html__('Cache Files Limit', 'docket-cache').$this->tooltip('maxfile'); ?></th>
                     <td>
                         <?php
-                    $maxfile_default = '50K';
+					    $maxfile_default = '50K';
 switch ($this->vcf()->dcvalue('maxfile')) {
     case '50000':
         $maxfile_default = '50K';
@@ -534,10 +569,31 @@ echo $this->config_select_set(
                         <?php echo $this->config_select_bool('chunkcachedir'); ?>
                     </td>
                 </tr>
+                <tr id="maxfile_livecheck">
+                    <th><?php echo esc_html__('Check file limits in real-time', 'docket-cache').$this->tooltip('maxfile_livecheck'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('maxfile_livecheck'); ?>
+                    </td>
+                </tr>
                 <tr id="flush_stalecache">
-                    <th class="border-b"><?php echo esc_html__('Auto Remove Stale Cache', 'docket-cache').$this->tooltip('flush_stalecache'); ?></th>
+                    <th><?php echo esc_html__('Auto Remove Stale Cache', 'docket-cache').$this->tooltip('flush_stalecache'); ?></th>
                     <td>
                         <?php echo $this->config_select_bool('flush_stalecache'); ?>
+                    </td>
+                </tr>
+                <?php
+                /*
+                <tr id="stalecache_ignore">
+                    <th><?php echo esc_html__('Exclude Stale Cache', 'docket-cache').$this->tooltip('stalecache_ignore'); ?></th>
+                <td>
+                    <?php echo $this->config_select_bool('stalecache_ignore'); ?>
+                </td>
+                </tr>*/
+                ?>
+                <tr id="emptycache_ignore">
+                    <th class="border-b"><?php echo esc_html__('Exclude Empty Object Data', 'docket-cache').$this->tooltip('emptycache_ignore'); ?></th>
+                    <td>
+                        <?php echo $this->config_select_bool('emptycache_ignore'); ?>
                     </td>
                 </tr>
                 <tr>
@@ -574,10 +630,10 @@ echo $this->config_select_set(
                         <?php esc_html_e('Plugin Options', 'docket-cache'); ?>
                     </td>
                 </tr>
-                <tr id="autoupdate">
-                    <th><?php echo esc_html__('Docket Cache Auto-Updates', 'docket-cache').$this->tooltip('autoupdate'); ?></th>
+                <tr id="autoupdate_toggle">
+                    <th><?php echo esc_html__('Docket Cache Auto-Updates', 'docket-cache').$this->tooltip('autoupdate_toggle'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('autoupdate'); ?>
+                        <?php echo $this->config_select_bool('autoupdate_toggle'); ?>
                     </td>
                 </tr>
                 <tr id="checkversion">

@@ -173,7 +173,7 @@ final class ReqAction
             case 'docket-flush-menucache':
                 $result = 0;
                 $ok = true;
-                if (\function_exists('wp_cache_flush_group')) {
+                if (\function_exists('wp_cache_flush_group') && method_exists('WP_Object_Cache', 'dc_remove_group')) {
                     $result = wp_cache_flush_group('docketcache-menu');
                     $this->pt->co()->lookup_set('menucacheflushed', $result);
                     $response = 'docket-menucache-flushed';
@@ -187,7 +187,7 @@ final class ReqAction
             case 'docket-flush-mocache':
                 $result = 0;
                 $ok = true;
-                if (\function_exists('wp_cache_flush_group')) {
+                if (\function_exists('wp_cache_flush_group') && method_exists('WP_Object_Cache', 'dc_remove_group')) {
                     $result = wp_cache_flush_group('docketcache-mo');
                     $this->pt->co()->lookup_set('mocacheflushed', $result);
                     $response = 'docket-mocache-flushed';
@@ -201,7 +201,7 @@ final class ReqAction
             case 'docket-flush-ocprecache':
                 $result = 0;
                 $ok = true;
-                if (\function_exists('wp_cache_flush_group')) {
+                if (\function_exists('wp_cache_flush_group') && method_exists('WP_Object_Cache', 'dc_remove_group')) {
                     $result = wp_cache_flush_group('docketcache-precache');
                     $this->pt->co()->lookup_set('ocprecacheflushed', $result);
                     $response = 'docket-ocprecache-flushed';
@@ -215,7 +215,7 @@ final class ReqAction
             case 'docket-flush-advcpost':
                 $result = 0;
                 $ok = true;
-                if (\function_exists('wp_cache_flush_group_match')) {
+                if (\function_exists('wp_cache_flush_group_match') && method_exists('WP_Object_Cache', 'dc_remove_group')) {
                     $result = wp_cache_flush_group_match('docketcache-post');
                     $this->pt->co()->lookup_set('advcpostflushed', $result);
                     $response = 'docket-advcpost-flushed';
@@ -229,7 +229,7 @@ final class ReqAction
             case 'docket-flush-transient':
                 $result = 0;
                 $ok = true;
-                if (\function_exists('wp_cache_flush_group')) {
+                if (\function_exists('wp_cache_flush_group') && method_exists('WP_Object_Cache', 'dc_remove_group')) {
                     $result = wp_cache_flush_group(['transient', 'site-transient']);
                     $this->pt->co()->lookup_set('transientflushed', $result);
                     $response = 'docket-transient-flushed';
@@ -313,8 +313,13 @@ final class ReqAction
                 $response = 'docket-gcrun-failed';
                 $result = apply_filters('docketcache/filter/garbagecollector', true);
                 if (!empty($result) && \is_object($result)) {
-                    $this->pt->co()->lookup_set('gcrun', (array) $result);
-                    $response = 'docket-gcrun';
+                    if ($result->is_locked) {
+                        $response = 'docket-gcrun-warn';
+                    } else {
+                        $this->pt->co()->lookup_set('gcrun', (array) $result);
+                        $response = 'docket-gcrun';
+                    }
+
                     $ok = true;
                 }
 
@@ -399,26 +404,38 @@ final class ReqAction
                             }
                         }
 
-                        $ok = $this->pt->co()->save($nx, $nv);
-                        if (isset($nvo)) {
-                            $nv = $nvo;
-                        }
+                        if (WpConfig::has($nx)) {
+                            $response = 'docket-option-wpf-warn';
+                            $this->pt->co()->save($nx, 'default');
+                        } else {
+                            $ok = $this->pt->co()->save($nx, $nv);
+                            if (isset($nvo)) {
+                                $nv = $nvo;
+                            }
 
-                        $response = $ok ? 'docket-option-save' : 'docket-option-failed';
+                            $response = $ok ? 'docket-option-save' : 'docket-option-failed';
+                        }
                     }
+
                     $option_value = $nv;
                 } else {
-                    $okmsg = 'default' === $nk ? 'docket-option-default' : 'docket-option-'.$nk;
-                    $ok = $this->pt->co()->save($nx, $nk);
-                    $response = $ok ? $okmsg : 'docket-option-failed';
+                    if (WpConfig::has($nx)) {
+                        $response = 'docket-option-wpf-warn';
+                        $this->pt->co()->save($nx, 'default');
+                    } else {
+                        $okmsg = 'default' === $nk ? 'docket-option-default' : 'docket-option-'.$nk;
+                        $ok = $this->pt->co()->save($nx, $nk);
+                        $response = $ok ? $okmsg : 'docket-option-failed';
+                    }
                 }
 
                 if ($ok) {
-                    if ('wooaddtochartcrawling' === $nx && 'enable' == $nk) {
+                    if ('wooaddtochartcrawling' === $nx && 'enable' == $nk && 'docket-option-wpf-warn' !== $response) {
                         $robotsfile = wp_normalize_path(ABSPATH).'robots.txt';
                         if (@is_file($robotsfile)) {
                             $response = 'docket-option-rbt-warn';
                         }
+                        clearstatcache();
                     }
                 }
 
@@ -430,6 +447,7 @@ final class ReqAction
                         'value' => $nv,
                         'name' => $nk,
                         'action' => $action,
+                        'response' => $response,
                     ]
                 );
             }
@@ -776,6 +794,11 @@ final class ReqAction
                     break;
                 case 'docket-gcrun-failed':
                     $this->pt->notice = esc_html__('Failed to run the garbage collector.', 'docket-cache');
+                    $this->pt->co()->lookup_delete('gcrun');
+                    break;
+                case 'docket-gcrun-warn':
+                    $this->pt->notice = esc_html__('Process locked. The garbage collector is in process. Try again in a few seconds.', 'docket-cache');
+                    $this->pt->co()->lookup_delete('gcrun');
                     break;
                 case 'docket-runtimeok':
                     $this->pt->notice = esc_html__('Updating wp-config.php file successful.', 'docket-cache');
@@ -834,7 +857,7 @@ final class ReqAction
                     unset($total, $clmsg);
                     break;
                 case 'docket-menucache-flushed-failed':
-                    $this->pt->notice = esc_html__('Menu cache could not be flushed.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Menu cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache');
                     break;
                 case 'docket-mocache-flushed':
                     $this->pt->notice = esc_html__('Translation cache was flushed.', 'docket-cache');
@@ -852,7 +875,7 @@ final class ReqAction
                     unset($total, $clmsg);
                     break;
                 case 'docket-mocache-flushed-failed':
-                    $this->pt->notice = esc_html__('Translation cache could not be flushed.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Translation cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache');
                     break;
                 case 'docket-ocprecache-flushed':
                     $this->pt->notice = esc_html__('Object Precache was flushed.', 'docket-cache');
@@ -870,7 +893,7 @@ final class ReqAction
                     unset($total, $clmsg);
                     break;
                 case 'docket-ocprecache-flushed-failed':
-                    $this->pt->notice = esc_html__('Object Precache could not be flushed.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Object Precache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache');
                     break;
                 case 'docket-advcpost-flushed':
                     $this->pt->notice = esc_html__('Advanced Post Cache was flushed.', 'docket-cache');
@@ -888,7 +911,7 @@ final class ReqAction
                     unset($total, $clmsg);
                     break;
                 case 'docket-advcpost-flushed-failed':
-                    $this->pt->notice = esc_html__('Advanced Post Cache could not be flushed.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Advanced Post Cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache');
                     break;
                 case 'docket-transient-flushed':
                     $this->pt->notice = esc_html__('Transient cache was flushed.', 'docket-cache');
@@ -906,7 +929,7 @@ final class ReqAction
                     unset($total, $clmsg);
                     break;
                 case 'docket-transient-flushed-failed':
-                    $this->pt->notice = esc_html__('Transient cache could not be flushed.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Transient cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache');
                     break;
             }
         }

@@ -92,25 +92,28 @@ if (is_multisite() && !empty($sites) && \is_array($sites) && \count($sites) > 1)
         </p>
         <a href="<?php echo $this->pt->action_query('configreset', ['idx' => 'config']); ?>" class="button button-primary button-large btx-spinner"><?php esc_html_e('Reset to default', 'docket-cache'); ?></a>
 
+        <?php if (is_main_network()) : ?>
         <hr>
         <h4><?php esc_html_e('Runtime Code', 'docket-cache'); ?></h4>
         <p>
             <?php esc_html_e('Code to handles WordPress constants.', 'docket-cache'); ?>
         </p>
         <a href="
-        <?php
-        $is_install = WpConfig::is_runtimefalse();
-$act = $is_install ? esc_html__('Install Runtime Code', 'docket-cache') : esc_html__('Update Runtime Code', 'docket-cache');
-$actc = $is_install ? 'button-primary' : 'button-secondary';
-echo $this->pt->get_page(
-    [
-        'idx' => 'config',
-        'adx' => 'rtcnf',
-        'st' => time(),
-    ]
-);
-?>
+			<?php
+    $is_install = WpConfig::is_runtimefalse();
+            $act = $is_install ? esc_html__('Install Runtime Code', 'docket-cache') : esc_html__('Update Runtime Code', 'docket-cache');
+            $actc = $is_install ? 'button-primary' : 'button-secondary';
+            echo $this->pt->get_page(
+                [
+                    'idx' => 'config',
+                    'adx' => 'rtcnf',
+                    'st' => time(),
+                ]
+            );
+            ?>
         " class="button <?php echo $actc; ?> button-large btx-spinner"><?php echo $act; ?></a>
+        <?php endif; // is_main_network?>
+
     </div>
 </div>
 <?php $this->tab_title(esc_html__('Resources', 'docket-cache')); ?>

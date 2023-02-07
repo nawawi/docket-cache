@@ -546,7 +546,7 @@ final class Plugin extends Bepart
      */
     public function get_cache_maxfile()
     {
-        $maxfile = $this->cf()->dcvalue('MAXFILE');
+        $maxfile = $this->cf()->dcvalue('MAXFILE', true);
 
         return $this->sanitize_maxfile($maxfile);
     }
@@ -580,7 +580,7 @@ final class Plugin extends Bepart
             return 0;
         }
 
-        $maxfile = $this->cf()->dcvalue('PRECACHE_MAXFILE');
+        $maxfile = $this->cf()->dcvalue('PRECACHE_MAXFILE', true);
 
         return $this->sanitize_precache_maxfile($maxfile);
     }
@@ -680,7 +680,11 @@ final class Plugin extends Bepart
         $this->co()->clear_part('cachestats');
         $this->cx()->delay();
 
-        delete_expired_transients(true);
+        if (\function_exists('nwdcx_cleanuptransient')) {
+            nwdcx_cleanuptransient();
+        } else {
+            delete_expired_transients(true);
+        }
 
         $cnt = $this->cachedir_flush($this->cache_path, $cleanup, $is_timeout);
         if (false === $cnt) {
@@ -688,6 +692,8 @@ final class Plugin extends Bepart
 
             return $cnt;
         }
+
+        $this->co()->clear_lock();
 
         return $cnt;
     }
@@ -971,6 +977,8 @@ final class Plugin extends Bepart
         if ($this->cf()->is_dctrue('OPCSHUTDOWN', true)) {
             $this->opcache_cleanup();
         }
+
+        $this->co()->clear_lock();
     }
 
     /**
@@ -1073,7 +1081,7 @@ final class Plugin extends Bepart
         add_action(
             'shutdown',
             function () {
-                $this->close_buffer();
+                // $this->close_buffer();
 
                 if ($this->cf()->is_dcfalse('OBJECTCACHEOFF', true)) {
                     $this->cx()->install(true);
@@ -1087,6 +1095,18 @@ final class Plugin extends Bepart
             },
             \PHP_INT_MAX
         );
+    }
+
+    private function toggle_auto_update($toggle = false)
+    {
+        $auto_updates = (array) get_site_option('auto_update_plugins', []);
+        if (true === $toggle) {
+            $auto_updates[] = $this->hook;
+
+            return update_site_option('auto_update_plugins', array_unique($auto_updates));
+        }
+
+        return update_site_option('auto_update_plugins', array_diff($auto_updates, [$this->hook]));
     }
 
     /**
@@ -1184,15 +1204,16 @@ final class Plugin extends Bepart
                                 @header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
                                 @header('Content-Type: text/plain; charset=UTF-8');
                                 if (@is_file($file) && @is_readable($file)) {
-                                    @readfile($file);
-                                    $this->close_exit();
+                                    if (@readfile($file) > 0) {
+                                        $this->close_exit();
+                                    }
                                 }
 
-                                $this->close_exit(__('No data available', 'docket-cache'));
+                                $this->close_exit(__('The log is empty. No data is available.', 'docket-cache'));
                             }
                         }
 
-                        if (\defined('WP_DEBUG') && WP_DEBUG && \defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+                        if ($this->cf()->is_true('WP_DEBUG') && $this->cf()->is_true('WP_DEBUG_LOG')) {
                             $req = $_SERVER['REQUEST_URI'];
                             if ((false !== strpos($req, '?page=docket-cache&idx=config&wplog=0') || false !== strpos($req, '?page=docket-cache-config&idx=config&wplog=0'))
                                 && preg_match('@config\&wplog=\d+(\&dd=\d+)?$@', $req)) {
@@ -1209,11 +1230,12 @@ final class Plugin extends Bepart
                                         $this->close_exit($log);
                                     }
 
-                                    @readfile($file);
-                                    $this->close_exit();
+                                    if (@readfile($file) > 0) {
+                                        $this->close_exit();
+                                    }
                                 }
 
-                                $this->close_exit(__('No data available', 'docket-cache'));
+                                $this->close_exit(__('The log is empty. No data is available.', 'docket-cache'));
                             }
                         }
                     }
@@ -1235,8 +1257,8 @@ final class Plugin extends Bepart
                     if (empty($ok)) {
                         $wpdb->query('SET SESSION SQL_BIG_SELECTS=1');
                     } else {
-                        // already big select, lock 24h
-                        $locktime = time() + 86400;
+                        // already big select, lock 28d
+                        $locktime = time() + 2419200;
                         $this->co()->setlock('sqlbigselect', $locktime);
                     }
 
@@ -1246,11 +1268,67 @@ final class Plugin extends Bepart
             \PHP_INT_MIN
         );
 
+        add_action(
+            'plugins_loaded',
+            function () {
+                $dc_option = $this->co()->get('DOCKET_CACHE_AUTOUPDATE');
+                if (!empty($dc_option)) {
+                    $cache_hash_group = substr(md5('options'), 0, 12);
+                    $cache_hash_key = substr(md5('auto_update_plugins'), 0, 12);
+                    if (is_multisite()) {
+                        $cache_hash_group = substr(md5('site-options'), 0, 12);
+                        $cache_hash_key = substr(md5(get_current_network_id().':auto_update_plugins'), 0, 12);
+                    }
+
+                    $file_cache = $this->cache_path.$cache_hash_group.'-'.$cache_hash_key.'.php';
+                    if (is_file($file_cache)) {
+                        @unlink($file_cache);
+                    }
+
+                    clearstatcache();
+
+                    if ('enable' === $dc_option) {
+                        $this->co()->save('autoupdate_toggle', 'enable');
+                    } elseif ('disable' === $dc_option) {
+                        $this->co()->save('autoupdate_toggle', 'disable');
+                    }
+
+                    $this->co()->save('AUTOUPDATE', false);
+                }
+            },
+            \PHP_INT_MAX
+        );
+
+        add_action(
+            'update_site_option',
+            function ($option, $auto_updates, $old_auto_updates, $network_id) {
+                if ('auto_update_plugins' === $option) {
+                    if (\in_array($this->hook, (array) $auto_updates, true) && !\in_array($this->hook, (array) $old_auto_updates, true)) {
+                        $this->co()->save('autoupdate_toggle', 'enable', false);
+
+                        return;
+                    }
+
+                    if (\in_array($this->hook, (array) $old_auto_updates, true) && !\in_array($this->hook, (array) $auto_updates, true)) {
+                        $this->co()->save('autoupdate_toggle', 'disable', false);
+
+                        return;
+                    }
+
+                    return;
+                }
+            },
+            \PHP_INT_MAX,
+            4
+        );
+
         add_filter(
             'auto_update_plugin',
             function ($update, $item) {
                 if ('docket-cache' === $item->slug) {
-                    return $this->cf()->is_dctrue('AUTOUPDATE');
+                    if (\defined('DOCKET_CACHE_AUTOUPDATE') && \is_bool(DOCKET_CACHE_AUTOUPDATE)) {
+                        return DOCKET_CACHE_AUTOUPDATE;
+                    }
                 }
 
                 return $update;
@@ -1624,14 +1702,10 @@ final class Plugin extends Bepart
             function () {
                 add_action(
                     'shutdown',
-                    function () {
-                        $this->close_buffer();
-                        $user = wp_get_current_user();
-                        if (\is_object($user) && isset($user->ID)) {
-                            wp_cache_delete($user->ID, 'user_meta');
-                            $this->delete_cron_siteid($user->ID);
-                            $this->delete_current_select_siteid($user->ID);
-                        }
+                    function ($user_id) {
+                        wp_cache_delete($user_id, 'user_meta');
+                        $this->delete_cron_siteid($user_id);
+                        $this->delete_current_select_siteid($user_id);
                     },
                     \PHP_INT_MAX
                 );
@@ -1765,7 +1839,7 @@ final class Plugin extends Bepart
             2
         );
 
-        add_filter(
+        /*add_filter(
             'plugin_auto_update_setting_html',
             function ($html, $plugin_file, $plugin_data) {
                 if ($plugin_file === $this->hook) {
@@ -1776,7 +1850,8 @@ final class Plugin extends Bepart
             },
             10,
             3
-        );
+        );*/
+
         // reference: Canopt::save()
         add_action(
             'docketcache/action/saveoption',
@@ -1794,10 +1869,10 @@ final class Plugin extends Bepart
                         add_action(
                             'shutdown',
                             function () {
-                                $this->close_buffer();
+                                // $this->close_buffer();
 
                                 wp_cache_delete('alloptions', 'options');
-                                if (\function_exists('wp_cache_flush_group')) {
+                                if (\function_exists('wp_cache_flush_group') && method_exists('WP_Object_Cache', 'dc_remove_group')) {
                                     wp_cache_flush_group('options');
                                     wp_cache_flush_group('docketcache-precache');
                                 }
@@ -1815,7 +1890,7 @@ final class Plugin extends Bepart
                             'shutdown',
                             function () use ($action) {
                                 if (!$action) {
-                                    $this->close_buffer();
+                                    // $this->close_buffer();
 
                                     apply_filters('docketcache/filter/active/cronbot', $action);
                                 }
@@ -1828,10 +1903,20 @@ final class Plugin extends Bepart
                         $error_log = \ini_get('error_log');
                         if ('off' === $value && @is_file($error_log) && @is_writable($error_log)) {
                             @unlink($error_log);
+                            clearstatcache();
                         }
                         break;
                     case 'menucache':
-                        wp_cache_flush_group('docketcache-menu');
+                        if (\function_exists('wp_cache_flush_group') && method_exists('WP_Object_Cache', 'dc_remove_group')) {
+                            wp_cache_flush_group('docketcache-menu');
+                        }
+                        break;
+                    case 'autoupdate_toggle':
+                        if ('enable' === $value) {
+                            $this->toggle_auto_update(true);
+                        } else {
+                            $this->toggle_auto_update(false);
+                        }
                         break;
                 }
 
@@ -1853,8 +1938,8 @@ final class Plugin extends Bepart
                 // lock opcache reset
                 $this->co()->setlock('preload_lock_opcache_reset', time() + 20);
 
-                // warmup: see after_delay
-                if ($this->cf()->is_dcfalse('PRELOAD')) {
+                // warmup: see Dropino::after_delay
+                if ($this->cf()->is_dcfalse('PRELOAD', true)) {
                     add_action(
                         'shutdown',
                         function () {
@@ -1960,6 +2045,11 @@ final class Plugin extends Bepart
         add_action(
             'docketcache/action/countcachesize',
             function () {
+                // gc is running
+                if ($this->co()->locked('garbage_collector')) {
+                    return;
+                }
+
                 if ($this->co()->lockproc('doing_countcachesize', time() + $this->get_max_execution_time())) {
                     return;
                 }
@@ -2100,7 +2190,7 @@ final class Plugin extends Bepart
                         if ($this->co()->lockproc('post_missed_schedule', time() + 180)) {
                             return false;
                         }
-                        $this->close_buffer();
+                        // $this->close_buffer();
                         $tweaks->post_missed_schedule();
                         $this->co()->lockreset('post_missed_schedule');
                     },
@@ -2183,25 +2273,13 @@ final class Plugin extends Bepart
             \WP_CLI::add_command('cache run:gc', [$cli, 'run_gc']);
             \WP_CLI::add_command('cache run:cron', [$cli, 'run_cron']);
             \WP_CLI::add_command('cache run:stats', [$cli, 'run_stats']);
+            \WP_CLI::add_command('cache run:optimizedb', [$cli, 'run_optimizedb']);
             \WP_CLI::add_command('cache reset:lock', [$cli, 'reset_lock']);
             \WP_CLI::add_command('cache reset:cron', [$cli, 'reset_cron']);
-
-            if ($this->cf()->is_dctrue('ADVCPOST')) {
-                \WP_CLI::add_command('cache flush:advcpost', [$cli, 'flush_advcpost']);
-            }
-
-            if ($this->cf()->is_dctrue('PRECACHE')) {
-                \WP_CLI::add_command('cache flush:precache', [$cli, 'flush_precache']);
-            }
-
-            if ($this->cf()->is_dctrue('MENUCACHE')) {
-                \WP_CLI::add_command('cache flush:menucache', [$cli, 'flush_menucache']);
-            }
-
-            if ($this->cf()->is_dctrue('MOCACHE')) {
-                \WP_CLI::add_command('cache flush:mocache', [$cli, 'flush_mocache']);
-            }
-
+            \WP_CLI::add_command('cache flush:advcpost', [$cli, 'flush_advcpost']);
+            \WP_CLI::add_command('cache flush:precache', [$cli, 'flush_precache']);
+            \WP_CLI::add_command('cache flush:menucache', [$cli, 'flush_menucache']);
+            \WP_CLI::add_command('cache flush:mocache', [$cli, 'flush_mocache']);
             \WP_CLI::add_command('cache flush:transient', [$cli, 'flush_transient']);
             \WP_CLI::add_command('cache flush', [$cli, 'flush_cache']);
             \WP_CLI::add_command('cache runtime:install', [$cli, 'runtime_install']);

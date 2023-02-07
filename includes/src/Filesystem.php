@@ -125,9 +125,9 @@ class Filesystem
     /**
      * is_docketcachegroup.
      */
-    public function is_docketcachegroup($group)
+    public function is_docketcachegroup($group, $key = '')
     {
-        return 'docketcache' === substr($group, 0, 11);
+        return 'docketcache' === substr($group, 0, 11) || !empty($key) && 'docketcache' === substr($key, 0, 11);
     }
 
     /**
@@ -157,9 +157,16 @@ class Filesystem
     /**
      * get_max_execution_time.
      */
-    public function get_max_execution_time()
+    public function get_max_execution_time($second = 0)
     {
         $max_execution_time = (int) \ini_get('max_execution_time');
+
+        $second = (int) $second;
+        if ($second > 0 && $max_execution_time > 0 && $second > $max_execution_time) {
+            set_time_limit($second);
+            $max_execution_time = (int) \ini_get('max_execution_time');
+        }
+
         if ($max_execution_time > 10) {
             --$max_execution_time;
         }
@@ -418,9 +425,12 @@ class Filesystem
         add_action(
             'shutdown',
             function () use ($file) {
+                $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+                clearstatcache(true, $file);
                 if (@is_file($file)) {
                     @unlink($file);
                 }
+                nwdcx_suppresserrors($nwdcx_suppresserrors);
             },
             $seq
         );
@@ -431,6 +441,8 @@ class Filesystem
      */
     public function unlink($file, $is_delete = false, $is_block = false)
     {
+        clearstatcache(true, $file);
+
         // skip if not exist
         if (!@is_file($file)) {
             return true;
@@ -457,15 +469,17 @@ class Filesystem
             $ok = true;
         }
 
-        clearstatcache();
-
         // cleanup if ftruncate() failed
         if (false === $ok) {
+            clearstatcache(true, $file);
             if (@is_file($file) && !@unlink($file)) {
                 // try cleanup at shutdown
                 $this->shutdown_cleanup($file);
             }
         }
+
+        // reset all
+        clearstatcache(true);
 
         // always true
         return true;
@@ -492,13 +506,14 @@ class Filesystem
             }
         }
         @fclose($handle);
-        clearstatcache();
 
         if (false === $ok) {
             $this->unlink($file, true);
 
             return -1;
         }
+
+        clearstatcache(true);
 
         $this->opcache_flush($file);
         $this->chmod($file);
@@ -520,10 +535,13 @@ class Filesystem
         // truncate reason
         $this->opcache_flush($file);
 
+        // make query-monitor happy.
+        $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+
         $ok = $this->put($tmpfile, $data, 'cb', true);
         if (true === $ok) {
             try {
-                clearstatcache();
+                clearstatcache(true, $tmpfile);
                 if (@is_file($tmpfile) && @rename($tmpfile, $file)) {
                     if (isset($nwdcx_suppresserrors)) {
                         nwdcx_suppresserrors($nwdcx_suppresserrors);
@@ -549,9 +567,14 @@ class Filesystem
         }
 
         // cleanup if not bool true
+        clearstatcache(true, $tmpfile);
         if (@is_file($tmpfile)) {
             @unlink($tmpfile);
         }
+
+        nwdcx_suppresserrors($nwdcx_suppresserrors);
+
+        clearstatcache(true);
 
         // maybe -1, >= 1, false: return from put()
         return $ok;
@@ -777,7 +800,10 @@ class Filesystem
         if (!$is_done && !empty($fcdata)) {
             $dir = $fcdata['file_cache'];
             $cnt = 0;
-            $max_execution_time = $this->get_max_execution_time();
+
+            $this->suspend_cache_write(true);
+
+            $max_execution_time = $this->get_max_execution_time(180);
             $slowdown = 0;
             foreach ($this->opcache_filecache_scanfiles($dir) as $object) {
                 try {
@@ -804,7 +830,11 @@ class Filesystem
                 }
             }
 
+            clearstatcache(true);
+
             $is_done = true;
+
+            $this->suspend_cache_write(false);
 
             return $cnt;
         }
@@ -979,12 +1009,15 @@ class Filesystem
             return true;
         }
 
-        wp_suspend_cache_addition(true);
+        $this->suspend_cache_write(true);
 
-        $max_execution_time = $this->get_max_execution_time();
+        $gcisrun_lock = $dir.'/.gc-is-run.txt';
+
+        $max_execution_time = $this->get_max_execution_time(180);
         $flush_lock = DOCKET_CACHE_CONTENT_PATH.'/.object-cache-flush.txt';
-        if ($this->put($flush_lock, time())) {
-            $this->touch($flush_lock, time() + $max_execution_time);
+        $flush_lock_expiry = time() + $max_execution_time + 10;
+        if ($this->put($flush_lock, $flush_lock_expiry)) {
+            $this->touch($flush_lock, $flush_lock_expiry);
         }
 
         $slowdown = 0;
@@ -1006,6 +1039,7 @@ class Filesystem
             }
 
             ++$slowdown;
+
             if ($max_execution_time > 0 && \defined('WP_START_TIMESTAMP') && (microtime(true) - WP_START_TIMESTAMP) > $max_execution_time) {
                 $is_timeout = true;
                 break;
@@ -1020,11 +1054,13 @@ class Filesystem
             $this->unlink($dir.'/index.html', true);
         }
 
+        $this->unlink($gcisrun_lock, true);
+
         if (@is_file($flush_lock)) {
             @unlink($flush_lock);
         }
 
-        wp_suspend_cache_addition(false);
+        $this->suspend_cache_write(false);
         $is_done = true;
 
         return $cnt;
@@ -1042,14 +1078,16 @@ class Filesystem
         $filestotal = 0;
 
         clearstatcache();
-        if (!$is_done && $this->is_docketcachedir($dir) && !@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-flush.txt')) {
+        $gcisrun_lock = $dir.'/.gc-is-run.txt';
+
+        if (!$is_done && $this->is_docketcachedir($dir) && !@is_file(DOCKET_CACHE_CONTENT_PATH.'/.object-cache-flush.txt') && !@is_file($gcisrun_lock)) {
             // hardmax
             $maxfile = 999000; // 1000000 - 1000;
             $cnt = 0;
             $slowdown = 0;
 
             ignore_user_abort(true);
-            $max_execution_time = $this->get_max_execution_time();
+            $max_execution_time = $this->get_max_execution_time(180);
 
             $pattern = '@^([a-z0-9]{12})\-([a-z0-9]{12})\.php$@';
             foreach ($this->scanfiles($dir, null, $pattern) as $object) {
@@ -1094,12 +1132,16 @@ class Filesystem
                 if ($max_execution_time > 0 && \defined('WP_START_TIMESTAMP') && (microtime(true) - WP_START_TIMESTAMP) > $max_execution_time) {
                     break;
                 }
+
+                if (@is_file($gcisrun_lock)) {
+                    break;
+                }
             }
         }
 
         $is_done = true;
 
-        wp_cache_set('numfile', $filestotal, 'docketcache-gc', 60);
+        wp_cache_set('count_file', $filestotal, 'docketcache-gc', 86400);
 
         return [
             'timestamp' => time(),
@@ -1193,6 +1235,20 @@ class Filesystem
     }
 
     /**
+     * suspend_cache_write.
+     */
+    public function suspend_cache_write($suspend = null)
+    {
+        static $_suspend = false;
+
+        if (\is_bool($suspend)) {
+            $_suspend = $suspend;
+        }
+
+        return $_suspend;
+    }
+
+    /**
      * cache_get.
      */
     public function cache_get($file)
@@ -1260,6 +1316,16 @@ class Filesystem
     {
         $is_debug = \defined('WP_DEBUG') && WP_DEBUG;
         $is_data = !empty($data);
+
+        $class_map = [
+            'Requests_Utility_CaseInsensitiveDictionary' => 'Requests/Utility/CaseInsensitiveDictionary.php',
+            'Requests_Response' => ' Requests/Response.php',
+            'Requests_Response_Headers' => 'Requests/Response/Headers.php',
+            'Requests_Cookie_Jar' => 'Requests/Cookie/Jar.php',
+            'WP_HTTP_Requests_Response' => 'class-wp-http-requests-response.php',
+            'WP_Post' => 'class-wp-post.php',
+        ];
+
         $ucode = '';
         if ($is_data && false !== strpos($data, 'Registry::p(')) {
             if (@preg_match_all('@Registry::p\(\'([a-zA-Z_]+)\'\)@', $data, $mm)) {
@@ -1267,13 +1333,26 @@ class Filesystem
                     $cls = $mm[1];
                     foreach ($cls as $clsname) {
                         if ('stdClass' !== $clsname) {
-                            if ($is_debug) {
-                                $reflector = new \ReflectionClass($clsname);
-                                $clsfname = $reflector->getFileName();
-                                if (false !== $clsfname) {
-                                    $ucode .= '/* f: '.str_replace(ABSPATH, '', $clsfname).' */'.\PHP_EOL;
+                            if (\defined('DOCKET_CACHE_USE_CLASSMAP') && DOCKET_CACHE_USE_CLASSMAP) {
+                                $clspath = '';
+                                if (\defined('DOCKET_CACHE_USE_REFLECTIONCLASS') && DOCKET_CACHE_USE_REFLECTIONCLASS) {
+                                    $reflector = new \ReflectionClass($clsname);
+                                    $clsfname = $reflector->getFileName();
+                                    if (false !== $clsfname) {
+                                        $clspath = str_replace(ABSPATH, '', $clsfname);
+                                    }
+                                }
+
+                                if (empty($clspath) && !empty($class_map[$clsname])) {
+                                    $clspath = WPINC.'/'.$class_map[$clsname];
+                                }
+
+                                if (!empty($clspath)) {
+                                    $clsfname = $clspath;
+                                    $ucode .= "if ( !@class_exists('".$clsname."', false) && @file_exists(ABSPATH.'".$clsfname."') ) { @include_once(ABSPATH.'".$clsfname."'); }".\PHP_EOL;
                                 }
                             }
+
                             $ucode .= "if ( !@class_exists('".$clsname."', false) ) { return false; }".\PHP_EOL;
                         }
                     }
@@ -1284,8 +1363,10 @@ class Filesystem
         }
 
         $code = '<?php ';
-        $code .= "if ( !\defined('ABSPATH') ) { return false; }";
         if ($is_data) {
+            if (!empty($ucode) || false !== strpos($data, '\Nawawi\DocketCache\\')) {
+                $code .= "if ( !\defined('ABSPATH') ) { return false; }";
+            }
             $code .= \PHP_EOL;
             if (!empty($ucode)) {
                 $code .= $ucode;
@@ -1407,11 +1488,12 @@ class Filesystem
      */
     public function sanitize_precache_maxfile($maxfile)
     {
+        $default = 100;
         if (empty($maxfile) || (int) $maxfile < 1) {
-            return 0;
+            return $default;
         }
 
-        return $this->sanitize_maxfile($maxfile);
+        return $this->sanitize_maxfile($maxfile, $default);
     }
 
     /**
@@ -1460,6 +1542,7 @@ class Filesystem
         return $timestamp > 0;
     }
 
+    // put here because use in Becache.
     public function keys_alloptions()
     {
         // reference: wp-admin/includes/schema.php

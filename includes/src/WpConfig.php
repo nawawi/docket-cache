@@ -32,16 +32,18 @@ final class WpConfig
     private static function keys()
     {
         return [
-             'rtpostautosave' => 'AUTOSAVE_INTERVAL',
-             'rtpostrevision' => 'WP_POST_REVISIONS',
-             'rtpostemptytrash' => 'EMPTY_TRASH_DAYS',
-             'rtpluginthemeeditor' => 'DISALLOW_FILE_EDIT',
-             'rtpluginthemeinstall' => 'DISALLOW_FILE_MODS',
-             'rtimageoverwrite' => 'IMAGE_EDIT_OVERWRITE',
-             'rtwpdebug' => 'WP_DEBUG',
-             'rtwpdebugdisplay' => 'WP_DEBUG_DISPLAY',
-             'rtwpdebuglog' => 'WP_DEBUG_LOG',
-             'rtwpcoreupdate' => 'WP_AUTO_UPDATE_CORE',
+            'rtpostautosave' => 'AUTOSAVE_INTERVAL',
+            'rtpostrevision' => 'WP_POST_REVISIONS',
+            'rtpostemptytrash' => 'EMPTY_TRASH_DAYS',
+            'rtpluginthemeeditor' => 'DISALLOW_FILE_EDIT',
+            'rtpluginthemeinstall' => 'DISALLOW_FILE_MODS',
+            'rtimageoverwrite' => 'IMAGE_EDIT_OVERWRITE',
+            'rtwpdebug' => 'WP_DEBUG',
+            'rtwpdebugdisplay' => 'WP_DEBUG_DISPLAY',
+            'rtwpdebuglog' => 'WP_DEBUG_LOG',
+            'rtwpcoreupdate' => 'WP_AUTO_UPDATE_CORE',
+            'rtconcatenatescripts' => 'CONCATENATE_SCRIPTS',
+            'rtdisablewpcron' => 'DISABLE_WP_CRON',
          ];
     }
 
@@ -256,7 +258,7 @@ final class WpConfig
 
     public static function has($name)
     {
-        if (!empty($GLOBALS[nwdcx_constfx($name.'_false')])) {
+        if (!empty($GLOBALS['DOCKET_CACHE_RUNTIME'][nwdcx_constfx($name.'_false')])) {
             return true;
         }
 
@@ -316,12 +318,20 @@ final class WpConfig
             'configpath' => self::canopt()->path,
         ];
 
-        $cons = '';
+        $cons = "\$GLOBALS['DOCKET_CACHE_RUNTIME'] = [];".\PHP_EOL;
         $keys = self::keys();
         foreach ($keys as $k => $v) {
             $ka = nwdcx_constfx($k);
             if (!empty($config[$ka])) {
                 $val = $config[$ka];
+
+                // inverse
+                switch ($k) {
+                    case 'rtconcatenatescripts':
+                        $val = 'on' === $val ? 'off' : 'on';
+                        break;
+                }
+
                 if ('default' === $val) {
                     continue;
                 }
@@ -338,7 +348,7 @@ final class WpConfig
                     }
                 }
 
-                $cons .= "if(!defined('".$v."')){define('".$v."', ".$val.");}else{\$GLOBALS['".$ka."_FALSE']=1;}".\PHP_EOL;
+                $cons .= "if(!defined('".$v."')){define('".$v."', ".$val.");}else{\$GLOBALS['DOCKET_CACHE_RUNTIME']['".$ka."_FALSE']=1;}".\PHP_EOL;
             }
         }
 

@@ -203,7 +203,7 @@ final class Resc
         $message .= '<br><br><textarea rows="15" onclick="this.select();document.execCommand(\'copy\');" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly>'.$code.'</textarea>';
 
         if (WpConfig::is_writable() && !$is_bedrock) {
-            $message .= '<br>'.$text4.'<br><a href="'.$action.'" class="button button-primary btx-bti btx-spinner">'.esc_html__('Install', 'docket-cache').'</a>';
+            $message .= '<br>'.$text4.'<br><a href="'.$action.'" class="button button-primary btx-bti btx-spinner" style="margin-right:6px;">'.esc_html__('Install', 'docket-cache').'</a>';
             if ($is_remove && $is_adr) {
                 $message .= '<a href="'.$is_adr.'" class="button button-secondary btx-btu btx-spinner">'.esc_html__('Un-Install', 'docket-cache').'</a>';
             }

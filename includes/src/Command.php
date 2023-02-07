@@ -24,7 +24,30 @@ class Command extends WP_CLI_Command
 
     public function __construct(Plugin $pt)
     {
+        if (empty($_SERVER['HTTP_HOST'])) {
+            $_SERVER['HTTP_HOST'] = wp_parse_url(site_url(), \PHP_URL_HOST);
+        }
+
         $this->pt = $pt;
+    }
+
+    private function print_stdout($text, $nl = true)
+    {
+        if (!empty($_SERVER['argv']) && \in_array('--quiet', $_SERVER['argv'])) {
+            return;
+        }
+        fwrite(\STDOUT, $text.($nl ? "\n" : ''));
+    }
+
+    private function clear_line()
+    {
+        $this->print_stdout("\r".str_repeat(' ', 100)."\r", false);
+    }
+
+    private function halt_warning($warning)
+    {
+        WP_CLI::warning($warning);
+        WP_CLI::halt(2);
     }
 
     private function halt_error($error)
@@ -41,7 +64,7 @@ class Command extends WP_CLI_Command
 
     private function halt_status($text, $status = 0)
     {
-        WP_CLI::line($text);
+        $this->print_stdout($text);
         WP_CLI::halt($status);
     }
 
@@ -68,7 +91,7 @@ class Command extends WP_CLI_Command
     {
         $info = (object) $this->pt->get_info();
         if (2 === $info->status_code) {
-            WP_CLI::line($this->title('Cache Status').$this->status_color($info->status_code, $info->status_text));
+            $this->print_stdout($this->title('Cache Status').$this->status_color($info->status_code, $info->status_text));
             unset($info);
             WP_CLI::halt(1);
         }
@@ -87,12 +110,14 @@ class Command extends WP_CLI_Command
         $info = (object) $this->pt->get_info();
         $halt = $info->status_code ? 0 : 1;
 
-        WP_CLI::line($this->title('Cache Status').$this->status_color($info->status_code, $info->status_text));
-        WP_CLI::line($this->title('Cache Path').$info->cache_path);
+        $line = str_repeat('-', 15).':'.str_repeat('-', \strlen($info->cache_path) + 2);
+        $this->print_stdout($line);
+        $this->print_stdout($this->title('Cache Status').$this->status_color($info->status_code, $info->status_text));
+        $this->print_stdout($this->title('Cache Path').$info->cache_path);
         if ($this->pt->cf()->is_dctrue('STATS')) {
-            WP_CLI::line($this->title('Cache Size').$info->cache_size);
+            $this->print_stdout($this->title('Cache Size').$info->cache_size);
         }
-
+        $this->print_stdout($line);
         unset($info);
 
         WP_CLI::halt($halt);
@@ -190,12 +215,14 @@ class Command extends WP_CLI_Command
      */
     public function flush_cache()
     {
-        WP_CLI::line(__('Flushing cache. Please wait..', 'docket-cache'));
+        $this->print_stdout(__('Flushing cache. Please wait..', 'docket-cache'), false);
         sleep(1);
 
         $is_timeout = false;
 
         $total = $this->pt->flush_cache(true, $is_timeout);
+
+        $this->clear_line();
 
         $this->pt->cx()->undelay();
 
@@ -242,9 +269,13 @@ class Command extends WP_CLI_Command
      */
     public function reset_cron()
     {
-        WP_CLI::line(__('Resetting cron event. Please wait..', 'docket-cache'));
+        $this->print_stdout(__('Resetting cron event. Please wait..', 'docket-cache'), false);
+
         ( new Event($this->pt) )->reset();
         sleep(1);
+
+        $this->clear_line();
+
         WP_CLI::runcommand('cron event list');
         $this->halt_success(__('Cron event has been reset.', 'docket-cache'));
     }
@@ -263,7 +294,7 @@ class Command extends WP_CLI_Command
     public function runtime_remove()
     {
         if (WpConfig::is_bedrock()) {
-            WP_CLI::line(__('This command does not support Bedrock. Please manually remove the runtime code.', 'docket-cache'));
+            $this->print_stdout(__('This command does not support Bedrock. Please manually remove the runtime code.', 'docket-cache'));
             WP_CLI::halt(1);
         }
 
@@ -287,7 +318,7 @@ class Command extends WP_CLI_Command
     public function runtime_install()
     {
         if (WpConfig::is_bedrock()) {
-            WP_CLI::line(__('This command does not support Bedrock. Please manually install the runtime code.', 'docket-cache'));
+            $this->print_stdout(__('This command does not support Bedrock. Please manually install the runtime code.', 'docket-cache'));
             WP_CLI::halt(1);
         }
 
@@ -310,13 +341,15 @@ class Command extends WP_CLI_Command
      */
     public function flush_precache()
     {
-        if (!\function_exists('wp_cache_flush_group')) {
-            $this->halt_error(__('Precache could not be flushed.', 'docket-cache'));
+        if (!\function_exists('wp_cache_flush_group') || !method_exists('WP_Object_Cache', 'dc_remove_group')) {
+            $this->halt_error(__('Object Precache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache'));
         }
 
-        WP_CLI::line(__('Flushing precache. Please wait..', 'docket-cache'));
+        $this->print_stdout(__('Flushing precache. Please wait..', 'docket-cache'), false);
         sleep(1);
-        $total = wp_cache_flush_group('docketcache-precache');
+
+        $total = wp_cache_flush_group(['docketcache-precache', 'docketcache-precache-gc']);
+        $this->clear_line();
 
         /* translators: %d = count */
         $this->halt_success(sprintf(__('The precache was flushed. Total cache flushed: %d', 'docket-cache'), $total));
@@ -335,14 +368,15 @@ class Command extends WP_CLI_Command
      */
     public function flush_transient()
     {
-        if (!\function_exists('wp_cache_flush_group')) {
-            $this->halt_error(__('Transient could not be flushed.', 'docket-cache'));
+        if (!\function_exists('wp_cache_flush_group') || !method_exists('WP_Object_Cache', 'dc_remove_group')) {
+            $this->halt_error(__('Transient could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache'));
         }
 
-        WP_CLI::line(__('Flushing transient. Please wait..', 'docket-cache'));
+        $this->print_stdout(__('Flushing transient. Please wait..', 'docket-cache'), false);
         sleep(1);
 
         $total = wp_cache_flush_group(['transient', 'site-transient']);
+        $this->clear_line();
 
         /* translators: %d = couint */
         $this->halt_success(sprintf(__('The transient was flushed. Total cache flushed: %d', 'docket-cache'), $total));
@@ -361,13 +395,15 @@ class Command extends WP_CLI_Command
      */
     public function flush_advcpost()
     {
-        if (!\function_exists('wp_cache_flush_group_match')) {
-            $this->halt_error(__('Advanced Post Cache could not be flushed.', 'docket-cache'));
+        if (!\function_exists('wp_cache_flush_group_match') || !method_exists('WP_Object_Cache', 'dc_remove_group')) {
+            $this->halt_error(__('Advanced Post Cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache'));
         }
 
-        WP_CLI::line(__('Flushing Advanced Post Cache. Please wait..', 'docket-cache'));
+        $this->print_stdout(__('Flushing Advanced Post Cache. Please wait..', 'docket-cache'), false);
         sleep(1);
         $total = wp_cache_flush_group_match('docketcache-post');
+
+        $this->clear_line();
 
         /* translators: %d = count */
         $this->halt_success(sprintf(__('The Advanced Post Cache was flushed. Total cache flushed: %d', 'docket-cache'), $total));
@@ -386,13 +422,15 @@ class Command extends WP_CLI_Command
      */
     public function flush_menucache()
     {
-        if (!\function_exists('wp_cache_flush_group')) {
-            $this->halt_error(__('Menu Cache could not be flushed.', 'docket-cache'));
+        if (!\function_exists('wp_cache_flush_group') || !method_exists('WP_Object_Cache', 'dc_remove_group')) {
+            $this->halt_error(__('Menu Cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache'));
         }
 
-        WP_CLI::line(__('Flushing Menu Cache. Please wait..', 'docket-cache'));
+        $this->print_stdout(__('Flushing Menu Cache. Please wait..', 'docket-cache'), false);
         sleep(1);
         $total = wp_cache_flush_group('docketcache-menu');
+
+        $this->clear_line();
 
         /* translators: %d = count */
         $this->halt_success(sprintf(__('The Menu Cache was flushed. Total cache flushed: %d', 'docket-cache'), $total));
@@ -411,13 +449,15 @@ class Command extends WP_CLI_Command
      */
     public function flush_mocache()
     {
-        if (!\function_exists('wp_cache_flush_group')) {
-            $this->halt_error(__('Translation Cache could not be flushed.', 'docket-cache'));
+        if (!\function_exists('wp_cache_flush_group') || !method_exists('WP_Object_Cache', 'dc_remove_group')) {
+            $this->halt_error(__('Translation Cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache'));
         }
 
-        WP_CLI::line(__('Flushing Translation Cache. Please wait..', 'docket-cache'));
+        $this->print_stdout(__('Flushing Translation Cache. Please wait..', 'docket-cache'), false);
         sleep(1);
         $total = wp_cache_flush_group('docketcache-mo');
+
+        $this->clear_line();
 
         /* translators: %d = count */
         $this->halt_success(sprintf(__('The Translation Cache was flushed. Total cache flushed: %d', 'docket-cache'), $total));
@@ -436,9 +476,13 @@ class Command extends WP_CLI_Command
      */
     public function run_cron()
     {
-        WP_CLI::line(__('Executing the cron event. Please wait..', 'docket-cache'));
+        $this->print_stdout(__('Executing the cron event. Please wait..', 'docket-cache'), false);
         sleep(1);
+
+        $this->clear_line();
+
         WP_CLI::runcommand('cron event run --all');
+        WP_CLI::runcommand('cron event list');
     }
 
     /**
@@ -454,14 +498,49 @@ class Command extends WP_CLI_Command
      */
     public function run_stats()
     {
-        WP_CLI::line(__('Executing the cache stats. Please wait..', 'docket-cache'));
+        $this->print_stdout(__('Executing the cache stats. Please wait..', 'docket-cache'), false);
         sleep(1);
+
         $pad = 15;
         $stats = $this->pt->get_cache_stats(true);
-        WP_CLI::line($this->title(__('Object size', 'docket-cache'), $pad).$this->pt->normalize_size($stats->size));
-        WP_CLI::line($this->title(__('File size', 'docket-cache'), $pad).$this->pt->normalize_size($stats->filesize));
-        WP_CLI::line($this->title(__('Total file', 'docket-cache'), $pad).$stats->files);
+
+        $this->clear_line();
+
+        $padr = 10;
+        if (\strlen($stats->files) > 10) {
+            $padr = \strlen($stats->files);
+        }
+
+        $line = str_repeat('-', $pad).':'.str_repeat('-', $padr);
+        $this->print_stdout($line);
+        $this->print_stdout($this->title(__('Object size', 'docket-cache'), $pad).$this->pt->normalize_size($stats->size));
+        $this->print_stdout($this->title(__('File size', 'docket-cache'), $pad).$this->pt->normalize_size($stats->filesize));
+        $this->print_stdout($this->title(__('Total file', 'docket-cache'), $pad).$stats->files);
+        $this->print_stdout($line);
         $this->halt_success(__('Executing the cache stats completed.', 'docket-cache'));
+    }
+
+    /**
+     * Runs the Docket Cache Optimizedb.
+     *
+     * Optimize DB.
+     *
+     * ## EXAMPLES
+     *
+     *  wp cache run:optimizedb
+     *
+     * @subcommand run:stats
+     */
+    public function run_optimizedb()
+    {
+        $this->print_stdout(__('Executing the optimizedb. Please wait..', 'docket-cache'), false);
+        sleep(1);
+
+        ( new Event($this->pt) )->optimizedb();
+
+        $this->clear_line();
+
+        $this->halt_success(__('Executing the optimizedb completed.', 'docket-cache'));
     }
 
     /**
@@ -477,42 +556,45 @@ class Command extends WP_CLI_Command
      */
     public function run_gc()
     {
-        if (!has_filter('docketcache/filter/garbagecollector')) {
-            $this->halt_error(__('Garbage collector not available.', 'docket-cache'));
-        }
-
-        WP_CLI::line(__('Executing the garbage collector. Please wait..', 'docket-cache'));
+        $this->print_stdout(__('Executing the garbage collector. Please wait..', 'docket-cache'), false);
         sleep(1);
 
         $pad = 35;
-        $collect = apply_filters('docketcache/filter/garbagecollector', true);
+        $collect = ( new Event($this->pt) )->garbage_collector(true);
 
-        WP_CLI::line(str_repeat('-', $pad).':'.str_repeat('-', 10));
-        WP_CLI::line($this->title(__('Cache MaxTTL', 'docket-cache'), $pad).$collect->cache_maxttl);
-        WP_CLI::line($this->title(__('Cache File Limit', 'docket-cache'), $pad).$collect->cache_maxfile);
-        WP_CLI::line($this->title(__('Cache Disk Limit', 'docket-cache'), $pad).$this->pt->normalize_size($collect->cache_maxdisk));
-        WP_CLI::line(str_repeat('-', $pad).':'.str_repeat('-', 10));
-        WP_CLI::line($this->title(__('Cleanup Cache MaxTTL', 'docket-cache'), $pad).$collect->cleanup_maxttl);
-        WP_CLI::line($this->title(__('Cleanup Cache File Limit', 'docket-cache'), $pad).$collect->cleanup_maxfile);
-        WP_CLI::line($this->title(__('Cleanup Cache Disk Limit', 'docket-cache'), $pad).$collect->cleanup_maxdisk);
+        $this->clear_line();
+
+        if ($collect->is_locked) {
+            $this->halt_warning(__('Process locked. The garbage collector is in process. Try again in a few seconds.', 'docket-cache'));
+        }
+
+        $line = str_repeat('-', $pad).':'.str_repeat('-', 10);
+        $this->print_stdout($line);
+        $this->print_stdout($this->title(__('Cache MaxTTL', 'docket-cache'), $pad).$collect->cache_maxttl);
+        $this->print_stdout($this->title(__('Cache File Limit', 'docket-cache'), $pad).$collect->cache_maxfile);
+        $this->print_stdout($this->title(__('Cache Disk Limit', 'docket-cache'), $pad).$this->pt->normalize_size($collect->cache_maxdisk));
+        $this->print_stdout($line);
+        $this->print_stdout($this->title(__('Cleanup Cache MaxTTL', 'docket-cache'), $pad).$collect->cleanup_maxttl);
+        $this->print_stdout($this->title(__('Cleanup Cache File Limit', 'docket-cache'), $pad).$collect->cleanup_maxfile);
+        $this->print_stdout($this->title(__('Cleanup Cache Disk Limit', 'docket-cache'), $pad).$collect->cleanup_maxdisk);
 
         if ($collect->cleanup_expire > 0) {
-            WP_CLI::line($this->title(__('Cleanup Cache Expire', 'docket-cache'), $pad).$collect->cleanup_expire);
+            $this->print_stdout($this->title(__('Cleanup Cache Expire', 'docket-cache'), $pad).$collect->cleanup_expire);
         }
 
         if ($this->pt->get_precache_maxfile() > 0 && $collect->cleanup_precache_maxfile > 0) {
-            WP_CLI::line($this->title(__('Cleanup Precache Limit', 'docket-cache'), $pad).$collect->cleanup_precache_maxfile);
+            $this->print_stdout($this->title(__('Cleanup Precache Limit', 'docket-cache'), $pad).$collect->cleanup_precache_maxfile);
         }
 
         if ($this->pt->cf()->is_dctrue('FLUSH_STALECACHE') && $collect->cleanup_stalecache > 0) {
-            WP_CLI::line($this->title(__('Cleanup Stale Cache', 'docket-cache'), $pad).$collect->cleanup_stalecache);
+            $this->print_stdout($this->title(__('Cleanup Stale Cache', 'docket-cache'), $pad).$collect->cleanup_stalecache);
         }
 
-        WP_CLI::line(str_repeat('-', $pad).':'.str_repeat('-', 10));
-        WP_CLI::line($this->title(__('Total Cache Cleanup', 'docket-cache'), $pad).$collect->cache_cleanup);
-        WP_CLI::line($this->title(__('Total Cache Ignored', 'docket-cache'), $pad).$collect->cache_ignore);
-        WP_CLI::line($this->title(__('Total Cache File', 'docket-cache'), $pad).$collect->cache_file);
-        WP_CLI::line(str_repeat('-', $pad).':'.str_repeat('-', 10));
+        $this->print_stdout($line);
+        $this->print_stdout($this->title(__('Total Cache Cleanup', 'docket-cache'), $pad).$collect->cache_cleanup);
+        $this->print_stdout($this->title(__('Total Cache Ignored', 'docket-cache'), $pad).$collect->cache_ignore);
+        $this->print_stdout($this->title(__('Total Cache File', 'docket-cache'), $pad).$collect->cache_file);
+        $this->print_stdout($line);
         $this->halt_success(__('Executing the garbage collector completed.', 'docket-cache'));
     }
 

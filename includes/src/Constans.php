@@ -149,6 +149,12 @@ final class Constans
             return @\define($name, $value);
         }
 
+        // mark defined constants
+        if (empty($GLOBALS['DOCKET_CACHE_RUNTIME'])) {
+            $GLOBALS['DOCKET_CACHE_RUNTIME'] = [];
+        }
+        $GLOBAL['DOCKET_CACHE_RUNTIME'][$this->px($name.'_FALSE')] = 1;
+
         return false;
     }
 
@@ -165,7 +171,7 @@ final class Constans
         // cache dir
         $this->maybe_define($this->px('PATH'), DOCKET_CACHE_CONTENT_PATH.'/cache/docket-cache/', false);
 
-        // cache file max size: 3MB, 1MB = 1048576 bytes (binary) = 1000000 bytes (decimal)
+        // object max size: 3MB, 1MB = 1048576 bytes (binary) = 1000000 bytes (decimal)
         // Only numbers between 1000000 and 10485760 are accepted
         $this->maybe_define($this->px('MAXSIZE'), 3145728);
 
@@ -175,6 +181,9 @@ final class Constans
 
         // cache file max accelerated files: Only numbers between 200 and 200000 are accepted
         $this->maybe_define($this->px('MAXFILE'), 50000);
+
+        // check cache file limit in real-time
+        $this->maybe_define($this->px('MAXFILE_LIVECHECK'), false);
 
         // cache maxttl: cache lifespan.  Only seconds between 86400 and 2419200 are accepted
         $this->maybe_define($this->px('MAXTTL'), 345600); // 4d
@@ -203,11 +212,17 @@ final class Constans
         // flush cache when deactivate/uninstall
         $this->maybe_define($this->px('FLUSH_SHUTDOWN'), true);
 
-        // flush wc_cache / advanced post cache stale cache
+        // flush wc_cache / advanced post cache / wp stale cache
         $this->maybe_define($this->px('FLUSH_STALECACHE'), false);
 
         // split a cache file into smaller directory
         $this->maybe_define($this->px('CHUNKCACHEDIR'), false);
+
+        // ignore stale cache
+        $this->maybe_define($this->px('STALECACHE_IGNORE'), false);
+
+        // ignore empty cache
+        $this->maybe_define($this->px('EMPTYCACHE_IGNORE'), false);
 
         // optimize db
         $this->maybe_define($this->px('CRONOPTMZDB'), 'never');
@@ -215,7 +230,7 @@ final class Constans
         // option autoload
         $this->maybe_define($this->px('WPOPTALOAD'), false);
 
-        // global cache group
+        // global cache group for multisite
         $this->maybe_define(
             $this->px('GLOBAL_GROUPS'),
             [
@@ -255,6 +270,10 @@ final class Constans
         $this->maybe_define($this->px('IGNORED_KEYS'), ['dnh_dismissed_notices']);
 
         // @private
+        // cache ignored group => key, group => [key1, key2]
+        $this->maybe_define($this->px('IGNORED_GROUPKEY'), []);
+
+        // @private
         // this option private for right now
         $this->maybe_define(
             $this->px('FILTERED_GROUPS'),
@@ -266,30 +285,36 @@ final class Constans
             ]
         );
 
-        // @private
-        // cache ignored group:key
-        $this->maybe_define($this->px('IGNORED_GROUPKEY'), []);
-
         // precache
         $this->maybe_define($this->px('PRECACHE'), false);
 
-        // precache maxfile: < 1, false, null = unlimited
-        $this->maybe_define($this->px('PRECACHE_MAXFILE'), 1000);
+        // precache maxfile
+        $this->maybe_define($this->px('PRECACHE_MAXFILE'), 100);
 
-        // precache maxlist
-        $this->maybe_define($this->px('PRECACHE_MAXLIST'), 1000);
+        // precache max key
+        $this->maybe_define($this->px('PRECACHE_MAXKEY'), 20);
+
+        // precache max group
+        $this->maybe_define($this->px('PRECACHE_MAXGROUP'), 20);
 
         // @private
         // cache ignored precache
         $this->maybe_define(
             $this->px('IGNORED_PRECACHE'),
             [
-                'freemius:fs_accounts',
-                'options:uninstall_plugins',
-                'options:active_plugins',
-                'options:cron',
-                'options:litespeed_messages',
-                'options:litespeed.admin_display.messages',
+                'freemius' => 'fs_accounts',
+                'options' => [
+                    'uninstall_plugins',
+                    'auto_update_plugins',
+                    'active_plugins',
+                    'cron',
+                    'litespeed_messages',
+                    'litespeed.admin_display.messages',
+                ],
+                'site-options' => [
+                    '1:auto_update_plugins',
+                    '1:active_sitewide_plugins',
+                ],
             ]
         );
 
@@ -324,7 +349,25 @@ final class Constans
         $this->maybe_define($this->px('ADVCPOST'), false);
 
         // advanced post cache allow post type
-        $this->maybe_define($this->px('ADVCPOST_POSTTYPE'), ['post', 'page', 'attachment']);
+        $this->maybe_define(
+            $this->px('ADVCPOST_POSTTYPE'),
+            [
+                'post',
+                'page',
+                'attachment',
+                'revision',
+                'nav_menu_item',
+                'custom_css',
+                'customize_changeset',
+                'oembed_cache',
+                'user_request',
+                'wp_block',
+                'wp_template',
+                'wp_template_part',
+                'wp_global_styles',
+                'wp_navigation',
+            ]
+        );
 
         // advanced post cache allow all post type
         $this->maybe_define($this->px('ADVCPOST_POSTTYPE_ALL'), false);
@@ -375,8 +418,11 @@ final class Constans
         // check version
         $this->maybe_define($this->px('CHECKVERSION'), false);
 
-        // auto update
-        $this->maybe_define($this->px('AUTOUPDATE'), false);
+        // / @private: auto update
+        // 28012023: DOCKET_CACHE_AUTOUPDATE only to force WP auto_update_plugin filter.
+        //           DOCKET_CACHE_AUTOUPDATE_TOGGLE will sync with WP auto_update_plugins option.
+        // $this->maybe_define($this->px('AUTOUPDATE'), false);
+        $this->maybe_define($this->px('AUTOUPDATE_TOGGLE'), false);
 
         // flush opcache when deactivate
         $this->maybe_define($this->px('OPCSHUTDOWN'), false);
@@ -467,6 +513,12 @@ final class Constans
 
         // @private: deactivate wp auto update core.
         $this->maybe_define($this->px('RTWPCOREUPDATE'), \defined('WP_AUTO_UPDATE_CORE') && WP_AUTO_UPDATE_CORE ? 'off' : 'on');
+
+        // @private: deactivate concatenate wp-admin scripts.
+        $this->maybe_define($this->px('RTCONCATENATESCRIPTS'), \defined('CONCATENATE_SCRIPTS') && !(bool) CONCATENATE_SCRIPTS ? 'on' : 'off');
+
+        // @private: deactivate wp cron.
+        $this->maybe_define($this->px('RTDISABLEWPCRON'), \defined('DISABLE_WP_CRON') && DISABLE_WP_CRON ? 'on' : 'off');
 
         // @private
         // capture fatal error rarely incase non-throwable
