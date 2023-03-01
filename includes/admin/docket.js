@@ -85,6 +85,12 @@
                         }
                     );
 
+                var close_notice = function() {
+                    $selector.find( 'div.is-dismissible' )
+                        .find( 'button.notice-dismiss' )
+                        .trigger( 'click' );
+                };
+
                 window.dospinner = false;
                 var spinner = function() {
                     if ( !window.dospinner ) {
@@ -170,6 +176,8 @@
                     .on(
                         'change.dc-select-config',
                         function() {
+                            close_notice();
+                            window.dospinner = true;
                             spinner();
                             var $self = $( this );
                             var link = $self.children( 'option:selected' )

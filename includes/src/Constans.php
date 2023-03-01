@@ -318,6 +318,19 @@ final class Constans
             ]
         );
 
+        // transient in DB.
+        $this->maybe_define($this->px('TRANSIENTDB'), false);
+
+        // exclude transient in DB.
+        $this->maybe_define($this->px('IGNORED_TRANSIENTDB'),
+            [
+                'doing_cron',
+                'update_plugins',
+                'update_themes',
+                'update_core',
+            ]
+        );
+
         // misc tweaks
         $this->maybe_define($this->px('MISC_TWEAKS'), true);
 
@@ -344,33 +357,6 @@ final class Constans
 
         // post missed schedule
         $this->maybe_define($this->px('POSTMISSEDSCHEDULE'), false);
-
-        // advanced post cache
-        $this->maybe_define($this->px('ADVCPOST'), false);
-
-        // advanced post cache allow post type
-        $this->maybe_define(
-            $this->px('ADVCPOST_POSTTYPE'),
-            [
-                'post',
-                'page',
-                'attachment',
-                'revision',
-                'nav_menu_item',
-                'custom_css',
-                'customize_changeset',
-                'oembed_cache',
-                'user_request',
-                'wp_block',
-                'wp_template',
-                'wp_template_part',
-                'wp_global_styles',
-                'wp_navigation',
-            ]
-        );
-
-        // advanced post cache allow all post type
-        $this->maybe_define($this->px('ADVCPOST_POSTTYPE_ALL'), false);
 
         // optimize term count
         $this->maybe_define($this->px('OPTERMCOUNT'), true);
@@ -430,6 +416,12 @@ final class Constans
         // optimize post query
         $this->maybe_define($this->px('OPTWPQUERY'), true);
 
+        // limit bulk edit
+        $this->maybe_define($this->px('LIMITBULKEDIT'), false);
+
+        // limit bulk edit bulk limit
+        $this->maybe_define($this->px('LIMITBULKEDIT_LIMIT'), 100);
+
         // xmlrpc pingbacks
         $this->maybe_define($this->px('PINGBACK'), true);
 
@@ -463,14 +455,14 @@ final class Constans
         // whitelist host from limit http request.
         $this->maybe_define($this->px('LIMITHTTPREQUEST_WHITELIST'), []/* ['feeds.feedburner.com'] */);
 
-        // curl "Expect" header performance tweak
-        $this->maybe_define($this->px('HTTPHEADERSEXPECT'), false);
-
         // wp browse-happy
         $this->maybe_define($this->px('WPBROWSEHAPPY'), false);
 
         // wp serve-happy
         $this->maybe_define($this->px('WPSERVEHAPPY'), false);
+
+        // post vis email
+        $this->maybe_define($this->px('POSTVIAEMAIL'), false);
 
         // cache http response from wp_remote_request.
         $this->maybe_define($this->px('CACHEHTTPRESPONSE'), false);
@@ -483,6 +475,43 @@ final class Constans
 
         // cache http exclude list.
         $this->maybe_define($this->px('CACHEHTTPRESPONS_EXCLUDE'), []);
+
+        // @compat: wp version < 6.1 || < 5.8
+        if (isset($GLOBALS['wp_version'])) {
+            if (version_compare($GLOBALS['wp_version'], '6.1', '<')) {
+                // advanced post cache
+                $this->maybe_define($this->px('ADVCPOST'), false);
+
+                // advanced post cache allow post type
+                $this->maybe_define(
+                    $this->px('ADVCPOST_POSTTYPE'),
+                    [
+                        'post',
+                        'page',
+                        'attachment',
+                        'revision',
+                        'nav_menu_item',
+                        'custom_css',
+                        'customize_changeset',
+                        'oembed_cache',
+                        'user_request',
+                        'wp_block',
+                        'wp_template',
+                        'wp_template_part',
+                        'wp_global_styles',
+                        'wp_navigation',
+                    ]
+                );
+
+                // advanced post cache allow all post type
+                $this->maybe_define($this->px('ADVCPOST_POSTTYPE_ALL'), false);
+            }
+
+            if (version_compare($GLOBALS['wp_version'], '5.8', '<')) {
+                // curl "Expect" header performance tweak
+                $this->maybe_define($this->px('HTTPHEADERSEXPECT'), false);
+            }
+        }
 
         // @private: auto save interval.
         $this->maybe_define($this->px('RTPOSTAUTOSAVE'), 1);

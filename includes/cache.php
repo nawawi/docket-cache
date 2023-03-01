@@ -43,6 +43,13 @@ class WP_Object_Cache
     public $cache_misses = 0;
 
     /**
+     * The amount of times the cached data was fetched from the cache file.
+     *
+     * @var int
+     */
+    public $persistent_cache_hits = 0;
+
+    /**
      * List of global cache groups.
      *
      * @var array
@@ -75,7 +82,7 @@ class WP_Object_Cache
      *
      * @var array
      */
-    protected $bypass_precache = [];
+    private $bypass_precache = [];
 
     /**
      * The blog prefix to prepend to keys in non-global groups.
@@ -232,6 +239,20 @@ class WP_Object_Cache
     private $ignore_emptycache = false;
 
     /**
+     * Store Transients in DB.
+     *
+     * @var bool
+     */
+    private $use_transientdb = false;
+
+    /**
+     * List of transient exclude from store in DB.
+     *
+     * @var array
+     */
+    private $bypass_transientdb = [];
+
+    /**
      * Sets up object properties.
      */
     public function __construct()
@@ -269,12 +290,12 @@ class WP_Object_Cache
         $is_exists = !$force && !empty($this->cache) && isset($this->cache[$group]) && (isset($this->cache[$group][$key]) || \array_key_exists($key, $this->cache[$group]));
 
         if (!$is_exists && !$this->is_non_persistent_groups($group) && !$this->is_non_persistent_keys($key) && !$this->is_non_persistent_groupkey($group, $key) && !$this->is_stalecache_ignored($key, $group)) {
-            $data = $this->dc_get($key, $group, false);
+            $data = $this->dc_get($key, $group, false, $codestub_false);
             if (false !== $data) {
                 $is_exists = true;
                 $this->cache[$group][$key] = $data;
 
-                if ($this->is_precache && !$this->fs()->suspend_cache_write() && !$this->is_bypass_precache($group, $key)) {
+                if ($this->is_precache && !$codestub_false && !$this->fs()->suspend_cache_write() && !$this->is_bypass_precache($group, $key)) {
                     if (empty($this->precache[$group])) {
                         $this->precache[$group][$key] = 1;
                     } elseif (\count($this->precache[$group]) < $this->precache_maxkey && \count($this->precache) < $this->precache_maxgroup) {
@@ -461,7 +482,7 @@ class WP_Object_Cache
      *
      * @return mixed|false the cache contents on success, false on failure to retrieve contents
      */
-    public function get($key, $group = 'default', $force = false, &$found = null)
+    public function get($key, $group = 'default', $force = false, &$found = null, $doing_precache = false)
     {
         if (!$this->is_valid_key($key)) {
             return false;
@@ -474,6 +495,9 @@ class WP_Object_Cache
         $cache_key = $this->dc_key($key, $group);
 
         if ($this->_exists($cache_key, $group, $force)) {
+            if (!$doing_precache) {
+                ++$this->cache_hits;
+            }
             $found = true;
             if (\is_object($this->cache[$group][$cache_key])) {
                 return clone $this->cache[$group][$cache_key];
@@ -483,6 +507,9 @@ class WP_Object_Cache
         }
 
         $found = false;
+        if (!$doing_precache) {
+            ++$this->cache_misses;
+        }
 
         return false;
     }
@@ -535,10 +562,7 @@ class WP_Object_Cache
         unset($this->cache[$group][$key]);
         unset($this->precache[$group][$key]);
 
-        $this->dc_remove($key, $group);
-
-        // always true
-        return true;
+        return $this->dc_remove($key, $group);
     }
 
     /**
@@ -698,6 +722,7 @@ class WP_Object_Cache
         $ret = '';
         $ret .= '<p>';
         $ret .= "<strong>Cache Hits:</strong> {$this->cache_hits}<br />";
+        $ret .= "<strong>Persistent Cache Hits:</strong> {$this->persistent_cache_hits}<br />";
         $ret .= "<strong>Cache Misses:</strong> {$this->cache_misses}<br />";
         $ret .= '</p>';
         $ret .= '<ul>';
@@ -788,9 +813,9 @@ class WP_Object_Cache
      * @param bool $group cache group
      * @param bool $key   cache key
      */
-    protected function is_bypass_precache($group, $key)
+    private function is_bypass_precache($group, $key)
     {
-        if ($this->fs()->is_docketcachegroup($group, $key) || $this->fs()->is_transient($group) || $this->is_non_persistent_groups($group) || $this->is_non_persistent_keys($key) || $this->has_stalecache($key, $group)) {
+        if ($this->fs()->is_docketcachegroup($group, $key) || $this->fs()->is_transient($group) || $this->has_stalecache($key, $group)) {
             return true;
         }
 
@@ -901,14 +926,14 @@ class WP_Object_Cache
         $maxttl = $this->cache_maxttl;
 
         if (0 === $expire && $maxttl < 2419200) {
-            if (\in_array($group, ['site-transient', 'transient'])) {
+            if ($this->fs()->is_transient($group)) {
                 if ('site-transient' === $group && \in_array($key, ['update_plugins', 'update_themes', 'update_core', '_woocommerce_helper_updates'])) {
                     $expire = $maxttl < 2419200 ? 2419200 : $maxttl; // 28d
                 } else {
                     // $expire = $maxttl < 604800 ? 604800 : $maxttl; // 7d
                     $expire = $maxttl < 86400 ? $maxttl : 86400; // 1d
                 }
-            } elseif (\in_array($group, ['options', 'site-options'])) {
+            } elseif ($this->fs()->is_wp_options($group)) {
                 $expire = $maxttl < 1209600 ? 1209600 : $maxttl; // 14d
             } elseif (\in_array($group, ['terms', 'posts', 'post_meta', 'comments', 'comment_feed', 'sites', 'networks'])) {
                 $expire = $maxttl < 1209600 ? 1209600 : $maxttl; // 14d
@@ -1029,28 +1054,6 @@ class WP_Object_Cache
     }
 
     /**
-     * is_data_uptodate.
-     */
-    private function is_data_uptodate($key, $group, $data)
-    {
-        $file = $this->get_file_path($key, $group);
-        $data_p = $this->fs()->cache_get($file);
-        if (false === $data_p || !isset($data_p['data'])) {
-            return false;
-        }
-
-        $data_p = $data_p['data'];
-
-        if (\function_exists('nwdcx_arraysimilar') && nwdcx_arraysimilar($data_p, $data)) {
-            nwdcx_debuglog(__FUNCTION__.': '.$this->get_item_hash($file).' No data changes.');
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * has_stalecache.
      */
     private function has_stalecache($key, $group = '')
@@ -1107,6 +1110,19 @@ class WP_Object_Cache
         static $inst;
         if (!\is_object($inst)) {
             $inst = new Nawawi\DocketCache\Constans();
+        }
+
+        return $inst;
+    }
+
+    /**
+     * transientdb.
+     */
+    private function transient_db()
+    {
+        static $inst;
+        if (!\is_object($inst)) {
+            $inst = new Nawawi\DocketCache\TransientDb();
         }
 
         return $inst;
@@ -1204,9 +1220,16 @@ class WP_Object_Cache
      */
     private function dc_remove($key, $group)
     {
+        $result = true;
+        if ($this->use_transientdb && $this->fs()->is_transient($group)) {
+            $result = $this->transient_db()->delete($key, $group);
+        }
+
         $file = $this->get_file_path($key, $group);
         $this->fs()->unlink($file, false);
         $this->dc_log('del', $this->get_item_hash($file), $group.':'.$key);
+
+        return $result;
     }
 
     /**
@@ -1260,6 +1283,10 @@ class WP_Object_Cache
         }
 
         $this->fs()->suspend_cache_write(false);
+
+        if ($this->use_transientdb && $this->fs()->is_transient(explode(',', $group)) && \function_exists('nwdcx_cleanuptransient')) {
+            $total += nwdcx_cleanuptransient();
+        }
 
         return $total;
     }
@@ -1329,18 +1356,32 @@ class WP_Object_Cache
     /**
      * dc_get.
      */
-    private function dc_get($key, $group, $is_raw = false)
+    private function dc_get($key, $group, $is_raw = false, &$codestub_false = false)
     {
         $file = $this->get_file_path($key, $group);
         $logkey = $this->get_item_hash($file);
 
+        if ($this->use_transientdb && !\in_array($key, $this->bypass_transientdb)) {
+            if ($this->fs()->is_transient($group)) {
+                return $this->transient_db()->get($key, $group);
+            }
+
+            if ($this->fs()->is_wp_options($group) && $this->transient_db()->match_key($key)) {
+                return false;
+            }
+        }
+
         $data = $this->fs()->cache_get($file);
         if (false === $data) {
-            if (!$this->skip_stats($group)) {
+            if (!$this->skip_stats($group) && !$this->fs()->is_transient($group)) {
+                $this->dc_log('miss', $logkey, $group.':'.$key);
+            }
+
+            /*if (!$this->skip_stats($group) && !$this->fs()->is_transient($group)) {
                 ++$this->cache_misses;
 
                 $this->dc_log('miss', $logkey, $group.':'.$key);
-            }
+            }*/
 
             return false;
         }
@@ -1362,7 +1403,7 @@ class WP_Object_Cache
         }
 
         if (!$this->skip_stats($group)) {
-            ++$this->cache_hits;
+            ++$this->persistent_cache_hits;
             $this->dc_log('hit', $logkey, $group.':'.$key);
         }
 
@@ -1384,6 +1425,11 @@ class WP_Object_Cache
         }
         clearstatcache();
 
+        // skip precache.
+        if (isset($GLOBALS['DOCKET_CACHE_CODESTUB_FALSE']) && isset($GLOBALS['DOCKET_CACHE_CODESTUB_FALSE'][$file])) {
+            $codestub_false = true;
+        }
+
         return $is_raw ? $data : $data['data'];
     }
 
@@ -1395,17 +1441,7 @@ class WP_Object_Cache
         $logkey = $this->get_item_hash($file);
         $logpref = __FUNCTION__.'():';
 
-        // use (object) instead of VarExporter.
-        if (\PHP_VERSION_ID >= 70433 && \in_array($arr['type'], ['object', 'array'])) {
-            $arr_data = var_export($arr, true);
-            if (!empty($arr_data) && false != strpos($arr_data, '(object) array(') && false === strpos($arr_data, '::__set_state')) {
-                $data = $arr_data;
-            }
-        }
-
-        if (!isset($data)) {
-            $data = $this->fs()->export_var($arr, $error);
-        }
+        $data = $this->fs()->export_var($arr, $error);
 
         if (false === $data) {
             $this->dc_log('err', $logkey, $logpref.' Failed to export var -> '.$error);
@@ -1444,12 +1480,27 @@ class WP_Object_Cache
         $logkey = $this->item_hash($group).'-'.$this->item_hash($cache_key);
         $logpref = __FUNCTION__.'():';
 
-        // skip save to disk, return true;
-        /*if ('' === $data && $this->fs()->is_transient($group)) {
-            nwdcx_debuglog(__FUNCTION__.': '.$logkey.': Process aborted. No data availale.');
+        if ($this->use_transientdb && !\in_array($cache_key, $this->bypass_transientdb)) {
+            if ($this->fs()->is_transient($group)) {
+                if (!$expire) {
+                    $expire = 86400;
+                }
 
-            return true;
-        }*/
+                return $this->transient_db()->set($cache_key, $data, $group, time() + $expire);
+            }
+
+            if ($this->fs()->is_wp_options($group) && $this->transient_db()->match_key($cache_key)) {
+                return false;
+            }
+
+            if (\in_array($cache_key, ['notoptions', 'alloptions']) && \is_array($data) && !empty($data)) {
+                foreach ($data as $m => $n) {
+                    if ($this->transient_db()->match_key($m)) {
+                        unset($data[$m]);
+                    }
+                }
+            }
+        }
 
         if (!$this->fs()->mkdir_p($this->cache_path)) {
             return false;
@@ -1459,7 +1510,7 @@ class WP_Object_Cache
 
         $file = $this->get_file_path($cache_key, $group);
 
-        // skip save to disk, return true;
+        // Skip save to disk, return true.
         if (('' === $data || (\is_array($data) && empty($data))) && ($this->fs()->is_transient($group) || $this->ignore_emptycache)) {
             nwdcx_debuglog(__FUNCTION__.': '.$logkey.': Process aborted. No data availale.');
             $this->fs()->unlink($file, false);
@@ -1467,12 +1518,12 @@ class WP_Object_Cache
             return true;
         }
 
-        // chunk dir
+        // Chunk dir.
         if ($this->cf()->is_dctrue('CHUNKCACHEDIR', true) && !$this->fs()->mkdir_p(\dirname($file))) {
             return false;
         }
 
-        // if $expire is larger than 0, convert it to timestamp
+        // If $expire is larger than 0, convert it to timestamp.
         $timeout = ($expire > 0 ? time() + $expire : 0);
 
         $type = \gettype($data);
@@ -1480,8 +1531,26 @@ class WP_Object_Cache
             $data = '';
         }
 
-        // unserialize content
         if (!empty($data)) {
+            // Abort if object too large.
+            $len = 0;
+            $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+            if (\function_exists('maybe_serialize')) {
+                $len = \strlen(@maybe_serialize($data));
+            } else {
+                $len = \strlen(@serialize($data));
+            }
+            nwdcx_suppresserrors($nwdcx_suppresserrors);
+
+            if ($len >= $this->cache_maxsize) {
+                $this->dc_log('err', $logkey, $group.':'.$cache_key.' '.$logpref.' Object too large -> '.$len.'/'.$this->cache_maxsize);
+
+                nwdcx_debuglog(__FUNCTION__.': '.$logkey.': Process aborted. Object too large ('.$len.'/'.$this->cache_maxsize.')');
+
+                return false;
+            }
+
+            // Unserialize content first.
             if ('string' === $type) {
                 $data = nwdcx_unserialize($data);
             } elseif ('array' === $type) {
@@ -1494,22 +1563,6 @@ class WP_Object_Cache
             }
         }
 
-        // abort if object too large
-        $len = \strlen(serialize($data));
-        if ($len >= $this->cache_maxsize) {
-            $this->dc_log('err', $logkey, $group.':'.$cache_key.' '.$logpref.' Object too large -> '.$len.'/'.$this->cache_maxsize);
-
-            nwdcx_debuglog(__FUNCTION__.': '.$logkey.': Process aborted. Object too large ('.$len.'/'.$this->cache_maxsize.')');
-
-            return false;
-        }
-
-        // since timeout set to timestamp.
-        /*clearstatcache(true, $file);
-        if (0 === $expire && !empty($key) && @is_file($file) && $this->is_data_uptodate($key, $group, $data)) {
-            return false;
-        }*/
-
         $meta = [];
         $meta['timestamp'] = time();
 
@@ -1520,17 +1573,32 @@ class WP_Object_Cache
         $final_type = \gettype($data);
         if ('string' === $final_type && nwdcx_serialized($data)) {
             $final_type = 'string_serialize';
-        } elseif ('array' === $final_type && (!\defined('DOCKET_CACHE_USE_CLASSMAP') || !DOCKET_CACHE_USE_CLASSMAP)) {
-            // may lead to __PHP_Incomplete_Class
-            // headers => Requests_Utility_CaseInsensitiveDictionary Object
-            // headers =>   Requests_Utility_CaseInsensitiveDictionary Object
-            // if (!empty($data['headers']) && \is_object($data['headers']) && false !== strpos(var_export($data['headers'], 1), 'Requests_Utility_CaseInsensitiveDictionary::__set_state')) {
-            if (false !== strpos(var_export($data, 1), 'Requests_Utility_CaseInsensitiveDictionary::__set_state')) {
-                $data = @serialize($data);
-                if (nwdcx_serialized($data)) {
-                    $final_type = 'array_serialize';
+        } elseif ('array' === $final_type) {
+            // The Data needs to be serialized.
+            // The cache always returns false if the object has a class instance
+            // other than stdClass since the class has not been loaded yet.
+            $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+            $export_data = @var_export($data, 1);
+            if (!empty($export_data)) {
+                // 1st priority. If has the "Request" instance.
+                if (false !== strpos($export_data, 'Requests_Utility_CaseInsensitiveDictionary::__set_state')) {
+                    $data = @serialize($data);
+                    if (nwdcx_serialized($data)) {
+                        $final_type = 'array_serialize';
+                    }
+                }
+
+                // 2nd priority. If Transients and has class instance.
+                if ('array' === $final_type && $this->fs()->is_transient($group) && false !== strpos($export_data, '::__set_state')) {
+                    $data = @serialize($data);
+                    if (nwdcx_serialized($data)) {
+                        $final_type = 'array_serialize';
+                    }
                 }
             }
+            unset($export_data);
+            nwdcx_suppresserrors($nwdcx_suppresserrors);
+            // Pass to code_stub.
         }
 
         $meta['site_id'] = get_current_blog_id();
@@ -1538,14 +1606,14 @@ class WP_Object_Cache
         $meta['key'] = $cache_key;
         $meta['type'] = $final_type;
 
-        // if 0 let gc handle it by comparing file mtime
+        // If 0 let gc handle it by comparing file mtime
         // and maxttl constants.
         $meta['timeout'] = $timeout;
 
-        // final data
+        // Before code_stub.
         $meta['data'] = $data;
 
-        // only count new file.
+        // Only count new file.
         clearstatcache(true, $file);
         $has_cache_file = is_file($file);
         if (true === $this->dc_code($file, $meta)) {
@@ -1591,14 +1659,8 @@ class WP_Object_Cache
     private function dc_precache_load($hash)
     {
         static $is_done = false;
-        $logkey = $this->item_hash('docketcache-precache').'-'.$this->item_hash(__FUNCTION__);
-        $logpref = __FUNCTION__.'():';
 
         if ($is_done) {
-            if ($this->is_dev) {
-                $this->dc_log('debug', $logkey, $logpref.' Precache Ignored: Already loaded');
-            }
-
             return;
         }
 
@@ -1610,9 +1672,7 @@ class WP_Object_Cache
             return;
         }
 
-        if ($this->is_dev) {
-            $this->dc_log('debug', $logkey, $logpref.' Precache Load: Start');
-        }
+        nwdcx_debuglog(__FUNCTION__.': Process started.');
 
         $this->precache_loaded[$hash] = $keys;
 
@@ -1625,7 +1685,10 @@ class WP_Object_Cache
                     break 2;
                 }
 
-                if (!isset($cached[$cache_key.$cache_group]) && false !== $this->get($cache_key, $cache_group)) {
+                $force = false;
+                $found = false;
+                $doing_precache = true;
+                if (!isset($cached[$cache_key.$cache_group]) && false !== $this->get($cache_key, $cache_group, $force, $found, $doing_precache)) {
                     $cached[$cache_key.$cache_group] = 1;
                 }
 
@@ -1644,9 +1707,7 @@ class WP_Object_Cache
             }
         }
 
-        if ($this->is_dev) {
-            $this->dc_log('debug', $logkey, $logpref.' Precache Load: End -> '.\count($cached));
-        }
+        nwdcx_debuglog(__FUNCTION__.': Process ended. Loaded '.\count($cached));
 
         unset($keys, $cached);
         $is_done = true;
@@ -1750,9 +1811,6 @@ class WP_Object_Cache
             return;
         }
 
-        $logkey = $this->item_hash('docketcache-precache').'-'.$this->item_hash(__FUNCTION__);
-        $logpref = __FUNCTION__.'():';
-
         $req_uri = $_SERVER['REQUEST_URI'];
         $dostrip = !empty($_SERVER['QUERY_STRING']);
 
@@ -1766,14 +1824,10 @@ class WP_Object_Cache
         ];
 
         if ($dostrip && !empty($_GET) && array_intersect_key($intersect_key, $_GET)) {
-            $this->dc_log('info', $logkey, $logpref.' Bypass GET key');
-
             return;
         }
 
         if (false !== strpos($req_uri, '/wp-json/') || false !== strpos($req_uri, '/wp-admin/admin-ajax.php') || false !== strpos($req_uri, '/xmlrpc.php') || false !== strpos($req_uri, '/wp-cron.php') || false !== strpos($req_uri, '/robots.txt') || false !== strpos($req_uri, '/favicon.ico')) {
-            $this->dc_log('info', $logkey, $logpref.' Bypass Request');
-
             return;
         }
 
@@ -1813,11 +1867,10 @@ class WP_Object_Cache
      */
     public function dc_close()
     {
-        // $this->fs()->close_buffer();
         static $is_done = false;
 
         if (!$is_done) {
-            if ($this->is_precache && !empty($this->precache_hashkey) && !$this->fs()->suspend_cache_write() /* && $this->fs()->close_buffer() */) {
+            if ($this->is_precache && !empty($this->precache_hashkey) && !$this->fs()->suspend_cache_write()) {
                 $this->dc_precache_set($this->precache_hashkey);
             }
 
@@ -1868,6 +1921,13 @@ class WP_Object_Cache
 
         if ($this->cf()->is_dcarray('IGNORED_PRECACHE', $dcvalue)) {
             $this->bypass_precache = $dcvalue;
+        }
+
+        if (class_exists('Nawawi\\DocketCache\\TransientDb')) {
+            $this->use_transientdb = $this->cf()->is_dctrue('TRANSIENTDB');
+            if ($this->cf()->is_dcarray('IGNORED_TRANSIENTDB', $dcvalue)) {
+                $this->bypass_transientdb = $dcvalue;
+            }
         }
 
         $this->cache_path = $this->fs()->define_cache_path($this->cf()->dcvalue('PATH'));
@@ -1995,59 +2055,6 @@ class WP_Object_Cache
             );
         }
 
-        if ($this->cf()->is_dctrue('OPTWPQUERY')) {
-            add_action(
-                'pre_get_posts',
-                function (&$args) {
-                    if (\is_object($args)) {
-                        $args->no_found_rows = true;
-                        $args->order = 'ASC';
-                    } elseif (\is_array($args)) {
-                        $args['no_found_rows'] = true;
-                        $args['order'] = 'ASC';
-                    }
-                },
-                \PHP_INT_MIN
-            );
-
-            add_action(
-                'parse_query',
-                function (&$args) {
-                    if (\is_object($args)) {
-                        $args->no_found_rows = true;
-                        $args->order = 'ASC';
-                    } elseif (\is_array($args)) {
-                        $args['no_found_rows'] = true;
-                        $args['order'] = 'ASC';
-                    }
-                },
-                \PHP_INT_MIN
-            );
-
-            add_action(
-                'pre_get_users',
-                function ($wpq) {
-                    if (nwdcx_wpdb($wpdb) && !empty($wpq->query_vars['count_total'])) {
-                        $wpq->query_vars['count_total'] = false;
-                        $wpq->query_vars['nwdcx_count_total'] = true;
-                    }
-                },
-                \PHP_INT_MIN
-            );
-
-            add_action(
-                'pre_user_query',
-                function ($wpq) {
-                    if (nwdcx_wpdb($wpdb) && !empty($wpq->query_vars['nwdcx_count_total'])) {
-                        unset($wpq->query_vars['nwdcx_count_total']);
-                        $sql = "SELECT COUNT(*) {$wpq->query_from} {$wpq->query_where}";
-                        $wpq->total_users = $wpdb->get_var($sql);
-                    }
-                },
-                \PHP_INT_MIN
-            );
-        }
-
         // html comment
         $this->add_signature = false;
         if ($this->cf()->is_dctrue('SIGNATURE')) {
@@ -2066,7 +2073,6 @@ class WP_Object_Cache
                 function () {
                     if ($this->add_signature && !$this->is_user_logged_in()) {
                         echo apply_filters('docketcache/filter/signature/htmlfooter', "\n<!-- Performance optimized by Docket Cache: https://wordpress.org/plugins/docket-cache -->\n");
-                        // $this->fs()->close_buffer();
                     }
                 },
                 \PHP_INT_MAX

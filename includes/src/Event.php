@@ -565,7 +565,7 @@ final class Event
         // release
         $this->pt->suspend_cache_write(false);
 
-        if (\function_exists('nwdcx_cleanuptransient')) {
+        if ($this->pt->cf()->is_dcfalse('TRANSIENTDB') && \function_exists('nwdcx_cleanuptransient')) {
             nwdcx_cliverbose("run-gc: cleanup expired transients in DB\n");
             nwdcx_cleanuptransient();
         }
@@ -649,7 +649,7 @@ final class Event
             return false;
         }
 
-        if (\function_exists('nwdcx_cleanuptransient')) {
+        if ($this->pt->cf()->is_dcfalse('TRANSIENTDB') && \function_exists('nwdcx_cleanuptransient')) {
             nwdcx_cleanuptransient();
         } elseif (\function_exists('delete_expired_transients')) {
             delete_expired_transients(true);

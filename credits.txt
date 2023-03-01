@@ -1,17 +1,22 @@
 The portion of following projects has been used in Docket Cache. Thank you for all the great works!.
 List in alphabetical order:
 
-1) Advanced Post Cache
+1) EventList(): includes/src/EventList.php
+   - plugins/wp-crontrol/src/event-list-table.php
+   - plugins/wp-crontrol/src/event.php
+   - plugins/query-monitor/classes/Util.php
+
+1) LimitBulkedit(): includes/src/LimitBulkedit.php
+   https://github.com/Automattic/vip-go-mu-plugins/blob/develop/performance/bulk-edit.php
+
+2) PostCache(): includes/src/PostCache.php
    https://github.com/Automattic/vip-go-mu-plugins-built/blob/master/advanced-post-cache/advanced-post-cache.php.
 
-2) Lightweight Term Count Update
+3) Filesystem::export_var(): include/src/Filesystem.php
+   https://github.com/symfony/var-exporter
+
+4) TermCount(): includes/src/TermCount.php
    https://github.com/Automattic/lightweight-term-count-update.
 
-3) MonoDB
-   https://github.com/nawawi/MonoDB
-
-4) Software Testing Isometric Banner Functional Test
-   Designed by upklyak / Freepik -- http://www.freepik.com
-
-5) Symfony VarExporter Component
-   https://github.com/symfony/var-exporter
+--
+Updated: 26-Feb-2023

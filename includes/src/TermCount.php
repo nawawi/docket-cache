@@ -66,7 +66,7 @@ final class TermCount
         } elseif (\in_array(get_post_status($post), $this->counted_status, true)) {
             $this->quick_update_terms_count($object_id, $tt_ids, $taxonomy, $transition_type);
         } else {
-            clean_term_cache($tt_ids, $taxonomy, false);
+            clean_term_cache($tt_ids, '', false);
         }
     }
 
@@ -168,7 +168,7 @@ final class TermCount
                 }
             }
 
-            clean_term_cache($tt_ids, $taxonomy, false);
+            clean_term_cache($tt_ids, '', false);
         }
     }
 

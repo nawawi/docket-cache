@@ -1045,7 +1045,7 @@ final class Plugin extends Bepart
         $this->notice = '';
         $this->inruntime = false;
 
-        add_filter(
+        /*add_filter(
             'perflab_oc_site_status_available_object_cache_services',
             function ($services) {
                 $services[] = 'docket-cache';
@@ -1053,7 +1053,9 @@ final class Plugin extends Bepart
                 return $services;
             },
             \PHP_INT_MAX
-        );
+        );*/
+
+        add_filter('perflab_disable_object_cache_dropin', '__return_true');
     }
 
     /**
@@ -1081,8 +1083,6 @@ final class Plugin extends Bepart
         add_action(
             'shutdown',
             function () {
-                // $this->close_buffer();
-
                 if ($this->cf()->is_dcfalse('OBJECTCACHEOFF', true)) {
                     $this->cx()->install(true);
                     if (is_multisite()) {
@@ -1244,6 +1244,7 @@ final class Plugin extends Bepart
             );
         }
 
+        // low priority
         add_action(
             'plugins_loaded',
             function () {
@@ -1322,6 +1323,16 @@ final class Plugin extends Bepart
             4
         );
 
+        // fix index.
+        add_filter(
+            'pre_update_site_option_auto_update_plugins',
+            function ($value, $old_value, $option, $network_id) {
+                return array_values($value);
+            },
+            10,
+            4
+        );
+
         add_filter(
             'auto_update_plugin',
             function ($update, $item) {
@@ -1337,7 +1348,7 @@ final class Plugin extends Bepart
             2
         );
 
-        if (class_exists('Nawawi\\DocketCache\\CronAgent')) {
+        if ($this->cf()->is_dctrue('CRONBOT') && class_exists('Nawawi\\DocketCache\\CronAgent')) {
             ( new CronAgent($this) )->register();
         }
 
@@ -1660,7 +1671,8 @@ final class Plugin extends Bepart
                         if (isset($message)) {
                             echo Resc::boxmsg($message, 'warning', false, false, false);
                         }
-                    }
+                    },
+                    \PHP_INT_MAX
                 );
             },
             \PHP_INT_MAX
@@ -1696,6 +1708,31 @@ final class Plugin extends Bepart
             }
         );
 
+        add_filter(
+            'script_loader_tag',
+            function ($tag, $handle) {
+                if (\in_array($handle, ['docket-cache-core', 'docket-cache-worker', 'docket-cache-loader'])) {
+                    $tag = str_replace('<script ', '<script data-cfasync="false" data-noptimize="1" data-no-minify="1" ', $tag);
+                }
+
+                return $tag;
+            },
+            10,
+            2
+        );
+
+        add_filter(
+            'style_loader_tag',
+            function ($tag, $handle, $href, $media) {
+                if (\in_array($handle, ['docket-cache-core', 'docket-cache-loader'])) {
+                    $tag = str_replace('<link ', '<link data-noptimize="1" data-no-minify="1" ', $tag);
+                }
+
+                return $tag;
+            },
+            10,
+            4
+        );
         // refresh user_meta: after logout
         add_action(
             'wp_logout',
@@ -1869,12 +1906,8 @@ final class Plugin extends Bepart
                         add_action(
                             'shutdown',
                             function () {
-                                // $this->close_buffer();
-
-                                wp_cache_delete('alloptions', 'options');
                                 if (\function_exists('wp_cache_flush_group') && method_exists('WP_Object_Cache', 'dc_remove_group')) {
-                                    wp_cache_flush_group('options');
-                                    wp_cache_flush_group('docketcache-precache');
+                                    wp_cache_flush_group(['options', 'site-options', 'docketcache-precache', 'docketcache-precache-gc']);
                                 }
                             },
                             \PHP_INT_MAX
@@ -1890,8 +1923,6 @@ final class Plugin extends Bepart
                             'shutdown',
                             function () use ($action) {
                                 if (!$action) {
-                                    // $this->close_buffer();
-
                                     apply_filters('docketcache/filter/active/cronbot', $action);
                                 }
                             },
@@ -1917,6 +1948,21 @@ final class Plugin extends Bepart
                         } else {
                             $this->toggle_auto_update(false);
                         }
+                        break;
+                    case 'transientdb':
+                        add_action(
+                            'shutdown',
+                            function () {
+                                if (\function_exists('wp_cache_flush_group') && method_exists('WP_Object_Cache', 'dc_remove_group')) {
+                                    wp_cache_flush_group(['transient', 'site-transient', 'options', 'site-options']);
+                                }
+
+                                if (\function_exists('nwdcx_cleanuptransient')) {
+                                    nwdcx_cleanuptransient();
+                                }
+                            },
+                            \PHP_INT_MAX
+                        );
                         break;
                 }
 
@@ -2165,6 +2211,10 @@ final class Plugin extends Bepart
                 $tweaks->wpdashboardnews();
             }
 
+            if ($this->cf()->is_dctrue('POSTVIAEMAIL')) {
+                $tweaks->postviaemail();
+            }
+
             if ($this->cf()->is_dctrue('WPBROWSEHAPPY')) {
                 $tweaks->wpbrowsehappy();
             }
@@ -2190,7 +2240,6 @@ final class Plugin extends Bepart
                         if ($this->co()->lockproc('post_missed_schedule', time() + 180)) {
                             return false;
                         }
-                        // $this->close_buffer();
                         $tweaks->post_missed_schedule();
                         $this->co()->lockreset('post_missed_schedule');
                     },
@@ -2206,8 +2255,10 @@ final class Plugin extends Bepart
         // only if dropin exists
         if (wp_using_ext_object_cache()) {
             // wp_cache: advanced cache post
-            if ($this->cf()->is_dctrue('ADVCPOST') && class_exists('Nawawi\\DocketCache\\PostCache')) {
-                ( new PostCache() )->register();
+            if (version_compare($GLOBALS['wp_version'], '6.1', '<')) {
+                if ($this->cf()->is_dctrue('ADVCPOST') && class_exists('Nawawi\\DocketCache\\PostCache')) {
+                    ( new PostCache() )->register();
+                }
             }
 
             // wp_cache: translation mo file cache
@@ -2243,6 +2294,10 @@ final class Plugin extends Bepart
         if ($this->cf()->is_dctrue('OPTERMCOUNT') && class_exists('Nawawi\\DocketCache\\TermCount')) {
             ( new TermCount() )->register();
         }
+
+        if ($this->cf()->is_dctrue('LIMITBULKEDIT') && class_exists('Nawawi\\DocketCache\\LimitBulkedit')) {
+            ( new LimitBulkedit() )->register();
+        }
     }
 
     /**
@@ -2276,7 +2331,11 @@ final class Plugin extends Bepart
             \WP_CLI::add_command('cache run:optimizedb', [$cli, 'run_optimizedb']);
             \WP_CLI::add_command('cache reset:lock', [$cli, 'reset_lock']);
             \WP_CLI::add_command('cache reset:cron', [$cli, 'reset_cron']);
-            \WP_CLI::add_command('cache flush:advcpost', [$cli, 'flush_advcpost']);
+
+            if (version_compare($GLOBALS['wp_version'], '6.1', '<')) {
+                \WP_CLI::add_command('cache flush:advcpost', [$cli, 'flush_advcpost']);
+            }
+
             \WP_CLI::add_command('cache flush:precache', [$cli, 'flush_precache']);
             \WP_CLI::add_command('cache flush:menucache', [$cli, 'flush_menucache']);
             \WP_CLI::add_command('cache flush:mocache', [$cli, 'flush_mocache']);

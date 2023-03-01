@@ -15,6 +15,43 @@ namespace Nawawi\DocketCache;
 class Bepart extends Filesystem
 {
     /**
+     * is_request_from_theme_editor.
+     */
+    public function is_request_from_theme_editor()
+    {
+        if (!empty($_POST)) {
+            if (!empty($_POST['_wp_http_referer'])) {
+                $wp_referer = $_POST['_wp_http_referer'];
+                if ((false !== strpos($wp_referer, '/theme-editor.php?file=') || false !== strpos($wp_referer, '/plugin-editor.php?file=')) && (!empty($_POST['newcontent']) && false !== strpos($_POST['newcontent'], '<?php'))) {
+                    return true;
+                }
+            }
+
+            if (!empty($_POST['action']) && 'heartbeat' === $_POST['action'] && !empty($_POST['screen_id']) && ('theme-editor' === $_POST['screen_id'] || 'plugin-editor' === $_POST['screen_id'])) {
+                return true;
+            }
+        }
+
+        if (!empty($_GET) && !empty($_GET['wp_scrape_key']) && !empty($_GET['wp_scrape_nonce'])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * fastcgi_close.
+     */
+    public function fastcgi_close()
+    {
+        if (\function_exists('fastcgi_finish_request') && !$this->is_request_from_theme_editor()) {
+            return @fastcgi_finish_request();
+        }
+
+        return false;
+    }
+
+    /**
      * close_exit.
      */
     public function close_exit($msg = '')

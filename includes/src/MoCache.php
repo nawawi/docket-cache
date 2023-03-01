@@ -36,6 +36,10 @@ final class MoCache
         $cache_key = $domain.'-'.basename($this->mofile, '.mo');
         $cache_group = 'docketcache-mo';
 
+        if (\function_exists('wp_cache_add_global_groups')) {
+            wp_cache_add_global_groups($cache_group);
+        }
+
         $mtime = @filemtime($this->mofile);
         $cache = wp_cache_get($cache_key, $cache_group);
         if (false !== $cache && !empty($cache['data'])) {
@@ -80,7 +84,8 @@ final class MoCache
 
     private function text_key($args)
     {
-        return substr(md5(serialize([$args, $this->domain])), 0, 12);
+        // return substr(md5(serialize([$args, $this->domain])), 0, 12);
+        return md5(serialize([$args, $this->domain]));
     }
 
     private function get_translation($text_key, $text, $args)

@@ -83,8 +83,6 @@ final class Canopt extends Bepart
             'log_time' => esc_html__('Log Timestamp', 'docket-cache'),
             'log_all' => esc_html__('Log All', 'docket-cache'),
             'preload' => esc_html__('Admin Page Cache Preloading', 'docket-cache'),
-            'advcpost' => esc_html__('Advanced Post Caching', 'docket-cache'),
-            'advpost_posttype_all' => esc_html__('Post Caching Any Post Type', 'docket-cache'),
             'menucache' => esc_html__('WordPress Menu Caching', 'docket-cache'),
             'optermcount' => esc_html__('Optimize Term Count Queries', 'docket-cache'),
             'precache' => esc_html__('Object Cache Precaching', 'docket-cache'),
@@ -106,10 +104,10 @@ final class Canopt extends Bepart
             'stats' => esc_html__('Object Cache Data Stats', 'docket-cache'),
             'gcaction' => esc_html__('Garbage Collector Action Button', 'docket-cache'),
             'flushaction' => esc_html__('Additional Flush Cache Action Button', 'docket-cache'),
-            /* 'autoupdate' => esc_html__('Docket Cache Auto Update', 'docket-cache'), */
             'autoupdate_toggle' => esc_html__('Docket Cache Auto Update', 'docket-cache'),
             'checkversion' => esc_html__('Critical Version Checking', 'docket-cache'),
             'optwpquery' => esc_html__('Optimize WP Query', 'docket-cache'),
+            'limitbulkedit' => esc_html__('Limit Bulk Edit Actions', 'docket-cache'),
             'pingback' => esc_html__('Deactivate XML-RPC / Pingbacks', 'docket-cache'),
             'headerjunk' => esc_html__('Deactivate WP Header Junk', 'docket-cache'),
             'wpemoji' => esc_html__('Deactivate WP Emoji', 'docket-cache'),
@@ -121,6 +119,7 @@ final class Canopt extends Bepart
             'wpdashboardnews' => esc_html__('Deactivate WP Events & News Feed Dashboard', 'docket-cache'),
             'wpbrowsehappy' => esc_html__('Deactivate Browse Happy Checking', 'docket-cache'),
             'wpservehappy' => esc_html__('Deactivate Serve Happy Checking', 'docket-cache'),
+            'postviaemail' => esc_html__('Deactivate Post Via Email', 'docket-cache'),
             'objectcacheoff' => esc_html__('Suspend Object Cache', 'docket-cache'),
             'flush_shutdown' => esc_html__('Flush Object Cache During Deactivation', 'docket-cache'),
             'opcshutdown' => esc_html__('Flush OPcache During Deactivation', 'docket-cache'),
@@ -131,8 +130,8 @@ final class Canopt extends Bepart
             'flush_stalecache' => esc_html__('Auto Remove Stale Cache', 'docket-cache'),
             'stalecache_ignore' => esc_html__('Exclude Stale Cache', 'docket-cache'),
             'emptycache_ignore' => esc_html__('Exclude Empty Object Data', 'docket-cache'),
+            'transientdb' => esc_html__('Retain Transients in Db', 'docket-cache'),
             'limithttprequest' => esc_html__('Limit WP-Admin HTTP requests', 'docket-cache'),
-            'httpheadersexpect' => esc_html__('HTTP Request Expect header tweaks', 'docket-cache'),
             'rtpostautosave' => esc_html__('Auto Save Interval', 'docket-cache'),
             'rtpostrevision' => esc_html__('Post Revisions', 'docket-cache'),
             'rtpostemptytrash' => esc_html__('Trash Bin', 'docket-cache'),
@@ -146,6 +145,15 @@ final class Canopt extends Bepart
             'rtconcatenatescripts' => esc_html__('Deactivate Concatenate WP-Admin Scripts', 'docket-cache'),
             'rtdisablewpcron' => esc_html__('Deactivate WP Cron', 'docket-cache'),
         ];
+
+        if (version_compare($GLOBALS['wp_version'], '6.1', '<')) {
+            $data['advcpost'] = esc_html__('Advanced Post Caching', 'docket-cache');
+            $data['advpost_posttype_all'] = esc_html__('Post Caching Any Post Type', 'docket-cache');
+        }
+
+        if (version_compare($GLOBALS['wp_version'], '5.8', '<')) {
+            $data['httpheadersexpect'] = esc_html__('HTTP Request Expect header tweaks', 'docket-cache');
+        }
 
         $data = apply_filters('docketcache/filter/optionkeys', $data);
 
@@ -455,6 +463,8 @@ final class Canopt extends Bepart
                 }
             }
         }
+
+        clearstatcache(true);
 
         return $ok;
     }

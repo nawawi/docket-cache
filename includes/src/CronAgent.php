@@ -520,15 +520,7 @@ final class CronAgent
         }
 
         // only main site
-        if (!is_main_site()) {
-            return;
-        }
-
-        if ($this->is_ping_request()) {
-            return;
-        }
-
-        if ($this->pt->cf()->is_true('WP_IMPORTING')) {
+        if (!is_main_site() || $this->pt->cf()->is_true('WP_IMPORTING') || $this->pt->is_request_from_theme_editor() || $this->is_ping_request()) {
             return;
         }
 

@@ -17,55 +17,6 @@ use Nawawi\DocketCache\Exporter\VarExporter;
 class Filesystem
 {
     /**
-     * is_request_from_theme_editor.
-     */
-    public function is_request_from_theme_editor()
-    {
-        if (!empty($_POST)) {
-            if (!empty($_POST['_wp_http_referer'])) {
-                $wp_referer = $_POST['_wp_http_referer'];
-                if ((false !== strpos($wp_referer, '/theme-editor.php?file=') || false !== strpos($wp_referer, '/plugin-editor.php?file=')) && (!empty($_POST['newcontent']) && false !== strpos($_POST['newcontent'], '<?php'))) {
-                    return true;
-                }
-            }
-
-            if (!empty($_POST['action']) && 'heartbeat' === $_POST['action'] && !empty($_POST['screen_id']) && ('theme-editor' === $_POST['screen_id'] || 'plugin-editor' === $_POST['screen_id'])) {
-                return true;
-            }
-        }
-
-        if (!empty($_GET) && !empty($_GET['wp_scrape_key']) && !empty($_GET['wp_scrape_nonce'])) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * fastcgi_close.
-     */
-    public function fastcgi_close()
-    {
-        if (\function_exists('fastcgi_finish_request') && !$this->is_request_from_theme_editor()) {
-            return @fastcgi_finish_request();
-        }
-
-        return false;
-    }
-
-    /**
-     * close_buffer.
-     */
-    public function close_buffer()
-    {
-        if (!@ob_get_level() && $this->fastcgi_close()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * is_docketcachedir.
      */
     public function is_docketcachedir($path)
@@ -135,7 +86,23 @@ class Filesystem
      */
     public function is_transient($group)
     {
+        if (\is_array($group)) {
+            return \in_array($group, ['transient', 'site-transient']);
+        }
+
         return 'transient' === $group || 'site-transient' === $group;
+    }
+
+    /**
+     * is_wp_options.
+     */
+    public function is_wp_options($group)
+    {
+        if (\is_array($group)) {
+            return \in_array($group, ['options', 'site-options']);
+        }
+
+        return 'options' === $group || 'site-options' === $group;
     }
 
     /**
@@ -249,8 +216,14 @@ class Filesystem
         clearstatcache();
 
         $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
-
-        $ok = @chmod($file, $mode);
+        $ok = false;
+        try {
+            if (@is_file($file)) {
+                $ok = @chmod($file, $mode);
+            }
+        } catch (\Throwable $e) {
+            nwdcx_throwable(__METHOD__, $e);
+        }
 
         nwdcx_suppresserrors($nwdcx_suppresserrors);
 
@@ -389,15 +362,36 @@ class Filesystem
      */
     public function export_var($data, &$error = '')
     {
+        // 28022023, self-note to future me.
+        // We use native var_export to improve cache writing, since VarExporter::export will use preg_replace_callback on string types and
+        // ReflectionClass to resolve class instances. Cached data may look not pretty.
+        try {
+            if (version_compare(\PHP_VERSION, '7.3.0', '>=') && !empty($data['type']) && \in_array($data['type'], ['object', 'array', 'string', 'string_serialize', 'array_serialize', 'integer', 'boolean'])) {
+                $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+                $arr_data = @var_export($data, true);
+                nwdcx_suppresserrors($nwdcx_suppresserrors);
+                // Return exported data, if doesn't have a class instance.
+                if (!empty($arr_data) && false === strpos($arr_data, '::__set_state')) {
+                    return $arr_data;
+                }
+            }
+        } catch (\Throwable $e) {
+            nwdcx_throwable(__METHOD__, $e);
+        }
+
+        // If native var_export failed or not from cache.
         try {
             $data = VarExporter::export($data);
         } catch (\Throwable $e) {
             nwdcx_throwable(__METHOD__, $e);
             $error = $e->getMessage();
 
+            // php < 7.3
             if (false !== strpos($error, 'Cannot export value of type "stdClass"')) {
-                $data = var_export($data, 1);
+                $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+                $data = @var_export($data, true);
                 $data = str_replace('stdClass::__set_state', '(object)', $data);
+                nwdcx_suppresserrors($nwdcx_suppresserrors);
             } else {
                 $this->log('err', '000000000000-000000000000', 'export_var: '.$error);
 
@@ -421,6 +415,11 @@ class Filesystem
      */
     public function shutdown_cleanup($file, $seq = 10)
     {
+        // for dump().
+        if (empty($this->filesize($file))) {
+            return false;
+        }
+
         // dont use register_shutdown_function to avoid issue with page cache plugin
         add_action(
             'shutdown',
@@ -434,6 +433,8 @@ class Filesystem
             },
             $seq
         );
+
+        return true;
     }
 
     /**
@@ -949,8 +950,6 @@ class Filesystem
         add_action(
             'shutdown',
             function () {
-                // anything involve disk, don't go into background
-                // $this->close_buffer();
                 $this->opcache_reset();
             },
             \PHP_INT_MAX
@@ -1316,44 +1315,38 @@ class Filesystem
     {
         $is_debug = \defined('WP_DEBUG') && WP_DEBUG;
         $is_data = !empty($data);
-
-        $class_map = [
-            'Requests_Utility_CaseInsensitiveDictionary' => 'Requests/Utility/CaseInsensitiveDictionary.php',
-            'Requests_Response' => ' Requests/Response.php',
-            'Requests_Response_Headers' => 'Requests/Response/Headers.php',
-            'Requests_Cookie_Jar' => 'Requests/Cookie/Jar.php',
-            'WP_HTTP_Requests_Response' => 'class-wp-http-requests-response.php',
-            'WP_Post' => 'class-wp-post.php',
-        ];
+        $is_precache = nwdcx_construe('PRECACHE');
+        // capture class not exist.
+        if (($is_debug || $is_precache) && empty($GLOBALS['DOCKET_CACHE_CODESTUB_FALSE'])) {
+            $GLOBALS['DOCKET_CACHE_CODESTUB_FALSE'] = [];
+        }
 
         $ucode = '';
         if ($is_data && false !== strpos($data, 'Registry::p(')) {
-            if (@preg_match_all('@Registry::p\(\'([a-zA-Z_]+)\'\)@', $data, $mm)) {
+            if (@preg_match_all('@Registry::p\(\'([a-zA-Z0-9_]+)\'\)@', $data, $mm)) {
                 if (!empty($mm) && isset($mm[1]) && \is_array($mm[1])) {
                     $cls = $mm[1];
                     foreach ($cls as $clsname) {
                         if ('stdClass' !== $clsname) {
-                            if (\defined('DOCKET_CACHE_USE_CLASSMAP') && DOCKET_CACHE_USE_CLASSMAP) {
-                                $clspath = '';
-                                if (\defined('DOCKET_CACHE_USE_REFLECTIONCLASS') && DOCKET_CACHE_USE_REFLECTIONCLASS) {
-                                    $reflector = new \ReflectionClass($clsname);
-                                    $clsfname = $reflector->getFileName();
-                                    if (false !== $clsfname) {
-                                        $clspath = str_replace(ABSPATH, '', $clsfname);
-                                    }
-                                }
-
-                                if (empty($clspath) && !empty($class_map[$clsname])) {
-                                    $clspath = WPINC.'/'.$class_map[$clsname];
-                                }
-
-                                if (!empty($clspath)) {
-                                    $clsfname = $clspath;
-                                    $ucode .= "if ( !@class_exists('".$clsname."', false) && @file_exists(ABSPATH.'".$clsfname."') ) { @include_once(ABSPATH.'".$clsfname."'); }".\PHP_EOL;
+                            $clsfname = false;
+                            if ($is_debug) {
+                                $reflector = new \ReflectionClass($clsname);
+                                $clsfname = $reflector->getFileName();
+                                if (false !== $clsfname) {
+                                    $clsfname = str_replace(ABSPATH, '', $clsfname);
+                                    $ucode .= '/* f: '.$clsfname.' */'.\PHP_EOL;
                                 }
                             }
 
-                            $ucode .= "if ( !@class_exists('".$clsname."', false) ) { return false; }".\PHP_EOL;
+                            // 13022023, self-note to future me.
+                            // The logic here, we can't just "include_once" a class if it doesn't exist
+                            // because if the main code uses "include" or "require" it will throw an error
+                            // since the class has already been loaded by us.
+                            $ucode .= "if(!@class_exists('".$clsname."',false)){";
+                            if ($is_debug || $is_precache) {
+                                $ucode .= "\$GLOBALS['DOCKET_CACHE_CODESTUB_FALSE'][__FILE__]=['".$clsname."','".$clsfname."'];";
+                            }
+                            $ucode .= 'return false;}'.\PHP_EOL;
                         }
                     }
                     unset($cls, $clsname);
@@ -1365,7 +1358,7 @@ class Filesystem
         $code = '<?php ';
         if ($is_data) {
             if (!empty($ucode) || false !== strpos($data, '\Nawawi\DocketCache\\')) {
-                $code .= "if ( !\defined('ABSPATH') ) { return false; }";
+                $code .= "if(!\defined('ABSPATH')){return false;}";
             }
             $code .= \PHP_EOL;
             if (!empty($ucode)) {

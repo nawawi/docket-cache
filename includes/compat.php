@@ -19,6 +19,64 @@ if (class_exists('Nawawi\\Symfony\\Component\\VarExporter\\Internal\\Registry'))
     class_alias('Nawawi\Symfony\Component\VarExporter\Internal\Registry', 'Nawawi\DocketCache\Exporter\Registry', false);
 }
 
+if (!\function_exists('nwdcx_constfx')) {
+    function nwdcx_constfx($name, $is_strip = false)
+    {
+        if (!$is_strip) {
+            return strtoupper('docket_cache_'.$name);
+        }
+
+        // strip prefix, see Canopt().
+        return substr($name, 13);
+    }
+}
+
+if (!\function_exists('nwdcx_construe')) {
+    function nwdcx_construe($name)
+    {
+        $name = nwdcx_constfx($name);
+        if (\defined($name)) {
+            $value = (bool) \constant($name);
+            if (true === $value || 1 === $value) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
+if (!\function_exists('nwdcx_consfalse')) {
+    function nwdcx_consfalse($name)
+    {
+        $name = nwdcx_constfx($name);
+
+        return !\defined($name) || !\constant($name);
+    }
+}
+
+if (!\function_exists('nwdcx_constval')) {
+    function nwdcx_constval($name)
+    {
+        $name = nwdcx_constfx($name);
+        $value = '';
+        if (\defined($name)) {
+            $value = \constant($name);
+        }
+
+        return $value;
+    }
+}
+
+if (!\function_exists('nwdcx_consdef')) {
+    function nwdcx_consdef($name, $value)
+    {
+        $name = nwdcx_constfx($name);
+
+        return !\defined($name) && \define($name, $value);
+    }
+}
+
 if (!\function_exists('nwdcx_arraymap')) {
     function nwdcx_arraymap($func, $arr)
     {
@@ -103,7 +161,7 @@ if (!\function_exists('nwdcx_unserialize')) {
             }
         }
 
-        // make query-monitor happy.
+        // To make query monitor happy.
         $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
         $data = @unserialize(trim($data));
 
@@ -187,12 +245,14 @@ if (!\function_exists('nwdcx_cleanuptransient')) {
             return false;
         }
 
+        $count = 0;
+        $qlimit = 1000;
         $suppress = $wpdb->suppress_errors(true);
 
         $collect = [];
 
         // $results = $wpdb->get_results('SELECT `option_id`,`option_name`,`option_value` FROM `'.$wpdb->options.'` WHERE `option_name` LIKE "_transient_%" OR `option_name` LIKE "_site_transient_%" ORDER BY `option_id` ASC LIMIT 1000', ARRAY_A);
-        $results = $wpdb->get_results('SELECT `option_id`,`option_name`,`option_value` FROM `'.$wpdb->options.'` WHERE `option_name` RLIKE "^(_site)?(_transient)(_timeout)?_.*?" ORDER BY `option_id` ASC LIMIT 5000', ARRAY_A);
+        $results = $wpdb->get_results('SELECT `option_id`,`option_name`,`option_value` FROM `'.$wpdb->options.'` WHERE `option_name` RLIKE "^(_site)?(_transient)(_timeout)?_.*?" ORDER BY `option_id` ASC LIMIT '.$qlimit, ARRAY_A);
 
         if (!empty($results) && \is_array($results)) {
             while ($row = @array_shift($results)) {
@@ -211,6 +271,7 @@ if (!\function_exists('nwdcx_cleanuptransient')) {
                     $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_name`='_transient_timeout_{$key}'");
                     $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_name`='_site_transient_{$key}'");
                     $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_name`='_site_transient_timeout_{$key}'");
+                    ++$count;
                 }
                 $wpdb->query('COMMIT');
             }
@@ -220,7 +281,7 @@ if (!\function_exists('nwdcx_cleanuptransient')) {
 
         if (is_multisite() && isset($wpdb->sitemeta)) {
             // $results = $wpdb->get_results('SELECT `meta_id`,`meta_key`,`meta_value` FROM `'.$wpdb->sitemeta.'` WHERE `meta_key` LIKE "_site_transient_%" ORDER BY `meta_id` ASC LIMIT 1000', ARRAY_A);
-            $results = $wpdb->get_results('SELECT `meta_id`,`meta_key`,`meta_value` FROM `'.$wpdb->sitemeta.'` WHERE `meta_key` RLIKE "^(_site_transient)(_timeout)?_.*?" ORDER BY `meta_id` ASC LIMIT 5000', ARRAY_A);
+            $results = $wpdb->get_results('SELECT `meta_id`,`meta_key`,`meta_value` FROM `'.$wpdb->sitemeta.'` WHERE `meta_key` RLIKE "^(_site_transient)(_timeout)?_.*?" ORDER BY `meta_id` ASC LIMIT '.$qlimit, ARRAY_A);
             if (!empty($results) && \is_array($results)) {
                 while ($row = @array_shift($results)) {
                     $key = @preg_replace('@^(_site)?(_transient)(_timeout)?_@', '', $row['meta_key']);
@@ -236,6 +297,7 @@ if (!\function_exists('nwdcx_cleanuptransient')) {
                     foreach ($collect as $key) {
                         $wpdb->query("DELETE FROM `{$wpdb->sitemeta}` WHERE `meta_key`='_site_transient_{$key}'");
                         $wpdb->query("DELETE FROM `{$wpdb->sitemeta}` WHERE `meta_key`='_site_transient_timeout_{$key}'");
+                        ++$count;
                     }
                     $wpdb->query('COMMIT');
                 }
@@ -245,7 +307,7 @@ if (!\function_exists('nwdcx_cleanuptransient')) {
         unset($collect, $results);
         $wpdb->suppress_errors($suppress);
 
-        return true;
+        return $count;
     }
 }
 
@@ -265,10 +327,7 @@ if (!\function_exists('nwdcx_throwable')) {
     function nwdcx_throwable($name, $error)
     {
         if (\defined('WP_DEBUG') && WP_DEBUG) {
-            if (!isset($GLOBALS['docketcache_throwable'])) {
-                $GLOBALS['docketcache_throwable'] = [];
-            }
-            $GLOBALS['docketcache_throwable'][$name] = $error;
+            do_action('docketcache/action/nwdcx/throwable', $name, $error);
         }
     }
 }
@@ -276,7 +335,7 @@ if (!\function_exists('nwdcx_throwable')) {
 if (!\function_exists('nwdcx_debuglog')) {
     function nwdcx_debuglog($text)
     {
-        if (\defined('DOCKET_CACHE_DEV') && DOCKET_CACHE_DEV) {
+        if (nwdcx_construe('dev')) {
             $logfile = WP_CONTENT_DIR.'/dcdev-debug.log';
             error_log('['.date('Y-m-d H:i:s').'] '.$text."\n", 3, $logfile);
         }
@@ -292,7 +351,7 @@ if (!\function_exists('nwdcx_cliverbose')) {
             $is_verbose = 'cli' === \PHP_SAPI && !empty($_SERVER['argv']) && \in_array('--verbose', $_SERVER['argv']) && !\in_array('--quiet', $_SERVER['argv']);
         }
 
-        if ($is_verbose) {
+        if ($is_verbose && \defined('STDOUT')) {
             fwrite(\STDOUT, $text);
         }
     }
@@ -304,63 +363,6 @@ if (!\function_exists('nwdcx_microtimetofloat')) {
         list($usec, $sec) = explode(' ', $second);
 
         return (float) $usec + (float) $sec;
-    }
-}
-
-if (!\function_exists('nwdcx_constfx')) {
-    function nwdcx_constfx($name, $is_strip = false)
-    {
-        if (!$is_strip) {
-            return strtoupper('docket_cache_'.$name);
-        }
-
-        return substr($name, 13);
-    }
-}
-
-if (!\function_exists('nwdcx_construe')) {
-    function nwdcx_construe($name)
-    {
-        $name = nwdcx_constfx($name);
-        if (\defined($name)) {
-            $value = (bool) \constant($name);
-            if (true === $value || 1 === $value) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-}
-
-if (!\function_exists('nwdcx_consfalse')) {
-    function nwdcx_consfalse($name)
-    {
-        $name = nwdcx_constfx($name);
-
-        return !\defined($name) || !\constant($name);
-    }
-}
-
-if (!\function_exists('nwdcx_constval')) {
-    function nwdcx_constval($name)
-    {
-        $name = nwdcx_constfx($name);
-        $value = '';
-        if (\defined($name)) {
-            $value = \constant($name);
-        }
-
-        return $value;
-    }
-}
-
-if (!\function_exists('nwdcx_consdef')) {
-    function nwdcx_consdef($name, $value)
-    {
-        $name = nwdcx_constfx($name);
-
-        return !\defined($name) && \define($name, $value);
     }
 }
 

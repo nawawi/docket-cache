@@ -14,24 +14,28 @@ namespace Nawawi\DocketCache;
 
 final class MenuCache
 {
-    public function __construct()
-    {
-    }
-
     public function register()
     {
         if ($this->is_front_end()) {
-            add_action('init', function () {
-                add_filter('pre_wp_nav_menu', [$this, 'pre_wp_nav_menu'], \PHP_INT_MAX, 2);
-                add_filter('wp_nav_menu', [$this, 'wp_nav_menu'], \PHP_INT_MAX, 2);
-            }, \PHP_INT_MAX);
+            add_action(
+                'init',
+                function () {
+                    add_filter('pre_wp_nav_menu', [$this, 'pre_wp_nav_menu'], \PHP_INT_MAX, 2);
+                    add_filter('wp_nav_menu', [$this, 'wp_nav_menu'], \PHP_INT_MAX, 2);
+                },
+                \PHP_INT_MAX
+            );
         }
 
-        add_action('admin_init', function () {
-            add_action('wp_update_nav_menu', [$this, 'wp_update_nav_menu'], \PHP_INT_MAX);
-            add_action('wp_delete_nav_menu', [$this, 'wp_update_nav_menu'], \PHP_INT_MAX);
-            add_filter('pre_set_theme_mod_nav_menu_locations', [$this, 'pre_set_theme_mod_nav_menu_locations'], \PHP_INT_MAX, 2);
-        }, \PHP_INT_MAX);
+        add_action(
+            'admin_init',
+            function () {
+                add_action('wp_update_nav_menu', [$this, 'wp_update_nav_menu'], \PHP_INT_MAX);
+                add_action('wp_delete_nav_menu', [$this, 'wp_update_nav_menu'], \PHP_INT_MAX);
+                add_filter('pre_set_theme_mod_nav_menu_locations', [$this, 'pre_set_theme_mod_nav_menu_locations'], \PHP_INT_MAX, 2);
+            },
+            \PHP_INT_MAX
+        );
     }
 
     private function is_front_end()

@@ -24,22 +24,18 @@ namespace Nawawi\DocketCache;
                 </tr>
                 <tr id="cronbot">
                     <th>
-                        <?php
-                        echo esc_html__('Cronbot Service', 'docket-cache').$this->tooltip('cronbot');
-?>
+                        <?php $this->opt_title('cronbot'); ?>
                     </th>
                     <td>
-                        <?php echo $this->config_select_bool('cronbot'); ?>
+                        <?php $this->config_select_bool_e('cronbot'); ?>
                     </td>
                 </tr>
                 <tr id="opcviewer">
                     <th>
-                        <?php
-echo esc_html__('OPcache Viewer', 'docket-cache').$this->tooltip('opcviewer');
-?>
+                        <?php $this->opt_title('opcviewer'); ?>
                     </th>
                     <td>
-                        <?php echo $this->config_select_bool('opcviewer'); ?>
+                        <?php $this->config_select_bool_e('opcviewer'); ?>
                     </td>
                 </tr>
 
@@ -47,12 +43,10 @@ echo esc_html__('OPcache Viewer', 'docket-cache').$this->tooltip('opcviewer');
 
                 <tr id="log">
                     <th class="border-b">
-                        <?php
-echo esc_html__('Cache Log', 'docket-cache').$this->tooltip('log');
-?>
+                        <?php $this->opt_title('log'); ?>
                     </th>
                     <td>
-                        <?php echo $this->config_select_bool('log'); ?>
+                        <?php $this->config_select_bool_e('log'); ?>
                     </td>
                 </tr>
                 <tr>
@@ -60,43 +54,50 @@ echo esc_html__('Cache Log', 'docket-cache').$this->tooltip('log');
                         <?php esc_html_e('Cache Options', 'docket-cache'); ?>
                     </td>
                 </tr>
+                <?php if (version_compare($GLOBALS['wp_version'], '6.1', '<')) : ?>
                 <tr id="advpost">
-                    <th><?php echo esc_html__('Advanced Post Caching', 'docket-cache').$this->tooltip('advcpost'); ?></th>
+                    <th><?php $this->opt_title('advcpost'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('advcpost'); ?>
+                        <?php $this->config_select_bool_e('advcpost'); ?>
                     </td>
                 </tr>
                 <?php if ($this->vcf()->is_dctrue('advcpost')) : ?>
                 <tr id="advpost_posttype_all">
-                    <th><?php echo esc_html__('Post Caching Any Post Type', 'docket-cache').$this->tooltip('advpost_posttype_all'); ?></th>
+                    <th><?php $this->opt_title('advpost_posttype_all'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('advpost_posttype_all'); ?>
+                        <?php $this->config_select_bool_e('advpost_posttype_all'); ?>
                     </td>
                 </tr>
                 <?php endif; ?>
-
+                <?php endif; // wp_version?>
                 <tr id="precache">
-                    <th><?php echo esc_html__('Object Cache Precaching', 'docket-cache').$this->tooltip('precache'); ?></th>
+                    <th><?php $this->opt_title('precache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('precache'); ?>
+                        <?php $this->config_select_bool_e('precache'); ?>
                     </td>
                 </tr>
                 <tr id="menucache">
-                    <th><?php echo esc_html__('WordPress Menu Caching', 'docket-cache').$this->tooltip('menucache'); ?></th>
+                    <th><?php $this->opt_title('menucache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('menucache'); ?>
+                        <?php $this->config_select_bool_e('menucache'); ?>
                     </td>
                 </tr>
                 <tr id="mocache">
-                    <th><?php echo esc_html__('WordPress Translation Caching', 'docket-cache').$this->tooltip('mocache'); ?></th>
+                    <th><?php $this->opt_title('mocache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('mocache'); ?>
+                        <?php $this->config_select_bool_e('mocache'); ?>
                     </td>
                 </tr>
                 <tr id="preload">
-                    <th class="border-b"><?php echo esc_html__('Admin Object Cache Preloading', 'docket-cache').$this->tooltip('preload'); ?></th>
+                    <th><?php $this->opt_title('preload'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('preload'); ?>
+                        <?php $this->config_select_bool_e('preload'); ?>
+                    </td>
+                </tr>
+                <tr id="transientdb">
+                    <th class="border-b"><?php $this->opt_title('transientdb'); ?></th>
+                    <td>
+                        <?php $this->config_select_bool_e('transientdb'); ?>
                     </td>
                 </tr>
                 <tr>
@@ -105,50 +106,56 @@ echo esc_html__('Cache Log', 'docket-cache').$this->tooltip('log');
                     </td>
                 </tr>
                 <tr id="optwpquery">
-                    <th><?php echo esc_html__('Optimize WP Query', 'docket-cache').$this->tooltip('optwpquery'); ?></th>
+                    <th><?php $this->opt_title('optwpquery'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('optwpquery'); ?>
+                        <?php $this->config_select_bool_e('optwpquery'); ?>
                     </td>
                 </tr>
                 <tr id="optermcount">
-                    <th><?php echo esc_html__('Optimize Term Count Queries', 'docket-cache').$this->tooltip('optermcount'); ?></th>
+                    <th><?php $this->opt_title('optermcount'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('optermcount'); ?>
+                        <?php $this->config_select_bool_e('optermcount'); ?>
                     </td>
                 </tr>
                 <tr id="cronoptmzdb">
-                    <th><?php echo esc_html__('Optimize Database Tables', 'docket-cache').$this->tooltip('cronoptmzdb'); ?></th>
+                    <th><?php $this->opt_title('cronoptmzdb'); ?></th>
                     <td>
                         <?php
-echo $this->config_select_set(
-    'cronoptmzdb',
-    [
-        'default' => __('Default', 'docket-cache'),
-        'daily' => __('Daily', 'docket-cache'),
-        'weekly' => __('Weekly', 'docket-cache'),
-        'monthly' => __('Monthly', 'docket-cache'),
-        'never' => __('Never', 'docket-cache'),
-    ]
-);
+                        $this->config_select_set_e(
+                            'cronoptmzdb',
+                            [
+                                'default' => __('Default', 'docket-cache'),
+                                'daily' => __('Daily', 'docket-cache'),
+                                'weekly' => __('Weekly', 'docket-cache'),
+                                'monthly' => __('Monthly', 'docket-cache'),
+                                'never' => __('Never', 'docket-cache'),
+                            ]
+                        );
 ?>
                     </td>
                 </tr>
                 <tr id="wpoptaload">
-                    <th><?php echo esc_html__('Suspend WP Options Autoload', 'docket-cache').$this->tooltip('wpoptaload'); ?></th>
+                    <th><?php $this->opt_title('wpoptaload'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wpoptaload'); ?>
+                        <?php $this->config_select_bool_e('wpoptaload'); ?>
                     </td>
                 </tr>
                 <tr id="postmissedschedule">
-                    <th><?php echo esc_html__('Post Missed Schedule Tweaks', 'docket-cache').$this->tooltip('postmissedschedule'); ?></th>
+                    <th><?php $this->opt_title('postmissedschedule'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('postmissedschedule'); ?>
+                        <?php $this->config_select_bool_e('postmissedschedule'); ?>
+                    </td>
+                </tr>
+                <tr id="limitbulkedit">
+                    <th><?php $this->opt_title('limitbulkedit'); ?></th>
+                    <td>
+                        <?php $this->config_select_bool_e('limitbulkedit'); ?>
                     </td>
                 </tr>
                 <tr id="misc_tweaks">
-                    <th class="border-b"><?php echo esc_html__('Misc Performance Tweaks', 'docket-cache').$this->tooltip('misc_tweaks'); ?></th>
+                    <th class="border-b"><?php $this->opt_title('misc_tweaks'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('misc_tweaks'); ?>
+                        <?php $this->config_select_bool_e('misc_tweaks'); ?>
                     </td>
                 </tr>
                 <tr>
@@ -157,45 +164,45 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="wootweaks">
-                    <th><?php echo esc_html__('Misc WooCommerce Tweaks', 'docket-cache').$this->tooltip('wootweaks'); ?></th>
+                    <th><?php $this->opt_title('wootweaks'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wootweaks'); ?>
+                        <?php $this->config_select_bool_e('wootweaks'); ?>
                     </td>
                 </tr>
                 <tr id="wooadminoff">
-                    <th><?php echo esc_html__('Deactivate WooCommerce Admin', 'docket-cache').$this->tooltip('wooadminoff'); ?></th>
+                    <th><?php $this->opt_title('wooadminoff'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wooadminoff'); ?>
+                        <?php $this->config_select_bool_e('wooadminoff'); ?>
                     </td>
                 </tr>
                 <tr id="woowidgetoff">
-                    <th><?php echo esc_html__('Deactivate WooCommerce Classic Widget', 'docket-cache').$this->tooltip('woowidgetoff'); ?></th>
+                    <th><?php $this->opt_title('woowidgetoff'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('woowidgetoff'); ?>
+                        <?php $this->config_select_bool_e('woowidgetoff'); ?>
                     </td>
                 </tr>
                 <tr id="woowpdashboardoff">
-                    <th><?php echo esc_html__('Deactivate WooCommerce WP Dashboard', 'docket-cache').$this->tooltip('woowpdashboardoff'); ?></th>
+                    <th><?php $this->opt_title('woowpdashboardoff'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('woowpdashboardoff'); ?>
+                        <?php $this->config_select_bool_e('woowpdashboardoff'); ?>
                     </td>
                 </tr>
                 <tr id="wooextensionpageoff">
-                    <th><?php echo esc_html__('Deactivate WooCommerce Extensions Page', 'docket-cache').$this->tooltip('wooextensionpageoff'); ?></th>
+                    <th><?php $this->opt_title('wooextensionpageoff'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wooextensionpageoff'); ?>
+                        <?php $this->config_select_bool_e('wooextensionpageoff'); ?>
                     </td>
                 </tr>
                 <tr id="woocartfragsoff">
-                    <th><?php echo esc_html__('Deactivate WooCommerce Cart Fragments', 'docket-cache').$this->tooltip('woocartfragsoff'); ?></th>
+                    <th><?php $this->opt_title('woocartfragsoff'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('woocartfragsoff'); ?>
+                        <?php $this->config_select_bool_e('woocartfragsoff'); ?>
                     </td>
                 </tr>
                 <tr id="wooaddtochartcrawling">
-                    <th class="border-b"><?php echo esc_html__('Prevent robots crawling add-to-cart links', 'docket-cache').$this->tooltip('wooaddtochartcrawling'); ?></th>
+                    <th class="border-b"><?php $this->opt_title('wooaddtochartcrawling'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wooaddtochartcrawling'); ?>
+                        <?php $this->config_select_bool_e('wooaddtochartcrawling'); ?>
                     </td>
                 </tr>
                 <tr>
@@ -204,82 +211,88 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="headerjunk">
-                    <th><?php echo esc_html__('Remove WP Header Junk', 'docket-cache').$this->tooltip('headerjunk'); ?></th>
+                    <th><?php $this->opt_title('headerjunk'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('headerjunk'); ?>
+                        <?php $this->config_select_bool_e('headerjunk'); ?>
                     </td>
                 </tr>
                 <tr id="pingback">
-                    <th><?php echo esc_html__('Deactivate XML-RPC / Pingbacks', 'docket-cache').$this->tooltip('pingback'); ?></th>
+                    <th><?php $this->opt_title('pingback'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('pingback'); ?>
+                        <?php $this->config_select_bool_e('pingback'); ?>
                     </td>
                 </tr>
                 <tr id="wpemoji">
-                    <th><?php echo esc_html__('Deactivate WP Emoji', 'docket-cache').$this->tooltip('wpemoji'); ?></th>
+                    <th><?php $this->opt_title('wpemoji'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wpemoji'); ?>
+                        <?php $this->config_select_bool_e('wpemoji'); ?>
                     </td>
                 </tr>
                 <tr id="wpfeed">
-                    <th><?php echo esc_html__('Deactivate WP Feed', 'docket-cache').$this->tooltip('wpfeed'); ?></th>
+                    <th><?php $this->opt_title('wpfeed'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wpfeed'); ?>
+                        <?php $this->config_select_bool_e('wpfeed'); ?>
                     </td>
                 </tr>
                 <tr id="wpembed">
-                    <th><?php echo esc_html__('Deactivate WP Embed', 'docket-cache').$this->tooltip('wpembed'); ?></th>
+                    <th><?php $this->opt_title('wpembed'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wpembed'); ?>
+                        <?php $this->config_select_bool_e('wpembed'); ?>
                     </td>
                 </tr>
                 <tr id="wplazyload">
-                    <th><?php echo esc_html__('Deactivate WP Lazy Load', 'docket-cache').$this->tooltip('wplazyload'); ?></th>
+                    <th><?php $this->opt_title('wplazyload'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wplazyload'); ?>
+                        <?php $this->config_select_bool_e('wplazyload'); ?>
                     </td>
                 </tr>
                 <tr id="wpsitemap">
-                    <th><?php echo esc_html__('Deactivate WP Sitemap', 'docket-cache').$this->tooltip('wpsitemap'); ?></th>
+                    <th><?php $this->opt_title('wpsitemap'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wpsitemap'); ?>
+                        <?php $this->config_select_bool_e('wpsitemap'); ?>
                     </td>
                 </tr>
                 <tr id="wpapppassword">
-                    <th><?php echo esc_html__('Deactivate WP Application Passwords', 'docket-cache').$this->tooltip('wpapppassword'); ?></th>
+                    <th><?php $this->opt_title('wpapppassword'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wpapppassword'); ?>
+                        <?php $this->config_select_bool_e('wpapppassword'); ?>
                     </td>
                 </tr>
                 <tr id="wpdashboardnews">
-                    <th><?php echo esc_html__('Deactivate WP Events & News Feed Dashboard', 'docket-cache').$this->tooltip('wpdashboardnews'); ?></th>
+                    <th><?php $this->opt_title('wpdashboardnews'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wpdashboardnews'); ?>
+                        <?php $this->config_select_bool_e('wpdashboardnews'); ?>
+                    </td>
+                </tr>
+                <tr id="postviaemail">
+                    <th><?php $this->opt_title('postviaemail'); ?></th>
+                    <td>
+                        <?php $this->config_select_bool_e('postviaemail'); ?>
                     </td>
                 </tr>
                 <tr id="wpbrowsehappy">
-                    <th><?php echo esc_html__('Deactivate Browse Happy Checking', 'docket-cache').$this->tooltip('wpbrowsehappy'); ?></th>
+                    <th><?php $this->opt_title('wpbrowsehappy'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wpbrowsehappy'); ?>
+                        <?php $this->config_select_bool_e('wpbrowsehappy'); ?>
                     </td>
                 </tr>
                 <tr id="wpservehappy">
-                    <th><?php echo esc_html__('Deactivate Serve Happy Checking', 'docket-cache').$this->tooltip('wpservehappy'); ?></th>
+                    <th><?php $this->opt_title('wpservehappy'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('wpservehappy'); ?>
+                        <?php $this->config_select_bool_e('wpservehappy'); ?>
                     </td>
                 </tr>
                 <tr id="limithttprequest">
-                    <th><?php echo esc_html__('Limit WP-Admin HTTP Requests', 'docket-cache').$this->tooltip('limithttprequest'); ?></th>
+                    <th><?php $this->opt_title('limithttprequest'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('limithttprequest'); ?>
+                        <?php $this->config_select_bool_e('limithttprequest'); ?>
                     </td>
                 </tr>
                 <?php if (version_compare($GLOBALS['wp_version'], '5.8', '<')) : ?>
                 <tr id="httpheadersexpect">
-                    <th class="border-b"><?php echo esc_html__('HTTP Request Expect header tweaks', 'docket-cache').$this->tooltip('httpheadersexpect'); ?></th>
+                    <th class="border-b"><?php $this->opt_title('httpheadersexpect'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('httpheadersexpect'); ?>
+                        <?php $this->config_select_bool_e('httpheadersexpect'); ?>
                     </td>
                 </tr>
                 <?php endif; ?>
@@ -290,10 +303,10 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="rtpostautosave">
-                    <th><?php echo esc_html__('Auto Save Interval', 'docket-cache').$this->tooltip('rtpostautosave'); ?></th>
+                    <th><?php $this->opt_title('rtpostautosave'); ?></th>
                     <td>
                         <?php
-echo $this->config_select_set(
+$this->config_select_set_e(
     'rtpostautosave',
     [
         'default' => __('Default', 'docket-cache'),
@@ -307,10 +320,10 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="rtpostrevision">
-                    <th><?php echo esc_html__('Post Revisions', 'docket-cache').$this->tooltip('rtpostrevision'); ?></th>
+                    <th><?php $this->opt_title('rtpostrevision'); ?></th>
                     <td>
                         <?php
-                    echo $this->config_select_set(
+                    $this->config_select_set_e(
                         'rtpostrevision',
                         [
                             'default' => __('Default', 'docket-cache'),
@@ -324,10 +337,10 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="rtpostemptytrash">
-                    <th><?php echo esc_html__('Trash Bin', 'docket-cache').$this->tooltip('rtpostemptytrash'); ?></th>
+                    <th><?php $this->opt_title('rtpostemptytrash'); ?></th>
                     <td>
                         <?php
-                    echo $this->config_select_set(
+                    $this->config_select_set_e(
                         'rtpostemptytrash',
                         [
                             'default' => __('Default', 'docket-cache'),
@@ -341,10 +354,10 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="rtimageoverwrite">
-                    <th><?php echo esc_html__('Cleanup Image Edits', 'docket-cache').$this->tooltip('rtimageoverwrite'); ?></th>
+                    <th><?php $this->opt_title('rtimageoverwrite'); ?></th>
                     <td>
                         <?php
-                    echo $this->config_select_set(
+                    $this->config_select_set_e(
                         'rtimageoverwrite',
                         [
                             'default' => __('Default', 'docket-cache'),
@@ -357,10 +370,10 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="rtwpcoreupdate">
-                    <th><?php echo esc_html__('Disallows WP Auto Update Core', 'docket-cache').$this->tooltip('rtwpcoreupdate'); ?></th>
+                    <th><?php $this->opt_title('rtwpcoreupdate'); ?></th>
                     <td>
                         <?php
-                    echo $this->config_select_set(
+                    $this->config_select_set_e(
                         'rtwpcoreupdate',
                         [
                             'default' => __('Default', 'docket-cache'),
@@ -373,10 +386,10 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="rtpluginthemeeditor">
-                    <th><?php echo esc_html__('Disallows Plugin / Theme Editor', 'docket-cache').$this->tooltip('rtpluginthemeeditor'); ?></th>
+                    <th><?php $this->opt_title('rtpluginthemeeditor'); ?></th>
                     <td>
                         <?php
-                    echo $this->config_select_set(
+                    $this->config_select_set_e(
                         'rtpluginthemeeditor',
                         [
                             'default' => __('Default', 'docket-cache'),
@@ -389,10 +402,10 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="rtpluginthemeinstall">
-                    <th><?php echo esc_html__('Disallows Plugin / Theme Update and Installation', 'docket-cache').$this->tooltip('rtpluginthemeinstall'); ?></th>
+                    <th><?php $this->opt_title('rtpluginthemeinstall'); ?></th>
                     <td>
                         <?php
-                    echo $this->config_select_set(
+                    $this->config_select_set_e(
                         'rtpluginthemeinstall',
                         [
                             'default' => __('Default', 'docket-cache'),
@@ -405,10 +418,10 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="rtconcatenatescripts">
-                    <th><?php echo esc_html__('Deactivate Concatenate WP-Admin Scripts', 'docket-cache').$this->tooltip('rtconcatenatescripts'); ?></th>
+                    <th><?php $this->opt_title('rtconcatenatescripts'); ?></th>
                     <td>
                         <?php
-                    echo $this->config_select_set(
+                    $this->config_select_set_e(
                         'rtconcatenatescripts',
                         [
                             'default' => __('Default', 'docket-cache'),
@@ -421,10 +434,10 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="rtdisablewpcron">
-                    <th><?php echo esc_html__('Deactivate WP Cron', 'docket-cache').$this->tooltip('rtdisablewpcron'); ?></th>
+                    <th class="border-b"><?php $this->opt_title('rtdisablewpcron'); ?></th>
                     <td>
                         <?php
-                    echo $this->config_select_set(
+                    $this->config_select_set_e(
                         'rtdisablewpcron',
                         [
                             'default' => __('Default', 'docket-cache'),
@@ -440,10 +453,10 @@ echo $this->config_select_set(
                     $rtwpdebug_default = !empty($GLOBALS[$this->vcf()->px('rtwpdebug_false')]) && WP_DEBUG ? 'on' : $this->vcf()->dcvalue('rtwpdebug');
                     ?>
                 <tr id="rtwpdebug">
-                    <th<?php echo  'off' === $rtwpdebug_default ? ' class="border-b"' : ''; ?>><?php echo esc_html__('WP Debug', 'docket-cache').$this->tooltip('rtwpdebug'); ?></th>
+                    <th<?php echo  'off' === $rtwpdebug_default ? ' class="border-b"' : ''; ?>><?php $this->opt_title('rtwpdebug'); ?></th>
                         <td>
                             <?php
-                                echo $this->config_select_set(
+                                $this->config_select_set_e(
                                     'rtwpdebug',
                                     [
                                         'default' => __('Default', 'docket-cache'),
@@ -457,10 +470,10 @@ echo $this->config_select_set(
                 </tr>
                 <?php if ('on' === $rtwpdebug_default) : ?>
                 <tr id="rtwpdebugdisplay">
-                    <th><?php echo esc_html__('WP Debug Display', 'docket-cache').$this->tooltip('rtwpdebugdisplay'); ?></th>
+                    <th><?php $this->opt_title('rtwpdebugdisplay'); ?></th>
                     <td>
                         <?php
-                        echo $this->config_select_set(
+                        $this->config_select_set_e(
                             'rtwpdebugdisplay',
                             [
                                 'default' => __('Default', 'docket-cache'),
@@ -477,10 +490,10 @@ echo $this->config_select_set(
 					    $error_log = \ini_get('error_log');
 					    ?>
                 <tr id="rtwpdebuglog">
-                    <th class="border-b"><?php echo esc_html__('WP Debug Log', 'docket-cache').$this->tooltip('rtwpdebuglog'); ?></th>
+                    <th class="border-b"><?php $this->opt_title('rtwpdebuglog'); ?></th>
                     <td>
                         <?php
-					        echo $this->config_select_set(
+					        $this->config_select_set_e(
 					            'rtwpdebuglog',
 					            [
 					                'default' => __('Default', 'docket-cache'),
@@ -506,7 +519,7 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="maxfile">
-                    <th><?php echo esc_html__('Cache Files Limit', 'docket-cache').$this->tooltip('maxfile'); ?></th>
+                    <th><?php $this->opt_title('maxfile'); ?></th>
                     <td>
                         <?php
 					    $maxfile_default = '50K';
@@ -521,7 +534,7 @@ switch ($this->vcf()->dcvalue('maxfile')) {
         $maxfile_default = '200K';
         break;
 }
-echo $this->config_select_set(
+$this->config_select_set_e(
     'maxfile',
     [
         'default' => __('Default', 'docket-cache'),
@@ -535,7 +548,7 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="maxsize_disk">
-                    <th><?php echo esc_html__('Cache Disk Limit', 'docket-cache').$this->tooltip('maxsize_disk'); ?></th>
+                    <th><?php $this->opt_title('maxsize_disk'); ?></th>
                     <td>
                         <?php
 $maxsize_disk_default = '500M';
@@ -550,7 +563,7 @@ switch ($this->vcf()->dcvalue('maxsize_disk')) {
         $maxsize_disk_default = '2G';
         break;
 }
-echo $this->config_select_set(
+$this->config_select_set_e(
     'maxsize_disk',
     [
         'default' => __('Default', 'docket-cache'),
@@ -564,36 +577,36 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="chunkcachedir">
-                    <th><?php echo esc_html__('Chunk Cache Directory', 'docket-cache').$this->tooltip('chunkcachedir'); ?></th>
+                    <th><?php $this->opt_title('chunkcachedir'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('chunkcachedir'); ?>
+                        <?php $this->config_select_bool_e('chunkcachedir'); ?>
                     </td>
                 </tr>
                 <tr id="maxfile_livecheck">
-                    <th><?php echo esc_html__('Check file limits in real-time', 'docket-cache').$this->tooltip('maxfile_livecheck'); ?></th>
+                    <th><?php $this->opt_title('maxfile_livecheck'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('maxfile_livecheck'); ?>
+                        <?php $this->config_select_bool_e('maxfile_livecheck'); ?>
                     </td>
                 </tr>
                 <tr id="flush_stalecache">
-                    <th><?php echo esc_html__('Auto Remove Stale Cache', 'docket-cache').$this->tooltip('flush_stalecache'); ?></th>
+                    <th><?php $this->opt_title('flush_stalecache'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('flush_stalecache'); ?>
+                        <?php $this->config_select_bool_e('flush_stalecache'); ?>
                     </td>
                 </tr>
                 <?php
                 /*
                 <tr id="stalecache_ignore">
-                    <th><?php echo esc_html__('Exclude Stale Cache', 'docket-cache').$this->tooltip('stalecache_ignore'); ?></th>
+                    <th><?php $this->opt_title('stalecache_ignore'); ?></th>
                 <td>
-                    <?php echo $this->config_select_bool('stalecache_ignore'); ?>
+                    <?php $this->config_select_bool_e('stalecache_ignore'); ?>
                 </td>
                 </tr>*/
                 ?>
                 <tr id="emptycache_ignore">
-                    <th class="border-b"><?php echo esc_html__('Exclude Empty Object Data', 'docket-cache').$this->tooltip('emptycache_ignore'); ?></th>
+                    <th class="border-b"><?php $this->opt_title('emptycache_ignore'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('emptycache_ignore'); ?>
+                        <?php $this->config_select_bool_e('emptycache_ignore'); ?>
                     </td>
                 </tr>
                 <tr>
@@ -602,27 +615,27 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="pageloader">
-                    <th><?php echo esc_html__('Admin Page Loader', 'docket-cache').$this->tooltip('pageloader'); ?></th>
+                    <th><?php $this->opt_title('pageloader'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('pageloader'); ?>
+                        <?php $this->config_select_bool_e('pageloader'); ?>
                     </td>
                 </tr>
                 <tr id="stats">
-                    <th><?php echo esc_html__('Object Cache Data Stats', 'docket-cache').$this->tooltip('stats'); ?></th>
+                    <th><?php $this->opt_title('stats'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('stats'); ?>
+                        <?php $this->config_select_bool_e('stats'); ?>
                     </td>
                 </tr>
                 <tr id="gcaction">
-                    <th><?php echo esc_html__('Garbage Collector Action Button', 'docket-cache').$this->tooltip('gcaction'); ?></th>
+                    <th><?php $this->opt_title('gcaction'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('gcaction'); ?>
+                        <?php $this->config_select_bool_e('gcaction'); ?>
                     </td>
                 </tr>
                 <tr id="flushaction">
-                    <th class="border-b"><?php echo esc_html__('Additional Flush Cache Action Button', 'docket-cache').$this->tooltip('flushaction'); ?></th>
+                    <th class="border-b"><?php $this->opt_title('flushaction'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('flushaction'); ?>
+                        <?php $this->config_select_bool_e('flushaction'); ?>
                     </td>
                 </tr>
                 <tr>
@@ -631,27 +644,27 @@ echo $this->config_select_set(
                     </td>
                 </tr>
                 <tr id="autoupdate_toggle">
-                    <th><?php echo esc_html__('Docket Cache Auto-Updates', 'docket-cache').$this->tooltip('autoupdate_toggle'); ?></th>
+                    <th><?php $this->opt_title('autoupdate_toggle'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('autoupdate_toggle'); ?>
+                        <?php $this->config_select_bool_e('autoupdate_toggle'); ?>
                     </td>
                 </tr>
                 <tr id="checkversion">
-                    <th><?php echo esc_html__('Check Critical Version', 'docket-cache').$this->tooltip('checkversion'); ?></th>
+                    <th><?php $this->opt_title('checkversion'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('checkversion'); ?>
+                        <?php $this->config_select_bool_e('checkversion'); ?>
                     </td>
                 </tr>
                 <tr id="flush_shutdown">
-                    <th><?php echo esc_html__('Flush Object Cache During Deactivation', 'docket-cache').$this->tooltip('flush_shutdown'); ?></th>
+                    <th><?php $this->opt_title('flush_shutdown'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('flush_shutdown'); ?>
+                        <?php $this->config_select_bool_e('flush_shutdown'); ?>
                     </td>
                 </tr>
                 <tr id="opcshutdown">
-                    <th><?php echo esc_html__('Flush OPcache During Deactivation', 'docket-cache').$this->tooltip('opcshutdown'); ?></th>
+                    <th><?php $this->opt_title('opcshutdown'); ?></th>
                     <td>
-                        <?php echo $this->config_select_bool('opcshutdown'); ?>
+                        <?php $this->config_select_bool_e('opcshutdown'); ?>
                     </td>
                 </tr>
             </table>

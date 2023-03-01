@@ -342,7 +342,7 @@ class Command extends WP_CLI_Command
     public function flush_precache()
     {
         if (!\function_exists('wp_cache_flush_group') || !method_exists('WP_Object_Cache', 'dc_remove_group')) {
-            $this->halt_error(__('Object Precache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache'));
+            $this->halt_error(__('Object Precache could not be flushed. Docket Cache object-cache.php Drop-in is inactive.', 'docket-cache'));
         }
 
         $this->print_stdout(__('Flushing precache. Please wait..', 'docket-cache'), false);
@@ -369,7 +369,7 @@ class Command extends WP_CLI_Command
     public function flush_transient()
     {
         if (!\function_exists('wp_cache_flush_group') || !method_exists('WP_Object_Cache', 'dc_remove_group')) {
-            $this->halt_error(__('Transient could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache'));
+            $this->halt_error(__('Transient could not be flushed. Docket Cache object-cache.php Drop-in is inactive.', 'docket-cache'));
         }
 
         $this->print_stdout(__('Flushing transient. Please wait..', 'docket-cache'), false);
@@ -396,7 +396,7 @@ class Command extends WP_CLI_Command
     public function flush_advcpost()
     {
         if (!\function_exists('wp_cache_flush_group_match') || !method_exists('WP_Object_Cache', 'dc_remove_group')) {
-            $this->halt_error(__('Advanced Post Cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache'));
+            $this->halt_error(__('Advanced Post Cache could not be flushed. Docket Cache object-cache.php Drop-in is inactive.', 'docket-cache'));
         }
 
         $this->print_stdout(__('Flushing Advanced Post Cache. Please wait..', 'docket-cache'), false);
@@ -423,7 +423,7 @@ class Command extends WP_CLI_Command
     public function flush_menucache()
     {
         if (!\function_exists('wp_cache_flush_group') || !method_exists('WP_Object_Cache', 'dc_remove_group')) {
-            $this->halt_error(__('Menu Cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache'));
+            $this->halt_error(__('Menu Cache could not be flushed. Docket Cache object-cache.php Drop-in is inactive.', 'docket-cache'));
         }
 
         $this->print_stdout(__('Flushing Menu Cache. Please wait..', 'docket-cache'), false);
@@ -450,7 +450,7 @@ class Command extends WP_CLI_Command
     public function flush_mocache()
     {
         if (!\function_exists('wp_cache_flush_group') || !method_exists('WP_Object_Cache', 'dc_remove_group')) {
-            $this->halt_error(__('Translation Cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache'));
+            $this->halt_error(__('Translation Cache could not be flushed. Docket Cache object-cache.php Drop-in is inactive.', 'docket-cache'));
         }
 
         $this->print_stdout(__('Flushing Translation Cache. Please wait..', 'docket-cache'), false);

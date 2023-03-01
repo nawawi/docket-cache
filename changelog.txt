@@ -1,4 +1,29 @@
+= v22.07.04 (2023-03-01) =
+
+- Fixed: Advanced Post Cache -> Only visible to wp < 6.1.1 as it is already implemented in wp core (WP_Query caching).
+- Fixed: Filesystem::shutdown_cleanup() -> Avoid cleanup on shutdown if a file is empty.
+- Fixed: Plugin::register_plugin_hooks() -> Do not load the CronAgent class if cronbot is disabled.
+- Fixed: TermCount() -> Invalid usage of clean_term_cache.
+- Fixed: WP_Object_Cache::$cache_hits, WP_Object_Cache::$cache_misses -> Retain same as non persistent.
+- Fixed: Prevent performance-lab from overwriting the object cache drop-in.
+- Fixed: Becache::export_alloptions() -> Only export option with autoload 'yes' and not transient.
+- Fixed: Becache::store_cache() -> Miss match array_serialize.
+- Added:  WP_Object_Cache::$persistent_cache_hits -> Stats hits from cache file.
+- Added: Tweaks::wpquery() -> wp_allow_query_attachment_by_filename for wp > 6.0.1.
+- Added: Configuration -> Cache Options, Retain Transients in Db.
+- Added: Configuration -> Optimisations, Limit Bulk Edit Actions.
+- Added: Configuration -> Wp Tweaks, Deactivate Post Via Email.
+- Added: DOCKET_CACHE_TRANSIENTDB constant to enable retaining Transients in the database.
+- Added: DOCKET_CACHE_IGNORED_TRANSIENTDB constant. A list of cache keys that remain in the object cache instead of the db.
+- Added: DOCKET_CACHE_POSTVIAEMAIL constant to enable deactivation Post Via Email.
+- Added: DOCKET_CACHE_LIMITBULKEDIT constant to enable Limit Bulk Edit Actions.
+- Added: DOCKET_CACHE_LIMITBULKEDIT_LIMIT constant to change bulk edit limit. By default it is set as 100..
+- Changed: Advanced Post Cache, some part of the code has been moved to Tweaks::wpquery().
+- Removed: WP_Object_Cache::is_data_uptodate() -> No longer needed.
+- Updated: Symfony component -> symfony/var-exporter v5.4.21.
+
 = v22.07.03 (2023-02-07) =
+
 - Fixed: Tweaks::woocommerce_misc() -> Check if action_scheduler_migration_status is complete to prevent the list on the Scheduled Actions page from disappearing.
 - Fixed: Tweaks::woocommerce_widget_remove() -> The classic widget is not disabled.
 - Fixed: Plugin::get_precache_maxfile() -> Invalid constant, replace maxfile with precache_maxfile.
@@ -29,6 +54,7 @@
 Thanks to Kevin Shenk of Avunu LLC for providing access to the staging server for testing purposes.
 
 = v22.07.02 (2022-12-10) =
+
 - Fixed: Tweaks::cache_http_response() -> Default TTL.
 - Fixed: Tweaks::wpservehappy() -> missing array key.
 - Added: wp_cache_supports() function.
@@ -38,25 +64,30 @@ Thanks to Kevin Shenk of Avunu LLC for providing access to the staging server fo
 - Tested up to 6.1.
 
 = v22.07.01 (2022-07-15) =
+
 - Fixed: Plugin:cleanuppost() -> Invalid index for trashbin.
 - Fixed: MoCache() -> Add $entries, $headers properties to avoid warning on get_translations_for_domain.
 - Updated: Symfony component -> symfony/var-exporter.
 
 = v21.08.11 (2022-05-30) =
+
 - Fixed: Avoid calling Filesystem::close_buffer() if a process involved accessing a disk.
 - Fixed: Removed handling stale cache on shutdown.
 - Added: Garbage Collector Status -> Cleanup Stale Cache.
 - Improved: Collected stale cache will be handled by Garbage Collector.
 
 = v21.08.10 (2022-05-20) =
+
 - Changed: Disable "CHUNKCACHEDIR" by default. Let's users choose it depending on their hosting environment.
 
 = v21.08.09 (2022-05-20) =
+
 - Fixed: WP_Object_Cache::maybe_expire() -> missing preg_match parameter.
 
 Thanks to @carmpocalypse for bug report.
 
 = v21.08.08 (2022-05-19) =
+
 - Fixed: Don't remove cron event without a hook, let's WordPress handles it.
 - Fixed: WP_Object_Cache::dc_close() -> Only run one time per instance.
 - Fixed: WP_Object_Cache::maybe_expire() -> Check cache key.
@@ -64,6 +95,7 @@ Thanks to @carmpocalypse for bug report.
 - Changed: Disable "Auto Remove Stale Cache" by default. Let's users choose it depending on their cpu/storage speeds limit.
 
 = v21.08.07 (2022-05-13) =
+
 - Fixed: Tweaks::wpembed() -> body_class missing seconds arguments that require by some themes.
 - Fixed: Tweaks::wpembed() -> Disable body_class filter, cause unpredictable syntax error on some themes.
 

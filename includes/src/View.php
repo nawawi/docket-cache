@@ -444,6 +444,11 @@ final class View
         return $html;
     }
 
+    private function config_select_bool_e($name, $default = 'dcdefault', $idx = 'config', $quiet = false)
+    {
+        echo $this->config_select_bool($name, $default, $idx, $quiet);
+    }
+
     private function config_select_set($name, $options, $default = 'dcdefault', $idx = 'config')
     {
         if (empty($default) || 'dcdefault' === $default) {
@@ -468,6 +473,11 @@ final class View
         $html .= '</select>';
 
         return $html;
+    }
+
+    private function config_select_set_e($name, $options, $default = 'dcdefault', $idx = 'config')
+    {
+        echo $this->config_select_set($name, $options, $default, $idx);
     }
 
     private function has_vcache()
@@ -545,7 +555,7 @@ final class View
             return;
         }
 
-        $code = '<script id="docket-cache-focus" data-noptimize="1">'.\PHP_EOL;
+        $code = '<script data-cfasync="false" data-noptimize="1" data-no-minify="1" id="docket-cache-focus">'.\PHP_EOL;
         $code .= '(function($) {';
         $code .= '$(document).ready(function() {';
         $code .= 'var fx = $(document).find("tr#'.$nx.'");';
@@ -574,12 +584,11 @@ final class View
             'cronbot' => esc_html__('The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively.', 'docket-cache'),
             'log' => esc_html__('The cache log intends to provide information on how the cache works. For performance and security concerns, disable it if no longer needed.', 'docket-cache'),
             'opcviewer' => esc_html__('OPcache Viewer allows you to view OPcache status and usage.', 'docket-cache'),
-            'advcpost' => esc_html__('Cache WP Queries for a post which results in faster data retrieval and reduced database workload. By default only for built-in Post Types.', 'docket-cache'),
-            'advpost_posttype_all' => esc_html__('Allow Advanced Post Caching to cache any Post Type.', 'docket-cache'),
             'menucache' => esc_html__('Cache the WordPress dynamic navigation menu.', 'docket-cache'),
             'precache' => esc_html__('Increase cache performance by early loading cached objects based on the current URL.', 'docket-cache'),
             'mocache' => esc_html__('Improve the performance of the WordPress Translation function.', 'docket-cache'),
             'optwpquery' => esc_html__('Docket Cache will attempt to optimize WordPress core query when this option enabled.', 'docket-cache'),
+            'limitbulkedit' => esc_html__('Enable this option to disable Bulk Edit Actions when reaching the listed item limit. By default, the bulk edit limit is set to 100.', 'docket-cache'),
             'optermcount' => esc_html__('Improve the performance of Word Term Count Update.', 'docket-cache'),
             'cronoptmzdb' => esc_html__('Docket Cache will optimize WordPress database tables using SQL optimizing syntax at scheduled times.', 'docket-cache'),
             'wpoptaload' => esc_html__('Reduce the size of Options Autoload by excluding non-WordPress Option from autoloading.', 'docket-cache'),
@@ -603,6 +612,7 @@ final class View
             'wpdashboardnews' => esc_html__('Deactivate the WordPress Events & News feed in Dashboard.', 'docket-cache'),
             'wpbrowsehappy' => esc_html__('Enable this option to turn off Browse Happy HTTP API requests, which checks whether the user needs a browser update.', 'docket-cache'),
             'wpservehappy' => esc_html__('Enable this option to turn off the Serve Happy HTTP API request, which checks whether the user needs to update PHP.', 'docket-cache'),
+            'postviaemail' => esc_html__('Enable this option to disable the post-via-email functionality.', 'docket-cache'),
             'preload' => esc_html__('Preload Object Cache by fetching administrator-related pages.', 'docket-cache'),
             'pageloader' => esc_html__('Display page loader when loading administrator pages.', 'docket-cache'),
             'stats' => esc_html__('Display Object Cache stats at Overview page.', 'docket-cache'),
@@ -620,7 +630,7 @@ final class View
             'stalecache_ignore' => esc_html__('Enable this option to exclude stale cache created by WordPress, WooCommerce, and others from being stored on disk. Only enable it if you have an issue with inode limits.', 'docket-cache'),
             'emptycache_ignore' => esc_html__('Enable this option to exclude empty caches from being stored on disk. Only enable it if you have an issue with inode limits.', 'docket-cache'),
             'limithttprequest' => esc_html__('Limit HTTP requests in WP Admin.', 'docket-cache'),
-            'httpheadersexpect' => esc_html__('By default, cURL sends the "Expect" header all the time which severely impacts performance. Enable this option, only send it if the body is larger than 1 MB.', 'docket-cache'),
+            'transientdb' => esc_html__('WordPress by default converts Transients as persistent object caching when available. Enable this option to persist Transients in the Database.', 'docket-cache'),
             'rtpostautosave' => esc_html__('WordPress by default automatically saves a draft every 1 minute when editing or create a new post. Changing this behaviour can reduce the usage of server resource.', 'docket-cache'),
             'rtpostrevision' => esc_html__('Post revision is a copy of each edit made to a post or page, allowing the possibility of reverting to a previous version. However, have a revision too much can create a bad impact on database performance. Changing this behaviour can reduce the usage of server resource.', 'docket-cache'),
             'rtpostemptytrash' => esc_html__('This option allows you to change the number of days before WordPress permanently deletes posts, pages, attachments, and comments, from the trash bin. The default is 30 days. There is no confirmation alert when someone clicks on "Delete Permanently" if this option is set to "Disable Trash Bin".', 'docket-cache'),
@@ -635,11 +645,34 @@ final class View
             'rtdisablewpcron' => esc_html__('Enable this option to disable the WP pseudo-cron. Only enable it if your site is already set up with real Cron.', 'docket-cache'),
         ];
 
+        if (version_compare($GLOBALS['wp_version'], '6.1', '<')) {
+            $info['advcpost'] = esc_html__('Cache WP Queries for a post which results in faster data retrieval and reduced database workload. By default only for built-in Post Types.', 'docket-cache');
+            $info['advpost_posttype_all'] = esc_html__('Allow Advanced Post Caching to cache any Post Type.', 'docket-cache');
+        }
+
+        if (version_compare($GLOBALS['wp_version'], '5.8', '<')) {
+            $info['httpheadersexpect'] = esc_html__('By default, cURL sends the "Expect" header all the time which severely impacts performance. Enable this option, only send it if the body is larger than 1 MB.', 'docket-cache');
+        }
+
         $info = apply_filters('docketcache/filter/view/tooltips', $info);
 
         $text = isset($info[$id]) ? $info[$id] : esc_html__('No info available', 'docket-cache');
 
         return '<span tabindex="0" data-tooltip="'.$text.'"><span class="dashicons dashicons-editor-help"></span></span>';
+    }
+
+    private function opt_title($id, $tooltip = true, $output = true)
+    {
+        $ret = $this->pt->co()->keys($id);
+        if ($tooltip) {
+            $ret .= $this->tooltip($id);
+        }
+
+        if ($output) {
+            echo $ret;
+        }
+
+        return $ret;
     }
 
     private function action_notice()

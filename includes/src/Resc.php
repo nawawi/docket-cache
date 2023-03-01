@@ -149,19 +149,56 @@ final class Resc
     public static function boxmsg($msg, $type = 'info', $is_dismiss = true, $is_bold = true, $is_hide = true)
     {
         if (!empty($msg) && !empty($type)) {
-            $html = '<div id="docket-cache-notice"';
+            $id = 'docket-cache-notice';
+            $extra_before = '';
+            $extra_after = '';
+            if (\is_array($msg)) {
+                if (!empty($msg['id'])) {
+                    $id = $msg['id'];
+                }
+
+                if (!empty($msg['type'])) {
+                    $type = $msg['type'];
+                }
+
+                if (!empty($msg['is_dismiss'])) {
+                    $is_dismiss = (bool) $msg['is_dismiss'];
+                }
+
+                if (!empty($msg['is_bold'])) {
+                    $is_bold = (bool) $msg['is_bold'];
+                }
+
+                if (!empty($msg['is_hide'])) {
+                    $is_hide = (bool) $msg['is_hide'];
+                }
+
+                if (!empty($msg['extra_before'])) {
+                    $extra_before = $msg['extra_before'];
+                }
+
+                if (!empty($msg['extra_after'])) {
+                    $extra_after = $msg['extra_after'];
+                }
+
+                if (!empty($msg['text'])) {
+                    $msg = $msg['text'];
+                }
+            }
+
+            $html = '<div id="'.$id.'"';
             if ($is_hide) {
                 $html .= ' style="display:none;" ';
             }
-            $html .= 'class="notice notice-'.$type.($is_dismiss ? ' is-dismissible' : '').'"> ';
+            $html .= 'class="notice notice-'.$type.($is_dismiss ? ' is-dismissible' : '').'">'.$extra_before;
             if ($is_bold) {
                 $html .= '<p><strong>'.$msg.'</strong></p>';
             } else {
                 $html .= '<p>'.$msg.'</p>';
             }
-            $html .= '</div>';
+            $html .= $extra_after.'</div>';
 
-            $html = apply_filters('docketcache/filter/resc/boxmsg', $html, $msg, $type, $is_dismiss);
+            $html = apply_filters('docketcache/filter/resc/boxmsg', $html, $msg, $type, $is_dismiss, $is_bold, $is_hide);
 
             return $html;
         }

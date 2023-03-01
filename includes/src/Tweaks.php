@@ -21,7 +21,11 @@ final class Tweaks
         add_action(
             'pre_get_posts',
             function () {
-                remove_filter('posts_clauses', '_filter_query_attachment_filenames');
+                if (version_compare($GLOBALS['wp_version'], '6.0.3', '>')) {
+                    add_filter('wp_allow_query_attachment_by_filename', '__return_false', \PHP_INT_MAX);
+                } else {
+                    remove_filter('posts_clauses', '_filter_query_attachment_filenames');
+                }
             },
             \PHP_INT_MAX
         );
@@ -39,6 +43,203 @@ final class Tweaks
 
         // vipcom: disable custom fields meta box dropdown (very slow)
         add_filter('postmeta_form_keys', '__return_false');
+
+        add_filter(
+            'dashboard_recent_posts_query_args',
+            function ($query_args) {
+                $query_args['cache_results'] = true;
+                $query_args['suppress_filters'] = false;
+
+                return $query_args;
+            },
+            10,
+            1
+        );
+
+        add_filter(
+            'dashboard_recent_drafts_query_args',
+            function ($query_args) {
+                $query_args['suppress_filters'] = false;
+
+                return $query_args;
+            },
+            10,
+            1
+        );
+
+        add_action('load-edit.php', function () {
+            if (isset($_REQUEST['bulk_edit'])) {
+                wp_defer_term_counting(true);
+                add_action('shutdown', function () {
+                    wp_defer_term_counting(false);
+                });
+            }
+        }, \PHP_INT_MIN);
+
+        if (wp_using_ext_object_cache()) {
+            if (nwdcx_consfalse('TWEAKS_WPQUERY_NOFOUNDROWS_DISABLED')) {
+                add_action(
+                    'pre_get_posts',
+                    function (&$args) {
+                        if (\is_object($args)) {
+                            $args->no_found_rows = true;
+                            $args->order = 'ASC';
+                        } elseif (\is_array($args)) {
+                            $args['no_found_rows'] = true;
+                            $args['order'] = 'ASC';
+                        }
+                    },
+                    \PHP_INT_MIN
+                );
+
+                add_action(
+                    'parse_query',
+                    function (&$args) {
+                        if (\is_object($args)) {
+                            $args->no_found_rows = true;
+                            $args->order = 'ASC';
+                        } elseif (\is_array($args)) {
+                            $args['no_found_rows'] = true;
+                            $args['order'] = 'ASC';
+                        }
+                    },
+                    \PHP_INT_MIN
+                );
+
+                add_action(
+                    'pre_get_users',
+                    function ($wpq) {
+                        if (nwdcx_wpdb($wpdb) && !empty($wpq->query_vars['count_total'])) {
+                            $wpq->query_vars['count_total'] = false;
+                            $wpq->query_vars['nwdcx_count_total'] = true;
+                        }
+                    },
+                    \PHP_INT_MIN
+                );
+
+                add_action(
+                    'pre_user_query',
+                    function ($wpq) {
+                        if (nwdcx_wpdb($wpdb) && !empty($wpq->query_vars['nwdcx_count_total'])) {
+                            unset($wpq->query_vars['nwdcx_count_total']);
+                            $sql = "SELECT COUNT(*) {$wpq->query_from} {$wpq->query_where}";
+                            $wpq->total_users = $wpdb->get_var($sql);
+                        }
+                    },
+                    \PHP_INT_MIN
+                );
+            }
+
+            if (nwdcx_consfalse('TWEAKS_COUNT_COMMENTS_DISABLED')) {
+                add_filter(
+                    'wp_count_comments',
+                    function ($counts = false, $post_id = 0) {
+                        if (0 !== $post_id) {
+                            return $counts;
+                        }
+
+                        $cache_group = 'docketcache-wpquery';
+                        $cache_key = 'comments-0';
+                        $stats_object = wp_cache_get($cache_key, $cache_group);
+
+                        if (false === $stats_object) {
+                            $stats = get_comment_count(0);
+                            $stats['moderated'] = $stats['awaiting_moderation'];
+                            unset($stats['awaiting_moderation']);
+                            $stats_object = $stats;
+
+                            wp_cache_set($cache_key, $stats_object, $cache_group, 1800); // 1800 = 30min
+                        }
+
+                        return (object) $stats_object;
+                    },
+                    \PHP_INT_MAX,
+                    2
+                );
+
+                // core
+                foreach (['comment_post', 'wp_set_comment_status'] as $fx) {
+                    add_action(
+                        $fx,
+                        function () {
+                            wp_cache_delete('comments-0', 'docketcache-wpquery');
+                        }
+                    );
+                }
+
+                // jetpack
+                foreach (['unapproved_to_approved', 'approved_to_unapproved', 'spam_to_approved', 'approved_to_spam'] as $fx) {
+                    add_action(
+                        'comment_'.$fx,
+                        function () {
+                            wp_cache_delete('comments-0', 'docketcache-wpquery');
+                        }
+                    );
+                }
+            }
+
+            if (nwdcx_consfalse('TWEAKS_COUNT_MEDIA_LIBRARY_DISABLED')) {
+                add_filter(
+                    'media_library_months_with_files',
+                    function () {
+                        $cache_group = 'docketcache-wpquery';
+
+                        $months = wp_cache_get('media_library_months_with_files', $cache_group);
+
+                        if (false === $months) {
+                            if (!nwdcx_wpdb($wpdb)) {
+                                return $months;
+                            }
+
+                            $months = $wpdb->get_results(
+                                $wpdb->prepare(
+                                    "SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month FROM `{$wpdb->posts}` WHERE post_type = %s ORDER BY post_date DESC",
+                                    'attachment'
+                                )
+                            );
+                            wp_cache_set('media_library_months_with_files', $months, $cache_group, 2592000); // 2592000 = 1month
+                        }
+
+                        return $months;
+                    }
+                );
+
+                add_action(
+                    'add_attachment',
+                    function ($post_id) {
+                        if (\defined('WP_IMPORTING') && WP_IMPORTING) {
+                            return;
+                        }
+
+                        if (!nwdcx_wpdb($wpdb)) {
+                            return;
+                        }
+
+                        $months = $wpdb->get_results(
+                            $wpdb->prepare(
+                                "SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month FROM `{$wpdb->posts}` WHERE post_type = %s ORDER BY post_date DESC LIMIT 1",
+                                'attachment'
+                            ),
+                            ARRAY_A
+                        );
+
+                        if (empty($months) || !\is_array($months)) {
+                            return;
+                        }
+
+                        $cache_group = 'docketcache-wpquery';
+                        $months = array_values($months);
+                        $months = array_shift($months);
+
+                        $months = (object) $months;
+
+                        if (!$months->year == get_the_time('Y', $post_id) && !$months->month == get_the_time('m', $post_id)) {
+                            wp_cache_delete('media_library_months_with_files', $cache_group);
+                        }
+                    }
+                );
+            }
+        } // wp_using_ext_object_cache
     }
 
     public function misc()
@@ -168,6 +369,44 @@ final class Tweaks
             },
             \PHP_INT_MAX
         );
+
+        // vipcom: performance/do-pings.php
+        // Disable pings by default.
+        add_action('schedule_event', function ($event) {
+            if (!\is_object($event)) {
+                return $event;
+            }
+
+            if ('do_pings' === $event->hook) {
+                return false;
+            }
+
+            return $event;
+        });
+
+        // vipcom: performance/do-pings.php : pre_disable_pings.
+        // Hooking at 0 to get in before cron control on pre_schedule_event.
+        add_filter('pre_schedule_event', function ($scheduled, $event) {
+            if (null !== $scheduled) {
+                return $scheduled;
+            }
+
+            if ('do_pings' === $event->hook) {
+                return false;
+            }
+
+            return $scheduled;
+        }, 0, 2);
+
+        // vipcom: performance/do-pings.php : avoid new _encloseme metas.
+        // https://wordpress.stackexchange.com/questions/20904/the-encloseme-meta-key-conundrum
+        add_filter('add_post_metadata', function ($should_update, $object_id, $meta_key) {
+            if ('_encloseme' === $meta_key) {
+                $should_update = false;
+            }
+
+            return $should_update;
+        }, 10, 3);
 
         // wp: disable xmlrpc
         // https://www.wpbeginner.com/plugins/how-to-disable-xml-rpc-in-wordpress/
@@ -732,6 +971,11 @@ final class Tweaks
             },
             \PHP_INT_MAX
         );
+    }
+
+    public function postviaemail()
+    {
+        add_filter('enable_post_by_email_configuration', '__return_false', \PHP_INT_MAX);
     }
 
     // reference:

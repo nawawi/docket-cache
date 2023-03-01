@@ -55,162 +55,36 @@ final class PostCache
 
     public function register()
     {
-        $this->setup_for_blog();
-        $this->setup_hooks();
+        // already in core.
+        // https://github.com/WordPress/wordpress-develop/commit/7f7d616d822b79c952cbd6a3046a6f6a8aa5a35e
+        if (isset($GLOBALS['wp_version']) && version_compare($GLOBALS['wp_version'], '6.1', '<')) {
+            $this->allow_posttype_all = nwdcx_construe('ADVCPOST_POSTTYPE_ALL');
+            if (!$this->allow_posttype_all) {
+                $types = nwdcx_constval('ADVCPOST_POSTTYPE');
 
-        $this->allow_posttype_all = nwdcx_construe('ADVCPOST_POSTTYPE_ALL');
-        if (!$this->allow_posttype_all) {
-            $types = nwdcx_constval('ADVCPOST_POSTTYPE');
-
-            if (\is_string($types) && 'all' === $types || \in_array($types, $this->allow_posttype)) {
-                $this->allow_posttype = $types;
-            } elseif (!empty($types) && \is_array($types)) {
-                $this->allow_posttype = array_merge($this->allow_posttype, $types);
-            }
-        }
-    }
-
-    private function setup_hooks()
-    {
-        add_action('switch_blog', [$this, 'setup_for_blog'], 10, 2);
-        add_filter('posts_request', [&$this, 'posts_request'], 10, 2);
-        add_filter('posts_results', [&$this, 'posts_results'], 10, 2);
-        add_filter('post_limits_request', [&$this, 'post_limits_request'], 999, 2);
-        add_filter('found_posts_query', [&$this, 'found_posts_query'], 10, 2);
-        add_filter('found_posts', [&$this, 'found_posts'], 10, 2);
-
-        // https://developer.wordpress.org/reference/functions/clean_term_cache/
-        add_action('clean_term_cache', [$this, 'invalidate_cache']);
-        // https://developer.wordpress.org/reference/functions/clean_post_cache/
-        add_action('clean_post_cache', [$this, 'invalidate_cache']);
-
-        add_filter(
-            'dashboard_recent_posts_query_args',
-            function ($query_args) {
-                $query_args['cache_results'] = true;
-                $query_args['suppress_filters'] = false;
-
-                return $query_args;
-            },
-            10,
-            1
-        );
-
-        add_filter(
-            'dashboard_recent_drafts_query_args',
-            function ($query_args) {
-                $query_args['suppress_filters'] = false;
-
-                return $query_args;
-            },
-            10,
-            1
-        );
-
-        add_filter(
-            'wp_count_comments',
-            function ($counts = false, $post_id = 0) {
-                if (0 !== $post_id) {
-                    return $counts;
-                }
-
-                $cache_key = 'comments-0';
-                $stats_object = wp_cache_get($cache_key, $this->prefix);
-
-                if (false === $stats_object) {
-                    $stats = get_comment_count(0);
-                    $stats['moderated'] = $stats['awaiting_moderation'];
-                    unset($stats['awaiting_moderation']);
-                    $stats_object = $stats;
-
-                    wp_cache_set($cache_key, $stats_object, $this->prefix, 1800); // 1800 = 30min
-                }
-
-                return (object) $stats_object;
-            },
-            \PHP_INT_MAX,
-            2
-        );
-
-        // core
-        foreach (['comment_post', 'wp_set_comment_status'] as $fx) {
-            add_action(
-                $fx,
-                function () {
-                    wp_cache_delete('comments-0', $this->prefix);
-                }
-            );
-        }
-
-        // jetpack
-        foreach (['unapproved_to_approved', 'approved_to_unapproved', 'spam_to_approved', 'approved_to_spam'] as $fx) {
-            add_action(
-                'comment_'.$fx,
-                function () {
-                    wp_cache_delete('comments-0', $this->prefix);
-                }
-            );
-        }
-
-        add_filter(
-            'media_library_months_with_files',
-            function () {
-                $cache_group = $this->prefix.'-media';
-
-                $months = wp_cache_get('media_library_months_with_files', $cache_group);
-
-                if (false === $months) {
-                    if (!nwdcx_wpdb($wpdb)) {
-                        return $months;
-                    }
-
-                    $months = $wpdb->get_results(
-                        $wpdb->prepare(
-                            "SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month FROM `{$wpdb->posts}` WHERE post_type = %s ORDER BY post_date DESC",
-                            'attachment'
-                        )
-                    );
-                    wp_cache_set('media_library_months_with_files', $months, $cache_group, 2592000); // 2592000 = 1month
-                }
-
-                return $months;
-            }
-        );
-
-        add_action(
-            'add_attachment',
-            function ($post_id) {
-                if (\defined('WP_IMPORTING') && WP_IMPORTING) {
-                    return;
-                }
-
-                if (!nwdcx_wpdb($wpdb)) {
-                    return;
-                }
-
-                $months = $wpdb->get_results(
-                    $wpdb->prepare(
-                        "SELECT DISTINCT YEAR( post_date ) AS year, MONTH( post_date ) AS month FROM `{$wpdb->posts}` WHERE post_type = %s ORDER BY post_date DESC LIMIT 1",
-                        'attachment'
-                    ),
-                    ARRAY_A
-                );
-
-                if (empty($months) || !\is_array($months)) {
-                    return;
-                }
-
-                $cache_group = $this->prefix.'-media';
-                $months = array_values($months);
-                $months = array_shift($months);
-
-                $months = (object) $months;
-
-                if (!$months->year == get_the_time('Y', $post_id) && !$months->month == get_the_time('m', $post_id)) {
-                    wp_cache_delete('media_library_months_with_files', $cache_group);
+                if (\is_string($types) && 'all' === $types || \in_array($types, $this->allow_posttype)) {
+                    $this->allow_posttype = $types;
+                } elseif (!empty($types) && \is_array($types)) {
+                    $this->allow_posttype = array_merge($this->allow_posttype, $types);
                 }
             }
-        );
+
+            $this->setup_for_blog();
+
+            add_action('switch_blog', [$this, 'setup_for_blog'], 10, 2);
+            add_filter('posts_request', [&$this, 'posts_request'], 10, 2);
+            add_filter('posts_results', [&$this, 'posts_results'], 10, 2);
+            add_filter('post_limits_request', [&$this, 'post_limits_request'], 999, 2);
+            add_filter('found_posts_query', [&$this, 'found_posts_query'], 10, 2);
+            add_filter('found_posts', [&$this, 'found_posts'], 10, 2);
+
+            add_action('clean_term_cache', [$this, 'invalidate_cache']);
+            add_action('clean_post_cache', [$this, 'invalidate_cache']);
+
+            add_action('added_post_meta', [$this, 'invalidate_cache']);
+            add_action('updated_post_meta', [$this, 'invalidate_cache']);
+            add_action('deleted_post_meta', [$this, 'invalidate_cache']);
+        }
     }
 
     public function setup_for_blog($new_blog_id = false, $previous_blog_id = false)

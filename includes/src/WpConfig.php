@@ -258,7 +258,7 @@ final class WpConfig
 
     public static function has($name)
     {
-        if (!empty($GLOBALS['DOCKET_CACHE_RUNTIME'][nwdcx_constfx($name.'_false')])) {
+        if (!empty($GLOBALS['DOCKET_CACHE_RUNTIME'][nwdcx_constfx($name.'_FALSE')])) {
             return true;
         }
 
@@ -318,7 +318,7 @@ final class WpConfig
             'configpath' => self::canopt()->path,
         ];
 
-        $cons = "\$GLOBALS['DOCKET_CACHE_RUNTIME'] = [];".\PHP_EOL;
+        $cons = "if(empty(\$GLOBALS['DOCKET_CACHE_RUNTIME'])){\$GLOBALS['DOCKET_CACHE_RUNTIME'] = [];}".\PHP_EOL;
         $keys = self::keys();
         foreach ($keys as $k => $v) {
             $ka = nwdcx_constfx($k);

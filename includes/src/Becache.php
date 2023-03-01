@@ -9,7 +9,7 @@
  */
 
 /*
- * This class is a minimal version of cache.php, only use for object-cache.php.
+ * This class is a minimal version of cache.php, only used for object-cache.php.
  *
  * Reference:
  *  wp-content/plugins/docket-cache/includes/cache.php
@@ -20,15 +20,16 @@ namespace Nawawi\DocketCache;
 
 \defined('ABSPATH') || exit;
 
-class Becache
+final class Becache
 {
     private $cache_path;
     private $cache_maxsize = 3145728;
     private $cache_maxttl = 345600;
     private $multisite = false;
     private $blog_prefix;
-    private $qlimit = 5000;
+    private $qlimit = 1000;
     private static $inst;
+    private $network_id = 1;
     private $max_execution_time = 0;
 
     public function __construct()
@@ -53,6 +54,7 @@ class Becache
             }
         }
 
+        $this->network_id = (int) nwdcx_network_id();
         $this->max_execution_time = $this->fs()->get_max_execution_time();
     }
 
@@ -122,18 +124,7 @@ class Becache
 
     private function dump_code($file, $arr)
     {
-        // use (object) instead of VarExporter.
-        if (\PHP_VERSION_ID >= 70433 && \in_array($arr['type'], ['object', 'array'])) {
-            $arr_data = var_export($arr, true);
-            if (!empty($arr_data) && false != strpos($arr_data, '(object) array(') && false === strpos($arr_data, '::__set_state')) {
-                $data = $arr_data;
-            }
-        }
-
-        if (!isset($data)) {
-            $data = $this->fs()->export_var($arr, $error);
-        }
-
+        $data = $this->fs()->export_var($arr, $error);
         if (false === $data) {
             return false;
         }
@@ -183,6 +174,19 @@ class Becache
         }
 
         if (!empty($data)) {
+            $len = 0;
+            $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+            if (\function_exists('maybe_serialize')) {
+                $len = \strlen(@maybe_serialize($data));
+            } else {
+                $len = \strlen(@serialize($data));
+            }
+            nwdcx_suppresserrors($nwdcx_suppresserrors);
+
+            if ($len >= $this->cache_maxsize) {
+                return false;
+            }
+
             if ('string' === $type) {
                 $data = nwdcx_unserialize($data);
             } elseif ('array' === $type) {
@@ -195,32 +199,36 @@ class Becache
             }
         }
 
-        $len = \strlen(serialize($data));
-        if ($len >= $this->cache_maxsize) {
-            return false;
-        }
-
         $meta = [];
         $meta['timestamp'] = time();
 
         if ($this->multisite) {
-            try {
-                $meta['network_id'] = get_current_network_id();
-            } catch (\Throwable $e) {
-                $meta['network_id'] = 0;
-            }
+            $meta['network_id'] = $this->network_id;
         }
 
         $final_type = \gettype($data);
         if ('string' === $final_type && nwdcx_serialized($data)) {
             $final_type = 'string_serialize';
-        } elseif ('array' === $final_type && (!\defined('DOCKET_CACHE_USE_CLASSMAP') || !DOCKET_CACHE_USE_CLASSMAP)) {
-            if (false !== strpos(var_export($data, 1), 'Requests_Utility_CaseInsensitiveDictionary::__set_state')) {
-                $data = @serialize($data);
-                if (nwdcx_serialized($data)) {
-                    $final_type = 'array_serialize';
+        } elseif ('array' === $final_type) {
+            $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+            $export_data = @var_export($data, 1);
+            if (!empty($export_data)) {
+                if (false !== strpos($export_data, 'Requests_Utility_CaseInsensitiveDictionary::__set_state')) {
+                    $data = @serialize($data);
+                    if (nwdcx_serialized($data)) {
+                        $final_type = 'array_serialize';
+                    }
+                }
+
+                if ('array' === $final_type && $this->fs()->is_transient($group) && false !== strpos($export_data, '::__set_state')) {
+                    $data = @serialize($data);
+                    if (nwdcx_serialized($data)) {
+                        $final_type = 'array_serialize';
+                    }
                 }
             }
+            unset($export_data);
+            nwdcx_suppresserrors($nwdcx_suppresserrors);
         }
 
         $meta['site_id'] = get_current_blog_id();
@@ -239,6 +247,10 @@ class Becache
 
     public function export_transient()
     {
+        if ($this->cf()->is_dctrue('TRANSIENTDB')) {
+            return false;
+        }
+
         if (!nwdcx_wpdb($wpdb)) {
             return false;
         }
@@ -339,24 +351,41 @@ class Becache
         return true;
     }
 
+    public static function cleanup_transient()
+    {
+        if (nwdcx_construe('TRANSIENTDB')) {
+            return false;
+        }
+
+        if (\function_exists('nwdcx_cleanuptransient')) {
+            return nwdcx_cleanuptransient();
+        }
+
+        return false;
+    }
+
     public function export_alloptions()
     {
         if (!nwdcx_wpdb($wpdb) || $this->multisite) {
             return false;
         }
 
+        // Only export if autoload=yes and not transient.
         $suppress = $wpdb->suppress_errors(true);
-        $alloptions_db = $wpdb->get_results('SELECT `option_name`,`option_value` FROM `'.$wpdb->options.'` WHERE autoload = \'yes\'', ARRAY_A);
+        $alloptions_db = $wpdb->get_results('SELECT `option_name`,`option_value` FROM `'.$wpdb->options.'` WHERE autoload = \'yes\' AND `option_name` NOT LIKE "_transient_%" AND `option_name` NOT LIKE "_site_transient_%"', ARRAY_A);
         if (empty($alloptions_db)) {
-            $alloptions_db = $wpdb->get_results('SELECT `option_name`,`option_value` FROM `'.$wpdb->options.'`', ARRAY_A);
+            return false;
         }
         $wpdb->suppress_errors($suppress);
 
         $alloptions = [];
 
-        if (!empty($alloptions_db) && \is_array($alloptions_db)) {
-            $wp_options = $this->fs()->keys_alloptions();
+        if (\is_array($alloptions_db)) {
             $is_filter = $this->cf()->is_dctrue('WPOPTALOAD', true);
+            $wp_options = [];
+            if ($is_filter) {
+                $wp_options = $this->fs()->keys_alloptions();
+            }
             foreach ($alloptions_db as $num => $options) {
                 if ($this->max_execution_time > 0 && \defined('WP_START_TIMESTAMP') && (microtime(true) - WP_START_TIMESTAMP) > $this->max_execution_time) {
                     $alloptions = [];

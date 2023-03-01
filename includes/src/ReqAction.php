@@ -857,7 +857,7 @@ final class ReqAction
                     unset($total, $clmsg);
                     break;
                 case 'docket-menucache-flushed-failed':
-                    $this->pt->notice = esc_html__('Menu cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Menu cache could not be flushed. Docket Cache object-cache.php Drop-in is inactive.', 'docket-cache');
                     break;
                 case 'docket-mocache-flushed':
                     $this->pt->notice = esc_html__('Translation cache was flushed.', 'docket-cache');
@@ -875,7 +875,7 @@ final class ReqAction
                     unset($total, $clmsg);
                     break;
                 case 'docket-mocache-flushed-failed':
-                    $this->pt->notice = esc_html__('Translation cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Translation cache could not be flushed. Docket Cache object-cache.php Drop-in is inactive.', 'docket-cache');
                     break;
                 case 'docket-ocprecache-flushed':
                     $this->pt->notice = esc_html__('Object Precache was flushed.', 'docket-cache');
@@ -893,7 +893,7 @@ final class ReqAction
                     unset($total, $clmsg);
                     break;
                 case 'docket-ocprecache-flushed-failed':
-                    $this->pt->notice = esc_html__('Object Precache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Object Precache could not be flushed. Docket Cache object-cache.php Drop-in is inactive.', 'docket-cache');
                     break;
                 case 'docket-advcpost-flushed':
                     $this->pt->notice = esc_html__('Advanced Post Cache was flushed.', 'docket-cache');
@@ -911,7 +911,7 @@ final class ReqAction
                     unset($total, $clmsg);
                     break;
                 case 'docket-advcpost-flushed-failed':
-                    $this->pt->notice = esc_html__('Advanced Post Cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Advanced Post Cache could not be flushed. Docket Cache object-cache.php Drop-in is inactive.', 'docket-cache');
                     break;
                 case 'docket-transient-flushed':
                     $this->pt->notice = esc_html__('Transient cache was flushed.', 'docket-cache');
@@ -929,7 +929,7 @@ final class ReqAction
                     unset($total, $clmsg);
                     break;
                 case 'docket-transient-flushed-failed':
-                    $this->pt->notice = esc_html__('Transient cache could not be flushed. This action require Docket Cache object-cache.php Drop-in.', 'docket-cache');
+                    $this->pt->notice = esc_html__('Transient cache could not be flushed. Docket Cache object-cache.php Drop-in is inactive.', 'docket-cache');
                     break;
             }
         }
