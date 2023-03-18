@@ -4,7 +4,7 @@ Tags: object cache, OPcache, cache, database, performance, Optimisation, redis, 
 Requires at least: 5.4
 Tested up to: 6.2
 Requires PHP: 7.2.5
-Stable tag: 22.07.04
+Stable tag: 22.07.05
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 
@@ -22,7 +22,7 @@ When it comes to reliable persistent Object Cache in WordPress, [Redis](https://
 
 The only solution is to store the object caches into files. With WordPress, exporting the PHP objects are not easy, most plugin that implements file-based solution will serialize and unserialize the object to store and retrieve the data.
 
-The Docket Cache is better because it converts the object cache into plain PHP code. This solution is faster since WordPress can use the cache directly without running other operation.
+Docket Cache takes a better approach by turning the object cache into plain PHP code. This solution is faster since WordPress can use the cache directly without running other operations.
 
 == Features ==
 
@@ -64,8 +64,6 @@ To adjust the plugin behaviour, installation or manage through a command line, p
 
 [Fund Docket Cache](https://docketcache.com/sponsorship/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg) one-off or recurring payment to support our open-source development efforts.
 
-All funds will be dedicated to the maintenance, development, and marketing of this project.
-
 **Noteworthy Sponsors:**
 
 A heartful thanks and appreciation.
@@ -82,10 +80,6 @@ A heartful thanks and appreciation.
 
 
 Other sponsors are mentioned in the [honourable list](https://github.com/nawawi/docket-cache/issues/5)
-
-== Additional Tool ==
-
-[Docket CronWP](https://github.com/nawawi/docket-cronwp) - A command-line tool for executing WordPress cron events in parallel.
 
 == Installation ==
 To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
@@ -178,6 +172,17 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 22.07.05 =
+- Fixed: Plugin::register_plugin_hooks() -> Undefined property: stdClass::$slug.
+- Fixed: Event::garbage_collector() -> Stale cache, invalid filter for comment_feed.
+- Fixed: Event::garbage_collector() -> Stale cache, add filter for adjacent_post, wp_get_archives and get_comment_child_ids.
+- Fixed: Tweaks::wplazyload() -> Add filter for wp_get_attachment_image_attributes.
+- Fixed: WP_Object_Cache::dc_save() -> Returns false if data type is "unknown type".
+- Added: Filesystem::is_wp_cache_group_queries() -> Match group for *-queries.
+- Added: WP_Object_Cache::maybe_expire() ->  Match group for *-queries.
+
+Thanks to Ronny from web55.se for bug report.
+
 = 22.07.04 =
 - Fixed: Advanced Post Cache -> Only visible to wp < 6.1.1 as it is already implemented in wp core (WP_Query caching).
 - Fixed: Filesystem::shutdown_cleanup() -> Avoid cleanup on shutdown if a file is empty.

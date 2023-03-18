@@ -1,3 +1,15 @@
+= v22.07.05 (2023-03-18) =
+
+- Fixed: Plugin::register_plugin_hooks() -> Undefined property: stdClass::$slug.
+- Fixed: Event::garbage_collector() -> Stale cache, invalid filter for comment_feed.
+- Fixed: Event::garbage_collector() -> Stale cache, add filter for adjacent_post, wp_get_archives and get_comment_child_ids.
+- Fixed: Tweaks::wplazyload() -> Add filter for wp_get_attachment_image_attributes.
+- Fixed: WP_Object_Cache::dc_save() -> Returns false if data type is "unknown type".
+- Added: Filesystem::is_wp_cache_group_queries() -> Match group for *-queries.
+- Added: WP_Object_Cache::maybe_expire() ->  Match group for *-queries.
+
+Thanks to Ronny from web55.se for bug report.
+
 = v22.07.04 (2023-03-01) =
 
 - Fixed: Advanced Post Cache -> Only visible to wp < 6.1.1 as it is already implemented in wp core (WP_Query caching).

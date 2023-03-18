@@ -184,6 +184,8 @@ final class Becache
             nwdcx_suppresserrors($nwdcx_suppresserrors);
 
             if ($len >= $this->cache_maxsize) {
+                $this->fs()->unlink($file, false);
+
                 return false;
             }
 

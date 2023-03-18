@@ -928,13 +928,12 @@ final class Tweaks
 
     public function wplazyload()
     {
-        add_action(
-            'init',
-            function () {
-                add_filter('wp_lazy_loading_enabled', '__return_false');
-            },
-            \PHP_INT_MAX
-        );
+        add_filter('wp_lazy_loading_enabled', '__return_false', \PHP_INT_MAX);
+        add_filter('wp_get_attachment_image_attributes', function ($attr, $attachment, $size) {
+            $attr['loading'] = 'eager';
+
+            return $attr;
+        }, \PHP_INT_MAX, 3);
     }
 
     public function wpsitemap()

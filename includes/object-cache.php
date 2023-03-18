@@ -3,8 +3,8 @@
  * @wordpress-plugin
  * Plugin Name:         Docket Cache Drop-in
  * Plugin URI:          https://wordpress.org/plugins/docket-cache/
- * Version:             22.07.04
- * Description:         A persistent object cache stored as a plain PHP code, accelerates caching with OPcache backend.
+ * Version:             22.07.05
+ * Description:         Object Cache drop-in for Docket Cache.
  * Author:              Nawawi Jamili
  * Author URI:          https://docketcache.com
  * Requires at least:   5.4

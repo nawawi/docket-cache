@@ -940,6 +940,12 @@ class WP_Object_Cache
             }
 
             // wp stale cache
+            // group-queries: wp >= 6.3
+            elseif ($this->fs()->is_wp_cache_group_queries($group)) {
+                $expire = $maxttl < 86400 ? $maxttl : 86400; // 1d
+            }
+
+            // wp stale cache
             // prefix:md5hash:microtime
             // wp_query|get_terms|get_comments|comment_feed|get_sites|get_network_ids|get_page_by_path|other?
             elseif (false !== strpos($key, ':') && @preg_match('@^([a-zA-Z0-9\._-]+):([0-9a-f]{32}):([0-9\. ]+)$@', $key)) {
@@ -1058,6 +1064,10 @@ class WP_Object_Cache
      */
     private function has_stalecache($key, $group = '')
     {
+        if ($this->fs()->is_wp_cache_group_queries($group)) {
+            return true;
+        }
+
         if ('wc_' === substr($key, 0, 3) && '_cache_prefix' === substr($key, -13)) {
             return true;
         }
@@ -1083,7 +1093,7 @@ class WP_Object_Cache
     private function is_stalecache_ignored($key, $group = '')
     {
         if ($this->ignore_stalecache) {
-            return $this->has_stalecache($key, $group = '');
+            return $this->has_stalecache($key, $group);
         }
 
         return false;
@@ -1514,6 +1524,7 @@ class WP_Object_Cache
         if (('' === $data || (\is_array($data) && empty($data))) && ($this->fs()->is_transient($group) || $this->ignore_emptycache)) {
             nwdcx_debuglog(__FUNCTION__.': '.$logkey.': Process aborted. No data availale.');
             $this->fs()->unlink($file, false);
+            unset($this->precache[$group][$cache_key]);
 
             return true;
         }
@@ -1527,27 +1538,35 @@ class WP_Object_Cache
         $timeout = ($expire > 0 ? time() + $expire : 0);
 
         $type = \gettype($data);
+        if ('unknown type' === $type) {
+            return false;
+        }
+
         if ('NULL' === $type && null === $data) {
             $data = '';
         }
 
         if (!empty($data)) {
-            // Abort if object too large.
-            $len = 0;
-            $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
-            if (\function_exists('maybe_serialize')) {
-                $len = \strlen(@maybe_serialize($data));
-            } else {
-                $len = \strlen(@serialize($data));
-            }
-            nwdcx_suppresserrors($nwdcx_suppresserrors);
+            if (!\in_array($type, ['boolean', 'integer', 'double', 'NULL'])) {
+                // Abort if object too large.
+                $len = 0;
+                $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+                if (\function_exists('maybe_serialize')) {
+                    $len = \strlen(@maybe_serialize($data));
+                } else {
+                    $len = \strlen(@serialize($data));
+                }
+                nwdcx_suppresserrors($nwdcx_suppresserrors);
 
-            if ($len >= $this->cache_maxsize) {
-                $this->dc_log('err', $logkey, $group.':'.$cache_key.' '.$logpref.' Object too large -> '.$len.'/'.$this->cache_maxsize);
+                if ($len >= $this->cache_maxsize) {
+                    $this->dc_log('err', $logkey, $group.':'.$cache_key.' '.$logpref.' The size of object has breached '.$len.' of '.$this->cache_maxsize.' bytes.');
 
-                nwdcx_debuglog(__FUNCTION__.': '.$logkey.': Process aborted. Object too large ('.$len.'/'.$this->cache_maxsize.')');
+                    nwdcx_debuglog(__FUNCTION__.': '.$logkey.': Process aborted. The size of object has breached '.$len.' of '.$this->cache_maxsize.' bytes.');
+                    $this->fs()->unlink($file, false);
+                    unset($this->precache[$group][$cache_key]);
 
-                return false;
+                    return false;
+                }
             }
 
             // Unserialize content first.

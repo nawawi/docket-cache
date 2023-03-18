@@ -1327,7 +1327,11 @@ final class Plugin extends Bepart
         add_filter(
             'pre_update_site_option_auto_update_plugins',
             function ($value, $old_value, $option, $network_id) {
-                return array_values($value);
+                if (\is_array($value) && !empty($value)) {
+                    return array_values($value);
+                }
+
+                return $value;
             },
             10,
             4
@@ -1336,7 +1340,7 @@ final class Plugin extends Bepart
         add_filter(
             'auto_update_plugin',
             function ($update, $item) {
-                if ('docket-cache' === $item->slug) {
+                if (\is_object($item) && isset($item->slug) && 'docket-cache' === $item->slug) {
                     if (\defined('DOCKET_CACHE_AUTOUPDATE') && \is_bool(DOCKET_CACHE_AUTOUPDATE)) {
                         return DOCKET_CACHE_AUTOUPDATE;
                     }

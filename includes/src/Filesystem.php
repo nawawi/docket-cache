@@ -106,6 +106,14 @@ class Filesystem
     }
 
     /**
+     * is_wp_cache_group_queries.
+     */
+    public function is_wp_cache_group_queries($group)
+    {
+        return \in_array($group, ['term-queries', 'post-queries', 'comment-queries', 'site-queries', 'network-queries']);
+    }
+
+    /**
      * is_dirempty.
      */
     public function is_dirempty($dir)

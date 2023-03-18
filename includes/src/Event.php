@@ -258,12 +258,15 @@ final class Event
             'posts' => 'wp_query',
             'terms' => 'get_terms',
             'comment' => 'get_comments',
-            'comment_feed' => 'comment_feed',
             'sites' => 'get_sites',
             'networks' => 'get_network_ids',
         ];
         foreach ($wp_cache_last_changed_match as $grp => $kk) {
             $wp_cache_last_changed[$grp] = wp_cache_get_last_changed($grp);
+            // wp >= 6.3
+            // remove ending 's' -> posts = post-queries.
+            $grpq = strtok($grp, 's').'-queries';
+            $wp_cache_last_changed[$grpq] = $wp_cache_last_changed[$grp];
         }
 
         $wp_cache_last_changed['advpost'] = wp_cache_get('cache_incr', 'docketcache-post');
@@ -413,14 +416,54 @@ final class Event
 
                 if ($is_flush_stalecache) {
                     // wp stale cache
-                    if (!empty($wp_cache_last_changed_match[$data['group']]) && preg_match('@^(wp_query|get_terms|get_comments|comment_feed|get_sites|get_network_ids|get_page_by_path):([0-9a-f]{32}):([0-9\. ]{21})([0-9\. ]+)?$@', $data['key'], $mm)) {
-                        if ('get_page_by_path' === $mm[1]) {
-                            $mm[1] = 'wp_query';
+                    // wp >= 6.3
+                    if ($is_ignore_stalecache && $this->is_wp_cache_group_queries($data['group'])) {
+                        if (@unlink($fx)) {
+                            clearstatcache(true, $fx);
+
+                            nwdcx_cliverbose('run-gc:stale-cache: '.$fx."\n");
+
+                            ++$collect->cleanup_stalecache;
+                            continue;
+                        }
+                    }
+
+                    // wp stale cache
+                    // prefix:hash:timestamp timestamp
+                    if (!empty($wp_cache_last_changed_match[$data['group']]) && preg_match('@^(wp_query|get_terms|get_comments|comment_feed|get_sites|get_network_ids|get_page_by_path|adjacent_post|wp_get_archives):([0-9a-f]{32}):([0-9\. ]{21})([0-9\. ]+)?$@', $data['key'], $mm)) {
+                        // main type
+                        switch ($mm[1]) {
+                            case 'get_page_by_path':
+                            case 'adjacent_post':
+                                $mm[1] = 'wp_query';
+                                break;
+                            case 'comment_feed':
+                                $mm[1] = 'get_comments';
+                                break;
                         }
 
                         $km = $wp_cache_last_changed_match[$data['group']];
 
                         if (($km === $mm[1] && $wp_cache_last_changed[$data['group']] !== $mm[3]) || $is_ignore_stalecache) {
+                            if (@unlink($fx)) {
+                                clearstatcache(true, $fx);
+
+                                nwdcx_cliverbose('run-gc:stale-cache: '.$fx."\n");
+
+                                ++$collect->cleanup_stalecache;
+                                continue;
+                            }
+                        }
+                    }
+
+                    // wp stale cache
+                    // get_comment_child_ids:int:hash:timestamp timestamp
+                    // get_comment_child_ids:1654:5247020d1a40e3b2e9a40de1139bc5c9:0.48761900 1678553206
+                    if (!empty($wp_cache_last_changed_match[$data['group']]) && preg_match('@^(get_comment_child_ids):(\d+):([0-9a-f]{32}):([0-9\. ]{21})([0-9\. ]+)?$@', $data['key'], $mm)) {
+                        $mm[1] = 'get_comments';
+                        $km = $wp_cache_last_changed_match[$data['group']];
+
+                        if (($km === $mm[1] && $wp_cache_last_changed[$data['group']] !== $mm[4]) || $is_ignore_stalecache) {
                             if (@unlink($fx)) {
                                 clearstatcache(true, $fx);
 
