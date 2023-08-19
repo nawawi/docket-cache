@@ -172,7 +172,7 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
-= v23.08.01 =
+= 23.08.01 =
 - Fixed: LimitBulkedit::bulk_editing_is_limited() -> Deprecated Constant FILTER_SANITIZE_STRING.
 - Fixed: restrict_api error notice.
 - Fixed: Outdated php warning is triggered when Disable Serve Happy Checking is enabled.
