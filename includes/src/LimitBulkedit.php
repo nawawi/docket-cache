@@ -72,7 +72,7 @@ final class LimitBulkedit
 
         // Get default per page.
         if (!empty($_GET['post_type'])) {
-            $post_type = filter_var($_GET['post_type'], \FILTER_SANITIZE_STRING);
+            $post_type = sanitize_key($_GET['post_type']);
             // See wp-admin/includes/post.php -> wp_edit_posts_query().
             $option = 'edit_'.$post_type.'_per_page';
             $per_page = (int) get_user_option($option);

@@ -110,7 +110,7 @@ class Filesystem
      */
     public function is_wp_cache_group_queries($group)
     {
-        return \in_array($group, ['term-queries', 'post-queries', 'comment-queries', 'site-queries', 'network-queries']);
+        return \in_array($group, ['term-queries', 'post-queries', 'comment-queries', 'site-queries', 'network-queries', 'user-queries']);
     }
 
     /**
@@ -759,7 +759,9 @@ class Filesystem
     public function opcache_filecache_only()
     {
         if ($this->is_opcache_filecache_only() && \function_exists('opcache_get_status')) {
-            $data = @opcache_get_status();
+            $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+            $data = opcache_get_status();
+            nwdcx_suppresserrors($nwdcx_suppresserrors);
             if (!empty($data) && \is_array($data) && !empty($data['file_cache_only']) && !empty($data['file_cache']) && is_dir($data['file_cache'])) {
                 return $data;
             }

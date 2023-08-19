@@ -3,7 +3,7 @@
         'name' => 'nawawi/docket-cache',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '449b87045f34fe11daf67cecd7b1559c0e2b3791',
+        'reference' => '471b1390e66efb09ca23f048494f355a8dbf17a4',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'nawawi/docket-cache' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '449b87045f34fe11daf67cecd7b1559c0e2b3791',
+            'reference' => '471b1390e66efb09ca23f048494f355a8dbf17a4',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../../',
             'aliases' => array(),

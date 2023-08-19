@@ -1019,6 +1019,10 @@ final class Tweaks
                 'is_acceptable' => '',
             ];
         }, \PHP_INT_MAX);
+
+        add_action('wp_dashboard_setup', function () {
+            remove_meta_box('dashboard_php_nag', 'dashboard', 'normal');
+        });
     }
 
     // wp < 5.8

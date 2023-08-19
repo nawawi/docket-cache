@@ -417,7 +417,10 @@ final class Plugin extends Bepart
             if (!$this->opcache_function_exists('opcache_get_status')) {
                 $status = 2;
             } else {
-                $data = @opcache_get_status();
+                $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
+                $data = opcache_get_status();
+                nwdcx_suppresserrors($nwdcx_suppresserrors);
+
                 if (!empty($data) && \is_array($data)) {
                     if (!empty($data['opcache_enabled'])) {
                         if ($is_raw) {

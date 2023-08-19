@@ -1,3 +1,10 @@
+= v23.08.01 (2023-08-19) =
+
+- Fixed: LimitBulkedit::bulk_editing_is_limited() -> Deprecated Constant FILTER_SANITIZE_STRING.
+- Fixed: restrict_api error notice.
+- Fixed: Outdated php warning is triggered when Disable Serve Happy Checking is enabled.
+- Updated: Tested up to 6.3.
+
 = v22.07.05 (2023-03-18) =
 
 - Fixed: Plugin::register_plugin_hooks() -> Undefined property: stdClass::$slug.
