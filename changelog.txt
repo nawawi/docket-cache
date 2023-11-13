@@ -1,3 +1,10 @@
+= v23.08.02 (2023-11-13) =
+
+- Fixed: Tweaks::post_missed_schedule() -> Prevent post publish immediately.
+- Fixed: WP_Object_Cache() -> Add setters and getters for backwards compatibility.
+- Added: TWEAKS_SINGLESEARCHREDIRECT_DISABLED constant to disable redirection of single search results to the page.
+- Updated: Tested up to 6.4.
+
 = v23.08.01 (2023-08-19) =
 
 - Fixed: LimitBulkedit::bulk_editing_is_limited() -> Deprecated Constant FILTER_SANITIZE_STRING.

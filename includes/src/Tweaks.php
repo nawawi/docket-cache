@@ -245,19 +245,21 @@ final class Tweaks
     public function misc()
     {
         // wp: if only one post is found by the search results, redirect user to that post
-        add_action(
-            'template_redirect',
-            function () {
-                if (is_search()) {
-                    global $wp_query;
-                    if (1 === (int) $wp_query->post_count && 1 === (int) $wp_query->max_num_pages) {
-                        wp_redirect(get_permalink($wp_query->posts['0']->ID));
-                        exit;
+        if (nwdcx_consfalse('TWEAKS_SINGLESEARCHREDIRECT_DISABLED')) {
+            add_action(
+                'template_redirect',
+                function () {
+                    if (is_search()) {
+                        global $wp_query;
+                        if (1 === (int) $wp_query->post_count && 1 === (int) $wp_query->max_num_pages) {
+                            wp_redirect(get_permalink($wp_query->posts['0']->ID));
+                            exit;
+                        }
                     }
-                }
-            },
-            \PHP_INT_MAX
-        );
+                },
+                \PHP_INT_MAX
+            );
+        }
 
         // wp: hide update notifications to non-admin users
         add_action(
@@ -630,7 +632,6 @@ final class Tweaks
                 $code .= 'script.src = src;';
                 $code .= 'script.async = true;';
                 $code .= 'document.head.appendChild(script);';
-                $code .= '';
                 $code .= '}';
                 $code .= '}';
                 $code .= '};';
@@ -736,11 +737,12 @@ final class Tweaks
         ];
 
         $post_types = get_post_types($args, 'names', 'and');
+        $current_datetime = date('Y-m-d H:i:s');
         if (!empty($post_types) && \is_array($post_types)) {
             $types = implode("','", $post_types);
-            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page','%s') AND post_status='future' ORDER BY ID ASC LIMIT %d", $types, $limit);
+            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page','%s') AND post_status='future' AND %s >= post_date_gmt ORDER BY ID ASC LIMIT %d", $types, $current_datetime, $limit);
         } else {
-            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page') AND post_status='future' ORDER BY ID ASC LIMIT %d", $limit);
+            $query = $wpdb->prepare("SELECT ID FROM `{$wpdb->posts}` WHERE post_type in ('post','page') AND post_status='future' AND %s >= post_date_gmt ORDER BY ID ASC LIMIT %d", $current_datetime, $limit);
         }
 
         $results = $wpdb->get_results($query, ARRAY_A);
