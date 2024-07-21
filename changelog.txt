@@ -1,3 +1,10 @@
+= v24.07.01 (2024-07-21) =
+
+- Fixed: View::tooltip() -> Typos "dan".
+- Fixed: Filesystem::sanitize_maxsizedisk() -> Returns default if empty.
+- Added: DOCKET_CACHE_OPCVIEWER_SHOWALL constant to enable/disable listing all opcache file.
+- Added: DOCKET_CACHE_PATH_NETWORK_(n) constant, to change default cache path for multinetwork. (n) for network Id.
+
 = v23.08.02 (2023-11-13) =
 
 - Fixed: Tweaks::post_missed_schedule() -> Prevent post publish immediately.

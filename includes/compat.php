@@ -162,10 +162,9 @@ if (!\function_exists('nwdcx_unserialize')) {
         }
 
         // To make query monitor happy.
-        $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
-        $data = @unserialize(trim($data));
-
-        nwdcx_suppresserrors($nwdcx_suppresserrors);
+        set_error_handler(function () {});
+        $data = unserialize(trim($data));
+        restore_error_handler();
 
         return $data;
     }
@@ -581,7 +580,17 @@ if (!\function_exists('nwdcx_network_dirpath')) {
     function nwdcx_network_dirpath($save_path)
     {
         if (nwdcx_network_multi() && !nwdcx_network_main()) {
-            $save_path = rtrim($save_path, '/').'/network-'.nwdcx_network_id().'/';
+            $network_id = nwdcx_network_id();
+            $cache_dir = sprintf('network-%s', $network_id);
+
+            if (false === strpos($save_path, 'docket-cache-data')) {
+                $cache_path_constant = sprintf('DOCKET_CACHE_PATH_NETWORK_%s', $network_id);
+                if (\defined($cache_path_constant)) {
+                    $save_path = \constant($cache_path_constant);
+                }
+            }
+
+            $save_path = rtrim($save_path, '/').'/'.$cache_dir.'/';
         }
 
         return $save_path;

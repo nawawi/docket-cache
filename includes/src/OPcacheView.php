@@ -124,6 +124,10 @@ class OPcacheView extends \WP_List_Table
                     $cpath = wp_normalize_path($arr['full_path']);
                     $script = wp_normalize_path($script);
 
+                    if ($this->pt->cf()->is_dcfalse('OPCVIEWER_SHOWALL') && !(0 === strpos($cpath, ABSPATH))) {
+                        continue;
+                    }
+
                     if (!empty($sstr) && false === strpos($cpath, $sstr)) {
                         continue;
                     }

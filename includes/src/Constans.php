@@ -394,6 +394,9 @@ final class Constans
         // opcviewer
         $this->maybe_define($this->px('OPCVIEWER'), false);
 
+        // opcviewer show all
+        $this->maybe_define($this->px('OPCVIEWER_SHOWALL'), false);
+
         // cache stats
         $this->maybe_define($this->px('STATS'), true);
 

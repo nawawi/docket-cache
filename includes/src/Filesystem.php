@@ -41,7 +41,8 @@ class Filesystem
         // 28042022: new cache directory.
         // depth = 3: cache/docket-cache/93/b2/8a/
         // depth = 4: cache/docket-cache/network-1/93/b2/8a/
-        $maxdepth = 4;
+        // depth = 5: cache/docket-cache/network/network-1/93/b2/8a/
+        $maxdepth = 5;
         foreach ($dir as $n => $c) {
             if ($n <= $maxdepth && 0 === strcmp($name, $c)) {
                 $ok = true;
@@ -1525,7 +1526,7 @@ class Filesystem
     public function sanitize_maxsizedisk($bytes)
     {
         if (empty($bytes) || !\is_int($bytes)) {
-            $maxsizedisk = 524288000; // 500MB
+            return 524288000; // 500MB
         }
 
         if ($bytes < 104857600) {

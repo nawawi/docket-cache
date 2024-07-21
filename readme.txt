@@ -1,10 +1,10 @@
 === Docket Cache - Object Cache Accelerator ===
 Contributors: nawawijamili
-Tags: object cache, OPcache, cache, database, performance, Optimisation, redis, memcached, speed
+Tags: object cache, OPcache, cache, database, performance
 Requires at least: 5.4
-Tested up to: 6.4
+Tested up to: 6.6
 Requires PHP: 7.2.5
-Stable tag: 23.08.02
+Stable tag: 24.07.01
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 
@@ -172,6 +172,12 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 24.07.01 =
+- Fixed: View::tooltip() -> Typos "dan".
+- Fixed: Filesystem::sanitize_maxsizedisk() -> Returns default if empty.
+- Added: DOCKET_CACHE_OPCVIEWER_SHOWALL constant to enable/disable listing all opcache file.
+- Added: DOCKET_CACHE_PATH_NETWORK_(n) constant, to change default cache path for multinetwork. (n) for network Id.
+
 = 23.08.02 =
 - Fixed: Tweaks::post_missed_schedule() -> Prevent post publish immediately.
 - Fixed: WP_Object_Cache() -> Add setters and getters for backwards compatibility.
