@@ -1,3 +1,9 @@
+= v24.07.02 (2024-12-06) =
+
+- Fixed: _load_textdomain_just_in_time was called incorrectly.
+- Fixed: blueprint.json -> deprecated pluginZipFile property.
+- Updated: Tested up to 6.7.
+
 = v24.07.01 (2024-07-21) =
 
 - Fixed: View::tooltip() -> Typos "dan".

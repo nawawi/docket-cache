@@ -2,9 +2,9 @@
 Contributors: nawawijamili
 Tags: object cache, OPcache, cache, database, performance
 Requires at least: 5.4
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 7.2.5
-Stable tag: 24.07.01
+Stable tag: 24.07.02
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 
@@ -172,6 +172,11 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 24.07.02 =
+- Fixed: _load_textdomain_just_in_time was called incorrectly.
+- Fixed: blueprint.json -> deprecated pluginZipFile property.
+- Updated: Tested up to 6.7.
+
 = 24.07.01 =
 - Fixed: View::tooltip() -> Typos "dan".
 - Fixed: Filesystem::sanitize_maxsizedisk() -> Returns default if empty.

@@ -1118,7 +1118,7 @@ final class Plugin extends Bepart
     private function register_plugin_hooks()
     {
         add_action(
-            'plugins_loaded',
+            'init',
             function () {
                 load_plugin_textdomain(
                     'docket-cache',
