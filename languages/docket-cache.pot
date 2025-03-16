@@ -1,15 +1,15 @@
-# Copyright (C) 2024 Nawawi Jamili
+# Copyright (C) 2025 Nawawi Jamili
 # This file is distributed under the MIT.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 24.07.02\n"
+"Project-Id-Version: Docket Cache 24.07.03\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-12-06T07:57:08+00:00\n"
+"POT-Creation-Date: 2025-03-16T16:54:06+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: docket-cache\n"
@@ -100,7 +100,7 @@ msgstr ""
 
 #: includes/admin/config.php:18
 #: includes/src/Plugin.php:1581
-#: includes/src/View.php:316
+#: includes/src/View.php:319
 msgid "Configuration"
 msgstr ""
 
@@ -132,7 +132,7 @@ msgstr ""
 #: includes/admin/config.php:540
 #: includes/admin/config.php:569
 #: includes/admin/log.php:31
-#: includes/src/View.php:427
+#: includes/src/View.php:430
 msgid "Default"
 msgstr ""
 
@@ -189,7 +189,7 @@ msgstr ""
 #: includes/admin/config.php:464
 #: includes/admin/config.php:481
 #: includes/admin/config.php:501
-#: includes/src/View.php:431
+#: includes/src/View.php:434
 msgid "Disable"
 msgstr ""
 
@@ -226,7 +226,7 @@ msgstr ""
 #: includes/admin/config.php:463
 #: includes/admin/config.php:480
 #: includes/admin/config.php:500
-#: includes/src/View.php:430
+#: includes/src/View.php:433
 msgid "Enable"
 msgstr ""
 
@@ -253,7 +253,7 @@ msgstr ""
 
 #: includes/admin/cronbot.php:32
 #: includes/src/Plugin.php:1544
-#: includes/src/View.php:303
+#: includes/src/View.php:306
 msgid "Cronbot"
 msgstr ""
 
@@ -316,7 +316,7 @@ msgstr ""
 #: includes/admin/log.php:21
 #: includes/src/Canopt.php:82
 #: includes/src/Plugin.php:1570
-#: includes/src/View.php:313
+#: includes/src/View.php:316
 msgid "Cache Log"
 msgstr ""
 
@@ -576,7 +576,7 @@ msgstr ""
 #: includes/admin/overview.php:35
 #: includes/src/Plugin.php:1533
 #: includes/src/Plugin.php:1861
-#: includes/src/View.php:300
+#: includes/src/View.php:303
 msgid "Overview"
 msgstr ""
 
@@ -1600,7 +1600,7 @@ msgid "The log is empty. No data is available."
 msgstr ""
 
 #: includes/src/Plugin.php:1556
-#: includes/src/View.php:307
+#: includes/src/View.php:310
 msgid "OPcache"
 msgstr ""
 
@@ -1923,267 +1923,267 @@ msgstr ""
 msgid "Un-Install"
 msgstr ""
 
-#: includes/src/View.php:584
+#: includes/src/View.php:587
 msgid "The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively."
 msgstr ""
 
-#: includes/src/View.php:585
+#: includes/src/View.php:588
 msgid "The cache log intends to provide information on how the cache works. For performance and security concerns, disable it if no longer needed."
 msgstr ""
 
-#: includes/src/View.php:586
+#: includes/src/View.php:589
 msgid "OPcache Viewer allows you to view OPcache status and usage."
 msgstr ""
 
-#: includes/src/View.php:587
+#: includes/src/View.php:590
 msgid "Cache the WordPress dynamic navigation menu."
 msgstr ""
 
-#: includes/src/View.php:588
+#: includes/src/View.php:591
 msgid "Increase cache performance by early loading cached objects based on the current URL."
 msgstr ""
 
-#: includes/src/View.php:589
+#: includes/src/View.php:592
 msgid "Improve the performance of the WordPress Translation function."
 msgstr ""
 
-#: includes/src/View.php:590
+#: includes/src/View.php:593
 msgid "Docket Cache will attempt to optimize WordPress core query when this option enabled."
 msgstr ""
 
-#: includes/src/View.php:591
+#: includes/src/View.php:594
 msgid "Enable this option to disable Bulk Edit Actions when reaching the listed item limit. By default, the bulk edit limit is set to 100."
 msgstr ""
 
-#: includes/src/View.php:592
+#: includes/src/View.php:595
 msgid "Improve the performance of Word Term Count Update."
 msgstr ""
 
-#: includes/src/View.php:593
+#: includes/src/View.php:596
 msgid "Docket Cache will optimize WordPress database tables using SQL optimizing syntax at scheduled times."
 msgstr ""
 
-#: includes/src/View.php:594
+#: includes/src/View.php:597
 msgid "Reduce the size of Options Autoload by excluding non-WordPress Option from autoloading."
 msgstr ""
 
-#: includes/src/View.php:595
+#: includes/src/View.php:598
 msgid "Fix the WordPress Missed Schedule Error after scheduling a future blog post."
 msgstr ""
 
-#: includes/src/View.php:596
+#: includes/src/View.php:599
 msgid "Miscellaneous WordPress Tweaks. Including performance, security and user experience."
 msgstr ""
 
-#: includes/src/View.php:597
+#: includes/src/View.php:600
 msgid "Miscellaneous WooCommerce Tweaks. Including performance, security and user experience."
 msgstr ""
 
-#: includes/src/View.php:598
+#: includes/src/View.php:601
 msgid "WooCommerce Admin or Analytics page is a new JavaScript-driven interface for managing stores. Enable this option to turn off any feature-related."
 msgstr ""
 
-#: includes/src/View.php:599
+#: includes/src/View.php:602
 msgid "Deactivate WooCommerce Classic Widget feature."
 msgstr ""
 
-#: includes/src/View.php:600
+#: includes/src/View.php:603
 msgid "Remove the WooCommerce meta box in the WordPress Dashboard."
 msgstr ""
 
-#: includes/src/View.php:601
+#: includes/src/View.php:604
 msgid "Remove the WooCommerce Cart Fragments."
 msgstr ""
 
-#: includes/src/View.php:602
+#: includes/src/View.php:605
 msgid "Remove WooCommerce Extensions page that includes My Subscriptions page."
 msgstr ""
 
-#: includes/src/View.php:603
+#: includes/src/View.php:606
 msgid "This option will add rules to robots.txt to prevent robots from crawling add-to-cart links."
 msgstr ""
 
-#: includes/src/View.php:604
+#: includes/src/View.php:607
 msgid "Deactivate the WordPress XML-RPC and Pingbacks related features."
 msgstr ""
 
-#: includes/src/View.php:605
+#: includes/src/View.php:608
 msgid "Remove WordPress features related to HTML header such as meta generators and feed links to reduce the page size."
 msgstr ""
 
-#: includes/src/View.php:606
+#: includes/src/View.php:609
 msgid "Deactivate the WordPress Emoji feature."
 msgstr ""
 
-#: includes/src/View.php:607
+#: includes/src/View.php:610
 msgid "Deactivate the WordPress Feed feature."
 msgstr ""
 
-#: includes/src/View.php:608
+#: includes/src/View.php:611
 msgid "Deactivate the WordPress Embed feature."
 msgstr ""
 
-#: includes/src/View.php:609
+#: includes/src/View.php:612
 msgid "Deactivate the WordPress Lazy Load feature."
 msgstr ""
 
-#: includes/src/View.php:610
+#: includes/src/View.php:613
 msgid "Deactivate the WordPress Auto-generate Sitemap feature."
 msgstr ""
 
-#: includes/src/View.php:611
+#: includes/src/View.php:614
 msgid "Deactivate the WordPress Application Passwords feature."
 msgstr ""
 
-#: includes/src/View.php:612
+#: includes/src/View.php:615
 msgid "Deactivate the WordPress Events & News feed in Dashboard."
 msgstr ""
 
-#: includes/src/View.php:613
+#: includes/src/View.php:616
 msgid "Enable this option to turn off Browse Happy HTTP API requests, which checks whether the user needs a browser update."
 msgstr ""
 
-#: includes/src/View.php:614
+#: includes/src/View.php:617
 msgid "Enable this option to turn off the Serve Happy HTTP API request, which checks whether the user needs to update PHP."
 msgstr ""
 
-#: includes/src/View.php:615
+#: includes/src/View.php:618
 msgid "Enable this option to disable the post-via-email functionality."
 msgstr ""
 
-#: includes/src/View.php:616
+#: includes/src/View.php:619
 msgid "Preload Object Cache by fetching administrator-related pages."
 msgstr ""
 
-#: includes/src/View.php:617
+#: includes/src/View.php:620
 msgid "Display page loader when loading administrator pages."
 msgstr ""
 
-#: includes/src/View.php:618
+#: includes/src/View.php:621
 msgid "Display Object Cache stats at Overview page."
 msgstr ""
 
-#: includes/src/View.php:619
+#: includes/src/View.php:622
 msgid "Enable the Garbage Collector action button on the Overview page."
 msgstr ""
 
-#: includes/src/View.php:620
+#: includes/src/View.php:623
 msgid "Enable the additional Flush Cache action button on the Configuration page."
 msgstr ""
 
-#: includes/src/View.php:621
+#: includes/src/View.php:624
 msgid "Enable automatic plugin updates for Docket Cache."
 msgstr ""
 
-#: includes/src/View.php:622
+#: includes/src/View.php:625
 msgid "Allows Docket Cache to check any critical future version that requires removing cache files after doing the updates, purposely to avoid error-prone."
 msgstr ""
 
-#: includes/src/View.php:623
+#: includes/src/View.php:626
 msgid "Flush Object Cache when deactivate / uninstall."
 msgstr ""
 
-#: includes/src/View.php:624
+#: includes/src/View.php:627
 msgid "Flush OPcache when deactivate / uninstall."
 msgstr ""
 
-#: includes/src/View.php:625
+#: includes/src/View.php:628
 msgid "Maximum size of the cache storage on disk. The garbage collector will remove the cache file to free up storage space."
 msgstr ""
 
-#: includes/src/View.php:626
+#: includes/src/View.php:629
 msgid "The maximum cache file can be stored on a disk. The cache file will free up by the garbage collector when triggered by WP Cron."
 msgstr ""
 
-#: includes/src/View.php:627
+#: includes/src/View.php:630
 msgid "Enable this option to allow Docket Cache to monitor the cache file limit in real-time."
 msgstr ""
 
-#: includes/src/View.php:628
+#: includes/src/View.php:631
 msgid "Enable this option to chunk cache files into smaller directories to avoid an excessive number of cache files in one directory. Only enable it if you have difficulty clearing the cache manually or experience slowdowns when the cache becomes too large."
 msgstr ""
 
-#: includes/src/View.php:629
+#: includes/src/View.php:632
 msgid "Enable this option to allow GC immediately remove the stale cache abandoned by WordPress, WooCommerce and others after doing cache invalidation."
 msgstr ""
 
-#: includes/src/View.php:630
+#: includes/src/View.php:633
 msgid "Enable this option to exclude stale cache created by WordPress, WooCommerce, and others from being stored on disk. Only enable it if you have an issue with inode limits."
 msgstr ""
 
-#: includes/src/View.php:631
+#: includes/src/View.php:634
 msgid "Enable this option to exclude empty caches from being stored on disk. Only enable it if you have an issue with inode limits."
 msgstr ""
 
-#: includes/src/View.php:632
+#: includes/src/View.php:635
 msgid "Limit HTTP requests in WP Admin."
 msgstr ""
 
-#: includes/src/View.php:633
+#: includes/src/View.php:636
 msgid "WordPress by default converts Transients as persistent object caching when available. Enable this option to persist Transients in the Database."
 msgstr ""
 
-#: includes/src/View.php:634
+#: includes/src/View.php:637
 msgid "WordPress by default automatically saves a draft every 1 minute when editing or create a new post. Changing this behaviour can reduce the usage of server resource."
 msgstr ""
 
-#: includes/src/View.php:635
+#: includes/src/View.php:638
 msgid "Post revision is a copy of each edit made to a post or page, allowing the possibility of reverting to a previous version. However, have a revision too much can create a bad impact on database performance. Changing this behaviour can reduce the usage of server resource."
 msgstr ""
 
-#: includes/src/View.php:636
+#: includes/src/View.php:639
 msgid "This option allows you to change the number of days before WordPress permanently deletes posts, pages, attachments, and comments, from the trash bin. The default is 30 days. There is no confirmation alert when someone clicks on \"Delete Permanently\" if this option is set to \"Disable Trash Bin\"."
 msgstr ""
 
-#: includes/src/View.php:637
+#: includes/src/View.php:640
 msgid "This option will completely disable the use of plugin and theme editor. If this option enabled, no plugins or theme file can be edited."
 msgstr ""
 
-#: includes/src/View.php:638
+#: includes/src/View.php:641
 msgid "This option will block users being able to use the plugin and theme installation/update functionality from the WordPress admin area."
 msgstr ""
 
-#: includes/src/View.php:639
+#: includes/src/View.php:642
 msgid "By default, WordPress creates a new set of images every time you edit image and restore the original. It leaves all the edits on the server. Enable this option to change this behaviour."
 msgstr ""
 
-#: includes/src/View.php:640
+#: includes/src/View.php:643
 msgid "Enable this option to turn on WordPress debugging."
 msgstr ""
 
-#: includes/src/View.php:641
+#: includes/src/View.php:644
 msgid "Enable this option to print debug info."
 msgstr ""
 
-#: includes/src/View.php:642
+#: includes/src/View.php:645
 msgid "Enable this option to log debug info."
 msgstr ""
 
-#: includes/src/View.php:643
+#: includes/src/View.php:646
 msgid "This option will disable all core updates."
 msgstr ""
 
-#: includes/src/View.php:644
+#: includes/src/View.php:647
 msgid "Enable this option to disable compression and concatenation of WP-Admin Scripts and CSS."
 msgstr ""
 
-#: includes/src/View.php:645
+#: includes/src/View.php:648
 msgid "Enable this option to disable the WP pseudo-cron. Only enable it if your site is already set up with real Cron."
 msgstr ""
 
-#: includes/src/View.php:649
+#: includes/src/View.php:652
 msgid "Cache WP Queries for a post which results in faster data retrieval and reduced database workload. By default only for built-in Post Types."
 msgstr ""
 
-#: includes/src/View.php:650
+#: includes/src/View.php:653
 msgid "Allow Advanced Post Caching to cache any Post Type."
 msgstr ""
 
-#: includes/src/View.php:654
+#: includes/src/View.php:657
 msgid "By default, cURL sends the \"Expect\" header all the time which severely impacts performance. Enable this option, only send it if the body is larger than 1 MB."
 msgstr ""
 
-#: includes/src/View.php:659
+#: includes/src/View.php:662
 msgid "No info available"
 msgstr ""
 

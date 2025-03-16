@@ -4,23 +4,24 @@ Tags: object cache, OPcache, cache, database, performance
 Requires at least: 5.4
 Tested up to: 6.7
 Requires PHP: 7.2.5
-Stable tag: 24.07.02
+Stable tag: 24.07.03
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
+Donate link: https://docketcache.com/sponsorship/
 
-Supercharge your website using a persistent object cache, accelerates caching with OPcache backend.
+Supercharge your website using a persistent object cache, accelerates caching with OPcache, an efficient alternative to Redis and Memcached.
 
 == Description ==
-The Docket cache is a persistent WordPress Object Cache that is stored as a plain PHP code. Intends to provide an alternative option for those who can't use Redis or Memcached server.
+The Docket Cache is a persistent WordPress Object Cache solution designed to store data as plain PHP code. It offers an efficient alternative for users who are unable to utilize Redis or Memcached servers.
 
-Rather than using [serialize](https://www.php.net/manual/en/function.serialize.php) and [unserialize](https://www.php.net/manual/en/function.unserialize.php) a PHP object to store into flat files, this plugin stores data by converting the object into plain PHP code which results in faster data retrieval and better performance with Zend OPcache enabled.
+Unlike conventional approaches that rely on [serializing](https://www.php.net/manual/en/function.serialize.php) and [unserializing](https://www.php.net/manual/en/function.unserialize.php) PHP objects to store them into flat files, this plugin transforms objects into plain PHP code. This method significantly enhances data retrieval speed and overall performance, especially when paired with Zend OPcache.
 
-Kindly refer to the documentation on [Caching In WordPress](https://docs.docketcache.com/resources/caching-in-wordpress).
+For more information, please refer to the documentation on [Caching In WordPress](https://docs.docketcache.com/resources/caching-in-wordpress).
 
 == Why use this plugin? ==
 When it comes to reliable persistent Object Cache in WordPress, [Redis](https://redis.io/) or [Memcached](https://memcached.org/) comes on top. However, those solutions require knowledge of server and rarely available at low cost or shared hosting servers.
 
-The only solution is to store the object caches into files. With WordPress, exporting the PHP objects are not easy, most plugin that implements file-based solution will serialize and unserialize the object to store and retrieve the data.
+The only viable solution is to store object caches in files. In WordPress, exporting PHP objects is not easy. Most plugins implementing file-based caching rely on serializing and unserializing objects to store and retrieve data.
 
 Docket Cache takes a better approach by turning the object cache into plain PHP code. This solution is faster since WordPress can use the cache directly without running other operations.
 
@@ -172,6 +173,10 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 24.07.03 =
+- Fixed: View::render() -> proper handling subpage name.
+- Fixed: Event::garbage_collector() -> missing is_wp_cache_group_queries() method.
+
 = 24.07.02 =
 - Fixed: _load_textdomain_just_in_time was called incorrectly.
 - Fixed: blueprint.json -> deprecated pluginZipFile property.

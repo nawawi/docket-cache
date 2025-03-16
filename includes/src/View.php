@@ -195,10 +195,13 @@ final class View
 
     private function render($index)
     {
+        $index = sanitize_file_name($index);
+
         $this->info = (object) $this->pt->get_info();
         $file = $this->pt->path.'/includes/admin/'.$index.'.php';
 
         $file = apply_filters('docketcache/filter/view/render', $file, $index);
+        $file = preg_replace('@(\.\.\/|\.\/)@', '', $file);
 
         if (@is_file($file)) {
             include_once $file;

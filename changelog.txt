@@ -1,3 +1,8 @@
+= v24.07.03 (2025-03-17) =
+
+- Fixed: View::render() -> proper handling subpage name.
+- Fixed: Event::garbage_collector() -> missing is_wp_cache_group_queries() method.
+
 = v24.07.02 (2024-12-06) =
 
 - Fixed: _load_textdomain_just_in_time was called incorrectly.

@@ -417,7 +417,7 @@ final class Event
                 if ($is_flush_stalecache) {
                     // wp stale cache
                     // wp >= 6.3
-                    if ($is_ignore_stalecache && $this->is_wp_cache_group_queries($data['group'])) {
+                    if ($is_ignore_stalecache && $this->pt->is_wp_cache_group_queries($data['group'])) {
                         if (@unlink($fx)) {
                             clearstatcache(true, $fx);
 
