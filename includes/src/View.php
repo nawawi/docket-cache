@@ -107,6 +107,7 @@ final class View
                 }
             }
             $file = $cache_path.$vache.'.php';
+            $file = sanitize_file_name($file);
             if ($this->pt->filesize($file) > 0) {
                 $data = $this->pt->cache_get($file);
                 if (false !== $data) {

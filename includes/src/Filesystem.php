@@ -1263,6 +1263,7 @@ class Filesystem
      */
     public function cache_get($file)
     {
+        $file = preg_replace('@(\.\.\/|\.\/)@', '', $file);
         if (!@is_file($file) || empty($this->filesize($file))) {
             return false;
         }

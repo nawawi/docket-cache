@@ -1,3 +1,7 @@
+= v24.07.04 (2025-08-19) =
+
+- Fixed: View::parse_log_query() -> proper handling file path traversal.
+
 = v24.07.03 (2025-03-17) =
 
 - Fixed: View::render() -> proper handling subpage name.
