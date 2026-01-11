@@ -2,7 +2,7 @@
 Contributors: nawawijamili
 Tags: object cache, OPcache, cache, database, performance
 Requires at least: 5.4
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.2.5
 Stable tag: 24.07.04
 License: MIT
