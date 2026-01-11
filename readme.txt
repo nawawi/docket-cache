@@ -4,7 +4,7 @@ Tags: object cache, OPcache, cache, database, performance
 Requires at least: 5.4
 Tested up to: 6.9
 Requires PHP: 7.2.5
-Stable tag: 24.07.04
+Stable tag: 24.07.05
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 Donate link: https://docketcache.com/sponsorship/
@@ -173,6 +173,9 @@ Yes, you can. It can boost more your WordPress performance since there is no net
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 24.07.05 =
+- Fixed: Authorization and nonce verification in AJAX worker handler.
+
 = 24.07.04 =
 - Fixed: View::parse_log_query() -> proper handling file path traversal.
 

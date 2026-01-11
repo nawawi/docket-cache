@@ -1688,6 +1688,11 @@ final class Plugin extends Bepart
         add_action(
             'admin_enqueue_scripts',
             function ($hook) {
+                $cap = is_multisite() ? 'manage_network_options' : 'manage_options';
+                if (!current_user_can($cap)) {
+                    return;
+                }
+
                 $is_debug = $this->cf()->is_true('WP_DEBUG');
                 $plugin_url = plugin_dir_url($this->file);
                 $version = str_replace('.', '', $this->version()).'xe'.($is_debug ? date('his') : date('yd'));
@@ -1760,8 +1765,14 @@ final class Plugin extends Bepart
         add_action(
             'wp_ajax_docket_worker',
             function () {
-                if (!check_ajax_referer('docketcache-token-nonce', 'token', false) && !isset($_POST['type'])) {
+                if (!check_ajax_referer('docketcache-token-nonce', 'token', false) || !isset($_POST['type'])) {
                     wp_send_json_error('Invalid security token sent.');
+                    exit;
+                }
+
+                $cap = is_multisite() ? 'manage_network_options' : 'manage_options';
+                if (!current_user_can($cap)) {
+                    wp_send_json_error('Unauthorized access.');
                     exit;
                 }
 

@@ -1,3 +1,7 @@
+= v24.07.05 (2025-01-11) =
+
+- Fixed: Authorization and nonce verification in AJAX worker handler.
+
 = v24.07.04 (2025-08-19) =
 
 - Fixed: View::parse_log_query() -> proper handling file path traversal.
