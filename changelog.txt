@@ -1,4 +1,8 @@
-= v24.07.05 (2025-01-11) =
+= v24.07.06 (2026-02-08) =
+
+- Fixed: MoCache double-applying load_textdomain_mofile filter.
+
+= v24.07.05 (2026-01-11) =
 
 - Fixed: Authorization and nonce verification in AJAX worker handler.
 
