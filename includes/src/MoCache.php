@@ -29,7 +29,13 @@ final class MoCache
 
     public function __construct($mofile, $domain, $override)
     {
-        $this->mofile = apply_filters('load_textdomain_mofile', $mofile, $domain);
+        // The $mofile has already been filtered by WordPress core via
+        // apply_filters('load_textdomain_mofile') in load_textdomain()
+        // before calling override_load_textdomain. Re-applying the filter
+        // here causes it to run twice, which breaks plugins with stateful
+        // filter callbacks (e.g. Polylang Pro's PLL_Locale_Fallback::load_file
+        // returns empty on the second pass, causing a PHP 8+ ValueError).
+        $this->mofile = $mofile;
         $this->domain = $domain;
         $this->override = $override;
 
@@ -106,8 +112,10 @@ final class MoCache
 
         if (!$this->upstream) {
             $this->upstream = new \Mo();
-            do_action('load_textdomain', $this->domain, $this->mofile);
-            $this->upstream->import_from_file($this->mofile);
+            if (!empty($this->mofile)) {
+                do_action('load_textdomain', $this->domain, $this->mofile);
+                $this->upstream->import_from_file($this->mofile);
+            }
         }
 
         if (($translation = \call_user_func_array([$this->upstream, $translate_function], $args)) !== $text) {
