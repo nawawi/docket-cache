@@ -75,6 +75,88 @@ final class Canopt extends Bepart
         return @is_writable(\dirname($this->path));
     }
 
+    private function key_names()
+    {
+        $names = [
+            'log',
+            'log_time',
+            'log_all',
+            'preload',
+            'menucache',
+            'optermcount',
+            'precache',
+            'mocache',
+            'misc_tweaks',
+            'postmissedschedule',
+            'wootweaks',
+            'wooadminoff',
+            'woowidgetoff',
+            'woowpdashboardoff',
+            'wooextensionpageoff',
+            'woocartfragsoff',
+            'wooaddtochartcrawling',
+            'pageloader',
+            'wpoptaload',
+            'cronoptmzdb',
+            'cronbot',
+            'opcviewer',
+            'stats',
+            'gcaction',
+            'flushaction',
+            'autoupdate_toggle',
+            'checkversion',
+            'optwpquery',
+            'limitbulkedit',
+            'pingback',
+            'headerjunk',
+            'wpemoji',
+            'wpembed',
+            'wpfeed',
+            'wplazyload',
+            'wpsitemap',
+            'wpapppassword',
+            'wpdashboardnews',
+            'wpbrowsehappy',
+            'wpservehappy',
+            'postviaemail',
+            'objectcacheoff',
+            'flush_shutdown',
+            'opcshutdown',
+            'maxsize_disk',
+            'maxfile',
+            'maxfile_livecheck',
+            'chunkcachedir',
+            'flush_stalecache',
+            'stalecache_ignore',
+            'emptycache_ignore',
+            'transientdb',
+            'limithttprequest',
+            'rtpostautosave',
+            'rtpostrevision',
+            'rtpostemptytrash',
+            'rtpluginthemeeditor',
+            'rtpluginthemeinstall',
+            'rtimageoverwrite',
+            'rtwpdebug',
+            'rtwpdebugdisplay',
+            'rtwpdebuglog',
+            'rtwpcoreupdate',
+            'rtconcatenatescripts',
+            'rtdisablewpcron',
+        ];
+
+        if (version_compare($GLOBALS['wp_version'], '6.1', '<')) {
+            $names[] = 'advcpost';
+            $names[] = 'advpost_posttype_all';
+        }
+
+        if (version_compare($GLOBALS['wp_version'], '5.8', '<')) {
+            $names[] = 'httpheadersexpect';
+        }
+
+        return $names;
+    }
+
     public function keys($key = false)
     {
         // key = title
@@ -210,10 +292,10 @@ final class Canopt extends Bepart
     public function config_cleanup($config)
     {
         if (!empty($config) && \is_array($config)) {
-            $keys = $this->keys();
+            $names = $this->key_names();
             foreach ($config as $name => $value) {
                 $nx = strtolower(nwdcx_constfx($name, true));
-                if (!\in_array($nx, $keys) || (\is_string($value) && 'default' === $value)) {
+                if (!\in_array($nx, $names) || (\is_string($value) && 'default' === $value)) {
                     unset($config[$name]);
                 }
             }
@@ -244,7 +326,7 @@ final class Canopt extends Bepart
         $config = $this->read_config();
         $config = $this->config_cleanup($config);
 
-        if (\in_array($name, $this->keys())) {
+        if (\in_array($name, $this->key_names())) {
             $nx = nwdcx_constfx($name);
 
             if ('default' === $value) {

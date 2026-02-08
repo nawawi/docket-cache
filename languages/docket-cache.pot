@@ -2,14 +2,14 @@
 # This file is distributed under the MIT.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 24.07.06\n"
+"Project-Id-Version: Docket Cache 24.07.07\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-08T02:43:41+00:00\n"
+"POT-Creation-Date: 2026-02-08T04:17:09+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: docket-cache\n"
@@ -169,7 +169,7 @@ msgid "Every Minute"
 msgstr ""
 
 #: includes/admin/config.php:314
-#: includes/src/Event.php:62
+#: includes/src/Event.php:64
 msgid "Every 5 Minutes"
 msgstr ""
 
@@ -243,7 +243,7 @@ msgid "Plugin Options"
 msgstr ""
 
 #: includes/admin/cronbot.php:20
-#: includes/src/Plugin.php:176
+#: includes/src/Plugin.php:177
 #: includes/src/Plugin.php:1802
 #: includes/src/Plugin.php:1803
 #: includes/src/Plugin.php:1810
@@ -314,7 +314,7 @@ msgid "Filter Hook Names"
 msgstr ""
 
 #: includes/admin/log.php:21
-#: includes/src/Canopt.php:82
+#: includes/src/Canopt.php:164
 #: includes/src/Plugin.php:1570
 #: includes/src/View.php:317
 msgid "Cache Log"
@@ -342,7 +342,7 @@ msgid "Site Format"
 msgstr ""
 
 #: includes/admin/log.php:47
-#: includes/src/Canopt.php:84
+#: includes/src/Canopt.php:166
 msgid "Log All"
 msgstr ""
 
@@ -657,12 +657,12 @@ msgid "Cache Writable"
 msgstr ""
 
 #: includes/admin/overview.php:162
-#: includes/src/Canopt.php:127
+#: includes/src/Canopt.php:209
 msgid "Cache Files Limit"
 msgstr ""
 
 #: includes/admin/overview.php:167
-#: includes/src/Canopt.php:126
+#: includes/src/Canopt.php:208
 #: includes/src/Command.php:575
 #: includes/src/ReqAction.php:769
 msgid "Cache Disk Limit"
@@ -673,7 +673,7 @@ msgid "Cache Path"
 msgstr ""
 
 #: includes/admin/overview.php:177
-#: includes/src/Canopt.php:129
+#: includes/src/Canopt.php:211
 msgid "Chunk Cache Directory"
 msgstr ""
 
@@ -834,256 +834,256 @@ msgstr ""
 msgid "Please wait.."
 msgstr ""
 
-#: includes/src/Canopt.php:83
+#: includes/src/Canopt.php:165
 msgid "Log Timestamp"
 msgstr ""
 
-#: includes/src/Canopt.php:85
+#: includes/src/Canopt.php:167
 msgid "Admin Page Cache Preloading"
 msgstr ""
 
-#: includes/src/Canopt.php:86
+#: includes/src/Canopt.php:168
 msgid "WordPress Menu Caching"
 msgstr ""
 
-#: includes/src/Canopt.php:87
+#: includes/src/Canopt.php:169
 msgid "Optimize Term Count Queries"
 msgstr ""
 
-#: includes/src/Canopt.php:88
+#: includes/src/Canopt.php:170
 msgid "Object Cache Precaching"
 msgstr ""
 
-#: includes/src/Canopt.php:89
+#: includes/src/Canopt.php:171
 msgid "WordPress Translation Caching"
 msgstr ""
 
-#: includes/src/Canopt.php:90
+#: includes/src/Canopt.php:172
 msgid "Misc Performance Tweaks"
 msgstr ""
 
-#: includes/src/Canopt.php:91
+#: includes/src/Canopt.php:173
 msgid "Post Missed Schedule Tweaks"
 msgstr ""
 
-#: includes/src/Canopt.php:92
+#: includes/src/Canopt.php:174
 msgid "Misc WooCommerce Tweaks"
 msgstr ""
 
-#: includes/src/Canopt.php:93
+#: includes/src/Canopt.php:175
 msgid "Deactivate WooCommerce Admin"
 msgstr ""
 
-#: includes/src/Canopt.php:94
+#: includes/src/Canopt.php:176
 msgid "Deactivate WooCommerce Classic Widget"
 msgstr ""
 
-#: includes/src/Canopt.php:95
+#: includes/src/Canopt.php:177
 msgid "Deactivate WooCommerce WP Dashboard"
 msgstr ""
 
-#: includes/src/Canopt.php:96
+#: includes/src/Canopt.php:178
 msgid "Deactivate WooCommerce Extensions Page"
 msgstr ""
 
-#: includes/src/Canopt.php:97
+#: includes/src/Canopt.php:179
 msgid "Deactivate WooCommerce Cart Fragments"
 msgstr ""
 
-#: includes/src/Canopt.php:98
+#: includes/src/Canopt.php:180
 msgid "Prevent robots crawling add-to-cart links"
 msgstr ""
 
-#: includes/src/Canopt.php:99
+#: includes/src/Canopt.php:181
 msgid "Admin Page Loader"
 msgstr ""
 
-#: includes/src/Canopt.php:100
+#: includes/src/Canopt.php:182
 msgid "Suspend WP Options Autoload"
 msgstr ""
 
-#: includes/src/Canopt.php:101
+#: includes/src/Canopt.php:183
 msgid "Optimize Database Tables"
 msgstr ""
 
-#: includes/src/Canopt.php:102
+#: includes/src/Canopt.php:184
 msgid "Cronbot Service"
 msgstr ""
 
-#: includes/src/Canopt.php:103
+#: includes/src/Canopt.php:185
 msgid "OPcache Viewer"
 msgstr ""
 
-#: includes/src/Canopt.php:104
+#: includes/src/Canopt.php:186
 msgid "Object Cache Data Stats"
 msgstr ""
 
-#: includes/src/Canopt.php:105
+#: includes/src/Canopt.php:187
 msgid "Garbage Collector Action Button"
 msgstr ""
 
-#: includes/src/Canopt.php:106
+#: includes/src/Canopt.php:188
 msgid "Additional Flush Cache Action Button"
 msgstr ""
 
-#: includes/src/Canopt.php:107
+#: includes/src/Canopt.php:189
 msgid "Docket Cache Auto Update"
 msgstr ""
 
-#: includes/src/Canopt.php:108
+#: includes/src/Canopt.php:190
 msgid "Critical Version Checking"
 msgstr ""
 
-#: includes/src/Canopt.php:109
+#: includes/src/Canopt.php:191
 msgid "Optimize WP Query"
 msgstr ""
 
-#: includes/src/Canopt.php:110
+#: includes/src/Canopt.php:192
 msgid "Limit Bulk Edit Actions"
 msgstr ""
 
-#: includes/src/Canopt.php:111
+#: includes/src/Canopt.php:193
 msgid "Deactivate XML-RPC / Pingbacks"
 msgstr ""
 
-#: includes/src/Canopt.php:112
+#: includes/src/Canopt.php:194
 msgid "Deactivate WP Header Junk"
 msgstr ""
 
-#: includes/src/Canopt.php:113
+#: includes/src/Canopt.php:195
 msgid "Deactivate WP Emoji"
 msgstr ""
 
-#: includes/src/Canopt.php:114
+#: includes/src/Canopt.php:196
 msgid "Deactivate WP Embed"
 msgstr ""
 
-#: includes/src/Canopt.php:115
+#: includes/src/Canopt.php:197
 msgid "Deactivate WP Feed"
 msgstr ""
 
-#: includes/src/Canopt.php:116
+#: includes/src/Canopt.php:198
 msgid "Deactivate WP Lazy Load"
 msgstr ""
 
-#: includes/src/Canopt.php:117
+#: includes/src/Canopt.php:199
 msgid "Deactivate WP Sitemap"
 msgstr ""
 
-#: includes/src/Canopt.php:118
+#: includes/src/Canopt.php:200
 msgid "Deactivate WP Application Passwords"
 msgstr ""
 
-#: includes/src/Canopt.php:119
+#: includes/src/Canopt.php:201
 msgid "Deactivate WP Events & News Feed Dashboard"
 msgstr ""
 
-#: includes/src/Canopt.php:120
+#: includes/src/Canopt.php:202
 msgid "Deactivate Browse Happy Checking"
 msgstr ""
 
-#: includes/src/Canopt.php:121
+#: includes/src/Canopt.php:203
 msgid "Deactivate Serve Happy Checking"
 msgstr ""
 
-#: includes/src/Canopt.php:122
+#: includes/src/Canopt.php:204
 msgid "Deactivate Post Via Email"
 msgstr ""
 
-#: includes/src/Canopt.php:123
+#: includes/src/Canopt.php:205
 msgid "Suspend Object Cache"
 msgstr ""
 
-#: includes/src/Canopt.php:124
+#: includes/src/Canopt.php:206
 msgid "Flush Object Cache During Deactivation"
 msgstr ""
 
-#: includes/src/Canopt.php:125
+#: includes/src/Canopt.php:207
 msgid "Flush OPcache During Deactivation"
 msgstr ""
 
-#: includes/src/Canopt.php:128
+#: includes/src/Canopt.php:210
 msgid "Real-time File Limit Checking"
 msgstr ""
 
-#: includes/src/Canopt.php:130
+#: includes/src/Canopt.php:212
 msgid "Auto Remove Stale Cache"
 msgstr ""
 
-#: includes/src/Canopt.php:131
+#: includes/src/Canopt.php:213
 msgid "Exclude Stale Cache"
 msgstr ""
 
-#: includes/src/Canopt.php:132
+#: includes/src/Canopt.php:214
 msgid "Exclude Empty Object Data"
 msgstr ""
 
-#: includes/src/Canopt.php:133
+#: includes/src/Canopt.php:215
 msgid "Retain Transients in Db"
 msgstr ""
 
-#: includes/src/Canopt.php:134
+#: includes/src/Canopt.php:216
 msgid "Limit WP-Admin HTTP requests"
 msgstr ""
 
-#: includes/src/Canopt.php:135
+#: includes/src/Canopt.php:217
 msgid "Auto Save Interval"
 msgstr ""
 
-#: includes/src/Canopt.php:136
+#: includes/src/Canopt.php:218
 msgid "Post Revisions"
 msgstr ""
 
-#: includes/src/Canopt.php:137
+#: includes/src/Canopt.php:219
 #: includes/src/ReqAction.php:824
 msgid "Trash Bin"
 msgstr ""
 
-#: includes/src/Canopt.php:138
+#: includes/src/Canopt.php:220
 msgid "Disallows Plugin / Theme Editor"
 msgstr ""
 
-#: includes/src/Canopt.php:139
+#: includes/src/Canopt.php:221
 msgid "Disallows Plugin / Theme Update and Installation"
 msgstr ""
 
-#: includes/src/Canopt.php:140
+#: includes/src/Canopt.php:222
 msgid "Cleanup Image Edits"
 msgstr ""
 
-#: includes/src/Canopt.php:141
+#: includes/src/Canopt.php:223
 msgid "WP Debug"
 msgstr ""
 
-#: includes/src/Canopt.php:142
+#: includes/src/Canopt.php:224
 msgid "WP Debug Display"
 msgstr ""
 
-#: includes/src/Canopt.php:143
+#: includes/src/Canopt.php:225
 msgid "WP Debug Log"
 msgstr ""
 
-#: includes/src/Canopt.php:144
+#: includes/src/Canopt.php:226
 msgid "Disallows WP Auto Update Core"
 msgstr ""
 
-#: includes/src/Canopt.php:145
+#: includes/src/Canopt.php:227
 msgid "Deactivate Concatenate WP-Admin Scripts"
 msgstr ""
 
-#: includes/src/Canopt.php:146
+#: includes/src/Canopt.php:228
 msgid "Deactivate WP Cron"
 msgstr ""
 
-#: includes/src/Canopt.php:150
+#: includes/src/Canopt.php:232
 msgid "Advanced Post Caching"
 msgstr ""
 
-#: includes/src/Canopt.php:151
+#: includes/src/Canopt.php:233
 msgid "Post Caching Any Post Type"
 msgstr ""
 
-#: includes/src/Canopt.php:155
+#: includes/src/Canopt.php:237
 msgid "HTTP Request Expect header tweaks"
 msgstr ""
 
@@ -1357,40 +1357,40 @@ msgstr ""
 msgid "Executing the garbage collector completed."
 msgstr ""
 
-#: includes/src/CronAgent.php:240
+#: includes/src/CronAgent.php:245
 msgid "Invalid request for single event"
 msgstr ""
 
 #. translators: %s: Event Hook.
-#: includes/src/CronAgent.php:252
+#: includes/src/CronAgent.php:257
 msgid "Event hook not found %s"
 msgstr ""
 
-#: includes/src/CronAgent.php:272
+#: includes/src/CronAgent.php:277
 msgid "No scheduled event ready to run"
 msgstr ""
 
-#: includes/src/CronAgent.php:279
+#: includes/src/CronAgent.php:284
 msgid "Another cron process is currently running wp-cron.php"
 msgstr ""
 
-#: includes/src/CronAgent.php:443
+#: includes/src/CronAgent.php:448
 msgid "Already received. Try again in a few minutes"
 msgstr ""
 
-#: includes/src/Event.php:43
+#: includes/src/Event.php:45
 msgid "Every 30 Minutes"
 msgstr ""
 
-#: includes/src/Event.php:49
+#: includes/src/Event.php:51
 msgid "Once Hourly"
 msgstr ""
 
-#: includes/src/Event.php:56
+#: includes/src/Event.php:58
 msgid "Once Monthly"
 msgstr ""
 
-#: includes/src/Event.php:67
+#: includes/src/Event.php:69
 msgid "Every 15 Days"
 msgstr ""
 
@@ -1506,9 +1506,9 @@ msgstr ""
 
 #. translators: %1$s = size, %2$s number of file
 #: includes/src/OPcacheView.php:98
-#: includes/src/Plugin.php:235
-#: includes/src/Plugin.php:239
-#: includes/src/Plugin.php:242
+#: includes/src/Plugin.php:236
+#: includes/src/Plugin.php:240
+#: includes/src/Plugin.php:243
 msgid "%1$s size of %2$s file"
 msgid_plural "%1$s size of %2$s files"
 msgstr[0] ""
@@ -1531,66 +1531,66 @@ msgstr ""
 msgid "No matching OPcache Cached Files."
 msgstr ""
 
-#: includes/src/Plugin.php:174
+#: includes/src/Plugin.php:175
 msgid "Disabled"
 msgstr ""
 
-#: includes/src/Plugin.php:175
+#: includes/src/Plugin.php:176
 msgid "Enabled"
 msgstr ""
 
-#: includes/src/Plugin.php:177
+#: includes/src/Plugin.php:178
 msgid "Unknown"
 msgstr ""
 
-#: includes/src/Plugin.php:181
+#: includes/src/Plugin.php:182
 msgid "No"
 msgstr ""
 
-#: includes/src/Plugin.php:182
+#: includes/src/Plugin.php:183
 msgid "Yes"
 msgstr ""
 
 #. translators: %1$s = size, %2$s number of file
-#: includes/src/Plugin.php:196
+#: includes/src/Plugin.php:197
 msgid "%1$s object of %2$s file"
 msgid_plural "%1$s object of %2$s files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/src/Plugin.php:201
+#: includes/src/Plugin.php:202
 msgid "Disabled at runtime."
 msgstr ""
 
 #. translators: %1$s = size, %2$s number of file
-#: includes/src/Plugin.php:216
-#: includes/src/Plugin.php:220
-#: includes/src/Plugin.php:223
+#: includes/src/Plugin.php:217
+#: includes/src/Plugin.php:221
+#: includes/src/Plugin.php:224
 msgid "%1$s memory of %2$s file"
 msgid_plural "%1$s memory of %2$s files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/src/Plugin.php:230
-#: includes/src/Plugin.php:245
+#: includes/src/Plugin.php:231
+#: includes/src/Plugin.php:246
 msgid "File cache only"
 msgstr ""
 
 #. translators: %s = sites
-#: includes/src/Plugin.php:268
+#: includes/src/Plugin.php:269
 msgid "%s Site"
 msgid_plural "%s Sites"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s = networks
-#: includes/src/Plugin.php:272
+#: includes/src/Plugin.php:273
 msgid "of %s Network"
 msgid_plural "of %s Networks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/src/Plugin.php:908
+#: includes/src/Plugin.php:912
 msgid "Docket Cache plugin requires PHP 7.2.5 or greater."
 msgstr ""
 

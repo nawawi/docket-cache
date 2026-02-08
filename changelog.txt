@@ -1,3 +1,7 @@
+= v24.07.07 (2026-02-08) =
+
+- Fixed: _load_textdomain_just_in_time was called incorrectly on WordPress 6.7+.
+
 = v24.07.06 (2026-02-08) =
 
 - Fixed: MoCache double-applying load_textdomain_mofile filter.

@@ -136,6 +136,11 @@ final class CronAgent
         }
 
         $cronbot_endpoint = $this->pt->cronbot_endpoint.'/checkstatus?v='.$stmp;
+
+        if (!@is_file(__DIR__.'/Crawler.php') || !class_exists('Nawawi\\DocketCache\\Crawler')) {
+            return false;
+        }
+
         $results = Crawler::post($cronbot_endpoint, $args);
 
         if ($is_quick) {

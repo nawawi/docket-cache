@@ -38,33 +38,35 @@ final class Event
         add_filter(
             'cron_schedules',
             function ($schedules) {
+                $is_after_init = did_action('init') > 0;
+
                 $schedules['halfhour'] = [
                     'interval' => 30 * MINUTE_IN_SECONDS,
-                    'display' => esc_html__('Every 30 Minutes', 'docket-cache'),
+                    'display' => $is_after_init ? esc_html__('Every 30 Minutes', 'docket-cache') : 'Every 30 Minutes',
                 ];
 
                 if (empty($schedules['hourly'])) {
                     $schedules['hourly'] = [
                         'interval' => HOUR_IN_SECONDS,
-                        'display' => esc_html__('Once Hourly', 'docket-cache'),
+                        'display' => $is_after_init ? esc_html__('Once Hourly', 'docket-cache') : 'Once Hourly',
                     ];
                 }
 
                 if (empty($schedules['monthly'])) {
                     $schedules['monthly'] = [
                         'interval' => MONTH_IN_SECONDS,
-                        'display' => esc_html__('Once Monthly', 'docket-cache'),
+                        'display' => $is_after_init ? esc_html__('Once Monthly', 'docket-cache') : 'Once Monthly',
                     ];
                 }
 
                 $schedules['docketcache_gc_schedule'] = [
                     'interval' => 5 * MINUTE_IN_SECONDS,
-                    'display' => esc_html__('Every 5 Minutes', 'docket-cache'),
+                    'display' => $is_after_init ? esc_html__('Every 5 Minutes', 'docket-cache') : 'Every 5 Minutes',
                 ];
 
                 $schedules['docketcache_checkversion_schedule'] = [
                     'interval' => 15 * DAY_IN_SECONDS,
-                    'display' => esc_html__('Every 15 Days', 'docket-cache'),
+                    'display' => $is_after_init ? esc_html__('Every 15 Days', 'docket-cache') : 'Every 15 Days',
                 ];
 
                 return $schedules;
@@ -73,7 +75,7 @@ final class Event
         );
 
         add_action(
-            'plugins_loaded',
+            'init',
             function () {
                 // 19092020: standardize. rename hooks.
                 // 19012023: remove docketcache_watchproc.

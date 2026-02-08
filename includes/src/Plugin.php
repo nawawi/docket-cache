@@ -160,7 +160,8 @@ final class Plugin extends Bepart
             return $version;
         }
 
-        $version = $this->plugin_meta($this->file)['Version'];
+        $meta = $this->plugin_meta($this->file);
+        $version = !empty($meta) ? $meta['Version'] : '';
 
         return $version;
     }
@@ -905,11 +906,10 @@ final class Plugin extends Bepart
     private function compat_notice()
     {
         if (!(\PHP_VERSION_ID >= 70205)) {
-            $text = __('Docket Cache plugin requires PHP 7.2.5 or greater.', 'docket-cache');
-
             add_action(
                 'all_admin_notices',
-                function () use ($text) {
+                function () {
+                    $text = __('Docket Cache plugin requires PHP 7.2.5 or greater.', 'docket-cache');
                     echo '<div id="docket-cache-notice" class="notice notice-warning is-dismissible"><p>'.$text.'</p></div>';
                     deactivate_plugins($this->hook);
                     wp_cache_flush();
@@ -926,7 +926,7 @@ final class Plugin extends Bepart
                     deactivate_plugins($this->hook);
                     wp_cache_flush();
 
-                    \WP_CLI::error($text, false);
+                    \WP_CLI::error('Docket Cache plugin requires PHP 7.2.5 or greater.', false);
                     \WP_CLI::halt(1);
                 }
             }
@@ -1191,7 +1191,7 @@ final class Plugin extends Bepart
 
         if (!empty($_SERVER['REQUEST_URI']) && false !== strpos($_SERVER['REQUEST_URI'], '/admin.php?page=docket-cache')) {
             add_action(
-                'plugins_loaded',
+                'init',
                 function () {
                     if (!headers_sent() && !empty($_SERVER['REQUEST_URI'])) {
                         if ($this->cf()->is_dctrue('LOG')) {
@@ -1243,7 +1243,7 @@ final class Plugin extends Bepart
                         }
                     }
                 },
-                \PHP_INT_MIN
+                1
             );
         }
 
