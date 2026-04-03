@@ -376,6 +376,15 @@ final class Constans
         // wp-cli
         $this->maybe_define($this->px('WPCLI'), \defined('WP_CLI') && WP_CLI);
 
+        // opcache invalidation via REST when running under WP-CLI.
+        // When opcache.validate_timestamps=0 (common on production), CLI-side
+        // opcache_invalidate() is a no-op because CLI and the web server have
+        // separate OPcache segments. Setting this to true (default) causes
+        // Docket Cache to fire a non-blocking HTTP request to the web server
+        // after any CLI flush so that opcache_invalidate/reset runs in the
+        // correct process. Set to false to disable.
+        $this->maybe_define($this->px('WPCLI_OPCACHE'), true);
+
         // banner
         $this->maybe_define($this->px('SIGNATURE'), true);
 

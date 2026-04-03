@@ -1073,6 +1073,13 @@ class Filesystem
         $this->suspend_cache_write(false);
         $is_done = true;
 
+        // When running under WP-CLI, opcache_invalidate() is a no-op because
+        // CLI and the web server use separate OPcache segments. Notify the web
+        // server via REST so it can call opcache_reset() in the right process.
+        if (nwdcx_construe('WPCLI') && nwdcx_construe('WPCLI_OPCACHE')) {
+            CliOpcache::notify([]);
+        }
+
         return $cnt;
     }
 
