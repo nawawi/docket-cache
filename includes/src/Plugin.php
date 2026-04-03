@@ -1508,6 +1508,17 @@ final class Plugin extends Bepart
     }
 
     /**
+     * register_cli_opcache.
+     *
+     * Registers the REST endpoint that allows WP-CLI to trigger OPcache
+     * invalidation inside the web-server process.
+     */
+    private function register_cli_opcache()
+    {
+        ( new CliOpcache($this) )->init();
+    }
+
+    /**
      * register_admin_hooks.
      */
     private function register_admin_hooks()
@@ -2379,6 +2390,7 @@ final class Plugin extends Bepart
         $this->register_admin_hooks();
         $this->register_tweaks();
         $this->register_cronjob();
+        $this->register_cli_opcache();
         $this->register_cli();
 
         nwdcx_runaction('docketcache/init', $this);
