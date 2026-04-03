@@ -47,3 +47,4 @@ composer.lock
 .php-cs-fixer.php
 CodeSniffer.*
 note.txt
+.analysis/
