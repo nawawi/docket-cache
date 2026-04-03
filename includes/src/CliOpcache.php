@@ -207,9 +207,11 @@ final class CliOpcache
 
         // Build the REST URL without get_rest_url() which requires $wp_rewrite
         // to be initialised (only available after the 'init' action). We use
-        // home_url() which is safe to call at any point after plugins_loaded.
+        // home_url() — the public-facing site root — which is safe to call at
+        // any point after plugins_loaded and correctly handles Bedrock's /wp/
+        // subdirectory install (siteurl includes /wp, home_url does not).
         $rest_prefix = \defined('REST_API_PREFIX') ? \REST_API_PREFIX : 'wp-json';
-        $url = \trailingslashit(\get_option('siteurl')).$rest_prefix.'/'.self::REST_NAMESPACE.self::REST_ROUTE;
+        $url = \trailingslashit(\get_option('home')).$rest_prefix.'/'.self::REST_NAMESPACE.self::REST_ROUTE;
 
         \wp_remote_post(
             $url,
