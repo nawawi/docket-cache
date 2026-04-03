@@ -58,8 +58,8 @@ To use Docket Cache requires minimum:
 For configuration options, installation guides, and command-line usage, please refer to the [Documentation](https://docs.docketcache.com).
 
 == Development ==
-- [GitHub Repository](https://github.com/nawawi/docket-cache/)
-- [Changelog](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt)
+- [GitHub Repository](https://github.com/nawawi/docket-cache/) — Source code and development hub for Docket Cache.
+- [Changelog](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt) — Full history of changes, fixes, and improvements.
 - [Gapo Tunnel](https://github.com/ghostbirdme/gapo) — Expose local services to the internet through secure tunnels. Useful for testing Docket Cache on a local development environment.
 
 == Sponsor This Project ==
