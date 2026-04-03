@@ -473,13 +473,6 @@ class Filesystem
         // bcoz we empty the file
         $this->opcache_flush($file);
 
-        // When running under WP-CLI and not inside a bulk flush (which sends
-        // all:true after the loop), notify the web server to invalidate this
-        // specific file in its OPcache.
-        if (!CliOpcache::is_bulk_flush() && nwdcx_construe('WPCLI') && nwdcx_construe('WPCLI_OPCACHE') && $this->is_php($file)) {
-            CliOpcache::notify([$file]);
-        }
-
         $do_delete = (nwdcx_construe('FLUSH_DELETE') && $this->is_php($file)) || $is_delete;
 
         if ($do_delete && @unlink($file)) {
@@ -1028,10 +1021,6 @@ class Filesystem
 
         $this->suspend_cache_write(true);
 
-        // Suppress per-file CLI notifications during a full flush; we send
-        // a single all:true notification after the loop instead.
-        CliOpcache::set_bulk_flush(true);
-
         $gcisrun_lock = $dir.'/.gc-is-run.txt';
 
         $max_execution_time = $this->get_max_execution_time(180);
@@ -1083,8 +1072,6 @@ class Filesystem
 
         $this->suspend_cache_write(false);
         $is_done = true;
-
-        CliOpcache::set_bulk_flush(false);
 
         // When running under WP-CLI, opcache_invalidate() is a no-op because
         // CLI and the web server use separate OPcache segments. Notify the web

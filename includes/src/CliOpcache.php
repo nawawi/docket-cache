@@ -59,14 +59,6 @@ final class CliOpcache
     const SECRET_KEY = 'cli_opcache_secret';
 
     /**
-     * Whether a bulk (full) flush is in progress.
-     * Used to suppress per-file notifications during cachedir_flush().
-     *
-     * @var bool
-     */
-    private static $bulk_flush = false;
-
-    /**
      * Plugin instance.
      *
      * @var Plugin
@@ -175,32 +167,14 @@ final class CliOpcache
     }
 
     /**
-     * Signal that a bulk flush is starting or ending.
-     * While true, per-file notifications in unlink() are suppressed.
-     *
-     * @param bool $state
-     * @return void
-     */
-    public static function set_bulk_flush(bool $state)
-    {
-        self::$bulk_flush = $state;
-    }
-
-    /**
-     * Whether a bulk flush is currently in progress.
-     *
-     * @return bool
-     */
-    public static function is_bulk_flush(): bool
-    {
-        return self::$bulk_flush;
-    }
-
-    /**
-     * Called from WP-CLI after cache files are flushed.
+     * Called from WP-CLI after cache files are explicitly flushed.
      *
      * Fires a non-blocking HTTP POST to the REST endpoint so that
      * opcache_invalidate() / opcache_reset() runs in the web-server process.
+     *
+     * Only fires during explicit flush operations (cachedir_flush or a
+     * deliberate wp_cache_delete call), never during normal cache eviction
+     * that happens as a side-effect of cache reads.
      *
      * @param array $files  Absolute paths of cache files that were flushed.
      *                      Pass an empty array to request a full opcache_reset().
@@ -231,7 +205,11 @@ final class CliOpcache
         $timestamp = (string) time();
         $signature = \hash_hmac('sha256', $timestamp.$body, $secret);
 
-        $url = \get_rest_url(null, self::REST_NAMESPACE.self::REST_ROUTE);
+        // Build the REST URL without get_rest_url() which requires $wp_rewrite
+        // to be initialised (only available after the 'init' action). We use
+        // home_url() which is safe to call at any point after plugins_loaded.
+        $rest_prefix = \defined('REST_API_PREFIX') ? \REST_API_PREFIX : 'wp-json';
+        $url = \trailingslashit(\get_option('siteurl')).$rest_prefix.'/'.self::REST_NAMESPACE.self::REST_ROUTE;
 
         \wp_remote_post(
             $url,
