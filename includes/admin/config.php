@@ -633,9 +633,15 @@ $this->config_select_set_e(
                     </td>
                 </tr>
                 <tr id="flushaction">
-                    <th class="border-b"><?php $this->opt_title('flushaction'); ?></th>
+                    <th><?php $this->opt_title('flushaction'); ?></th>
                     <td>
                         <?php $this->config_select_bool_e('flushaction'); ?>
+                    </td>
+                </tr>
+                <tr id="configaction">
+                    <th class="border-b"><?php $this->opt_title('configaction'); ?></th>
+                    <td>
+                        <?php $this->config_select_bool_e('configaction'); ?>
                     </td>
                 </tr>
                 <tr>

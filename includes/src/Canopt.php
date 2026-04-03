@@ -103,6 +103,7 @@ final class Canopt extends Bepart
             'stats',
             'gcaction',
             'flushaction',
+            'configaction',
             'autoupdate_toggle',
             'checkversion',
             'optwpquery',
@@ -186,6 +187,7 @@ final class Canopt extends Bepart
             'stats' => esc_html__('Object Cache Data Stats', 'docket-cache'),
             'gcaction' => esc_html__('Garbage Collector Action Button', 'docket-cache'),
             'flushaction' => esc_html__('Additional Flush Cache Action Button', 'docket-cache'),
+            'configaction' => esc_html__('Export/Import Settings Action Button', 'docket-cache'),
             'autoupdate_toggle' => esc_html__('Docket Cache Auto Update', 'docket-cache'),
             'checkversion' => esc_html__('Critical Version Checking', 'docket-cache'),
             'optwpquery' => esc_html__('Optimize WP Query', 'docket-cache'),
@@ -520,6 +522,71 @@ final class Canopt extends Bepart
         $fkey = 'lockup-'.$key;
 
         return $this->unlock($fkey);
+    }
+
+    public function export_config()
+    {
+        $config = $this->read_config();
+        $config = $this->config_cleanup($config);
+
+        if (empty($config) || !\is_array($config)) {
+            return false;
+        }
+
+        // Strip DOCKET_CACHE_ prefix for cleaner export.
+        $export = [];
+        foreach ($config as $name => $value) {
+            $key = strtolower(nwdcx_constfx($name, true));
+            $export[$key] = $value;
+        }
+
+        return $export;
+    }
+
+    public function import_config($data)
+    {
+        if (empty($data) || !\is_array($data)) {
+            return false;
+        }
+
+        if (!$this->mkdir_p($this->path)) {
+            return false;
+        }
+
+        $this->placeholder($this->path);
+
+        $valid_keys = $this->key_names();
+        $config = [];
+
+        foreach ($data as $name => $value) {
+            $name = strtolower($name);
+            if (!\in_array($name, $valid_keys)) {
+                continue;
+            }
+
+            // Only accept scalar values.
+            if (!\is_scalar($value)) {
+                continue;
+            }
+
+            $value = (string) $value;
+
+            // Cap value length to prevent abuse.
+            if (\strlen($value) > 256) {
+                continue;
+            }
+
+            if ('default' !== $value) {
+                $nx = nwdcx_constfx($name);
+                $config[$nx] = $value;
+            }
+        }
+
+        if (empty($config)) {
+            return false;
+        }
+
+        return $this->put_config($config);
     }
 
     public function reset()

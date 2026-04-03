@@ -40,6 +40,7 @@ class ComposerStaticInit71169967e8f502f7da209e4236957996
         'Nawawi\\DocketCache\\Becache' => __DIR__ . '/../../..' . '/includes/src/Becache.php',
         'Nawawi\\DocketCache\\Bepart' => __DIR__ . '/../../..' . '/includes/src/Bepart.php',
         'Nawawi\\DocketCache\\Canopt' => __DIR__ . '/../../..' . '/includes/src/Canopt.php',
+        'Nawawi\\DocketCache\\CliOpcache' => __DIR__ . '/../../..' . '/includes/src/CliOpcache.php',
         'Nawawi\\DocketCache\\Command' => __DIR__ . '/../../..' . '/includes/src/Command.php',
         'Nawawi\\DocketCache\\Constans' => __DIR__ . '/../../..' . '/includes/src/Constans.php',
         'Nawawi\\DocketCache\\Crawler' => __DIR__ . '/../../..' . '/includes/src/Crawler.php',

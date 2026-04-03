@@ -473,6 +473,11 @@ class Filesystem
         // bcoz we empty the file
         $this->opcache_flush($file);
 
+        // Notify web-server OPcache when running under WP-CLI.
+        if (nwdcx_construe('WPCLI') && nwdcx_construe('WPCLI_OPCACHE') && $this->is_php($file)) {
+            CliOpcache::notify([$file]);
+        }
+
         $do_delete = (nwdcx_construe('FLUSH_DELETE') && $this->is_php($file)) || $is_delete;
 
         if ($do_delete && @unlink($file)) {
@@ -1021,6 +1026,10 @@ class Filesystem
 
         $this->suspend_cache_write(true);
 
+        if (nwdcx_construe('WPCLI') && nwdcx_construe('WPCLI_OPCACHE')) {
+            CliOpcache::set_bulk_flush(true);
+        }
+
         $gcisrun_lock = $dir.'/.gc-is-run.txt';
 
         $max_execution_time = $this->get_max_execution_time(180);
@@ -1073,10 +1082,10 @@ class Filesystem
         $this->suspend_cache_write(false);
         $is_done = true;
 
-        // When running under WP-CLI, opcache_invalidate() is a no-op because
-        // CLI and the web server use separate OPcache segments. Notify the web
-        // server via REST so it can call opcache_reset() in the right process.
+        // When running under WP-CLI, notify the web server to run
+        // opcache_reset() since CLI has a separate OPcache segment.
         if (nwdcx_construe('WPCLI') && nwdcx_construe('WPCLI_OPCACHE')) {
+            CliOpcache::set_bulk_flush(false);
             CliOpcache::notify([]);
         }
 

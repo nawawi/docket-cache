@@ -85,6 +85,28 @@ if (is_multisite() && !empty($sites) && \is_array($sites) && \count($sites) > 1)
         <?php endif; ?>
 
         <?php endif; // flushaction?>
+
+        <?php if ($this->vcf()->is_dctrue('CONFIGACTION')) : ?>
+        <hr>
+        <h4><?php esc_html_e('Export Settings', 'docket-cache'); ?></h4>
+        <p>
+            <?php esc_html_e('Download current configuration as a JSON file.', 'docket-cache'); ?>
+        </p>
+        <a href="<?php echo $this->pt->action_query('export-config', ['idx' => 'config']); ?>" class="button button-primary button-large"><?php esc_html_e('Export Settings', 'docket-cache'); ?></a>
+
+        <hr>
+        <h4><?php esc_html_e('Import Settings', 'docket-cache'); ?></h4>
+        <p>
+            <?php esc_html_e('Upload a previously exported JSON configuration file.', 'docket-cache'); ?>
+        </p>
+        <form method="post" action="<?php echo $this->pt->action_query('import-config', ['idx' => 'config']); ?>" enctype="multipart/form-data">
+            <input type="file" name="dcimportfile" accept=".json" required>
+            <p>
+                <button type="submit" class="button button-primary button-large"><?php esc_html_e('Import Settings', 'docket-cache'); ?></button>
+            </p>
+        </form>
+        <?php endif; // configaction?>
+
         <hr>
         <h4><?php esc_html_e('Config Reset', 'docket-cache'); ?></h4>
         <p>

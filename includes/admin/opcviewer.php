@@ -37,8 +37,8 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
                     foreach ($config['version'] as $k => $v) :
                         ?>
                 <tr>
-                    <th<?php echo  $lcnt >= $last ? ' class="border-b"' : ''; ?>><?php echo $k; ?><span class="rsep">:</span></th>
-                        <td><?php echo $v; ?></td>
+                    <th<?php echo  $lcnt >= $last ? ' class="border-b"' : ''; ?>><?php echo esc_html($k); ?><span class="rsep">:</span></th>
+                        <td><?php echo esc_html($v); ?></td>
                 </tr>
                 <?php
                         ++$lcnt;
@@ -58,7 +58,7 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
                                 $v = $v ? 'true' : 'false';
                                 break;
                             case 'string':
-                                $v = '' === $v ? esc_html__('Not set', 'docket-cache') : $v;
+                                $v = '' === $v ? esc_html__('Not set', 'docket-cache') : esc_html($v);
                                 break;
                             case 'integer':
                                 switch ($k) {
@@ -78,13 +78,13 @@ $is_config = !empty($_GET['adx']) && 'cnf' === sanitize_text_field($_GET['adx'])
                         }
                         ?>
                 <tr>
-                    <th><a href="<?php echo $opcache_view->get_doc($k); ?>" rel="noopener" target="new"><?php echo $k; ?></a><span class="rsep">:</span></th>
-                    <td><?php echo $v; ?></td>
+                    <th><a href="<?php echo esc_url($opcache_view->get_doc($k)); ?>" rel="noopener" target="new"><?php echo esc_html($k); ?></a><span class="rsep">:</span></th>
+                    <td><?php echo esc_html($v); ?></td>
                 </tr>
                 <?php if (!empty($blacklist)) : ?>
                 <tr>
                     <th></th>
-                    <td><small><?php echo implode('<br>', $blacklist); ?></small></td>
+                    <td><small><?php echo implode('<br>', array_map('esc_html', $blacklist)); ?></small></td>
                 </tr>
                 <?php endif; ?>
 
@@ -239,7 +239,7 @@ else :
                     '1k' => __('< 1000 Items', 'docket-cache'),
                     '5k' => __('< 5000 Items', 'docket-cache'),
                     '10k' => __('< 10000 Items', 'docket-cache'),
-                    'all' => __('> All Items', 'docket-cache'),
+                    '50k' => __('< 50000 Items', 'docket-cache'),
                 ] as $k => $n) {
                     echo '<option value="'.$k.'"'.($sort_sm === $k ? ' selected' : '').'>'.$n.'</option>';
                 }

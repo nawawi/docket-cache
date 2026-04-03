@@ -438,13 +438,14 @@ final class Plugin extends Bepart
                         }
 
                         if (!empty($data['scripts']) && \is_array($data['scripts'])) {
+                            $abspath = nwdcx_normalizepath(ABSPATH);
                             foreach ($data['scripts'] as $script => $arr) {
-                                $cpath = $arr['full_path'];
-                                if (!@is_file($cpath)) {
-                                    ++$stale;
+                                // Only count scripts belonging to this site.
+                                if (false === strpos($arr['full_path'], $abspath)) {
+                                    continue;
                                 }
-                                $cfile = basename($cpath);
-                                $cdir = \dirname($cpath);
+                                $cfile = basename($arr['full_path']);
+                                $cdir = \dirname($arr['full_path']);
                                 if (false !== strpos($script, $this->cache_path) && $this->is_docketcachedir($cdir) && @preg_match('@^([a-z0-9]{12})\-([a-z0-9]{12})\.php$@', $cfile)) {
                                     ++$dcfiles;
                                     if (isset($arr['memory_consumption'])) {
@@ -464,14 +465,26 @@ final class Plugin extends Bepart
                         if (!empty($data['file_cache']) && is_dir($data['file_cache']) && is_readable($data['file_cache'])) {
                             $dir = nwdcx_normalizepath(realpath($data['file_cache']));
                             $cnt = 0;
+                            $abspath = nwdcx_normalizepath(ABSPATH);
 
-                            // dummy
-                            $cdata = [
+                            $cdata = $is_raw ? [
                                 'opcache_statistics' => [
                                     'num_cached_scripts' => 0,
                                 ],
                                 'scripts' => [],
-                            ];
+                            ] : null;
+
+                            // Cap scripts array to prevent memory exhaustion.
+                            // Timeout guard to prevent hitting max_execution_time on shared hosting.
+                            $scripts_limit = 50000;
+                            $scan_start = microtime(true);
+                            $scan_timeout = (int) \ini_get('max_execution_time');
+                            if ($scan_timeout > 0) {
+                                // Use half the max execution time to leave room for rendering.
+                                $scan_timeout = max(5, (int) ($scan_timeout / 2));
+                            } else {
+                                $scan_timeout = 30;
+                            }
 
                             foreach ($this->opcache_filecache_scanfiles($dir) as $object) {
                                 try {
@@ -480,7 +493,7 @@ final class Plugin extends Bepart
                                     }
 
                                     $cpath = nwdcx_normalizepath($object->getPathName());
-                                    if (false === strpos($cpath, nwdcx_normalizepath(ABSPATH))) {
+                                    if (false === strpos($cpath, $abspath)) {
                                         continue;
                                     }
 
@@ -497,15 +510,22 @@ final class Plugin extends Bepart
                                     }
 
                                     ++$cnt;
-
                                     $total_bytes += $fs;
 
-                                    $cdata['scripts'][$cpath] = [
-                                        'full_path' => $cpath,
-                                        'memory_consumption' => $fs,
-                                        'last_used_timestamp' => $object->getATime(),
-                                        'hits' => 1,
-                                    ];
+                                    // Only build scripts array when raw data is requested (OPcacheView).
+                                    if ($is_raw && $cnt <= $scripts_limit) {
+                                        $cdata['scripts'][$cpath] = [
+                                            'full_path' => $cpath,
+                                            'memory_consumption' => $fs,
+                                            'last_used_timestamp' => $object->getATime(),
+                                            'hits' => 1,
+                                        ];
+                                    }
+
+                                    // Check timeout every 500 files.
+                                    if (0 === $cnt % 500 && (microtime(true) - $scan_start) > $scan_timeout) {
+                                        break;
+                                    }
                                 } catch (\Throwable $e) {
                                     nwdcx_throwable(__METHOD__, $e);
                                     continue;
@@ -1515,8 +1535,6 @@ final class Plugin extends Bepart
      */
     private function register_cli_opcache()
     {
-        // Keep a reference on $this so the CliOpcache instance is not
-        // garbage-collected before rest_api_init fires.
         $cli_opcache = new CliOpcache($this);
         add_action('rest_api_init', [$cli_opcache, 'register_rest_route']);
     }

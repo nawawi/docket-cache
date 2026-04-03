@@ -4,26 +4,26 @@ Tags: object cache, OPcache, cache, database, performance
 Requires at least: 5.4
 Tested up to: 6.9
 Requires PHP: 7.2.5
-Stable tag: 24.07.07
+Stable tag: 26.04.03
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 Donate link: https://docketcache.com/sponsorship/
 
-Supercharge your website using a persistent object cache, accelerates caching with OPcache, an efficient alternative to Redis and Memcached.
+Speed up your WordPress site with a persistent object cache, powered by OPcache. An efficient alternative to Redis and Memcached.
 
 == Description ==
-The Docket Cache is a persistent WordPress Object Cache solution designed to store data as plain PHP code. It offers an efficient alternative for users who are unable to utilize Redis or Memcached servers.
+Docket Cache is a persistent WordPress Object Cache that stores cached data as plain PHP code. It is designed as an alternative for sites that do not have access to Redis or Memcached.
 
-Unlike conventional approaches that rely on [serializing](https://www.php.net/manual/en/function.serialize.php) and [unserializing](https://www.php.net/manual/en/function.unserialize.php) PHP objects to store them into flat files, this plugin transforms objects into plain PHP code. This method significantly enhances data retrieval speed and overall performance, especially when paired with Zend OPcache.
+Most file-based caching plugins use [serializing](https://www.php.net/manual/en/function.serialize.php) and [unserializing](https://www.php.net/manual/en/function.unserialize.php) to save PHP objects to flat files. Docket Cache takes a different approach by converting objects into plain PHP code. This makes data retrieval faster and improves overall performance, especially when Zend OPcache is enabled.
 
 For more information, please refer to the documentation on [Caching In WordPress](https://docs.docketcache.com/resources/caching-in-wordpress).
 
 == Why use this plugin? ==
-When it comes to reliable persistent Object Cache in WordPress, [Redis](https://redis.io/) or [Memcached](https://memcached.org/) comes on top. However, those solutions require knowledge of server and rarely available at low cost or shared hosting servers.
+For reliable persistent Object Cache in WordPress, [Redis](https://redis.io/) or [Memcached](https://memcached.org/) are the top choices. However, they require server knowledge and are rarely available on low-cost or shared hosting plans.
 
-The only viable solution is to store object caches in files. In WordPress, exporting PHP objects is not easy. Most plugins implementing file-based caching rely on serializing and unserializing objects to store and retrieve data.
+The alternative is to store object caches in files. In WordPress, exporting PHP objects is not straightforward. Most file-based caching plugins rely on serialising and unserialising objects to store and retrieve data.
 
-Docket Cache takes a better approach by turning the object cache into plain PHP code. This solution is faster since WordPress can use the cache directly without running other operations.
+Docket Cache takes a better approach by turning the object cache into plain PHP code. This is faster because WordPress can use the cache directly without additional processing.
 
 == Features ==
 
@@ -55,19 +55,20 @@ To use Docket Cache requires minimum:
 
 == Documentation ==
 
-To adjust the plugin behaviour, installation or manage through a command line, please refer to the [Documentation](https://docs.docketcache.com) for details.
+For configuration options, installation guides, and command-line usage, please refer to the [Documentation](https://docs.docketcache.com).
 
 == Development ==
-- [Github Repo](https://github.com/nawawi/docket-cache/)
+- [GitHub Repository](https://github.com/nawawi/docket-cache/)
 - [Changelog](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt)
+- [Gapo Tunnel](https://github.com/ghostbirdme/gapo) — Expose local services to the internet through secure tunnels. Useful for testing Docket Cache on a local development environment.
 
-== Sponsor this project ==
+== Sponsor This Project ==
 
-[Fund Docket Cache](https://docketcache.com/sponsorship/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg) one-off or recurring payment to support our open-source development efforts.
+Support the ongoing development of Docket Cache with a [one-off or recurring contribution](https://docketcache.com/sponsorship/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg).
 
 **Noteworthy Sponsors:**
 
-A heartful thanks and appreciation.
+A heartfelt thanks and appreciation.
 
 - [Jimat Hosting](https://jimathosting.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [Themecloud](https://www.themecloud.io/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
@@ -83,14 +84,14 @@ A heartful thanks and appreciation.
 Other sponsors are mentioned in the [honourable list](https://github.com/nawawi/docket-cache/issues/5)
 
 == Installation ==
-To use Docket Cache require minimum PHP 7.2.5, WordPress 5.4 and Zend OPcache for best performance.
+Docket Cache requires PHP 7.2.5 or higher, WordPress 5.4 or higher, and Zend OPcache for best performance.
 
-1. In your WordPress admin click **Plugins -> Add New**
-2. Search plugins "Docket Cache" and click Install Now.
-3. Click **Activate** or **Network Activate** in Multisite setups.
-4. Click **Docket Cache** in the left menu to access the admin page.
+1. In your WordPress admin, go to **Plugins -> Add New**.
+2. Search for "Docket Cache" and click **Install Now**.
+3. Click **Activate** or **Network Activate** for Multisite setups.
+4. Click **Docket Cache** in the left menu to access the settings page.
 
-Please wait around 5 seconds for Docket Cache ready to cache the objects.
+Please allow a few seconds for Docket Cache to begin caching objects.
 
 == Screenshots ==
 1. Overview.
@@ -105,74 +106,93 @@ Please wait around 5 seconds for Docket Cache ready to cache the objects.
 
 == Frequently Asked Questions ==
 = What is Object Caching in WordPress? =
-Object caching is a process that stores database query results in order to quickly bring them back up next time they are needed.
+Object caching stores database query results so they can be retrieved quickly the next time they are needed.
 
-The cached object will be served promptly from the cache rather than sending multiple requests to a database. This is more efficient and reduces massive unnecessary loads on your server.
+Cached data is served directly from the cache rather than making repeated database queries. This reduces the load on your server and makes your site faster.
 
-In simple terms, object caching allows objects that are used often to be copied and stored at a closer location for quicker use.
+In simple terms, object caching keeps frequently used data in a location where it can be accessed more quickly.
 
 = What is Docket Cache in Object Caching? =
-By default, the object cache in WordPress is non-persistent. This means that data stored in the cache reside in memory only and only for the duration of the request. Cached data will not be stored persistently across page loads. To make it persistent, the object cache must be stored on a local disk.
+By default, the WordPress object cache is non-persistent. This means cached data is stored in memory only for the duration of a single page request. It is not kept between page loads. To make it persistent, the object cache must be stored on disk.
 
-Docket Cache is not just stored the object cache, it converts the object cache into plain PHP code. This solution is faster since WordPress can use the cache directly without running other operation.
+Docket Cache does more than just store the object cache — it converts cached data into plain PHP code. This is faster because WordPress can use the cache directly without additional processing.
 
 = What is OPcache in Docket Cache? =
-OPcache is a caching engine built into PHP, that improves performance by storing precompiled script bytecode in shared memory, thereby removing the need for PHP to load and parse scripts on each request.
+OPcache is a caching engine built into PHP. It improves performance by storing precompiled script bytecode in shared memory, so PHP does not need to load and parse scripts on each request.
 
-Docket Cache converts the object cache into plain PHP code. When reading and writing cache, it will use OPcache directly which results in faster data retrieval and better performance.
+Docket Cache converts the object cache into plain PHP code. When reading and writing cache data, it uses OPcache directly, which results in faster data retrieval and better performance.
 
 = What is the Cronbot Service in Docket Cache? =
-The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively. 
+Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively.
 
-This service offered as an alternative option and is not compulsory to use. By default, this service not connected to the [end-point server](https://cronbot.docketcache.com/). You can completely disable it at the configuration page.
+This service is optional and is not required. By default, it is not connected to the [end-point server](https://cronbot.docketcache.com/). You can disable it entirely on the configuration page.
 
-= What is Garbage Collector in Docket Cache? =
-Garbage Collector is a Cron Event that runs every 5 minutes to monitor cache files purposely for cleanup and collecting stats.
+= What is the Garbage Collector in Docket Cache? =
+The Garbage Collector is a scheduled event that runs every 5 minutes to monitor cache files, clean up expired entries, and collect statistics.
 
 = What is a RAM disk in Docket Cache? =
-A RAM disk is a representation of a hard disk using RAM resources, and it can take the form of a hardware device or a virtual disk. 
+A RAM disk uses your server's memory (RAM) to act as a storage drive. It can be a hardware device or a virtual disk.
 
-Read and write speed on RAM is multiple times faster than SSD drives therefore storing Docket Cache files on a RAM disk greatly increases it's performance.
+Reading and writing data from RAM is much faster than from an SSD. Storing Docket Cache files on a RAM disk can greatly improve performance.
 
-Do note that creating RAM disks requires server administrative permission (root access) so this solution is not suitable for shared hosting servers.
+Please note that creating a RAM disk requires server administrator access (root), so this option is not available on shared hosting.
 
-This is an example command to create and use a RAM disk with Docket Cache:
+Here is an example command to create and use a RAM disk with Docket Cache:
 
 `$ cd wp-content/
 $ sudo mount -t tmpfs -o size=500m tmpfs ./cache/docket-cache`
 
-To mount the cache path automatically on boot, you need to update your /etc/fstab file.
+To mount the cache path automatically when the server starts, update your `/etc/fstab` file.
 
-Please refer to the articles below about RAM disk:
+For more information about RAM disks:
 
-1. [How to Easily Create RAM Disk](https://www.linuxbabe.com/command-line/create-ramdisk-linux)
-2. [What Is /dev/shm And Its Practical Usage](https://www.cyberciti.biz/tips/what-is-devshm-and-its-practical-usage.html)
-4. [Creating A Filesystem In RAM](https://www.cyberciti.biz/faq/howto-create-linux-ram-disk-filesystem/)
+1. [How to Easily Create a RAM Disk](https://www.linuxbabe.com/command-line/create-ramdisk-linux)
+2. [What Is /dev/shm and Its Practical Usage](https://www.cyberciti.biz/tips/what-is-devshm-and-its-practical-usage.html)
+3. [Creating a Filesystem in RAM](https://www.cyberciti.biz/faq/howto-create-linux-ram-disk-filesystem/)
 
-To use it in Windows OS, create RAM Disk and change [DOCKET_CACHE_PATH](https://docs.docketcache.com/configuration#docket_cache_path) point to RAM Disk drive.
+On Windows, create a RAM disk and set the [DOCKET_CACHE_PATH](https://docs.docketcache.com/configuration#docket_cache_path) to point to the RAM disk drive.
 
-= What is the minimum RAM required to use with shared hosting? =
-By default, WordPress allocates the memory limit to 256 MB. Combined with MySQL and Web Server, you need more than 256 MB. If you're using a cheap hosting plan that allocates only 256 MB for totals usage. It is not enough, and Docket Cache can't improve your website performance.
+= What is the minimum RAM required for shared hosting? =
+By default, WordPress sets the memory limit to 256 MB. When combined with MySQL and the web server, you need more than 256 MB. If your hosting plan only provides 256 MB in total, this is not enough, and Docket Cache will not be able to improve your site's performance.
 
-= What's the difference with the other object cache plugins? =
-Docket Cache is an Object Cache Accelerator. It does some optimization of caching like cache post queries, comments counting, WordPress translation and more before storing the object caches.
+= How is Docket Cache different from other object cache plugins? =
+Docket Cache is an Object Cache Accelerator. It optimises caching by handling post queries, comment counting, WordPress translations, and more before storing the object cache.
 
-= Can I pair using it with other cache plugin? =
-Yes and No. You can pair using it with page caching plugin, but not with the object cache plugin.
+= Can I use it alongside other cache plugins? =
+Yes and no. You can use it together with a page caching plugin, but not with another object cache plugin.
 
-= Can I pair using it with LiteSpeed Cache? =
-Yes, you can. The LiteSpeed Cache plugin has an Object Cache feature. Currently, by default, it will prompt a notice asking to disable Docket Cache. You only need to turn off LiteSpeed Cache Object Cache in order to use Docket Cache.
+= Can I use it with LiteSpeed Cache? =
+Yes. The LiteSpeed Cache plugin includes its own Object Cache feature. It may display a notice asking you to disable Docket Cache. Simply turn off the LiteSpeed Cache Object Cache to use Docket Cache instead.
 
-= Can I use Docket Cache on heavy WooCommerce stores? =
-Yes and No. As suggested, Docket Cache is an alternative to in-memory caches like Redis and Memcached. It depends on how your store has been setups. It may require further tuning to the configuration and may involve other optimisations.
+= Can I use Docket Cache on a busy WooCommerce store? =
+It is not recommended for high-traffic WooCommerce stores. Docket Cache is designed as a file-based alternative to in-memory caches like Redis and Memcached, and may not handle the demands of a busy store. For WooCommerce sites with heavy traffic, we recommend using Redis instead.
 
-= I'm using a VPS server. Can I use Docket Cache to replace Redis? =
-Yes, you can. It can boost more your WordPress performance since there is no network connection need to makes and no worry about memory burst, cache-key conflict and error-prone caused by the improper settings.
+= I have a VPS. Can I use Docket Cache instead of Redis? =
+You can, but if your VPS supports Redis, we recommend using Redis for better performance. Docket Cache is best suited for environments where Redis or Memcached is not available. That said, Docket Cache works well for small to medium sites on a VPS, with no network connection required and no risk of cache-key conflicts.
 
 == Upgrade Notice ==
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= v26.04.03 =
+- Added: CliOpcache — Invalidate web-server OPcache from WP-CLI via REST endpoint.
+- Added: DOCKET_CACHE_WPCLI_OPCACHE constant to enable/disable CLI OPcache invalidation.
+- Added: DOCKET_CACHE_CONFIGACTION constant to enable/disable Export/Import settings feature.
+- Added: Export/Import settings feature for configuration backup and restore.
+- Fixed: CliOpcache -> Path traversal protection using realpath() validation.
+- Fixed: CliOpcache -> Bulk flush suppression to avoid excessive HTTP requests during full cache flush.
+- Fixed: CliOpcache -> Shared secret initialised during REST route registration.
+- Fixed: ReqAction -> Flush Object Cache causing 502 nginx error by deferring flush after response.
+- Fixed: Plugin::get_opcache_status() -> Filter scripts by ABSPATH to prevent counting other sites on shared hosting.
+- Fixed: Plugin::get_opcache_status() -> Removed unnecessary is_file() stale check on every cached script.
+- Fixed: OPcache Viewer -> Escaped output of configuration values to prevent XSS.
+- Improved: Filesystem::unlink() -> Notify web-server OPcache on individual cache file deletion.
+- Improved: Filesystem::cachedir_flush() -> Utilise Crawler class for internal HTTP requests.
+- Improved: Plugin::get_opcache_status() -> Skip building scripts array for overview page, cap at 50000 for OPcacheView.
+- Improved: Plugin::get_opcache_status() -> Timeout guard for file cache scan on shared hosting.
+- Improved: OPcacheView -> Removed "All Items" option, replaced with 50000 items cap.
+- Improved: OPcacheView::get_status() -> Cache result to prevent double scan per page load.
+
 = v24.07.07 =
 - Fixed: _load_textdomain_just_in_time was called incorrectly on WordPress 6.7+.
 

@@ -15,6 +15,7 @@ namespace Nawawi\DocketCache;
 final class ReqAction
 {
     private $pt;
+    private $deferred_flush = false;
 
     public function __construct(Plugin $pt)
     {
@@ -79,6 +80,8 @@ final class ReqAction
              'docket-rungc',
              'docket-runtime',
              'docket-configreset',
+             'docket-export-config',
+             'docket-import-config',
              'docket-cleanuppost',
          ];
 
@@ -107,12 +110,8 @@ final class ReqAction
 
         switch ($action) {
             case 'docket-flush-occache':
-                $is_timeout = false;
-                $result = $this->pt->flush_cache(true, $is_timeout);
-                $response = $is_timeout ? 'docket-occache-flushed-warn' : 'docket-occache-flushed';
-                $this->pt->co()->lookup_set('occacheflushed', $result);
-
-                do_action('docketcache/action/flush/objectcache', $result);
+                $this->deferred_flush = true;
+                $response = 'docket-occache-flushed';
                 break;
             case 'docket-enable-occache':
                 $result = $this->pt->cx()->install(true);
@@ -339,6 +338,54 @@ final class ReqAction
                 $response = $result ? 'docket-configresetok' : 'docket-configresetok-failed';
                 do_action('docketcache/action/configreset', $result);
                 break;
+            case 'docket-export-config':
+                if (!nwdcx_construe('CONFIGACTION')) {
+                    break;
+                }
+
+                $export = $this->pt->co()->export_config();
+                if (false !== $export) {
+                    $filename = 'docket-cache-settings-'.date('Y-m-d-His').'.json';
+                    $json = wp_json_encode($export, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
+
+                    nocache_headers();
+                    header('Content-Type: application/json; charset=utf-8');
+                    header('Content-Disposition: attachment; filename="'.$filename.'"');
+                    header('Content-Length: '.\strlen($json));
+                    echo $json;
+                    exit;
+                }
+
+                $response = 'docket-configexport-failed';
+                break;
+            case 'docket-import-config':
+                if (!nwdcx_construe('CONFIGACTION')) {
+                    break;
+                }
+
+                $response = 'docket-configimport-failed';
+
+                if (!empty($_FILES['dcimportfile'])) {
+                    $file = $_FILES['dcimportfile'];
+
+                    if (\UPLOAD_ERR_OK === $file['error']
+                        && $file['size'] > 0
+                        && $file['size'] < 102400
+                        && is_uploaded_file($file['tmp_name'])
+                        && '.json' === strtolower(substr($file['name'], -5))
+                    ) {
+                        $content = file_get_contents($file['tmp_name']);
+                        $data = json_decode($content, true);
+
+                        if (\JSON_ERROR_NONE === json_last_error() && !empty($data) && \is_array($data)) {
+                            $result = $this->pt->co()->import_config($data);
+                            $response = $result ? 'docket-configimportok' : 'docket-configimport-failed';
+                        }
+                    }
+                }
+
+                do_action('docketcache/action/configimport', 'docket-configimportok' === $response);
+                break;
             case 'docket-cleanuppost':
                 if ($this->pt->co()->lockproc('cleanuppost_check', time() + 20)) {
                     $result = false;
@@ -502,8 +549,35 @@ final class ReqAction
                     }
                 }
 
+                if ($this->deferred_flush) {
+                    // Mark flush in progress before sending redirect.
+                    $this->pt->co()->lookup_set('occacheflushing', 1);
+                }
+
                 $query = add_query_arg($args, $this->pt->get_page());
                 wp_safe_redirect(network_admin_url($query));
+
+                if ($this->deferred_flush) {
+                    // Close the connection so nginx sends the redirect immediately.
+                    if (\function_exists('fastcgi_finish_request')) {
+                        fastcgi_finish_request();
+                    } elseif (\function_exists('litespeed_finish_request')) {
+                        litespeed_finish_request();
+                    }
+
+                    ignore_user_abort(true);
+                    if (\function_exists('set_time_limit')) {
+                        @set_time_limit(300);
+                    }
+
+                    $is_timeout = false;
+                    $result = $this->pt->flush_cache(true, $is_timeout);
+                    $this->pt->co()->lookup_set('occacheflushed', $result);
+                    $this->pt->co()->lookup_set('occacheflushed_timeout', $is_timeout ? 1 : 0);
+                    $this->pt->co()->lookup_set('occacheflushing', 0);
+                    do_action('docketcache/action/flush/objectcache', $result);
+                }
+
                 exit;
             }
         }
@@ -565,9 +639,40 @@ final class ReqAction
                     $this->pt->notice = esc_html__('Object cache could not be disabled.', 'docket-cache');
                     break;
                 case 'docket-occache-flushed':
+                    // Flush runs in the background — if still in progress, show a message.
+                    $is_flushing = (int) $this->pt->co()->lookup_get('occacheflushing');
+                    if ($is_flushing) {
+                        $this->pt->notice = esc_html__('Object cache is being flushed in the background. Please refresh the page shortly.', 'docket-cache');
+                        break;
+                    }
+
                     $total = $this->pt->co()->lookup_get('occacheflushed', true);
                     if (empty($total)) {
                         $total = 0;
+                    }
+
+                    // Check if the deferred flush timed out.
+                    $flushed_timeout = (int) $this->pt->co()->lookup_get('occacheflushed_timeout');
+                    if ($flushed_timeout && $total > 0) {
+                        $cachedir = $this->pt->sanitize_rootpath($this->pt->cache_path);
+
+                        /* translators: %d = seconds */
+                        $clmsg = sprintf(esc_html__('Process aborted. The object cache is not fully flushed. The maximum execution time of %d seconds was exceeded.', 'docket-cache'), (int) \ini_get('max_execution_time'));
+                        $clmsg .= '<div class="gc"><ul>';
+                        $clmsg .= '<li><span class="single">'.esc_html__('Total cache flushed', 'docket-cache').'</span>: '.$total.'</li>';
+                        $clmsg .= '<li><span class="bulllist">'.esc_html__('Alternatively, you may try to flush the cache by doing:', 'docket-cache');
+                        $clmsg .= '<br>&bull; '.esc_html__('Hit the "Disable Object Cache" button.', 'docket-cache');
+                        $clmsg .= '<br>&bull; '.esc_html__('Hit the "Flush Object Cache" button repeatedly until fully flushed.', 'docket-cache');
+                        $clmsg .= '<br>&bull; '.esc_html__('Or run the WP-CLI command "wp cache flush".', 'docket-cache');
+
+                        /* translators: %s = cache path */
+                        $clmsg .= '<br>&bull; '.sprintf(esc_html__('Or manually remove the cache directory: %s', 'docket-cache'), $cachedir);
+                        $clmsg .= '</span></li>';
+                        $clmsg .= '</ul>';
+                        $clmsg .= '</div>';
+                        $this->pt->notice .= $clmsg;
+                        $this->pt->co()->lookup_set('occacheflushed_timeout', 0);
+                        break;
                     }
 
                     if ($total > 0) {
@@ -811,6 +916,15 @@ final class ReqAction
                     break;
                 case 'docket-configresetok-failed':
                     $this->pt->notice = esc_html__('Failed to reset configuration.', 'docket-cache');
+                    break;
+                case 'docket-configexport-failed':
+                    $this->pt->notice = esc_html__('Failed to export configuration.', 'docket-cache');
+                    break;
+                case 'docket-configimportok':
+                    $this->pt->notice = esc_html__('Import configuration successful.', 'docket-cache');
+                    break;
+                case 'docket-configimport-failed':
+                    $this->pt->notice = esc_html__('Failed to import configuration.', 'docket-cache');
                     break;
                 case 'docket-cleanuppostok':
                     $this->pt->notice = esc_html__('Cleanup Post successful', 'docket-cache');

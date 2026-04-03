@@ -58,12 +58,14 @@ class OPcacheView extends \WP_List_Table
 
     private function get_status()
     {
-        $data = $this->pt->get_opcache_status(true);
-        if (!empty($data) && \is_array($data)) {
-            return $data;
+        static $cache = null;
+
+        if (null === $cache) {
+            $data = $this->pt->get_opcache_status(true);
+            $cache = (!empty($data) && \is_array($data)) ? $data : false;
         }
 
-        return false;
+        return $cache;
     }
 
     public function get_usage()

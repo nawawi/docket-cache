@@ -415,6 +415,9 @@ final class Constans
         // additional flush cache button
         $this->maybe_define($this->px('FLUSHACTION'), false);
 
+        // export/import config action button
+        $this->maybe_define($this->px('CONFIGACTION'), false);
+
         // check version
         $this->maybe_define($this->px('CHECKVERSION'), false);
 

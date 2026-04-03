@@ -622,6 +622,7 @@ final class View
             'stats' => esc_html__('Display Object Cache stats at Overview page.', 'docket-cache'),
             'gcaction' => esc_html__('Enable the Garbage Collector action button on the Overview page.', 'docket-cache'),
             'flushaction' => esc_html__('Enable the additional Flush Cache action button on the Configuration page.', 'docket-cache'),
+            'configaction' => esc_html__('Enable the Export/Import settings action button on the Configuration page.', 'docket-cache'),
             'autoupdate_toggle' => esc_html__('Enable automatic plugin updates for Docket Cache.', 'docket-cache'),
             'checkversion' => esc_html__('Allows Docket Cache to check any critical future version that requires removing cache files after doing the updates, purposely to avoid error-prone.', 'docket-cache'),
             'flush_shutdown' => esc_html__('Flush Object Cache when deactivate / uninstall.', 'docket-cache'),

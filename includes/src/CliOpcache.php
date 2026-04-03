@@ -59,6 +59,13 @@ final class CliOpcache
     const SECRET_KEY = 'cli_opcache_secret';
 
     /**
+     * Whether a bulk flush is in progress (suppresses per-file notifications).
+     *
+     * @var bool
+     */
+    private static $bulk_flush = false;
+
+    /**
      * Plugin instance.
      *
      * @var Plugin
@@ -74,18 +81,46 @@ final class CliOpcache
     }
 
     /**
+     * Set bulk flush state.
+     *
+     * When true, per-file notify() calls are suppressed to avoid
+     * firing thousands of HTTP requests during a full flush.
+     *
+     * @param bool $state
+     *
+     * @return void
+     */
+    public static function set_bulk_flush($state)
+    {
+        self::$bulk_flush = (bool) $state;
+    }
+
+    /**
+     * Check if a bulk flush is in progress.
+     *
+     * @return bool
+     */
+    public static function is_bulk_flush()
+    {
+        return self::$bulk_flush;
+    }
+
+    /**
      * Register the REST endpoint.
      *
      * @return void
      */
     public function register_rest_route()
     {
+        // Ensure the shared secret exists before CLI needs it.
+        $this->get_or_create_secret();
+
         register_rest_route(
             self::REST_NAMESPACE,
             self::REST_ROUTE,
             [
-                'methods'             => 'POST',
-                'callback'            => [$this, 'handle_request'],
+                'methods' => 'POST',
+                'callback' => [$this, 'handle_request'],
                 'permission_callback' => [$this, 'verify_request'],
             ]
         );
@@ -94,20 +129,19 @@ final class CliOpcache
     /**
      * Verify the HMAC signature on incoming requests.
      *
-     * @param \WP_REST_Request $request
      * @return bool|\WP_Error
      */
     public function verify_request(\WP_REST_Request $request)
     {
-        $signature = $request->get_header('X-Docket-Signature');
-        $timestamp  = $request->get_header('X-Docket-Timestamp');
+        $signature = $request->get_header('X-DocketCache-Signature');
+        $timestamp = $request->get_header('X-DocketCache-Timestamp');
 
         if (empty($signature) || empty($timestamp)) {
             return new \WP_Error('missing_headers', 'Missing authentication headers.', ['status' => 401]);
         }
 
         // Reject requests older than 30 seconds to prevent replay attacks.
-        if (\abs(time() - (int) $timestamp) > 30) {
+        if (abs(time() - (int) $timestamp) > 30) {
             return new \WP_Error('expired_request', 'Request timestamp expired.', ['status' => 401]);
         }
 
@@ -116,10 +150,10 @@ final class CliOpcache
             return new \WP_Error('no_secret', 'Shared secret not available.', ['status' => 500]);
         }
 
-        $body     = $request->get_body();
-        $expected = \hash_hmac('sha256', $timestamp.$body, $secret);
+        $body = $request->get_body();
+        $expected = hash_hmac('sha256', $timestamp.$body, $secret);
 
-        if (!\hash_equals($expected, $signature)) {
+        if (!hash_equals($expected, $signature)) {
             return new \WP_Error('invalid_signature', 'Invalid signature.', ['status' => 403]);
         }
 
@@ -129,16 +163,16 @@ final class CliOpcache
     /**
      * Handle the invalidation request.
      *
-     * @param \WP_REST_Request $request
      * @return \WP_REST_Response
      */
     public function handle_request(\WP_REST_Request $request)
     {
-        $params    = $request->get_json_params();
+        $params = $request->get_json_params();
         $flush_all = !empty($params['all']);
-        $files     = !empty($params['files']) && \is_array($params['files']) ? $params['files'] : [];
+        $files = !empty($params['files']) && \is_array($params['files']) ? $params['files'] : [];
 
         $invalidated = 0;
+        $cache_path = nwdcx_normalizepath(DOCKET_CACHE_PATH);
 
         if ($flush_all) {
             if (\function_exists('opcache_reset') && @opcache_reset()) {
@@ -146,12 +180,16 @@ final class CliOpcache
             }
         } elseif (!empty($files)) {
             foreach ($files as $file) {
-                $file = (string) $file;
-                // Only invalidate files inside the cache directory.
-                if (0 !== \strpos($file, nwdcx_normalizepath(DOCKET_CACHE_PATH))) {
+                $file = nwdcx_normalizepath((string) $file);
+                // Resolve relative segments and only allow files inside the cache directory.
+                // Note: realpath() returns false for deleted files, but this is acceptable —
+                // unlink() calls notify() before deletion, and the bulk flush path uses
+                // opcache_reset() instead. OPcache also drops entries for missing files automatically.
+                $real = @realpath($file);
+                if (false === $real || 0 !== strpos($real, $cache_path)) {
                     continue;
                 }
-                if (\function_exists('opcache_invalidate') && @opcache_invalidate($file, true)) {
+                if (\function_exists('opcache_invalidate') && @opcache_invalidate($real, true)) {
                     ++$invalidated;
                 }
             }
@@ -159,7 +197,7 @@ final class CliOpcache
 
         return new \WP_REST_Response(
             [
-                'success'     => true,
+                'success' => true,
                 'invalidated' => $invalidated,
             ],
             200
@@ -176,13 +214,20 @@ final class CliOpcache
      * deliberate wp_cache_delete call), never during normal cache eviction
      * that happens as a side-effect of cache reads.
      *
-     * @param array $files  Absolute paths of cache files that were flushed.
-     *                      Pass an empty array to request a full opcache_reset().
+     * @param array $files Absolute paths of cache files that were flushed.
+     *                     Pass an empty array to request a full opcache_reset().
+     *
      * @return void
      */
     public static function notify(array $files = [])
     {
         if (!nwdcx_construe('WPCLI_OPCACHE')) {
+            return;
+        }
+
+        // Skip per-file notifications during a bulk flush — a single
+        // opcache_reset() will be sent at the end of cachedir_flush().
+        if (!empty($files) && self::$bulk_flush) {
             return;
         }
 
@@ -192,10 +237,10 @@ final class CliOpcache
         }
 
         $flush_all = empty($files);
-        $body      = \wp_json_encode(
+        $body = wp_json_encode(
             $flush_all
                 ? ['all' => true]
-                : ['files' => \array_values($files)]
+                : ['files' => array_values($files)]
         );
 
         if (false === $body) {
@@ -203,28 +248,26 @@ final class CliOpcache
         }
 
         $timestamp = (string) time();
-        $signature = \hash_hmac('sha256', $timestamp.$body, $secret);
+        $signature = hash_hmac('sha256', $timestamp.$body, $secret);
 
         // Build the REST URL without get_rest_url() which requires $wp_rewrite
         // to be initialised (only available after the 'init' action). We use
         // home_url() — the public-facing site root — which is safe to call at
         // any point after plugins_loaded and correctly handles Bedrock's /wp/
         // subdirectory install (siteurl includes /wp, home_url does not).
-        $rest_prefix = \defined('REST_API_PREFIX') ? \REST_API_PREFIX : 'wp-json';
-        $url = \trailingslashit(\get_option('home')).$rest_prefix.'/'.self::REST_NAMESPACE.self::REST_ROUTE;
+        $rest_prefix = \defined('REST_API_PREFIX') ? REST_API_PREFIX : 'wp-json';
+        $url = trailingslashit(get_option('home')).$rest_prefix.'/'.self::REST_NAMESPACE.self::REST_ROUTE;
 
-        \wp_remote_post(
+        Crawler::post(
             $url,
             [
-                'body'      => $body,
-                'headers'   => [
-                    'Content-Type'       => 'application/json',
-                    'X-Docket-Signature' => $signature,
-                    'X-Docket-Timestamp' => $timestamp,
+                'body' => $body,
+                'timeout' => 5,
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'X-DocketCache-Signature' => $signature,
+                    'X-DocketCache-Timestamp' => $timestamp,
                 ],
-                'timeout'   => 5,
-                'blocking'  => false,
-                'sslverify' => false,
             ]
         );
     }
@@ -242,26 +285,19 @@ final class CliOpcache
         }
 
         // Generate a new 256-bit secret.
-        $secret = \bin2hex(\random_bytes(32));
+        $secret = bin2hex(random_bytes(32));
         $this->pt->co()->lookup_set(self::SECRET_KEY, $secret);
 
         return $secret;
     }
 
     /**
-     * Read the shared secret from disk (CLI-safe, no WP object cache).
-     *
-     * Canopt stores lookup values as lock files in the data directory.
-     * We replicate the path logic here so CLI can read it without
-     * going through the object cache (which is the thing we're fixing).
+     * Read the shared secret from disk via Canopt singleton.
      *
      * @return string
      */
     private static function read_secret()
     {
-        // Canopt::lookup_get is available in CLI — use it directly.
-        $co = new Canopt();
-
-        return (string) $co->lookup_get(self::SECRET_KEY);
+        return (string) Canopt::init()->lookup_get(self::SECRET_KEY);
     }
 }
