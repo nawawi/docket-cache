@@ -82,16 +82,6 @@ final class CliOpcache
     }
 
     /**
-     * Initialize hooks (web-server process only).
-     *
-     * @return void
-     */
-    public function init()
-    {
-        add_action('rest_api_init', [$this, 'register_rest_route']);
-    }
-
-    /**
      * Register the REST endpoint.
      *
      * @return void

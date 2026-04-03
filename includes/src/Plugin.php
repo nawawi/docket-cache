@@ -1515,7 +1515,10 @@ final class Plugin extends Bepart
      */
     private function register_cli_opcache()
     {
-        ( new CliOpcache($this) )->init();
+        // Keep a reference on $this so the CliOpcache instance is not
+        // garbage-collected before rest_api_init fires.
+        $cli_opcache = new CliOpcache($this);
+        add_action('rest_api_init', [$cli_opcache, 'register_rest_route']);
     }
 
     /**
