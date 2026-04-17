@@ -15,6 +15,7 @@ namespace Nawawi\DocketCache;
 final class CronAgent
 {
     private $is_pingpong;
+    private $is_running_wpcron = false;
     private $pt;
 
     public function __construct(Plugin $pt)
@@ -106,8 +107,12 @@ final class CronAgent
         static $stmp = 0;
         static $cache = [];
 
-        if (isset($cache[$uip])) {
-            return $cache[$uip];
+        // Include the action in the cache key so send_action('on') and
+        // send_action('off') from the same IP don't collide within one
+        // request (e.g. via filter chaining).
+        $cache_key = $uip.'_'.$action;
+        if (isset($cache[$cache_key])) {
+            return $cache[$cache_key];
         }
 
         $site_url = $this->pt->site_url();
@@ -131,7 +136,10 @@ final class CronAgent
             ],
         ];
 
-        if (0 === $stmp) {
+        // Refresh the cache-buster every 5 minutes so long-running CLI /
+        // worker processes don't reuse a stale value indefinitely (could
+        // otherwise get cached by a CDN or proxy in front of cronbot).
+        if (0 === $stmp || (time() - ($stmp - 120)) > 300) {
             $stmp = time() + 120;
         }
 
@@ -164,7 +172,7 @@ final class CronAgent
             $this->pt->co()->save_part($output, 'cronbot');
             $this->pt->co()->lookup_set('cronboterror', $output['error']);
 
-            $cache[$uip] = false;
+            $cache[$cache_key] = false;
 
             return false;
         }
@@ -179,7 +187,7 @@ final class CronAgent
                     $this->pt->co()->save_part($output, 'cronbot');
                     $this->pt->co()->lookup_set('cronboterror', $output['error']);
 
-                    $cache[$uip] = false;
+                    $cache[$cache_key] = false;
 
                     return false;
                 }
@@ -196,7 +204,7 @@ final class CronAgent
 
             $this->pt->co()->lookup_set('cronboterror', 'Error '.$output['error']);
 
-            $cache[$uip] = false;
+            $cache[$cache_key] = false;
 
             return false;
         }
@@ -207,7 +215,7 @@ final class CronAgent
             $this->pt->co()->save_part($output, 'cronbot');
         }
 
-        $cache[$uip] = true;
+        $cache[$cache_key] = true;
 
         return true;
     }
@@ -234,160 +242,197 @@ final class CronAgent
 
     private function run_wpcron($run_now = false)
     {
-        $this->pt->cf()->maybe_define('DOING_RUN_WPCRON', true);
+        // Re-entry guard. Use an instance flag, not a process-wide constant:
+        // a constant would persist across legitimate subsequent calls
+        // (e.g. per-site iteration in the multisite loop) and block them.
+        if ($this->is_running_wpcron) {
+            return [
+                'wpcron_return' => 1,
+                'wpcron_msg' => esc_html__('Already running wp-cron', 'docket-cache'),
+            ];
+        }
 
-        $run_uno = false;
-        $uno_ehk = '';
-        $uno_eky = '';
-        if (!empty($run_now) && \is_array($run_now)) {
-            if (empty($run_now['ehk']) || empty($run_now['eky'])) {
-                $results['wpcron_return'] = 0;
-                $results['wpcron_msg'] = esc_html__('Invalid request for single event', 'docket-cache');
+        $this->is_running_wpcron = true;
 
-                return $results;
+        try {
+            $this->pt->cf()->maybe_define('DOING_RUN_WPCRON', true);
+
+            // Initialise $results up front so the validation short-circuits
+            // below don't auto-vivify an undefined variable (PHP 8 emits
+            // E_WARNING on that pattern and spams debug.log).
+            $results = [
+                'wpcron_return' => 0,
+                'wpcron_msg' => '',
+                'wpcron_crons' => 0,
+                'wpcron_event' => 0,
+            ];
+
+            // Initialise $cron_event so the by-reference out-parameter on
+            // get_crons() never starts as an undefined variable.
+            $cron_event = 0;
+
+            $run_uno = false;
+            $uno_ehk = '';
+            $uno_eky = '';
+            if (!empty($run_now) && \is_array($run_now)) {
+                if (empty($run_now['ehk']) || empty($run_now['eky'])) {
+                    $results['wpcron_return'] = 0;
+                    $results['wpcron_msg'] = esc_html__('Invalid request for single event', 'docket-cache');
+
+                    return $results;
+                }
+
+                $uno_ehk = sanitize_text_field($run_now['ehk']);
+                $uno_eky = sanitize_text_field($run_now['eky']);
+
+                if (!has_action($uno_ehk)) {
+                    $results['wpcron_return'] = 1;
+
+                    /* translators: %s: Event Hook. */
+                    $results['wpcron_msg'] = sprintf(esc_html__('Event hook not found %s', 'docket-cache'), $uno_ehk);
+
+                    return $results;
+                }
+
+                $run_now = true;
+                $run_uno = true;
             }
 
-            $uno_ehk = sanitize_text_field($run_now['ehk']);
-            $uno_eky = sanitize_text_field($run_now['eky']);
+            $crons = $this->pt->get_crons($run_now, $cron_event);
+            $results['wpcron_crons'] = $cron_event;
 
-            if (!has_action($uno_ehk)) {
+            if (empty($crons)) {
                 $results['wpcron_return'] = 1;
-
-                /* translators: %s: Event Hook. */
-                $results['wpcron_msg'] = sprintf(esc_html__('Event hook not found %s', 'docket-cache'), $uno_ehk);
+                $results['wpcron_msg'] = esc_html__('No scheduled event ready to run', 'docket-cache');
 
                 return $results;
             }
 
-            $run_now = true;
-            $run_uno = true;
-        }
+            if (wp_doing_cron()
+            || isset($_GET['doing_wp_cron'])
+            || (!empty($_SERVER['REQUEST_URI']) && false !== strpos(urldecode($_SERVER['REQUEST_URI']), '/wp-cron.php'))
+            ) {
+                $results['wpcron_return'] = 1;
+                $results['wpcron_msg'] = esc_html__('Another cron process is currently running wp-cron.php', 'docket-cache');
 
-        $crons = $this->pt->get_crons($run_now, $cron_event);
-
-        $results = [
-            'wpcron_return' => 0,
-            'wpcron_msg' => '',
-            'wpcron_crons' => $cron_event,
-            'wpcron_event' => 0,
-        ];
-
-        if (empty($crons)) {
-            $results['wpcron_return'] = 1;
-            $results['wpcron_msg'] = esc_html__('No scheduled event ready to run', 'docket-cache');
-
-            return $results;
-        }
-
-        if (false !== strpos($_SERVER['REQUEST_URI'], '/wp-cron.php') || isset($_GET['doing_wp_cron']) || wp_doing_cron()) {
-            $results['wpcron_return'] = 1;
-            $results['wpcron_msg'] = esc_html__('Another cron process is currently running wp-cron.php', 'docket-cache');
-
-            return $results;
-        }
-
-        $gmt_time = microtime(true);
-
-        // overwrite cron lock
-        $doing_wp_cron = sprintf('%.22F', microtime(true));
-        set_transient('doing_cron', $doing_wp_cron, 86400);
-
-        $run_event = 0;
-        $slowdown = 0;
-        $delay = $this->is_pingpong ? 850 : 200;
-
-        $max_execution_time = $this->pt->get_max_execution_time();
-
-        foreach ($crons as $timestamp => $cronhooks) {
-            if ($max_execution_time > 0 && (microtime(true) - WP_START_TIMESTAMP) > $max_execution_time) {
-                break;
+                return $results;
             }
 
-            if (false === $run_now && ($timestamp > $gmt_time)) {
-                continue;
-            }
+            $gmt_time = microtime(true);
 
-            if ($slowdown > 10) {
-                $slowdown = 0;
-                usleep($delay);
-            }
+            // overwrite cron lock
+            $doing_wp_cron = sprintf('%.22F', microtime(true));
+            set_transient('doing_cron', $doing_wp_cron, 86400);
 
-            ++$slowdown;
+            $run_event = 0;
+            $slowdown = 0;
+            $delay = $this->is_pingpong ? 850 : 200;
 
-            foreach ($cronhooks as $hook => $keys) {
-                if (!has_action($hook)) {
-                    // wp_clear_scheduled_hook($hook);
+            $max_execution_time = $this->pt->get_max_execution_time();
+
+            foreach ($crons as $timestamp => $cronhooks) {
+                if ($max_execution_time > 0 && (microtime(true) - WP_START_TIMESTAMP) > $max_execution_time) {
+                    break;
+                }
+
+                if (false === $run_now && ($timestamp > $gmt_time)) {
                     continue;
                 }
 
-                // single
-                if ($run_uno && $hook !== $uno_ehk) {
-                    continue;
+                if ($slowdown > 10) {
+                    $slowdown = 0;
+                    usleep($delay);
                 }
 
-                foreach ($keys as $k => $v) {
-                    // single
-                    if ($run_uno && $k !== $uno_eky) {
+                ++$slowdown;
+
+                foreach ($cronhooks as $hook => $keys) {
+                    if (!has_action($hook)) {
+                        // wp_clear_scheduled_hook($hook);
                         continue;
                     }
 
-                    $schedule = $v['schedule'];
+                    // single
+                    if ($run_uno && $hook !== $uno_ehk) {
+                        continue;
+                    }
 
-                    if ($schedule) {
-                        if (false === wp_reschedule_event($timestamp, $schedule, $hook, $v['args'])) {
+                    foreach ($keys as $k => $v) {
+                        // single
+                        if ($run_uno && $k !== $uno_eky) {
                             continue;
                         }
-                    }
 
-                    if (false === wp_unschedule_event($timestamp, $hook, $v['args'])) {
-                        continue;
-                    }
+                        $schedule = $v['schedule'];
 
-                    $hcontent = '';
-                    try {
-                        ob_start();
-                        do_action_ref_array($hook, $v['args']);
-                        $hcontent = trim(ob_get_contents());
-                        ob_end_clean();
-                        ++$run_event;
-                    } catch (\Throwable $e) {
-                        $results['wpcron_error'][$hook] = $e->getMessage();
-                        // wp_clear_scheduled_hook($hook);
-
-                        if ($run_uno) {
-                            $results['wpcron_return'] = 0;
-                            $results['wpcron_event'] = 1;
-                            $results['wpcron_uno'] = $uno_ehk;
-                            break;
+                        if ($schedule) {
+                            if (false === wp_reschedule_event($timestamp, $schedule, $hook, $v['args'])) {
+                                continue;
+                            }
                         }
-                        --$run_event;
-                    }
 
-                    if ('' !== $hcontent) {
-                        $results['wpcron_output'][$hook] = $hcontent;
-                    }
+                        if (false === wp_unschedule_event($timestamp, $hook, $v['args'])) {
+                            continue;
+                        }
 
-                    usleep(100);
+                        $hcontent = '';
+                        $ob_started = false;
+                        try {
+                            ob_start();
+                            $ob_started = true;
+                            do_action_ref_array($hook, $v['args']);
+                            $hcontent = trim(ob_get_contents());
+                            ob_end_clean();
+                            $ob_started = false;
+                            ++$run_event;
+                        } catch (\Throwable $e) {
+                            if ($ob_started) {
+                                ob_end_clean();
+                            }
+                            $results['wpcron_error'][$hook] = $e->getMessage();
+                            // wp_clear_scheduled_hook($hook);
+
+                            if ($run_uno) {
+                                $results['wpcron_return'] = 0;
+                                $results['wpcron_event'] = 1;
+                                $results['wpcron_uno'] = $uno_ehk;
+                                break;
+                            }
+                            // Don't decrement $run_event — it was never incremented
+                            // for this hook, so -- would push it negative and the
+                            // reported count would be misleading.
+                        }
+
+                        if ('' !== $hcontent) {
+                            $results['wpcron_output'][$hook] = $hcontent;
+                        }
+
+                        usleep(100);
+                    }
                 }
             }
+
+            unset($crons, $cronhooks, $hook, $keys);
+
+            // lock must below 10 minutes
+            // wp-includes/cron.php -> spawn_cron()
+            // wp-cron.php
+            $lock_wp_cron = microtime(true) + 300;
+            set_transient('doing_cron', $lock_wp_cron, 86400);
+
+            $results['wpcron_return'] = 1;
+            $results['wpcron_event'] = $run_event;
+
+            if ($run_uno && 1 === $run_event) {
+                $results['wpcron_uno'] = $uno_ehk;
+            }
+
+            return $results;
+        } finally {
+            // Runs on any path out — normal returns above, an exception, or
+            // an early return from validation. Guarantees the flag is cleared.
+            $this->is_running_wpcron = false;
         }
-
-        unset($crons, $cronhooks, $hook, $keys);
-
-        // lock must below 10 minutes
-        // wp-includes/cron.php -> spawn_cron()
-        // wp-cron.php
-        $lock_wp_cron = microtime(true) + 300;
-        set_transient('doing_cron', $lock_wp_cron, 86400);
-
-        $results['wpcron_return'] = 1;
-        $results['wpcron_event'] = $run_event;
-
-        if ($run_uno && 1 === $run_event) {
-            $results['wpcron_uno'] = $uno_ehk;
-        }
-
-        return $results;
     }
 
     private function receive_ping()
@@ -396,7 +441,12 @@ final class CronAgent
             return;
         }
 
-        if ($_POST['ping'] !== md5($_GET['docketcache_ping'])) {
+        // Guard against non-string inputs (e.g. ?docketcache_ping[]=foo)
+        // which would make md5() a TypeError on PHP 8.
+        $ping_get = isset($_GET['docketcache_ping']) && \is_string($_GET['docketcache_ping']) ? $_GET['docketcache_ping'] : '';
+        $ping_post = isset($_POST['ping']) && \is_string($_POST['ping']) ? $_POST['ping'] : '';
+
+        if ('' === $ping_get || '' === $ping_post || $ping_post !== md5($ping_get)) {
             $this->close_ping('Invalid ping');
 
             return;
@@ -442,6 +492,8 @@ final class CronAgent
             $response['status'] = 0;
             $cache[$uip] = $response;
             $this->close_ping($response);
+
+            return;
         }
 
         if ($this->pt->co()->lockproc('receive_ping', time() + 60)) {
@@ -474,16 +526,33 @@ final class CronAgent
                 switch_to_blog($site['id']);
             }
 
-            if ($maxrun >= $maxcan) {
+            try {
+                if ($maxrun >= $maxcan) {
+                    $results = [
+                        'wpcron_return' => 3,
+                        'wpcron_msg' => 'Reach maximum run: '.$maxrun.'/'.$siteall,
+                        'wpcron_crons' => 0,
+                        'wpcron_event' => 0,
+                    ];
+                    $halt = true;
+                } else {
+                    $results = $this->run_wpcron();
+                }
+            } catch (\Throwable $e) {
+                // Isolate failures so one broken site doesn't halt the whole
+                // multisite loop. run_wpcron already catches exceptions per
+                // hook; this covers get_crons / reschedule / unschedule
+                // failures that escape that inner handler.
+                // Include wpcron_error so the cronbot server's
+                // !empty(wpcron_error) check increments ping_halt and
+                // eventually disconnects a persistently failing site.
                 $results = [
-                    'wpcron_return' => 3,
-                    'wpcron_msg' => 'Reach maximum run: '.$maxrun.'/'.$siteall,
+                    'wpcron_return' => 0,
+                    'wpcron_msg' => 'Error: '.$e->getMessage(),
                     'wpcron_crons' => 0,
                     'wpcron_event' => 0,
+                    'wpcron_error' => ['_multisite_loop' => $e->getMessage()],
                 ];
-                $halt = true;
-            } else {
-                $results = $this->run_wpcron();
             }
 
             if ($is_multisite) {
@@ -517,6 +586,18 @@ final class CronAgent
         static $done = false;
 
         if ($done) {
+            return;
+        }
+
+        // Skip on AJAX / REST / cron requests — these don't need the
+        // self-check and avoiding them keeps the shutdown hook cheap on
+        // high-traffic endpoints.
+        if ((\function_exists('wp_doing_ajax') && wp_doing_ajax())
+            || (\function_exists('wp_doing_cron') && wp_doing_cron())
+            || (\defined('REST_REQUEST') && REST_REQUEST)
+        ) {
+            $done = true;
+
             return;
         }
 

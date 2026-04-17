@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-03T15:25:42+00:00\n"
+"POT-Creation-Date: 2026-04-17T18:30:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: docket-cache\n"
@@ -314,7 +314,7 @@ msgid "Filter Hook Names"
 msgstr ""
 
 #: includes/admin/log.php:21
-#: includes/src/Canopt.php:165
+#: includes/src/Canopt.php:166
 #: includes/src/Plugin.php:1602
 #: includes/src/View.php:317
 msgid "Cache Log"
@@ -342,7 +342,7 @@ msgid "Site Format"
 msgstr ""
 
 #: includes/admin/log.php:47
-#: includes/src/Canopt.php:167
+#: includes/src/Canopt.php:168
 msgid "Log All"
 msgstr ""
 
@@ -657,12 +657,12 @@ msgid "Cache Writable"
 msgstr ""
 
 #: includes/admin/overview.php:162
-#: includes/src/Canopt.php:211
+#: includes/src/Canopt.php:213
 msgid "Cache Files Limit"
 msgstr ""
 
 #: includes/admin/overview.php:167
-#: includes/src/Canopt.php:210
+#: includes/src/Canopt.php:212
 #: includes/src/Command.php:575
 #: includes/src/ReqAction.php:874
 msgid "Cache Disk Limit"
@@ -673,7 +673,7 @@ msgid "Cache Path"
 msgstr ""
 
 #: includes/admin/overview.php:177
-#: includes/src/Canopt.php:213
+#: includes/src/Canopt.php:215
 msgid "Chunk Cache Directory"
 msgstr ""
 
@@ -852,260 +852,264 @@ msgstr ""
 msgid "Please wait.."
 msgstr ""
 
-#: includes/src/Canopt.php:166
+#: includes/src/Canopt.php:167
 msgid "Log Timestamp"
 msgstr ""
 
-#: includes/src/Canopt.php:168
+#: includes/src/Canopt.php:169
 msgid "Admin Page Cache Preloading"
 msgstr ""
 
-#: includes/src/Canopt.php:169
+#: includes/src/Canopt.php:170
 msgid "WordPress Menu Caching"
 msgstr ""
 
-#: includes/src/Canopt.php:170
+#: includes/src/Canopt.php:171
 msgid "Optimize Term Count Queries"
 msgstr ""
 
-#: includes/src/Canopt.php:171
+#: includes/src/Canopt.php:172
 msgid "Object Cache Precaching"
 msgstr ""
 
-#: includes/src/Canopt.php:172
+#: includes/src/Canopt.php:173
 msgid "WordPress Translation Caching"
 msgstr ""
 
-#: includes/src/Canopt.php:173
+#: includes/src/Canopt.php:174
 msgid "Misc Performance Tweaks"
 msgstr ""
 
-#: includes/src/Canopt.php:174
+#: includes/src/Canopt.php:175
 msgid "Post Missed Schedule Tweaks"
 msgstr ""
 
-#: includes/src/Canopt.php:175
+#: includes/src/Canopt.php:176
 msgid "Misc WooCommerce Tweaks"
 msgstr ""
 
-#: includes/src/Canopt.php:176
+#: includes/src/Canopt.php:177
 msgid "Deactivate WooCommerce Admin"
 msgstr ""
 
-#: includes/src/Canopt.php:177
+#: includes/src/Canopt.php:178
 msgid "Deactivate WooCommerce Classic Widget"
 msgstr ""
 
-#: includes/src/Canopt.php:178
+#: includes/src/Canopt.php:179
 msgid "Deactivate WooCommerce WP Dashboard"
 msgstr ""
 
-#: includes/src/Canopt.php:179
+#: includes/src/Canopt.php:180
 msgid "Deactivate WooCommerce Extensions Page"
 msgstr ""
 
-#: includes/src/Canopt.php:180
+#: includes/src/Canopt.php:181
 msgid "Deactivate WooCommerce Cart Fragments"
 msgstr ""
 
-#: includes/src/Canopt.php:181
+#: includes/src/Canopt.php:182
 msgid "Prevent robots crawling add-to-cart links"
 msgstr ""
 
-#: includes/src/Canopt.php:182
+#: includes/src/Canopt.php:183
 msgid "Admin Page Loader"
 msgstr ""
 
-#: includes/src/Canopt.php:183
+#: includes/src/Canopt.php:184
 msgid "Suspend WP Options Autoload"
 msgstr ""
 
-#: includes/src/Canopt.php:184
+#: includes/src/Canopt.php:185
 msgid "Optimize Database Tables"
 msgstr ""
 
-#: includes/src/Canopt.php:185
+#: includes/src/Canopt.php:186
 msgid "Cronbot Service"
 msgstr ""
 
-#: includes/src/Canopt.php:186
+#: includes/src/Canopt.php:187
 msgid "OPcache Viewer"
 msgstr ""
 
-#: includes/src/Canopt.php:187
+#: includes/src/Canopt.php:188
 msgid "Object Cache Data Stats"
 msgstr ""
 
-#: includes/src/Canopt.php:188
+#: includes/src/Canopt.php:189
 msgid "Garbage Collector Action Button"
 msgstr ""
 
-#: includes/src/Canopt.php:189
+#: includes/src/Canopt.php:190
 msgid "Additional Flush Cache Action Button"
 msgstr ""
 
-#: includes/src/Canopt.php:190
+#: includes/src/Canopt.php:191
 msgid "Export/Import Settings Action Button"
 msgstr ""
 
-#: includes/src/Canopt.php:191
+#: includes/src/Canopt.php:192
 msgid "Docket Cache Auto Update"
 msgstr ""
 
-#: includes/src/Canopt.php:192
+#: includes/src/Canopt.php:193
 msgid "Critical Version Checking"
 msgstr ""
 
-#: includes/src/Canopt.php:193
+#: includes/src/Canopt.php:194
 msgid "Optimize WP Query"
 msgstr ""
 
-#: includes/src/Canopt.php:194
+#: includes/src/Canopt.php:195
 msgid "Limit Bulk Edit Actions"
 msgstr ""
 
-#: includes/src/Canopt.php:195
+#: includes/src/Canopt.php:196
 msgid "Deactivate XML-RPC / Pingbacks"
 msgstr ""
 
-#: includes/src/Canopt.php:196
+#: includes/src/Canopt.php:197
 msgid "Deactivate WP Header Junk"
 msgstr ""
 
-#: includes/src/Canopt.php:197
+#: includes/src/Canopt.php:198
 msgid "Deactivate WP Emoji"
 msgstr ""
 
-#: includes/src/Canopt.php:198
+#: includes/src/Canopt.php:199
 msgid "Deactivate WP Embed"
 msgstr ""
 
-#: includes/src/Canopt.php:199
+#: includes/src/Canopt.php:200
 msgid "Deactivate WP Feed"
 msgstr ""
 
-#: includes/src/Canopt.php:200
+#: includes/src/Canopt.php:201
 msgid "Deactivate WP Lazy Load"
 msgstr ""
 
-#: includes/src/Canopt.php:201
+#: includes/src/Canopt.php:202
 msgid "Deactivate WP Sitemap"
 msgstr ""
 
-#: includes/src/Canopt.php:202
+#: includes/src/Canopt.php:203
 msgid "Deactivate WP Application Passwords"
 msgstr ""
 
-#: includes/src/Canopt.php:203
+#: includes/src/Canopt.php:204
 msgid "Deactivate WP Events & News Feed Dashboard"
 msgstr ""
 
-#: includes/src/Canopt.php:204
+#: includes/src/Canopt.php:205
 msgid "Deactivate Browse Happy Checking"
 msgstr ""
 
-#: includes/src/Canopt.php:205
+#: includes/src/Canopt.php:206
 msgid "Deactivate Serve Happy Checking"
 msgstr ""
 
-#: includes/src/Canopt.php:206
+#: includes/src/Canopt.php:207
 msgid "Deactivate Post Via Email"
 msgstr ""
 
-#: includes/src/Canopt.php:207
+#: includes/src/Canopt.php:208
 msgid "Suspend Object Cache"
 msgstr ""
 
-#: includes/src/Canopt.php:208
+#: includes/src/Canopt.php:209
 msgid "Flush Object Cache During Deactivation"
 msgstr ""
 
-#: includes/src/Canopt.php:209
+#: includes/src/Canopt.php:210
 msgid "Flush OPcache During Deactivation"
 msgstr ""
 
-#: includes/src/Canopt.php:212
-msgid "Real-time File Limit Checking"
+#: includes/src/Canopt.php:211
+msgid "WP-CLI OPcache Invalidation"
 msgstr ""
 
 #: includes/src/Canopt.php:214
-msgid "Auto Remove Stale Cache"
-msgstr ""
-
-#: includes/src/Canopt.php:215
-msgid "Exclude Stale Cache"
+msgid "Real-time File Limit Checking"
 msgstr ""
 
 #: includes/src/Canopt.php:216
-msgid "Exclude Empty Object Data"
+msgid "Auto Remove Stale Cache"
 msgstr ""
 
 #: includes/src/Canopt.php:217
-msgid "Retain Transients in Db"
+msgid "Exclude Stale Cache"
 msgstr ""
 
 #: includes/src/Canopt.php:218
-msgid "Limit WP-Admin HTTP requests"
+msgid "Exclude Empty Object Data"
 msgstr ""
 
 #: includes/src/Canopt.php:219
-msgid "Auto Save Interval"
+msgid "Retain Transients in Db"
 msgstr ""
 
 #: includes/src/Canopt.php:220
-msgid "Post Revisions"
+msgid "Limit WP-Admin HTTP requests"
 msgstr ""
 
 #: includes/src/Canopt.php:221
+msgid "Auto Save Interval"
+msgstr ""
+
+#: includes/src/Canopt.php:222
+msgid "Post Revisions"
+msgstr ""
+
+#: includes/src/Canopt.php:223
 #: includes/src/ReqAction.php:938
 msgid "Trash Bin"
 msgstr ""
 
-#: includes/src/Canopt.php:222
+#: includes/src/Canopt.php:224
 msgid "Disallows Plugin / Theme Editor"
 msgstr ""
 
-#: includes/src/Canopt.php:223
+#: includes/src/Canopt.php:225
 msgid "Disallows Plugin / Theme Update and Installation"
 msgstr ""
 
-#: includes/src/Canopt.php:224
+#: includes/src/Canopt.php:226
 msgid "Cleanup Image Edits"
 msgstr ""
 
-#: includes/src/Canopt.php:225
+#: includes/src/Canopt.php:227
 msgid "WP Debug"
 msgstr ""
 
-#: includes/src/Canopt.php:226
+#: includes/src/Canopt.php:228
 msgid "WP Debug Display"
 msgstr ""
 
-#: includes/src/Canopt.php:227
+#: includes/src/Canopt.php:229
 msgid "WP Debug Log"
 msgstr ""
 
-#: includes/src/Canopt.php:228
+#: includes/src/Canopt.php:230
 msgid "Disallows WP Auto Update Core"
 msgstr ""
 
-#: includes/src/Canopt.php:229
+#: includes/src/Canopt.php:231
 msgid "Deactivate Concatenate WP-Admin Scripts"
 msgstr ""
 
-#: includes/src/Canopt.php:230
+#: includes/src/Canopt.php:232
 msgid "Deactivate WP Cron"
 msgstr ""
 
-#: includes/src/Canopt.php:234
+#: includes/src/Canopt.php:236
 msgid "Advanced Post Caching"
 msgstr ""
 
-#: includes/src/Canopt.php:235
+#: includes/src/Canopt.php:237
 msgid "Post Caching Any Post Type"
 msgstr ""
 
-#: includes/src/Canopt.php:239
+#: includes/src/Canopt.php:241
 msgid "HTTP Request Expect header tweaks"
 msgstr ""
 
@@ -1380,24 +1384,28 @@ msgstr ""
 msgid "Executing the garbage collector completed."
 msgstr ""
 
-#: includes/src/CronAgent.php:245
+#: includes/src/CronAgent.php:251
+msgid "Already running wp-cron"
+msgstr ""
+
+#: includes/src/CronAgent.php:280
 msgid "Invalid request for single event"
 msgstr ""
 
 #. translators: %s: Event Hook.
-#: includes/src/CronAgent.php:257
+#: includes/src/CronAgent.php:292
 msgid "Event hook not found %s"
 msgstr ""
 
-#: includes/src/CronAgent.php:277
+#: includes/src/CronAgent.php:306
 msgid "No scheduled event ready to run"
 msgstr ""
 
-#: includes/src/CronAgent.php:284
+#: includes/src/CronAgent.php:316
 msgid "Another cron process is currently running wp-cron.php"
 msgstr ""
 
-#: includes/src/CronAgent.php:448
+#: includes/src/CronAgent.php:500
 msgid "Already received. Try again in a few minutes"
 msgstr ""
 
@@ -2137,102 +2145,106 @@ msgid "Flush OPcache when deactivate / uninstall."
 msgstr ""
 
 #: includes/src/View.php:630
-msgid "Maximum size of the cache storage on disk. The garbage collector will remove the cache file to free up storage space."
+msgid "Notify the web-server OPcache to invalidate cache files after WP-CLI cache operations. Disable this if WP-CLI runs frequently and the HTTP callbacks are undesirable."
 msgstr ""
 
 #: includes/src/View.php:631
-msgid "The maximum cache file can be stored on a disk. The cache file will free up by the garbage collector when triggered by WP Cron."
+msgid "Maximum size of the cache storage on disk. The garbage collector will remove the cache file to free up storage space."
 msgstr ""
 
 #: includes/src/View.php:632
-msgid "Enable this option to allow Docket Cache to monitor the cache file limit in real-time."
+msgid "The maximum cache file can be stored on a disk. The cache file will free up by the garbage collector when triggered by WP Cron."
 msgstr ""
 
 #: includes/src/View.php:633
-msgid "Enable this option to chunk cache files into smaller directories to avoid an excessive number of cache files in one directory. Only enable it if you have difficulty clearing the cache manually or experience slowdowns when the cache becomes too large."
+msgid "Enable this option to allow Docket Cache to monitor the cache file limit in real-time."
 msgstr ""
 
 #: includes/src/View.php:634
-msgid "Enable this option to allow GC immediately remove the stale cache abandoned by WordPress, WooCommerce and others after doing cache invalidation."
+msgid "Enable this option to chunk cache files into smaller directories to avoid an excessive number of cache files in one directory. Only enable it if you have difficulty clearing the cache manually or experience slowdowns when the cache becomes too large."
 msgstr ""
 
 #: includes/src/View.php:635
-msgid "Enable this option to exclude stale cache created by WordPress, WooCommerce, and others from being stored on disk. Only enable it if you have an issue with inode limits."
+msgid "Enable this option to allow GC immediately remove the stale cache abandoned by WordPress, WooCommerce and others after doing cache invalidation."
 msgstr ""
 
 #: includes/src/View.php:636
-msgid "Enable this option to exclude empty caches from being stored on disk. Only enable it if you have an issue with inode limits."
+msgid "Enable this option to exclude stale cache created by WordPress, WooCommerce, and others from being stored on disk. Only enable it if you have an issue with inode limits."
 msgstr ""
 
 #: includes/src/View.php:637
-msgid "Limit HTTP requests in WP Admin."
+msgid "Enable this option to exclude empty caches from being stored on disk. Only enable it if you have an issue with inode limits."
 msgstr ""
 
 #: includes/src/View.php:638
-msgid "WordPress by default converts Transients as persistent object caching when available. Enable this option to persist Transients in the Database."
+msgid "Limit HTTP requests in WP Admin."
 msgstr ""
 
 #: includes/src/View.php:639
-msgid "WordPress by default automatically saves a draft every 1 minute when editing or create a new post. Changing this behaviour can reduce the usage of server resource."
+msgid "WordPress by default converts Transients as persistent object caching when available. Enable this option to persist Transients in the Database."
 msgstr ""
 
 #: includes/src/View.php:640
-msgid "Post revision is a copy of each edit made to a post or page, allowing the possibility of reverting to a previous version. However, have a revision too much can create a bad impact on database performance. Changing this behaviour can reduce the usage of server resource."
+msgid "WordPress by default automatically saves a draft every 1 minute when editing or create a new post. Changing this behaviour can reduce the usage of server resource."
 msgstr ""
 
 #: includes/src/View.php:641
-msgid "This option allows you to change the number of days before WordPress permanently deletes posts, pages, attachments, and comments, from the trash bin. The default is 30 days. There is no confirmation alert when someone clicks on \"Delete Permanently\" if this option is set to \"Disable Trash Bin\"."
+msgid "Post revision is a copy of each edit made to a post or page, allowing the possibility of reverting to a previous version. However, have a revision too much can create a bad impact on database performance. Changing this behaviour can reduce the usage of server resource."
 msgstr ""
 
 #: includes/src/View.php:642
-msgid "This option will completely disable the use of plugin and theme editor. If this option enabled, no plugins or theme file can be edited."
+msgid "This option allows you to change the number of days before WordPress permanently deletes posts, pages, attachments, and comments, from the trash bin. The default is 30 days. There is no confirmation alert when someone clicks on \"Delete Permanently\" if this option is set to \"Disable Trash Bin\"."
 msgstr ""
 
 #: includes/src/View.php:643
-msgid "This option will block users being able to use the plugin and theme installation/update functionality from the WordPress admin area."
+msgid "This option will completely disable the use of plugin and theme editor. If this option enabled, no plugins or theme file can be edited."
 msgstr ""
 
 #: includes/src/View.php:644
-msgid "By default, WordPress creates a new set of images every time you edit image and restore the original. It leaves all the edits on the server. Enable this option to change this behaviour."
+msgid "This option will block users being able to use the plugin and theme installation/update functionality from the WordPress admin area."
 msgstr ""
 
 #: includes/src/View.php:645
-msgid "Enable this option to turn on WordPress debugging."
+msgid "By default, WordPress creates a new set of images every time you edit image and restore the original. It leaves all the edits on the server. Enable this option to change this behaviour."
 msgstr ""
 
 #: includes/src/View.php:646
-msgid "Enable this option to print debug info."
+msgid "Enable this option to turn on WordPress debugging."
 msgstr ""
 
 #: includes/src/View.php:647
-msgid "Enable this option to log debug info."
+msgid "Enable this option to print debug info."
 msgstr ""
 
 #: includes/src/View.php:648
-msgid "This option will disable all core updates."
+msgid "Enable this option to log debug info."
 msgstr ""
 
 #: includes/src/View.php:649
-msgid "Enable this option to disable compression and concatenation of WP-Admin Scripts and CSS."
+msgid "This option will disable all core updates."
 msgstr ""
 
 #: includes/src/View.php:650
+msgid "Enable this option to disable compression and concatenation of WP-Admin Scripts and CSS."
+msgstr ""
+
+#: includes/src/View.php:651
 msgid "Enable this option to disable the WP pseudo-cron. Only enable it if your site is already set up with real Cron."
 msgstr ""
 
-#: includes/src/View.php:654
+#: includes/src/View.php:655
 msgid "Cache WP Queries for a post which results in faster data retrieval and reduced database workload. By default only for built-in Post Types."
 msgstr ""
 
-#: includes/src/View.php:655
+#: includes/src/View.php:656
 msgid "Allow Advanced Post Caching to cache any Post Type."
 msgstr ""
 
-#: includes/src/View.php:659
+#: includes/src/View.php:660
 msgid "By default, cURL sends the \"Expect\" header all the time which severely impacts performance. Enable this option, only send it if the body is larger than 1 MB."
 msgstr ""
 
-#: includes/src/View.php:664
+#: includes/src/View.php:665
 msgid "No info available"
 msgstr ""
 

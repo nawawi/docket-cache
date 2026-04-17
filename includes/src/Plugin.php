@@ -2404,6 +2404,12 @@ final class Plugin extends Bepart
      */
     public function register()
     {
+        // Register the CLI OPcache REST endpoint up front so it is
+        // always available — if this sits behind compat_notice() and the
+        // plugin short-circuits (or fails under load), CLI-side notify()
+        // calls get 404s from an unregistered route and flood the logs.
+        $this->register_cli_opcache();
+
         if (!$this->compat_notice()) {
             return;
         }
@@ -2411,7 +2417,6 @@ final class Plugin extends Bepart
         $this->register_admin_hooks();
         $this->register_tweaks();
         $this->register_cronjob();
-        $this->register_cli_opcache();
         $this->register_cli();
 
         nwdcx_runaction('docketcache/init', $this);

@@ -627,6 +627,7 @@ final class View
             'checkversion' => esc_html__('Allows Docket Cache to check any critical future version that requires removing cache files after doing the updates, purposely to avoid error-prone.', 'docket-cache'),
             'flush_shutdown' => esc_html__('Flush Object Cache when deactivate / uninstall.', 'docket-cache'),
             'opcshutdown' => esc_html__('Flush OPcache when deactivate / uninstall.', 'docket-cache'),
+            'wpcli_opcache' => esc_html__('Notify the web-server OPcache to invalidate cache files after WP-CLI cache operations. Disable this if WP-CLI runs frequently and the HTTP callbacks are undesirable.', 'docket-cache'),
             'maxsize_disk' => esc_html__('Maximum size of the cache storage on disk. The garbage collector will remove the cache file to free up storage space.', 'docket-cache'),
             'maxfile' => esc_html__('The maximum cache file can be stored on a disk. The cache file will free up by the garbage collector when triggered by WP Cron.', 'docket-cache'),
             'maxfile_livecheck' => esc_html__('Enable this option to allow Docket Cache to monitor the cache file limit in real-time.', 'docket-cache'),

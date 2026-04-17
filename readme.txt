@@ -4,7 +4,7 @@ Tags: object cache, OPcache, cache, database, performance
 Requires at least: 5.4
 Tested up to: 6.9
 Requires PHP: 7.2.5
-Stable tag: 26.04.03
+Stable tag: 26.04.04
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 Donate link: https://docketcache.com/sponsorship/
@@ -174,6 +174,21 @@ You can, but if your VPS supports Redis, we recommend using Redis for better per
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= v26.04.04 =
+- Added: Configuration UI toggle for WP-CLI OPcache Invalidation (mirrors DOCKET_CACHE_WPCLI_OPCACHE constant).
+- Fixed: CliOpcache::notify() -> Buffered per-file notifications at shutdown to prevent HTTP request floods during GC and individual cache unlinks.
+- Fixed: CliOpcache -> REST route registered before compat check to eliminate 404 noise when workers bail early under load.
+- Fixed: CronAgent::receive_ping() -> Type-safety guard on ping inputs to prevent PHP 8 TypeError from array-form values.
+- Fixed: CronAgent::receive_ping() -> Explicit return after close_ping() when CRONBOT is disabled.
+- Fixed: CronAgent::receive_ping() -> Multisite loop isolates per-site errors via try/catch; wpcron_error reported so cronbot server detects persistent failures.
+- Fixed: CronAgent::run_wpcron() -> Re-entry guard via instance flag and try/finally.
+- Fixed: CronAgent::run_wpcron() -> ob_end_clean() on exception path; stop decrementing $run_event below zero.
+- Fixed: CronAgent::run_wpcron() -> Pre-init $results and $cron_event to prevent PHP 8 undefined-variable warnings.
+- Fixed: CronAgent::run_wpcron() -> REQUEST_URI check uses urldecode() and checks wp_doing_cron() first to avoid URL-encoded bypass.
+- Fixed: CronAgent::send_action() -> Cache key includes action to prevent collision between on/off calls from the same IP.
+- Improved: CronAgent::send_action() -> $stmp cache-buster refreshes every 5 minutes to avoid CDN staleness in long-running processes.
+- Improved: CronAgent::check_connection() -> Skip on AJAX/REST/cron requests to reduce shutdown-hook overhead on high-traffic endpoints.
+
 = v26.04.03 =
 - Added: CliOpcache — Invalidate web-server OPcache from WP-CLI via REST endpoint.
 - Added: DOCKET_CACHE_WPCLI_OPCACHE constant to enable/disable CLI OPcache invalidation.

@@ -673,6 +673,12 @@ $this->config_select_set_e(
                         <?php $this->config_select_bool_e('opcshutdown'); ?>
                     </td>
                 </tr>
+                <tr id="wpcli_opcache">
+                    <th><?php $this->opt_title('wpcli_opcache'); ?></th>
+                    <td>
+                        <?php $this->config_select_bool_e('wpcli_opcache'); ?>
+                    </td>
+                </tr>
             </table>
         </div>
         <div class="row-right">

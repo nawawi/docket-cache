@@ -59,11 +59,41 @@ final class CliOpcache
     const SECRET_KEY = 'cli_opcache_secret';
 
     /**
+     * Threshold beyond which buffered per-file notifications are
+     * collapsed into a single opcache_reset() request.
+     *
+     * Kept high because opcache_reset() is nuclear — it evicts every
+     * cached script on the site (WP core, plugins, themes), not just
+     * docket-cache files. N individual opcache_invalidate() calls are
+     * almost always cheaper than one reset, so this threshold exists
+     * purely as a safety valve against unreasonable HTTP payload sizes,
+     * not as a performance optimisation.
+     *
+     * @var int
+     */
+    const QUEUE_RESET_THRESHOLD = 1000;
+
+    /**
      * Whether a bulk flush is in progress (suppresses per-file notifications).
      *
      * @var bool
      */
     private static $bulk_flush = false;
+
+    /**
+     * Buffered notifications pending a single end-of-run HTTP POST.
+     * Keys are file paths; the special key '__all__' signals a full reset.
+     *
+     * @var array
+     */
+    private static $queue = [];
+
+    /**
+     * Whether the shutdown flush has been registered for this process.
+     *
+     * @var bool
+     */
+    private static $shutdown_registered = false;
 
     /**
      * Plugin instance.
@@ -231,16 +261,53 @@ final class CliOpcache
             return;
         }
 
-        $secret = self::read_secret();
-        if (empty($secret)) {
+        // An empty $files array means "reset everything". Collapse the
+        // buffer so any pending per-file entries are superseded.
+        if (empty($files)) {
+            self::$queue = ['__all__' => true];
+        } elseif (!isset(self::$queue['__all__'])) {
+            foreach ($files as $f) {
+                self::$queue[(string) $f] = true;
+            }
+            // Too many buffered paths — collapse to a single opcache_reset.
+            if (\count(self::$queue) > self::QUEUE_RESET_THRESHOLD) {
+                self::$queue = ['__all__' => true];
+            }
+        }
+
+        if (!self::$shutdown_registered) {
+            self::$shutdown_registered = true;
+            register_shutdown_function([__CLASS__, 'flush_queue']);
+        }
+    }
+
+    /**
+     * Emit a single HTTP POST for all buffered notifications.
+     *
+     * Registered as a shutdown function by notify(); may also be
+     * invoked directly to flush immediately.
+     *
+     * @return void
+     */
+    public static function flush_queue()
+    {
+        if (empty(self::$queue)) {
             return;
         }
 
-        $flush_all = empty($files);
+        $secret = self::read_secret();
+        if (empty($secret)) {
+            // Preserve the queue so a later flush_queue() call can retry
+            // if the secret becomes available.
+            return;
+        }
+
+        $reset_all = isset(self::$queue['__all__']);
+        $files = $reset_all ? [] : array_keys(self::$queue);
+        self::$queue = [];
+
         $body = wp_json_encode(
-            $flush_all
-                ? ['all' => true]
-                : ['files' => array_values($files)]
+            $reset_all ? ['all' => true] : ['files' => array_values($files)]
         );
 
         if (false === $body) {
