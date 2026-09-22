@@ -96,7 +96,7 @@ $log = $this->parse_log_query();
                         <a href="<?php echo $this->tab_query('log'); ?>" class="button button-primary button-small bt-fx button-vcache hide"><?php esc_html_e('View', 'docket-cache'); ?></a>
                         <a href="<?php echo $this->tab_query('log'); ?>" class="button button-primary button-small bt-fx button-vcache-c hide"><?php esc_html_e('Close', 'docket-cache'); ?></a>
                         <?php endif; ?>
-                        <textarea id="log" class="code" readonly="readonly" rows="<?php echo $log->row_size; ?>" wrap="off"><?php echo $log->output; ?></textarea>
+                        <textarea id="log" class="code" readonly="readonly" rows="<?php echo $log->row_size; ?>" wrap="off"><?php echo esc_textarea($log->output); ?></textarea>
                     </td>
                 </tr>
                 <?php endif; ?>

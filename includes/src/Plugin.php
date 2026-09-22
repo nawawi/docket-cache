@@ -1214,6 +1214,11 @@ final class Plugin extends Bepart
                 'init',
                 function () {
                     if (!headers_sent() && !empty($_SERVER['REQUEST_URI'])) {
+                        $cap = is_multisite() ? 'manage_network_options' : 'manage_options';
+                        if (!is_user_logged_in() || !current_user_can($cap)) {
+                            return;
+                        }
+
                         if ($this->cf()->is_dctrue('LOG')) {
                             $req = $_SERVER['REQUEST_URI'];
                             if ((false !== strpos($req, '?page=docket-cache&idx=log&dl=0') || false !== strpos($req, '?page=docket-cache-log&idx=log&dl=0'))

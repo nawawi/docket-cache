@@ -4,7 +4,7 @@ Tags: object cache, OPcache, cache, database, performance
 Requires at least: 5.4
 Tested up to: 7.0
 Requires PHP: 7.2.5
-Stable tag: 26.04.05
+Stable tag: 26.04.06
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 Donate link: https://ko-fi.com/nawawijamili
@@ -175,10 +175,15 @@ You can, but if your VPS supports Redis, we recommend using Redis for better per
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
-= v26.04.05 =
+= 26.04.06 =
+- Fixed: admin/log.php -> esc_textarea() on Cache Log output to prevent stored XSS.
+- Fixed: Plugin::dc_log() -> Sanitise REQUEST_URI caller before logging.
+- Fixed: Plugin -> Capability check on log/debug.log downloads reachable unauthenticated on 'init'.
+
+= 26.04.05 =
 - Fixed: Removed double echo in log.php.
 
-= v26.04.04 =
+= 26.04.04 =
 - Added: Configuration UI toggle for WP-CLI OPcache Invalidation (mirrors DOCKET_CACHE_WPCLI_OPCACHE constant).
 - Fixed: CliOpcache::notify() -> Buffered per-file notifications at shutdown to prevent HTTP request floods during GC and individual cache unlinks.
 - Fixed: CliOpcache -> REST route registered before compat check to eliminate 404 noise when workers bail early under load.
@@ -193,7 +198,7 @@ Please do manually remove wp-content/object-cache.php and wp-content/cache/docke
 - Improved: CronAgent::send_action() -> $stmp cache-buster refreshes every 5 minutes to avoid CDN staleness in long-running processes.
 - Improved: CronAgent::check_connection() -> Skip on AJAX/REST/cron requests to reduce shutdown-hook overhead on high-traffic endpoints.
 
-= v26.04.03 =
+= 26.04.03 =
 - Added: CliOpcache — Invalidate web-server OPcache from WP-CLI via REST endpoint.
 - Added: DOCKET_CACHE_WPCLI_OPCACHE constant to enable/disable CLI OPcache invalidation.
 - Added: DOCKET_CACHE_CONFIGACTION constant to enable/disable Export/Import settings feature.
@@ -212,7 +217,7 @@ Please do manually remove wp-content/object-cache.php and wp-content/cache/docke
 - Improved: OPcacheView -> Removed "All Items" option, replaced with 50000 items cap.
 - Improved: OPcacheView::get_status() -> Cache result to prevent double scan per page load.
 
-= v24.07.07 =
+= 24.07.07 =
 - Fixed: _load_textdomain_just_in_time was called incorrectly on WordPress 6.7+.
 
 = v24.07.06 =

@@ -1230,7 +1230,8 @@ class WP_Object_Cache
 
         $caller = '';
         if (!empty($_SERVER['REQUEST_URI'])) {
-            $caller = $_SERVER['REQUEST_URI'];
+            $caller = preg_replace('/[\x00-\x1F\x7F]/', '', (string) $_SERVER['REQUEST_URI']);
+            $caller = str_replace(['<', '>', '"'], ['%3C', '%3E', '%22'], $caller);
         } elseif ($this->cf()->is_dctrue('WPCLI')) {
             $caller = 'wp-cli';
         }
