@@ -4,7 +4,7 @@ Tags: object cache, OPcache, cache, database, performance
 Requires at least: 5.4
 Tested up to: 7.0
 Requires PHP: 7.2.5
-Stable tag: 26.04.06
+Stable tag: 26.04.07
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 Donate link: https://ko-fi.com/nawawijamili
@@ -175,6 +175,10 @@ You can, but if your VPS supports Redis, we recommend using Redis for better per
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 26.04.07 =
+- Fixed: Polyfill PhpToken stub -> Extend scoped Nawawi\Symfony\Polyfill\Php80\PhpToken.
+- Improved: Updated Symfony vendor libraries for PHP 8.4 compatibility.
+
 = 26.04.06 =
 - Fixed: admin/log.php -> esc_textarea() on Cache Log output to prevent stored XSS.
 - Fixed: Plugin::dc_log() -> Sanitise REQUEST_URI caller before logging.
