@@ -75,7 +75,6 @@ A heartfelt thanks and appreciation.
 - [Themecloud](https://www.themecloud.io/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [Websavers Inc](https://websavers.ca/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [Avunu LLC](https://avu.nu/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
-- [Linqru](https://linqru.jp/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [Gentleman's Guru](https://www.gentlemansguru.com/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [SecurePay](https://www.securepay.my/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
 - [DNSVault](https://dnsvault.net/?utm_source=docketcache&utm_campaign=plugin-uri&utm_medium=wporg)
