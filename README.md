@@ -1,6 +1,5 @@
 ![Docket Cache](./.wordpress.org/icon-128x128.png)
 # Docket Cache
-[![WP compatibility](https://plugintests.com/plugins/wporg/docket-cache/wp-badge.svg)](https://plugintests.com/plugins/wporg/docket-cache/latest) [![PHP compatibility](https://plugintests.com/plugins/wporg/docket-cache/php-badge.svg)](https://plugintests.com/plugins/wporg/docket-cache/latest)
 
 Speed up your WordPress site with a persistent object cache, powered by OPcache. An efficient alternative to Redis and Memcached.
 
@@ -41,15 +40,15 @@ Support the ongoing development of Docket Cache with a one-off or recurring cont
 
 A heartfelt thanks and appreciation.
 
-<a href="https://jimathosting.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/jimathosting.jpg" width="250" height="125" style="margin:10px;"></a>
-<a href="https://www.themecloud.io/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/12/themecloud.jpg" width="250" height="125" style="margin:10px;"></a>
-<a href="https://websavers.ca/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2022/04/websavers-logo.jpg" width="250" height="125" style="margin:10px;"></a>
-<a href="https://avu.nu/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2023/01/avunu-logo0.jpg" width="250" height="125" style="margin:10px;"></a>
-<a href="https://linqru.jp/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2022/04/linqru-logo.jpg" width="250" height="125" style="margin:10px;"></a>
-<a href="https://www.gentlemansguru.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2023/06/gentlemansguru0.jpg" width="250" height="125" style="margin:10px;"></a>
-<a href="https://www.securepay.my/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/securepay0.jpg" width="250" height="125" style="margin:10px;"></a>
-<a href="https://dnsvault.net/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/dnsvault.jpg" width="250" height="125" style="margin:10px;"></a>
-<a href="https://exnano.io/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src="https://docketcache.com/wp-content/uploads/2021/03/exnano2-1.jpg" width="250" height="125" style="margin:10px;"></a>
+<a href="https://jimathosting.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/jimathosting.jpg" width="250" height="125" style="margin:10px;"></a>
+<a href="https://www.themecloud.io/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/themecloud.jpg" width="250" height="125" style="margin:10px;"></a>
+<a href="https://websavers.ca/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/websavers-logo.jpg" width="250" height="125" style="margin:10px;"></a>
+<a href="https://avu.nu/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/avunu-logo0.jpg" width="250" height="125" style="margin:10px;"></a>
+<a href="https://linqru.jp/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/linqru-logo.jpg" width="250" height="125" style="margin:10px;"></a>
+<a href="https://www.gentlemansguru.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/gentlemansguru0.jpg" width="250" height="125" style="margin:10px;"></a>
+<a href="https://www.securepay.my/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/securepay0.jpg" width="250" height="125" style="margin:10px;"></a>
+<a href="https://dnsvault.net/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/dnsvault.jpg" width="250" height="125" style="margin:10px;"></a>
+<a href="https://exnano.io/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/exnano2-1.jpg" width="250" height="125" style="margin:10px;"></a>
 
 Other sponsors are mentioned in the [honourable list](https://github.com/nawawi/docket-cache/issues/5).
 
