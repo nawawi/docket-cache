@@ -16,7 +16,7 @@ Docket Cache is a persistent WordPress Object Cache that stores cached data as p
 
 Most file-based caching plugins use [serializing](https://www.php.net/manual/en/function.serialize.php) and [unserializing](https://www.php.net/manual/en/function.unserialize.php) to save PHP objects to flat files. Docket Cache takes a different approach by converting objects into plain PHP code. This makes data retrieval faster and improves overall performance, especially when Zend OPcache is enabled.
 
-For more information, please refer to the documentation on [Caching In WordPress](https://docs.docketcache.com/resources/caching-in-wordpress).
+For more information, please refer to the documentation on [Caching In WordPress](https://docketcache.com/docs/resources/caching-in-wordpress/).
 
 == Why use this plugin? ==
 For reliable persistent Object Cache in WordPress, [Redis](https://redis.io/) or [Memcached](https://memcached.org/) are the top choices. However, they require server knowledge and are rarely available on low-cost or shared hosting plans.
@@ -51,11 +51,16 @@ To use Docket Cache requires minimum:
 
 - PHP 7.2.5
 - WordPress 5.4
+
+We also recommend:
+
 - Zend OPcache
+
+Docket Cache saves the cache as PHP files, so it works with or without OPcache. With OPcache, PHP keeps those files ready in memory and does not have to read them from disk on every page load, which makes the cache much faster.
 
 == Documentation ==
 
-For configuration options, installation guides, and command-line usage, please refer to the [Documentation](https://docs.docketcache.com).
+For configuration options, installation guides, and command-line usage, please refer to the [Documentation](https://docketcache.com/docs/).
 
 == Development ==
 - [GitHub Repository](https://github.com/nawawi/docket-cache/) — Source code and development hub for Docket Cache.
@@ -65,7 +70,7 @@ For configuration options, installation guides, and command-line usage, please r
 
 == Sponsor This Project ==
 
-Support the ongoing development of Docket Cache with a [one-off or recurring contribution](https://docketcache.com/sponsorship/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg).
+Support the ongoing development of Docket Cache with a [one-off or recurring contribution](https://docketcache.com/?utm_source=wp-readme&utm_campaign=sponsor-uri&utm_medium=wporg#sponsor).
 
 **Noteworthy Sponsors:**
 
@@ -150,7 +155,7 @@ For more information about RAM disks:
 2. [What Is /dev/shm and Its Practical Usage](https://www.cyberciti.biz/tips/what-is-devshm-and-its-practical-usage.html)
 3. [Creating a Filesystem in RAM](https://www.cyberciti.biz/faq/howto-create-linux-ram-disk-filesystem/)
 
-On Windows, create a RAM disk and set the [DOCKET_CACHE_PATH](https://docs.docketcache.com/configuration#docket_cache_path) to point to the RAM disk drive.
+On Windows, create a RAM disk and set the [DOCKET_CACHE_PATH](https://docketcache.com/docs/constants/#docket_cache_path) to point to the RAM disk drive.
 
 = What is the minimum RAM required for shared hosting? =
 By default, WordPress sets the memory limit to 256 MB. When combined with MySQL and the web server, you need more than 256 MB. If your hosting plan only provides 256 MB in total, this is not enough, and Docket Cache will not be able to improve your site's performance.

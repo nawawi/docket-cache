@@ -13,7 +13,7 @@ For a full description, please visit https://wordpress.org/plugins/docket-cache.
 
 ## Documentation
 
-For configuration options, installation guides, and command-line usage, please refer to the documentation at https://docs.docketcache.com.
+For configuration options, installation guides, and command-line usage, please refer to the documentation at https://docketcache.com/docs/.
 
 ## Installation
 
@@ -32,7 +32,7 @@ You may also download it directly from the [WordPress Plugin Directory](https://
 
 Support the ongoing development of Docket Cache with a one-off or recurring contribution.
 
-[Become a sponsor](https://docketcache.com/sponsorship/) — all funds go towards the maintenance, development, and promotion of this project.
+[Become a sponsor](https://docketcache.com/#sponsor) — all funds go towards the maintenance, development, and promotion of this project.
 
 <br>
 
