@@ -1438,12 +1438,40 @@ class Filesystem
         if (@file_put_contents($file, $log.\PHP_EOL, $flags)) {
             if ($do_chmod) {
                 $this->chmod($file);
+                $this->log_remove_legacy();
             }
 
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * log_remove_legacy.
+     */
+    public function log_remove_legacy()
+    {
+        $file = nwdcx_constval('LOG_FILE');
+        if (empty($file)) {
+            return;
+        }
+
+        $keep = basename($file, '.log');
+        if (!preg_match('@^\.object-cache-[0-9a-f]{16}$@', $keep)) {
+            return;
+        }
+
+        $list = @glob(\dirname($file).'/.object-cache*.log');
+        if (empty($list) || !\is_array($list)) {
+            return;
+        }
+
+        foreach ($list as $legacy) {
+            if (0 !== strpos(basename($legacy), $keep) && @is_file($legacy)) {
+                @unlink($legacy);
+            }
+        }
     }
 
     /**

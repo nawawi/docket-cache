@@ -222,13 +222,20 @@ final class CronAgent
 
     private function close_ping($response)
     {
+        if (!\is_array($response)) {
+            if (!headers_sent()) {
+                status_header(500);
+                @header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
+                @header('Content-Type: text/plain; charset=UTF-8');
+            }
+            $this->pt->close_exit($response);
+        }
+
         $output = $response;
         $output['request'] = array_filter(
             $_SERVER,
             function ($arr) {
-                if ('HTTP_' === substr($arr, 0, 5)) {
-                    return true;
-                }
+                return 'HTTP_' === substr($arr, 0, 5) && !\in_array($arr, ['HTTP_COOKIE', 'HTTP_AUTHORIZATION', 'HTTP_PROXY_AUTHORIZATION'], true);
             },
             \ARRAY_FILTER_USE_KEY
         );

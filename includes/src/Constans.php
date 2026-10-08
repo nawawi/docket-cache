@@ -158,6 +158,18 @@ final class Constans
         return false;
     }
 
+    private function log_suffix()
+    {
+        $seed = '';
+        foreach (['DB_PASSWORD', 'AUTH_KEY', 'SECURE_AUTH_KEY', 'LOGGED_IN_KEY', 'NONCE_KEY'] as $name) {
+            if (\defined($name)) {
+                $seed .= (string) \constant($name);
+            }
+        }
+
+        return substr(hash_hmac('sha256', DOCKET_CACHE_CONTENT_PATH, $seed), 0, 16);
+    }
+
     public function register_default()
     {
         // compat
@@ -195,7 +207,7 @@ final class Constans
         $this->maybe_define($this->px('LOG_ALL'), \defined('WP_DEBUG') ? WP_DEBUG : false);
 
         // log file
-        $this->maybe_define($this->px('LOG_FILE'), DOCKET_CACHE_CONTENT_PATH.'/.object-cache.log');
+        $this->maybe_define($this->px('LOG_FILE'), DOCKET_CACHE_CONTENT_PATH.'/.object-cache-'.$this->log_suffix().'.log');
 
         // empty file when cache flushed
         $this->maybe_define($this->px('LOG_FLUSH'), true);

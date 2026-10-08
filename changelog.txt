@@ -1,3 +1,10 @@
+= v26.04.08 (2026-10-08) =
+- Fixed: WP_Object_Cache::dc_log() -> Redact query string values in the logged request URI.
+- Fixed: Constans -> Default Cache Log file name is no longer predictable.
+- Fixed: Filesystem::log_remove_legacy() -> Remove Cache Log files left under the old name.
+- Fixed: CronAgent::close_ping() -> Fatal error on rejected ping request.
+- Fixed: CronAgent::close_ping() -> Exclude Cookie and Authorization headers from stored ping data.
+
 = v26.04.07 (2026-09-27) =
 - Fixed: Polyfill PhpToken stub -> Extend scoped Nawawi\Symfony\Polyfill\Php80\PhpToken.
 - Improved: Updated Symfony vendor libraries for PHP 8.4 compatibility.

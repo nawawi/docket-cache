@@ -759,6 +759,8 @@ final class Plugin extends Bepart
      */
     public function flush_log()
     {
+        $this->log_remove_legacy();
+
         if ($this->has_log($logfile)) {
             return @unlink($logfile);
         }

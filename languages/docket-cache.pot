@@ -2,14 +2,14 @@
 # This file is distributed under the MIT.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 26.04.06\n"
+"Project-Id-Version: Docket Cache 26.04.08\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-25T13:35:48+00:00\n"
+"POT-Creation-Date: 2026-10-08T16:04:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: docket-cache\n"
@@ -99,7 +99,7 @@ msgid "Run Garbage Collector"
 msgstr ""
 
 #: includes/admin/config.php:18
-#: includes/src/Plugin.php:1618
+#: includes/src/Plugin.php:1620
 #: includes/src/View.php:320
 msgid "Configuration"
 msgstr ""
@@ -244,15 +244,15 @@ msgstr ""
 
 #: includes/admin/cronbot.php:20
 #: includes/src/Plugin.php:177
-#: includes/src/Plugin.php:1839
-#: includes/src/Plugin.php:1840
-#: includes/src/Plugin.php:1847
+#: includes/src/Plugin.php:1841
+#: includes/src/Plugin.php:1842
 #: includes/src/Plugin.php:1849
+#: includes/src/Plugin.php:1851
 msgid "Not Available"
 msgstr ""
 
 #: includes/admin/cronbot.php:32
-#: includes/src/Plugin.php:1581
+#: includes/src/Plugin.php:1583
 #: includes/src/View.php:307
 msgid "Cronbot"
 msgstr ""
@@ -315,7 +315,7 @@ msgstr ""
 
 #: includes/admin/log.php:21
 #: includes/src/Canopt.php:166
-#: includes/src/Plugin.php:1607
+#: includes/src/Plugin.php:1609
 #: includes/src/View.php:317
 msgid "Cache Log"
 msgstr ""
@@ -574,8 +574,8 @@ msgid "Web Proxy"
 msgstr ""
 
 #: includes/admin/overview.php:35
-#: includes/src/Plugin.php:1570
-#: includes/src/Plugin.php:1909
+#: includes/src/Plugin.php:1572
+#: includes/src/Plugin.php:1911
 #: includes/src/View.php:304
 msgid "Overview"
 msgstr ""
@@ -1384,28 +1384,28 @@ msgstr ""
 msgid "Executing the garbage collector completed."
 msgstr ""
 
-#: includes/src/CronAgent.php:251
+#: includes/src/CronAgent.php:258
 msgid "Already running wp-cron"
 msgstr ""
 
-#: includes/src/CronAgent.php:280
+#: includes/src/CronAgent.php:287
 msgid "Invalid request for single event"
 msgstr ""
 
 #. translators: %s: Event Hook.
-#: includes/src/CronAgent.php:292
+#: includes/src/CronAgent.php:299
 msgid "Event hook not found %s"
 msgstr ""
 
-#: includes/src/CronAgent.php:306
+#: includes/src/CronAgent.php:313
 msgid "No scheduled event ready to run"
 msgstr ""
 
-#: includes/src/CronAgent.php:316
+#: includes/src/CronAgent.php:323
 msgid "Another cron process is currently running wp-cron.php"
 msgstr ""
 
-#: includes/src/CronAgent.php:500
+#: includes/src/CronAgent.php:507
 msgid "Already received. Try again in a few minutes"
 msgstr ""
 
@@ -1621,49 +1621,49 @@ msgid_plural "of %s Networks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/src/Plugin.php:932
+#: includes/src/Plugin.php:934
 msgid "Docket Cache plugin requires PHP 7.2.5 or greater."
 msgstr ""
 
-#: includes/src/Plugin.php:1240
-#: includes/src/Plugin.php:1266
+#: includes/src/Plugin.php:1242
+#: includes/src/Plugin.php:1268
 msgid "The log is empty. No data is available."
 msgstr ""
 
-#: includes/src/Plugin.php:1593
+#: includes/src/Plugin.php:1595
 #: includes/src/View.php:311
 msgid "OPcache"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:1703
+#: includes/src/Plugin.php:1705
 msgid "The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href=\"%s\" style=\"min-width:100px;text-align:center;font-wight:bold;\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %1$s: url install, %2$s = url dismiss
-#: includes/src/Plugin.php:1707
+#: includes/src/Plugin.php:1709
 msgid "An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use <strong>Docket Cache</strong>. <br><br><a href=\"%1$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-primary button-small\">Install</a>&nbsp;<a href=\"%2$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-secondary button-small\">Dismiss</a>"
 msgstr ""
 
-#: includes/src/Plugin.php:1712
+#: includes/src/Plugin.php:1714
 msgid "The Object Cache feature has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: version
-#: includes/src/Plugin.php:1880
-#: includes/src/Plugin.php:1895
+#: includes/src/Plugin.php:1882
+#: includes/src/Plugin.php:1897
 msgid "Version %s"
 msgstr ""
 
-#: includes/src/Plugin.php:1910
+#: includes/src/Plugin.php:1912
 msgid "Configure"
 msgstr ""
 
-#: includes/src/Plugin.php:1922
+#: includes/src/Plugin.php:1924
 msgid "Docs"
 msgstr ""
 
-#: includes/src/Plugin.php:1923
+#: includes/src/Plugin.php:1925
 msgid "Sponsor"
 msgstr ""
 

@@ -1206,6 +1206,44 @@ class WP_Object_Cache
     }
 
     /**
+     * dc_log_caller.
+     */
+    private function dc_log_caller($uri)
+    {
+        $pos = strcspn($uri, '?#');
+        $path = substr($uri, 0, $pos);
+        if (!isset($uri[$pos]) || '?' !== $uri[$pos]) {
+            return $path;
+        }
+
+        $query = strtok(substr($uri, $pos + 1), '#');
+        if (false === $query || '' === $query) {
+            return $path;
+        }
+
+        static $safe = ['action' => 1, 'page' => 1, 'post_type' => 1, 'taxonomy' => 1, 'paged' => 1];
+
+        $args = [];
+        foreach (explode('&', $query) as $pair) {
+            if ('' === $pair) {
+                continue;
+            }
+
+            $eq = strpos($pair, '=');
+            if (false === $eq) {
+                $args[] = $pair;
+                continue;
+            }
+
+            $name = substr($pair, 0, $eq);
+            $keep = isset($safe[strtolower($name)]) && !preg_match('/[^\w.\-]/', substr($pair, $eq + 1));
+            $args[] = $keep ? $pair : $name.'=*';
+        }
+
+        return $path.'?'.implode('&', $args);
+    }
+
+    /**
      * dc_log.
      */
     private function dc_log($tag, $id, $data)
@@ -1231,13 +1269,15 @@ class WP_Object_Cache
         $caller = '';
         if (!empty($_SERVER['REQUEST_URI'])) {
             $caller = preg_replace('/[\x00-\x1F\x7F]/', '', (string) $_SERVER['REQUEST_URI']);
+
+            if (false !== strpos($caller, '?page=docket-cache')) {
+                return false;
+            }
+
+            $caller = $this->dc_log_caller($caller);
             $caller = str_replace(['<', '>', '"'], ['%3C', '%3E', '%22'], $caller);
         } elseif ($this->cf()->is_dctrue('WPCLI')) {
             $caller = 'wp-cli';
-        }
-
-        if (false !== strpos($caller, '?page=docket-cache')) {
-            return false;
         }
 
         static $duplicate = [];
