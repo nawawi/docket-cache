@@ -44,6 +44,7 @@ A heartfelt thanks and appreciation.
 <a href="https://www.themecloud.io/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/themecloud.jpg" width="250" height="125" style="margin:10px;"></a>
 <a href="https://websavers.ca/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/websavers-logo.jpg" width="250" height="125" style="margin:10px;"></a>
 <a href="https://avu.nu/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/avunu-logo0.jpg" width="250" height="125" style="margin:10px;"></a>
+<a href="https://linqru.jp/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/linqru-logo.jpg" width="250" height="125" style="margin:10px;"></a>
 <a href="https://www.gentlemansguru.com/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/gentlemansguru0.jpg" width="250" height="125" style="margin:10px;"></a>
 <a href="https://www.securepay.my/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/securepay0.jpg" width="250" height="125" style="margin:10px;"></a>
 <a href="https://dnsvault.net/?utm_source=docketcache&utm_campaign=sponsor-uri&utm_medium=noteworthy"><img src=".github/images/sponsors/dnsvault.jpg" width="250" height="125" style="margin:10px;"></a>
