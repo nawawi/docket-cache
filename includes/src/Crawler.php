@@ -14,10 +14,26 @@ namespace Nawawi\DocketCache;
 
 final class Crawler
 {
-    private static $version = '26.04.08';
+    private static $version = '26.04.09';
     public static $send_cookie = false;
 
-    private static function default_args($param = [])
+    private static function is_local_url($url)
+    {
+        $host = wp_parse_url($url, \PHP_URL_HOST);
+        if (empty($host)) {
+            return false;
+        }
+
+        foreach ([home_url(), site_url(), network_home_url()] as $local) {
+            if (0 === strcasecmp($host, (string) wp_parse_url($local, \PHP_URL_HOST))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function default_args($url, $param = [])
     {
         $args = [
             'blocking' => false,
@@ -27,7 +43,8 @@ final class Crawler
             'body' => null,
             'compress' => false,
             'decompress' => false,
-            'sslverify' => apply_filters('https_local_ssl_verify', false),
+            // only loopback requests may skip certificate verification.
+            'sslverify' => self::is_local_url($url) ? apply_filters('https_local_ssl_verify', false) : apply_filters('https_ssl_verify', true),
             'stream' => false,
             'headers' => [
                 'REFERER' => home_url(),
@@ -81,14 +98,14 @@ final class Crawler
 
     public static function fetch($url, $param = [])
     {
-        $args = self::default_args($param);
+        $args = self::default_args($url, $param);
 
         return wp_remote_get($url, $args);
     }
 
     public static function post($url, $param = [])
     {
-        $args = self::default_args($param);
+        $args = self::default_args($url, $param);
 
         return wp_remote_post($url, $args);
     }

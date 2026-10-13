@@ -62,6 +62,15 @@ endif;
                 <?php endif; ?>
             </p>
 
+            <?php if ($is_connected && !apply_filters('docketcache/filter/view/nosponsor', false)) : ?>
+            <p>
+                <small>
+                    <?php esc_html_e('Cronbot is a free service. Fund Docket Cache to help keep it running.', 'docket-cache'); ?>
+                    <a href="https://docketcache.com/sponsorship/?utm_source=wp-plugins&utm_campaign=sponsor-uri&utm_medium=dc-cronbot" rel="noopener" target="new"><?php esc_html_e('Become Sponsor', 'docket-cache'); ?></a>
+                </small>
+            </p>
+            <?php endif; ?>
+
             <?php $this->tab_title(esc_html__('Cron Events', 'docket-cache'), 'title-below'); ?>
             <table class="form-table">
                 <?php

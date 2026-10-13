@@ -1,3 +1,10 @@
+= v26.04.09 (2026-10-13) =
+- Added: Cronbot -> Sponsor notice when the service is connected.
+- Fixed: nwdcx_cleanuptransient() -> Use prepared statements when removing transients from the database.
+- Fixed: Crawler -> Verify SSL certificate on requests to remote endpoints.
+- Fixed: ReqAction -> Escape Cronbot error message in admin notice.
+- Removed: Critical Version Checking -> No longer needed.
+
 = v26.04.08 (2026-10-08) =
 - Fixed: WP_Object_Cache::dc_log() -> Redact query string values in the logged request URI.
 - Fixed: Constans -> Default Cache Log file name is no longer predictable.

@@ -64,11 +64,6 @@ final class Event
                     'display' => $is_after_init ? esc_html__('Every 5 Minutes', 'docket-cache') : 'Every 5 Minutes',
                 ];
 
-                $schedules['docketcache_checkversion_schedule'] = [
-                    'interval' => 15 * DAY_IN_SECONDS,
-                    'display' => $is_after_init ? esc_html__('Every 15 Days', 'docket-cache') : 'Every 15 Days',
-                ];
-
                 return $schedules;
             },
             \PHP_INT_MAX
@@ -130,24 +125,9 @@ final class Event
                     }
                 }
 
-                // check version
-                if ($this->pt->cf()->is_dctrue('CHECKVERSION', true)) {
-                    // 06102020: reset old schedule
-                    $check = wp_get_scheduled_event('docketcache_checkversion');
-                    if (\is_object($check) && 'docketcache_checkversion_schedule' !== $check->schedule) {
-                        wp_clear_scheduled_hook('docketcache_checkversion');
-                    }
-
-                    if (is_main_site() && is_main_network()) {
-                        add_action('docketcache_checkversion', [$this, 'checkversion']);
-                        if (!wp_next_scheduled('docketcache_checkversion')) {
-                            wp_schedule_event(time(), 'docketcache_checkversion_schedule', 'docketcache_checkversion');
-                        }
-                    }
-                } else {
-                    if (wp_get_schedule('docketcache_checkversion')) {
-                        wp_clear_scheduled_hook('docketcache_checkversion');
-                    }
+                // 26.04.09: check version removed, clear leftover schedule
+                if (wp_next_scheduled('docketcache_checkversion')) {
+                    wp_clear_scheduled_hook('docketcache_checkversion');
                 }
 
                 // expired transient in DB
@@ -699,100 +679,6 @@ final class Event
         } elseif (\function_exists('delete_expired_transients')) {
             delete_expired_transients(true);
         }
-
-        return true;
-    }
-
-    /**
-     * checkversion.
-     */
-    public function checkversion()
-    {
-        if (!is_main_site()) {
-            return false;
-        }
-
-        $part = 'checkversion';
-
-        if ($this->pt->co()->lockproc($part, time() + 3600)) {
-            return false;
-        }
-
-        $checkdata = $this->pt->co()->get_part($part, true);
-        if (!empty($checkdata) && \is_array($checkdata) && !empty($checkdata['selfcheck'])) {
-            $selfcheck = $checkdata['selfcheck'];
-            if (0 === $this->pt->sanitize_timestamp($selfcheck)) {
-                return false;
-            }
-
-            if ($selfcheck > 0 && $selfcheck > time()) {
-                return false;
-            }
-        }
-
-        $main_site_url = $this->pt->site_url();
-        $site_url = $this->pt->site_url(true);
-        $home_url = $this->pt->site_url(true, true);
-        $stmp = time() + 120;
-        $api_endpoint = $this->pt->api_endpoint.'/'.$part.'?v='.$stmp;
-
-        $args = [
-            'blocking' => true,
-            'body' => [
-                'timestamp' => date('Y-m-d H:i:s T'),
-                'timezone' => wp_timezone_string(),
-                'site' => $site_url,
-                'token' => $this->pt->nw_encrypt($main_site_url, md5($site_url)),
-                'meta' => $this->pt->site_meta(),
-            ],
-            'headers' => [
-                'REFERER' => $home_url,
-                'Cache-Control' => 'no-cache',
-            ],
-        ];
-
-        $results = Crawler::post($api_endpoint, $args);
-
-        $output = [
-            'timestamp' => time(),
-            'endpoint' => $api_endpoint,
-            'request' => [
-                'headers' => $args['headers'],
-                'content' => $args['body'],
-            ],
-            'selfcheck' => time() + 86400,
-        ];
-
-        if (is_wp_error($results)) {
-            $output['error'] = $results->get_error_message();
-            $this->pt->co()->save_part($output, $part);
-
-            return false;
-        }
-
-        $output['response'] = wp_remote_retrieve_body($results);
-        if (!empty($output['response'])) {
-            $output['response'] = json_decode($output['response'], true);
-            if (\JSON_ERROR_NONE === json_last_error()) {
-                if (!empty($output['response']['error'])) {
-                    $output['error'] = $output['response']['error'];
-                    $this->pt->co()->save_part($output, $part);
-
-                    return false;
-                }
-            }
-        }
-
-        $code = (int) wp_remote_retrieve_response_code($results);
-        if ($code > 400) {
-            $output['error'] = $code;
-            $this->pt->co()->save_part($output, $part);
-
-            return false;
-        }
-
-        $this->pt->co()->save_part($output, $part);
-        $this->pt->co()->lockreset($part);
 
         return true;
     }

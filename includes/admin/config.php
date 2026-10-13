@@ -655,12 +655,6 @@ $this->config_select_set_e(
                         <?php $this->config_select_bool_e('autoupdate_toggle'); ?>
                     </td>
                 </tr>
-                <tr id="checkversion">
-                    <th><?php $this->opt_title('checkversion'); ?></th>
-                    <td>
-                        <?php $this->config_select_bool_e('checkversion'); ?>
-                    </td>
-                </tr>
                 <tr id="flush_shutdown">
                     <th><?php $this->opt_title('flush_shutdown'); ?></th>
                     <td>

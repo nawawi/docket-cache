@@ -750,7 +750,7 @@ final class ReqAction
                     break;
                 case 'docket-cronbot-connect-failed':
                     $msg = $this->pt->co()->lookup_get('cronboterror', true);
-                    $errmsg = !empty($msg) ? ': '.$msg : '.';
+                    $errmsg = !empty($msg) ? ': '.esc_html(\is_scalar($msg) ? $msg : wp_json_encode($msg)) : '.';
                     /* translators: %s = error message */
                     $this->pt->notice = sprintf(esc_html__('Cronbot failed to connect%s', 'docket-cache'), $errmsg);
                     unset($msg, $errmsg);
@@ -766,6 +766,7 @@ final class ReqAction
                     $endpoint = parse_url($this->pt->cronbot_endpoint, \PHP_URL_HOST);
                     $errmsg = $this->pt->co()->lookup_get('cronboterror', true);
                     if (!empty($errmsg)) {
+                        $errmsg = esc_html(\is_scalar($errmsg) ? $errmsg : wp_json_encode($errmsg));
                         /* translators: %1$s: cronbot endpoint, %2$s = error message */
                         $this->pt->notice = sprintf(esc_html__('Pong from %1$s: %2$s.', 'docket-cache'), $endpoint, $errmsg);
                     } else {

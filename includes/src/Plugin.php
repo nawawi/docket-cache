@@ -78,13 +78,6 @@ final class Plugin extends Bepart
     public $cache_path;
 
     /**
-     * API Endpoint.
-     *
-     * @var string
-     */
-    public $api_endpoint;
-
-    /**
      * Cronbot Endpoint.
      *
      * @var string
@@ -1057,12 +1050,10 @@ final class Plugin extends Bepart
             $this->cache_path = nwdcx_network_dirpath($this->cache_path);
         }
 
-        $this->api_endpoint = 'https://api.docketcache.com';
         $this->cronbot_endpoint = 'https://cronbot.docketcache.com';
 
         // use Constans() to trigger default
         if ($this->cf()->is_dctrue('DEV')) {
-            $this->api_endpoint = 'http://api.docketcache.local';
             $this->cronbot_endpoint = 'http://cronbot.docketcache.local';
         }
 
@@ -1084,23 +1075,6 @@ final class Plugin extends Bepart
     }
 
     /**
-     * critical_version.
-     */
-    private function critical_version()
-    {
-        $checkdata = $this->co()->get_part('checkversion', true);
-        if (!empty($checkdata) && \is_array($checkdata) && !empty($checkdata['doversion'])) {
-            $current_version = $this->plugin_meta($this->file)['Version'];
-            if (0 === strcmp($checkdata['doversion'], $current_version)) {
-                $this->flush_cache(true);
-            }
-        }
-        unset($checkdata);
-
-        return true;
-    }
-
-    /**
      * plugin_upgrade.
      */
     private function plugin_upgrade()
@@ -1114,9 +1088,6 @@ final class Plugin extends Bepart
                         $this->cx()->multinet_install($this->hook);
                     }
                 }
-
-                // put last
-                $this->critical_version();
             },
             \PHP_INT_MAX
         );

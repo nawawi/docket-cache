@@ -266,10 +266,10 @@ if (!\function_exists('nwdcx_cleanuptransient')) {
             if (!empty($collect)) {
                 $wpdb->query('START TRANSACTION');
                 foreach ($collect as $key) {
-                    $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_name`='_transient_{$key}'");
-                    $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_name`='_transient_timeout_{$key}'");
-                    $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_name`='_site_transient_{$key}'");
-                    $wpdb->query("DELETE FROM `{$wpdb->options}` WHERE `option_name`='_site_transient_timeout_{$key}'");
+                    $wpdb->query($wpdb->prepare('DELETE FROM `'.$wpdb->options.'` WHERE `option_name`=%s', '_transient_'.$key));
+                    $wpdb->query($wpdb->prepare('DELETE FROM `'.$wpdb->options.'` WHERE `option_name`=%s', '_transient_timeout_'.$key));
+                    $wpdb->query($wpdb->prepare('DELETE FROM `'.$wpdb->options.'` WHERE `option_name`=%s', '_site_transient_'.$key));
+                    $wpdb->query($wpdb->prepare('DELETE FROM `'.$wpdb->options.'` WHERE `option_name`=%s', '_site_transient_timeout_'.$key));
                     ++$count;
                 }
                 $wpdb->query('COMMIT');
@@ -294,8 +294,8 @@ if (!\function_exists('nwdcx_cleanuptransient')) {
                 if (!empty($collect)) {
                     $wpdb->query('START TRANSACTION');
                     foreach ($collect as $key) {
-                        $wpdb->query("DELETE FROM `{$wpdb->sitemeta}` WHERE `meta_key`='_site_transient_{$key}'");
-                        $wpdb->query("DELETE FROM `{$wpdb->sitemeta}` WHERE `meta_key`='_site_transient_timeout_{$key}'");
+                        $wpdb->query($wpdb->prepare('DELETE FROM `'.$wpdb->sitemeta.'` WHERE `meta_key`=%s', '_site_transient_'.$key));
+                        $wpdb->query($wpdb->prepare('DELETE FROM `'.$wpdb->sitemeta.'` WHERE `meta_key`=%s', '_site_transient_timeout_'.$key));
                         ++$count;
                     }
                     $wpdb->query('COMMIT');

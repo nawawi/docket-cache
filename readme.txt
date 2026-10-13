@@ -4,7 +4,7 @@ Tags: object cache, OPcache, cache, database, performance
 Requires at least: 5.4
 Tested up to: 7.0
 Requires PHP: 7.2.5
-Stable tag: 26.04.08
+Stable tag: 26.04.09
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 Donate link: https://docketcache.com/#sponsor
@@ -180,6 +180,13 @@ You can, but if your VPS supports Redis, we recommend using Redis for better per
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 26.04.09 =
+- Added: Cronbot -> Sponsor notice when the service is connected.
+- Fixed: nwdcx_cleanuptransient() -> Use prepared statements when removing transients from the database.
+- Fixed: Crawler -> Verify SSL certificate on requests to remote endpoints.
+- Fixed: ReqAction -> Escape Cronbot error message in admin notice.
+- Removed: Critical Version Checking -> No longer needed.
+
 = 26.04.08 =
 - Fixed: WP_Object_Cache::dc_log() -> Redact query string values in the logged request URI.
 - Fixed: Constans -> Default Cache Log file name is no longer predictable.
@@ -232,124 +239,6 @@ Please do manually remove wp-content/object-cache.php and wp-content/cache/docke
 - Improved: Plugin::get_opcache_status() -> Timeout guard for file cache scan on shared hosting.
 - Improved: OPcacheView -> Removed "All Items" option, replaced with 50000 items cap.
 - Improved: OPcacheView::get_status() -> Cache result to prevent double scan per page load.
-
-= 24.07.07 =
-- Fixed: _load_textdomain_just_in_time was called incorrectly on WordPress 6.7+.
-
-= v24.07.06 =
-- Fixed: MoCache double-applying load_textdomain_mofile filter.
-
-= 24.07.05 =
-- Fixed: Authorization and nonce verification in AJAX worker handler.
-
-= 24.07.04 =
-- Fixed: View::parse_log_query() -> proper handling file path traversal.
-
-= 24.07.03 =
-- Fixed: View::render() -> proper handling subpage name.
-- Fixed: Event::garbage_collector() -> missing is_wp_cache_group_queries() method.
-
-= 24.07.02 =
-- Fixed: _load_textdomain_just_in_time was called incorrectly.
-- Fixed: blueprint.json -> deprecated pluginZipFile property.
-- Updated: Tested up to 6.7.
-
-= 24.07.01 =
-- Fixed: View::tooltip() -> Typos "dan".
-- Fixed: Filesystem::sanitize_maxsizedisk() -> Returns default if empty.
-- Added: DOCKET_CACHE_OPCVIEWER_SHOWALL constant to enable/disable listing all opcache file.
-- Added: DOCKET_CACHE_PATH_NETWORK_(n) constant, to change default cache path for multinetwork. (n) for network Id.
-
-= 23.08.02 =
-- Fixed: Tweaks::post_missed_schedule() -> Prevent post publish immediately.
-- Fixed: WP_Object_Cache() -> Add setters and getters for backwards compatibility.
-- Added: TWEAKS_SINGLESEARCHREDIRECT_DISABLED constant to disable redirection of single search results to the page.
-- Updated: Tested up to 6.4.
-
-= 23.08.01 =
-- Fixed: LimitBulkedit::bulk_editing_is_limited() -> Deprecated Constant FILTER_SANITIZE_STRING.
-- Fixed: restrict_api error notice.
-- Fixed: Outdated php warning is triggered when Disable Serve Happy Checking is enabled.
-- Updated: Tested up to 6.3.
-
-= 22.07.05 =
-- Fixed: Plugin::register_plugin_hooks() -> Undefined property: stdClass::$slug.
-- Fixed: Event::garbage_collector() -> Stale cache, invalid filter for comment_feed.
-- Fixed: Event::garbage_collector() -> Stale cache, add filter for adjacent_post, wp_get_archives and get_comment_child_ids.
-- Fixed: Tweaks::wplazyload() -> Add filter for wp_get_attachment_image_attributes.
-- Fixed: WP_Object_Cache::dc_save() -> Returns false if data type is "unknown type".
-- Added: Filesystem::is_wp_cache_group_queries() -> Match group for *-queries.
-- Added: WP_Object_Cache::maybe_expire() ->  Match group for *-queries.
-
-Thanks to Ronny from web55.se for bug report.
-
-= 22.07.04 =
-- Fixed: Advanced Post Cache -> Only visible to wp < 6.1.1 as it is already implemented in wp core (WP_Query caching).
-- Fixed: Filesystem::shutdown_cleanup() -> Avoid cleanup on shutdown if a file is empty.
-- Fixed: Plugin::register_plugin_hooks() -> Do not load the CronAgent class if cronbot is disabled.
-- Fixed: TermCount() -> Invalid usage of clean_term_cache.
-- Fixed: WP_Object_Cache::$cache_hits, WP_Object_Cache::$cache_misses -> Retain same as non persistent.
-- Fixed: Prevent performance-lab from overwriting the object cache drop-in.
-- Fixed: Becache::export_alloptions() -> Only export option with autoload 'yes' and not transient.
-- Fixed: Becache::store_cache() -> Miss match array_serialize.
-- Added:  WP_Object_Cache::$persistent_cache_hits -> Stats hits from cache file.
-- Added: Tweaks::wpquery() -> wp_allow_query_attachment_by_filename for wp > 6.0.1.
-- Added: Configuration -> Cache Options, Retain Transients in Db.
-- Added: Configuration -> Optimisations, Limit Bulk Edit Actions.
-- Added: Configuration -> Wp Tweaks, Deactivate Post Via Email.
-- Added: DOCKET_CACHE_TRANSIENTDB constant to enable retaining Transients in the database.
-- Added: DOCKET_CACHE_IGNORED_TRANSIENTDB constant. A list of cache keys that remain in the object cache instead of the db.
-- Added: DOCKET_CACHE_POSTVIAEMAIL constant to enable deactivation Post Via Email.
-- Added: DOCKET_CACHE_LIMITBULKEDIT constant to enable Limit Bulk Edit Actions.
-- Added: DOCKET_CACHE_LIMITBULKEDIT_LIMIT constant to change bulk edit limit. By default it is set as 100..
-- Changed: Advanced Post Cache, some part of the code has been moved to Tweaks::wpquery().
-- Removed: WP_Object_Cache::is_data_uptodate() -> No longer needed.
-- Updated: Symfony component -> symfony/var-exporter v5.4.21.
-
-= 22.07.03 =
-- Fixed: Tweaks::woocommerce_misc() -> Check if action_scheduler_migration_status is complete to prevent the list on the Scheduled Actions page from disappearing.
-- Fixed: Tweaks::woocommerce_widget_remove() -> The classic widget is not disabled.
-- Fixed: Plugin::get_precache_maxfile() -> Invalid constant, replace maxfile with precache_maxfile.
-- Fixed: Filesystem::sanitize_precache_maxfile() -> Set the limit to 100 by default.
-- Fixed: Becache::export() -> Invalid expiration time. Already in timestamp format not in seconds.
-- Fixed: WP_Object_Cache::dc_save() -> Serialize twice when checking object size.
-- Fixed: Configuration -> A notice is not shown when the constant is already defined.
-- Added: Configuration -> Storage Options, Check file limits in real-time and Exclude Empty Object Data.
-- Added: Configuration -> Runtime Options, Deactivate Concatenate WP-Admin Scripts and Deactivate WP Cron.
-- Added: WP-CLI command -> run:optimizedb.
-- Added: DOCKET_CACHE_MAXFILE_LIVECHECK constant to enable checking file limits in real-time.
-- Added: DOCKET_CACHE_PRECACHE_MAXKEY, DOCKET_CACHE_PRECACHE_MAXGROUP constant to limit cache keys and groups.
-- Added: DOCKET_CACHE_STALECACHE_IGNORE constant to enable excluding stale cache from being stored on disk.
-- Added: DOCKET_CACHE_EMPTYCACHE constant to enable excluding empty caches from being stored on disk.
-- Added: DOCKET_CACHE_AUTOUPDATE_TOGGLE constant, only to sync with WordPress auto_update_plugins option.
-- Added: DOCKET_CACHE_GCRON_DISABLED constant to disable garbage collector cron event.
-- Added: Filesystem::suspend_cache_write() -> Temporarily suspends new cache from being stored on disk.
-- Changed: DOCKET_CACHE_AUTOUPDATE constant can only be defined manually to force an automatic update.
-- Improved: Increase timeout limit if lower than 180 seconds.
-- Improved: Constans::maybe_define() -> Keep track of constants that have been defined in the $GLOBAL['DOCKET_CACHE_RUNTIME'] list.
-- Improved: WP_Object_Cache::maybe_expire() -> Set expiration to 1 day for key/group matches with the stale cache.
-- Improved: Event::garbage_collector() -> Improve wc_cache filtering and other possible stale caches.
-- Improved: WP_Object_Cache::dc_code() -> Use native var_export for data type objects and arrays if only have stdClass.
-- Removed: Event::watchproc() -> No longer needed.
-- Updated: DOCKET_CACHE_ADVCPOST_POSTTYPE -> Set the built-in Post Type as the default.
-- Updated: Filesystem::get_max_execution_time() -> Accept value to set time limit.
-
-Thanks to Kevin Shenk of Avunu LLC for providing access to the staging server for testing purposes.
-
-= 22.07.02 =
-- Fixed: Tweaks::cache_http_response() -> Default TTL.
-- Fixed: Tweaks::wpservehappy() -> missing array key.
-- Added: wp_cache_supports() function.
-- Changed: Tweaks::cache_http_response() -> Use transient instead of wp_cache.
-- Changed: Disable Auto update by default.
-- Changed: Disable Advanced Post Cache by default.
-- Tested up to 6.1.
-
-= 22.07.01 =
-- Fixed: Plugin:cleanuppost() -> Invalid index for trashbin.
-- Fixed: MoCache() -> Add $entries, $headers properties to avoid warning on get_translations_for_domain.
-- Updated: Symfony component -> symfony/var-exporter.
-
 
 
 Kindly refer to [changelog.txt](https://raw.githubusercontent.com/nawawi/docket-cache/master/changelog.txt) for previous changes.
