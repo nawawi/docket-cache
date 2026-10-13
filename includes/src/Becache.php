@@ -189,16 +189,7 @@ final class Becache
                 return false;
             }
 
-            if ('string' === $type) {
-                $data = nwdcx_unserialize($data);
-            } elseif ('array' === $type) {
-                $data_r = nwdcx_arraymap('nwdcx_unserialize', $data);
-
-                if (!empty($data_r)) {
-                    $data = $data_r;
-                }
-                unset($data_r);
-            }
+            // Keep string values and array leaves verbatim (see cache.php dc_save).
         }
 
         $meta = [];
@@ -237,6 +228,7 @@ final class Becache
         $meta['group'] = $group;
         $meta['key'] = $cache_key;
         $meta['type'] = $final_type;
+        $meta['sv'] = 2;
         $meta['timeout'] = $timeout;
         $meta['data'] = $data;
 

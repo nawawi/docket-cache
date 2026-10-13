@@ -1141,13 +1141,20 @@ final class Tweaks
     {
         add_action('init', function () {
             add_filter('http_response', function ($response, $parsed_args, $url) {
-                if (/* 'GET' !== $parsed_args['method'] || */ $this->http_filter_bypass_url($url)) {
+                if ($this->http_filter_bypass_url($url) || !$this->http_response_cacheable($parsed_args)) {
                     return $response;
                 }
 
                 $cache_key = 'docketcache-httpresponse_'.md5($url);
 
                 if (200 !== $response['response']['code']) {
+                    delete_transient($cache_key);
+
+                    return $response;
+                }
+
+                // Don't cache (and later replay to others) a response that sets cookies.
+                if (!empty($response['cookies']) || '' !== wp_remote_retrieve_header($response, 'set-cookie')) {
                     delete_transient($cache_key);
 
                     return $response;
@@ -1185,7 +1192,7 @@ final class Tweaks
             }, \PHP_INT_MIN, 3);
 
             add_filter('pre_http_request', function ($preempt, $parsed_args, $url) {
-                if (/* 'GET' !== $parsed_args['method'] || */ $this->http_filter_bypass_url($url)) {
+                if ($this->http_filter_bypass_url($url) || !$this->http_response_cacheable($parsed_args)) {
                     return $preempt;
                 }
 
@@ -1200,6 +1207,40 @@ final class Tweaks
                 return $preempt;
             }, \PHP_INT_MIN, 3);
         }, \PHP_INT_MAX);
+    }
+
+    // URL-only cache key: only cache a plain GET with no Authorization/Cookie.
+    private function http_response_cacheable($parsed_args)
+    {
+        if (!\is_array($parsed_args)) {
+            return false;
+        }
+
+        $method = isset($parsed_args['method']) ? strtoupper($parsed_args['method']) : 'GET';
+        if ('GET' !== $method) {
+            return false;
+        }
+
+        if (!empty($parsed_args['cookies'])) {
+            return false;
+        }
+
+        if (!empty($parsed_args['headers'])) {
+            $headers = $parsed_args['headers'];
+            if (\is_array($headers)) {
+                foreach ($headers as $hkey => $hval) {
+                    $hkey = strtolower((string) $hkey);
+                    if ('authorization' === $hkey || 'cookie' === $hkey) {
+                        return false;
+                    }
+                }
+            } elseif (\is_string($headers) && @preg_match('@^\s*(authorization|cookie)\s*:@im', $headers)) {
+                // Raw header block: pre_http_request fires before WP arrays it.
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function http_filter_bypass_url($url)

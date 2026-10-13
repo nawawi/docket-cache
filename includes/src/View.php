@@ -553,7 +553,12 @@ final class View
             return;
         }
 
-        $nx = sanitize_text_field($_GET['nx']);
+        // sanitize_key restricts to [a-z0-9_-], which cannot break out of the
+        // emitted selector/JS string below.
+        $nx = sanitize_key($_GET['nx']);
+        if (empty($nx)) {
+            return;
+        }
 
         if (WpConfig::is_runtimeconst($nx) && WpConfig::is_runtimefalse()) {
             return;
@@ -571,7 +576,7 @@ final class View
         $code .= 'var mg = mx.text();';
         $code .= 'var tc = "";';
         $code .= 'if ( mx.hasClass("notice-success") ) { tc = "text-green"; } else if ( mx.hasClass("notice-alert") ) { tc = "text-red"; } else if ( mx.hasClass("notice-warning") ) { tc = "text-maroon"; }';
-        $code .= 'fx.children("td").append("<p id=\"innotice\" class=\""+tc+"\">"+mg+"</p>");';
+        $code .= 'fx.children("td").append($("<p>", {id: "innotice", "class": tc}).text(mg));';
         $code .= 'setTimeout(function() { fx.removeClass("notice-focus"); }, 3000);';
         $code .= '}';
         $code .= '}';

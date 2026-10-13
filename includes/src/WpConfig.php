@@ -340,12 +340,15 @@ final class WpConfig
                     $val = 'true';
                 } elseif ('off' === $val) {
                     $val = 'false';
-                } elseif (@preg_match('@^\d+$@', $val)) {
+                } elseif (\is_int($val) || (\is_string($val) && @preg_match('@^\d+$@', $val))) {
                     $val = (int) $val;
 
                     if ('rtpostautosave' === $k) {
                         $val = 60 * $val;
                     }
+                } else {
+                    // Not a valid value. Never emit it as raw PHP into runtime.php.
+                    continue;
                 }
 
                 $cons .= "if(!defined('".$v."')){define('".$v."', ".$val.");}else{\$GLOBALS['DOCKET_CACHE_RUNTIME']['".$ka."_FALSE']=1;}".\PHP_EOL;

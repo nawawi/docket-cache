@@ -52,7 +52,7 @@ final class CliOpcache
     const REST_ROUTE = '/opcache-invalidate';
 
     /**
-     * Secret lookup key used with Canopt::lookup_set/get.
+     * Canopt part-file name that stores the shared secret.
      *
      * @var string
      */
@@ -346,16 +346,29 @@ final class CliOpcache
      */
     public function get_or_create_secret()
     {
-        $secret = $this->pt->co()->lookup_get(self::SECRET_KEY);
-        if (!empty($secret) && \is_string($secret) && 64 === \strlen($secret)) {
+        $secret = self::secret_from_part($this->pt->co());
+        if ('' !== $secret) {
             return $secret;
         }
 
-        // Generate a new 256-bit secret.
+        // Store in a PHP-return part file, not a web-servable lock/*.txt.
         $secret = bin2hex(random_bytes(32));
-        $this->pt->co()->lookup_set(self::SECRET_KEY, $secret);
+        $this->pt->co()->save_part(['secret' => $secret], self::SECRET_KEY);
 
         return $secret;
+    }
+
+    /**
+     * Read the secret from the Canopt part file ('' when absent/invalid).
+     */
+    private static function secret_from_part($co)
+    {
+        $data = $co->get_part(self::SECRET_KEY);
+        if (!empty($data['secret']) && \is_string($data['secret']) && 64 === \strlen($data['secret'])) {
+            return $data['secret'];
+        }
+
+        return '';
     }
 
     /**
@@ -365,6 +378,6 @@ final class CliOpcache
      */
     private static function read_secret()
     {
-        return (string) Canopt::init()->lookup_get(self::SECRET_KEY);
+        return self::secret_from_part(Canopt::init());
     }
 }

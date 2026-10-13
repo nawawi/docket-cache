@@ -220,6 +220,19 @@ final class CronAgent
         return true;
     }
 
+    // Recursively remove $key from a response tree, whatever its nesting.
+    private function strip_key(array $data, $key)
+    {
+        unset($data[$key]);
+        foreach ($data as $k => $v) {
+            if (\is_array($v)) {
+                $data[$k] = $this->strip_key($v, $key);
+            }
+        }
+
+        return $data;
+    }
+
     private function close_ping($response)
     {
         if (!\is_array($response)) {
@@ -242,6 +255,9 @@ final class CronAgent
 
         $output['selfcheck'] = time() + 5400; // 90min
         $this->pt->co()->save_part($output, 'pings');
+
+        // Don't return captured cron-hook output to the caller. Keep it in 'pings' only.
+        $response = $this->strip_key($response, 'wpcron_output');
 
         $this->pt->json_header();
         $this->pt->close_exit(json_encode($response, \JSON_UNESCAPED_SLASHES));

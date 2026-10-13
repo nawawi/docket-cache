@@ -722,8 +722,19 @@ final class Plugin extends Bepart
     {
         if (!empty($_GET['idxv'])) {
             $fx = sanitize_text_field($_GET['idxv']);
+
+            // Only a bare cache-file index is valid. Reject path traversal.
+            if (!preg_match('@^[a-z0-9]{12}\-[a-z0-9]{12}$@', $fx)) {
+                return true;
+            }
+
             $file = $this->cache_path.$fx.'.php';
-            if (@is_file($file)) {
+            if ($this->cf()->is_dctrue('CHUNKCACHEDIR')) {
+                $part = explode('-', $fx);
+                $file = $this->cache_path.$this->get_chunk_path($part[0], $part[1]).$fx.'.php';
+            }
+
+            if (@is_file($file) && $this->is_docketcachefile($file)) {
                 $this->co()->clear_part('cachestats');
 
                 return $this->unlink($file, true);

@@ -2,14 +2,14 @@
 # This file is distributed under the MIT.
 msgid ""
 msgstr ""
-"Project-Id-Version: Docket Cache 26.04.09\n"
+"Project-Id-Version: Docket Cache 26.04.10\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/docket-cache\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-13T15:36:17+00:00\n"
+"POT-Creation-Date: 2026-10-13T19:08:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: docket-cache\n"
@@ -99,7 +99,7 @@ msgid "Run Garbage Collector"
 msgstr ""
 
 #: includes/admin/config.php:18
-#: includes/src/Plugin.php:1591
+#: includes/src/Plugin.php:1602
 #: includes/src/View.php:320
 msgid "Configuration"
 msgstr ""
@@ -244,15 +244,15 @@ msgstr ""
 
 #: includes/admin/cronbot.php:20
 #: includes/src/Plugin.php:170
-#: includes/src/Plugin.php:1812
-#: includes/src/Plugin.php:1813
-#: includes/src/Plugin.php:1820
-#: includes/src/Plugin.php:1822
+#: includes/src/Plugin.php:1823
+#: includes/src/Plugin.php:1824
+#: includes/src/Plugin.php:1831
+#: includes/src/Plugin.php:1833
 msgid "Not Available"
 msgstr ""
 
 #: includes/admin/cronbot.php:32
-#: includes/src/Plugin.php:1554
+#: includes/src/Plugin.php:1565
 #: includes/src/View.php:307
 msgid "Cronbot"
 msgstr ""
@@ -324,7 +324,7 @@ msgstr ""
 
 #: includes/admin/log.php:21
 #: includes/src/Canopt.php:165
-#: includes/src/Plugin.php:1580
+#: includes/src/Plugin.php:1591
 #: includes/src/View.php:317
 msgid "Cache Log"
 msgstr ""
@@ -583,8 +583,8 @@ msgid "Web Proxy"
 msgstr ""
 
 #: includes/admin/overview.php:35
-#: includes/src/Plugin.php:1543
-#: includes/src/Plugin.php:1882
+#: includes/src/Plugin.php:1554
+#: includes/src/Plugin.php:1893
 #: includes/src/View.php:304
 msgid "Overview"
 msgstr ""
@@ -673,7 +673,7 @@ msgstr ""
 #: includes/admin/overview.php:167
 #: includes/src/Canopt.php:210
 #: includes/src/Command.php:575
-#: includes/src/ReqAction.php:875
+#: includes/src/ReqAction.php:880
 msgid "Cache Disk Limit"
 msgstr ""
 
@@ -853,7 +853,7 @@ msgstr ""
 msgid "Fund Docket Cache one-off or recurring payment to support our open-source development efforts."
 msgstr ""
 
-#: includes/admin/wrap.php:49
+#: includes/admin/wrap.php:48
 msgid "Please wait.."
 msgstr ""
 
@@ -1062,7 +1062,7 @@ msgid "Post Revisions"
 msgstr ""
 
 #: includes/src/Canopt.php:221
-#: includes/src/ReqAction.php:939
+#: includes/src/ReqAction.php:944
 msgid "Trash Bin"
 msgstr ""
 
@@ -1123,12 +1123,12 @@ msgid "An unknown object cache Drop-In was found. To use Docket object cache, ru
 msgstr ""
 
 #: includes/src/Command.php:149
-#: includes/src/ReqAction.php:628
+#: includes/src/ReqAction.php:635
 msgid "Object cache enabled."
 msgstr ""
 
 #: includes/src/Command.php:152
-#: includes/src/ReqAction.php:632
+#: includes/src/ReqAction.php:638
 msgid "Object cache could not be enabled."
 msgstr ""
 
@@ -1141,22 +1141,22 @@ msgid "An unknown object cache Drop-In was found. To use Docket run: wp cache dr
 msgstr ""
 
 #: includes/src/Command.php:178
-#: includes/src/ReqAction.php:635
+#: includes/src/ReqAction.php:641
 msgid "Object cache disabled."
 msgstr ""
 
 #: includes/src/Command.php:181
-#: includes/src/ReqAction.php:639
+#: includes/src/ReqAction.php:644
 msgid "Object cache could not be disabled."
 msgstr ""
 
 #: includes/src/Command.php:200
-#: includes/src/ReqAction.php:716
+#: includes/src/ReqAction.php:721
 msgid "Updated object cache Drop-In and enabled Docket object cache."
 msgstr ""
 
 #: includes/src/Command.php:202
-#: includes/src/ReqAction.php:719
+#: includes/src/ReqAction.php:724
 msgid "Object cache Drop-In could not be updated."
 msgstr ""
 
@@ -1166,13 +1166,13 @@ msgstr ""
 
 #. translators: %d = seconds
 #: includes/src/Command.php:231
-#: includes/src/ReqAction.php:660
-#: includes/src/ReqAction.php:699
+#: includes/src/ReqAction.php:665
+#: includes/src/ReqAction.php:704
 msgid "Process aborted. The object cache is not fully flushed. The maximum execution time of %d seconds was exceeded."
 msgstr ""
 
 #: includes/src/Command.php:235
-#: includes/src/ReqAction.php:686
+#: includes/src/ReqAction.php:691
 msgid "The cache is empty, no cache needs to be flushed."
 msgstr ""
 
@@ -1214,12 +1214,12 @@ msgid "Updating wp-config.php file successful"
 msgstr ""
 
 #: includes/src/Command.php:328
-#: includes/src/ReqAction.php:913
+#: includes/src/ReqAction.php:918
 msgid "Failed to update wp-config.php file."
 msgstr ""
 
 #: includes/src/Command.php:345
-#: includes/src/ReqAction.php:1011
+#: includes/src/ReqAction.php:1016
 msgid "Object Precache could not be flushed. Docket Cache object-cache.php Drop-in is inactive."
 msgstr ""
 
@@ -1246,7 +1246,7 @@ msgid "The transient was flushed. Total cache flushed: %d"
 msgstr ""
 
 #: includes/src/Command.php:399
-#: includes/src/ReqAction.php:1029
+#: includes/src/ReqAction.php:1034
 msgid "Advanced Post Cache could not be flushed. Docket Cache object-cache.php Drop-in is inactive."
 msgstr ""
 
@@ -1322,62 +1322,62 @@ msgid "Executing the garbage collector. Please wait.."
 msgstr ""
 
 #: includes/src/Command.php:568
-#: includes/src/ReqAction.php:906
+#: includes/src/ReqAction.php:911
 msgid "Process locked. The garbage collector is in process. Try again in a few seconds."
 msgstr ""
 
 #: includes/src/Command.php:573
-#: includes/src/ReqAction.php:873
+#: includes/src/ReqAction.php:878
 msgid "Cache MaxTTL"
 msgstr ""
 
 #: includes/src/Command.php:574
-#: includes/src/ReqAction.php:874
+#: includes/src/ReqAction.php:879
 msgid "Cache File Limit"
 msgstr ""
 
 #: includes/src/Command.php:577
-#: includes/src/ReqAction.php:876
+#: includes/src/ReqAction.php:881
 msgid "Cleanup Cache MaxTTL"
 msgstr ""
 
 #: includes/src/Command.php:578
-#: includes/src/ReqAction.php:877
+#: includes/src/ReqAction.php:882
 msgid "Cleanup Cache File Limit"
 msgstr ""
 
 #: includes/src/Command.php:579
-#: includes/src/ReqAction.php:878
+#: includes/src/ReqAction.php:883
 msgid "Cleanup Cache Disk Limit"
 msgstr ""
 
 #: includes/src/Command.php:582
-#: includes/src/ReqAction.php:881
+#: includes/src/ReqAction.php:886
 msgid "Cleanup Cache Expire"
 msgstr ""
 
 #: includes/src/Command.php:586
-#: includes/src/ReqAction.php:885
+#: includes/src/ReqAction.php:890
 msgid "Cleanup Precache Limit"
 msgstr ""
 
 #: includes/src/Command.php:590
-#: includes/src/ReqAction.php:889
+#: includes/src/ReqAction.php:894
 msgid "Cleanup Stale Cache"
 msgstr ""
 
 #: includes/src/Command.php:594
-#: includes/src/ReqAction.php:892
+#: includes/src/ReqAction.php:897
 msgid "Total Cache Cleanup"
 msgstr ""
 
 #: includes/src/Command.php:595
-#: includes/src/ReqAction.php:893
+#: includes/src/ReqAction.php:898
 msgid "Total Cache Ignored"
 msgstr ""
 
 #: includes/src/Command.php:596
-#: includes/src/ReqAction.php:894
+#: includes/src/ReqAction.php:899
 msgid "Total Cache File"
 msgstr ""
 
@@ -1385,28 +1385,28 @@ msgstr ""
 msgid "Executing the garbage collector completed."
 msgstr ""
 
-#: includes/src/CronAgent.php:258
+#: includes/src/CronAgent.php:274
 msgid "Already running wp-cron"
 msgstr ""
 
-#: includes/src/CronAgent.php:287
+#: includes/src/CronAgent.php:303
 msgid "Invalid request for single event"
 msgstr ""
 
 #. translators: %s: Event Hook.
-#: includes/src/CronAgent.php:299
+#: includes/src/CronAgent.php:315
 msgid "Event hook not found %s"
 msgstr ""
 
-#: includes/src/CronAgent.php:313
+#: includes/src/CronAgent.php:329
 msgid "No scheduled event ready to run"
 msgstr ""
 
-#: includes/src/CronAgent.php:323
+#: includes/src/CronAgent.php:339
 msgid "Another cron process is currently running wp-cron.php"
 msgstr ""
 
-#: includes/src/CronAgent.php:507
+#: includes/src/CronAgent.php:523
 msgid "Already received. Try again in a few minutes"
 msgstr ""
 
@@ -1505,25 +1505,25 @@ msgstr ""
 msgid "Run Now"
 msgstr ""
 
-#: includes/src/EventList.php:364
-#: includes/src/EventList.php:384
+#: includes/src/EventList.php:360
+#: includes/src/EventList.php:380
 msgid "None"
 msgstr ""
 
 #. translators: %s: Time period, for example "8 minutes"
-#: includes/src/EventList.php:404
+#: includes/src/EventList.php:400
 msgid "%s ago"
 msgstr ""
 
-#: includes/src/EventList.php:434
+#: includes/src/EventList.php:430
 msgid "Non-repeating"
 msgstr ""
 
-#: includes/src/EventList.php:440
+#: includes/src/EventList.php:436
 msgid "There are currently no scheduled cron events."
 msgstr ""
 
-#: includes/src/EventList.php:442
+#: includes/src/EventList.php:438
 msgid "No matching cron events."
 msgstr ""
 
@@ -1618,317 +1618,317 @@ msgid_plural "of %s Networks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/src/Plugin.php:927
+#: includes/src/Plugin.php:938
 msgid "Docket Cache plugin requires PHP 7.2.5 or greater."
 msgstr ""
 
-#: includes/src/Plugin.php:1213
-#: includes/src/Plugin.php:1239
+#: includes/src/Plugin.php:1224
+#: includes/src/Plugin.php:1250
 msgid "The log is empty. No data is available."
 msgstr ""
 
-#: includes/src/Plugin.php:1566
+#: includes/src/Plugin.php:1577
 #: includes/src/View.php:311
 msgid "OPcache"
 msgstr ""
 
 #. translators: %s: url
-#: includes/src/Plugin.php:1676
+#: includes/src/Plugin.php:1687
 msgid "The object-cache.php Drop-In is outdated. Please click <strong>Re-Install</strong> to update it now. <br><br><a href=\"%s\" style=\"min-width:100px;text-align:center;font-wight:bold;\" class=\"button button-primary\">Re-Install</a>"
 msgstr ""
 
 #. translators: %1$s: url install, %2$s = url dismiss
-#: includes/src/Plugin.php:1680
+#: includes/src/Plugin.php:1691
 msgid "An unknown object-cache.php Drop-In was found. Please click <strong>Install</strong> to use <strong>Docket Cache</strong>. <br><br><a href=\"%1$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-primary button-small\">Install</a>&nbsp;<a href=\"%2$s\" style=\"min-width:100px;text-align:center;font-weight:bold;\" class=\"button button-secondary button-small\">Dismiss</a>"
 msgstr ""
 
-#: includes/src/Plugin.php:1685
+#: includes/src/Plugin.php:1696
 msgid "The Object Cache feature has been disabled at runtime."
 msgstr ""
 
 #. translators: %s: version
-#: includes/src/Plugin.php:1853
-#: includes/src/Plugin.php:1868
+#: includes/src/Plugin.php:1864
+#: includes/src/Plugin.php:1879
 msgid "Version %s"
 msgstr ""
 
-#: includes/src/Plugin.php:1883
+#: includes/src/Plugin.php:1894
 msgid "Configure"
 msgstr ""
 
-#: includes/src/Plugin.php:1895
+#: includes/src/Plugin.php:1906
 msgid "Docs"
 msgstr ""
 
-#: includes/src/Plugin.php:1896
+#: includes/src/Plugin.php:1907
 msgid "Sponsor"
 msgstr ""
 
-#: includes/src/ReqAction.php:598
+#: includes/src/ReqAction.php:605
 msgid "Option"
 msgstr ""
 
-#: includes/src/ReqAction.php:645
+#: includes/src/ReqAction.php:650
 msgid "Object cache is being flushed in the background. Please refresh the page shortly."
 msgstr ""
 
-#: includes/src/ReqAction.php:662
-#: includes/src/ReqAction.php:681
-#: includes/src/ReqAction.php:701
-#: includes/src/ReqAction.php:967
-#: includes/src/ReqAction.php:985
-#: includes/src/ReqAction.php:1003
-#: includes/src/ReqAction.php:1021
-#: includes/src/ReqAction.php:1039
+#: includes/src/ReqAction.php:667
+#: includes/src/ReqAction.php:686
+#: includes/src/ReqAction.php:706
+#: includes/src/ReqAction.php:972
+#: includes/src/ReqAction.php:990
+#: includes/src/ReqAction.php:1008
+#: includes/src/ReqAction.php:1026
+#: includes/src/ReqAction.php:1044
 msgid "Total cache flushed"
 msgstr ""
 
-#: includes/src/ReqAction.php:663
-#: includes/src/ReqAction.php:702
+#: includes/src/ReqAction.php:668
+#: includes/src/ReqAction.php:707
 msgid "Alternatively, you may try to flush the cache by doing:"
 msgstr ""
 
-#: includes/src/ReqAction.php:664
-#: includes/src/ReqAction.php:703
+#: includes/src/ReqAction.php:669
+#: includes/src/ReqAction.php:708
 msgid "Hit the \"Disable Object Cache\" button."
 msgstr ""
 
-#: includes/src/ReqAction.php:665
-#: includes/src/ReqAction.php:704
+#: includes/src/ReqAction.php:670
+#: includes/src/ReqAction.php:709
 msgid "Hit the \"Flush Object Cache\" button repeatedly until fully flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:666
-#: includes/src/ReqAction.php:705
+#: includes/src/ReqAction.php:671
+#: includes/src/ReqAction.php:710
 msgid "Or run the WP-CLI command \"wp cache flush\"."
 msgstr ""
 
 #. translators: %s = cache path
-#: includes/src/ReqAction.php:669
-#: includes/src/ReqAction.php:708
+#: includes/src/ReqAction.php:674
+#: includes/src/ReqAction.php:713
 msgid "Or manually remove the cache directory: %s"
 msgstr ""
 
-#: includes/src/ReqAction.php:679
+#: includes/src/ReqAction.php:684
 msgid "Object cache was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:722
+#: includes/src/ReqAction.php:727
 msgid "Cache log was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:725
+#: includes/src/ReqAction.php:730
 msgid "Cache log could not be flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:728
+#: includes/src/ReqAction.php:733
 msgid "Cache file was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:731
+#: includes/src/ReqAction.php:736
 msgid "Cache file could not be flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:734
+#: includes/src/ReqAction.php:739
 msgid "OPcache was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:737
+#: includes/src/ReqAction.php:742
 msgid "OPcache could not be flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:740
+#: includes/src/ReqAction.php:745
 msgid "OPcache already flushed. Try again in a few seconds."
 msgstr ""
 
-#: includes/src/ReqAction.php:743
+#: includes/src/ReqAction.php:748
 msgid "OPcache could not be flushed, opcache_reset function disabled in PHP configuration."
 msgstr ""
 
-#: includes/src/ReqAction.php:746
+#: includes/src/ReqAction.php:751
 msgid "Process locked. Flushing OPcache is in process. Try again in a few seconds."
 msgstr ""
 
-#: includes/src/ReqAction.php:749
+#: includes/src/ReqAction.php:754
 msgid "Cronbot connected."
 msgstr ""
 
 #. translators: %s = error message
-#: includes/src/ReqAction.php:755
+#: includes/src/ReqAction.php:760
 msgid "Cronbot failed to connect%s"
 msgstr ""
 
-#: includes/src/ReqAction.php:759
+#: includes/src/ReqAction.php:764
 msgid "Cronbot disconnected."
 msgstr ""
 
-#: includes/src/ReqAction.php:762
+#: includes/src/ReqAction.php:767
 msgid "Cronbot failed to disconnect."
 msgstr ""
 
 #. translators: %1$s: cronbot endpoint, %2$s = error message
-#: includes/src/ReqAction.php:771
+#: includes/src/ReqAction.php:776
 msgid "Pong from %1$s: %2$s."
 msgstr ""
 
 #. translators: %s: cronbot endpoint
-#: includes/src/ReqAction.php:774
+#: includes/src/ReqAction.php:779
 msgid "Pong from %s : connected."
 msgstr ""
 
-#: includes/src/ReqAction.php:778
+#: includes/src/ReqAction.php:783
 msgid "Running cron successful."
 msgstr ""
 
 #. translators: %s = event hook
-#: includes/src/ReqAction.php:796
+#: includes/src/ReqAction.php:801
 msgid "Executed the %s event successful"
 msgstr ""
 
 #. translators: %d = cron event
-#: includes/src/ReqAction.php:799
+#: includes/src/ReqAction.php:804
 msgid "Executed a total of %d cron events"
 msgstr ""
 
-#: includes/src/ReqAction.php:808
+#: includes/src/ReqAction.php:813
 msgid "Failed to run cron."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:815
+#: includes/src/ReqAction.php:820
 msgid "%s. Enabled."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:819
+#: includes/src/ReqAction.php:824
 msgid "%s. Disabled."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:833
-#: includes/src/ReqAction.php:846
+#: includes/src/ReqAction.php:838
+#: includes/src/ReqAction.php:851
 msgid "%s resets to default."
 msgstr ""
 
 #. translators: %1$s = option name, %2$s = option_value
-#: includes/src/ReqAction.php:836
+#: includes/src/ReqAction.php:841
 msgid "%1$s set to %2$s."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:841
+#: includes/src/ReqAction.php:846
 msgid "%s updated."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:850
+#: includes/src/ReqAction.php:855
 msgid "Failed to update option %s."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:854
+#: includes/src/ReqAction.php:859
 msgid "%s constant already defined or exists in wp-config.php file. This update has no effects."
 msgstr ""
 
-#: includes/src/ReqAction.php:857
+#: includes/src/ReqAction.php:862
 msgid "The physical robots.txt file exists. This update only works with the WordPress robots.txt virtual file."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/ReqAction.php:861
+#: includes/src/ReqAction.php:866
 msgid "%s requires runtime code to be installed. This update has no effects."
 msgstr ""
 
-#: includes/src/ReqAction.php:864
+#: includes/src/ReqAction.php:869
 msgid "Failed to execute the action request. Please try again."
 msgstr ""
 
-#: includes/src/ReqAction.php:867
+#: includes/src/ReqAction.php:872
 msgid "Executing the garbage collector successful"
 msgstr ""
 
-#: includes/src/ReqAction.php:902
+#: includes/src/ReqAction.php:907
 msgid "Failed to run the garbage collector."
 msgstr ""
 
-#: includes/src/ReqAction.php:910
+#: includes/src/ReqAction.php:915
 msgid "Updating wp-config.php file successful."
 msgstr ""
 
-#: includes/src/ReqAction.php:916
+#: includes/src/ReqAction.php:921
 msgid "Reset all configuration successful."
 msgstr ""
 
-#: includes/src/ReqAction.php:919
+#: includes/src/ReqAction.php:924
 msgid "Failed to reset configuration."
 msgstr ""
 
-#: includes/src/ReqAction.php:922
+#: includes/src/ReqAction.php:927
 msgid "Failed to export configuration."
 msgstr ""
 
-#: includes/src/ReqAction.php:925
+#: includes/src/ReqAction.php:930
 msgid "Import configuration successful."
 msgstr ""
 
-#: includes/src/ReqAction.php:928
+#: includes/src/ReqAction.php:933
 msgid "Failed to import configuration."
 msgstr ""
 
-#: includes/src/ReqAction.php:931
+#: includes/src/ReqAction.php:936
 msgid "Cleanup Post successful"
 msgstr ""
 
-#: includes/src/ReqAction.php:937
+#: includes/src/ReqAction.php:942
 msgid "Revisions"
 msgstr ""
 
-#: includes/src/ReqAction.php:938
+#: includes/src/ReqAction.php:943
 msgid "Auto Drafts"
 msgstr ""
 
 #. translators: %d = sites
-#: includes/src/ReqAction.php:944
+#: includes/src/ReqAction.php:949
 msgid "For %d sites"
 msgstr ""
 
-#: includes/src/ReqAction.php:954
+#: includes/src/ReqAction.php:959
 msgid "Failed to cleanup Post."
 msgstr ""
 
-#: includes/src/ReqAction.php:957
+#: includes/src/ReqAction.php:962
 msgid "Post already cleanup. Try again in a few seconds."
 msgstr ""
 
-#: includes/src/ReqAction.php:960
+#: includes/src/ReqAction.php:965
 msgid "Menu cache was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:975
+#: includes/src/ReqAction.php:980
 msgid "Menu cache could not be flushed. Docket Cache object-cache.php Drop-in is inactive."
 msgstr ""
 
-#: includes/src/ReqAction.php:978
+#: includes/src/ReqAction.php:983
 msgid "Translation cache was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:993
+#: includes/src/ReqAction.php:998
 msgid "Translation cache could not be flushed. Docket Cache object-cache.php Drop-in is inactive."
 msgstr ""
 
-#: includes/src/ReqAction.php:996
+#: includes/src/ReqAction.php:1001
 msgid "Object Precache was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:1014
+#: includes/src/ReqAction.php:1019
 msgid "Advanced Post Cache was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:1032
+#: includes/src/ReqAction.php:1037
 msgid "Transient cache was flushed."
 msgstr ""
 
-#: includes/src/ReqAction.php:1047
+#: includes/src/ReqAction.php:1052
 msgid "Transient cache could not be flushed. Docket Cache object-cache.php Drop-in is inactive."
 msgstr ""
 
@@ -1973,313 +1973,313 @@ msgstr ""
 msgid "Un-Install"
 msgstr ""
 
-#: includes/src/View.php:588
+#: includes/src/View.php:593
 msgid "The Cronbot is an external service that pings your website every hour to keep WordPress Cron running actively."
 msgstr ""
 
-#: includes/src/View.php:589
+#: includes/src/View.php:594
 msgid "The cache log intends to provide information on how the cache works. For performance and security concerns, disable it if no longer needed."
 msgstr ""
 
-#: includes/src/View.php:590
+#: includes/src/View.php:595
 msgid "OPcache Viewer allows you to view OPcache status and usage."
 msgstr ""
 
-#: includes/src/View.php:591
+#: includes/src/View.php:596
 msgid "Cache the WordPress dynamic navigation menu."
 msgstr ""
 
-#: includes/src/View.php:592
+#: includes/src/View.php:597
 msgid "Increase cache performance by early loading cached objects based on the current URL."
 msgstr ""
 
-#: includes/src/View.php:593
+#: includes/src/View.php:598
 msgid "Improve the performance of the WordPress Translation function."
 msgstr ""
 
-#: includes/src/View.php:594
+#: includes/src/View.php:599
 msgid "Docket Cache will attempt to optimize WordPress core query when this option enabled."
 msgstr ""
 
-#: includes/src/View.php:595
+#: includes/src/View.php:600
 msgid "Enable this option to disable Bulk Edit Actions when reaching the listed item limit. By default, the bulk edit limit is set to 100."
 msgstr ""
 
-#: includes/src/View.php:596
+#: includes/src/View.php:601
 msgid "Improve the performance of Word Term Count Update."
 msgstr ""
 
-#: includes/src/View.php:597
+#: includes/src/View.php:602
 msgid "Docket Cache will optimize WordPress database tables using SQL optimizing syntax at scheduled times."
 msgstr ""
 
-#: includes/src/View.php:598
+#: includes/src/View.php:603
 msgid "Reduce the size of Options Autoload by excluding non-WordPress Option from autoloading."
 msgstr ""
 
-#: includes/src/View.php:599
+#: includes/src/View.php:604
 msgid "Fix the WordPress Missed Schedule Error after scheduling a future blog post."
 msgstr ""
 
-#: includes/src/View.php:600
+#: includes/src/View.php:605
 msgid "Miscellaneous WordPress Tweaks. Including performance, security and user experience."
 msgstr ""
 
-#: includes/src/View.php:601
+#: includes/src/View.php:606
 msgid "Miscellaneous WooCommerce Tweaks. Including performance, security and user experience."
 msgstr ""
 
-#: includes/src/View.php:602
+#: includes/src/View.php:607
 msgid "WooCommerce Admin or Analytics page is a new JavaScript-driven interface for managing stores. Enable this option to turn off any feature-related."
 msgstr ""
 
-#: includes/src/View.php:603
+#: includes/src/View.php:608
 msgid "Deactivate WooCommerce Classic Widget feature."
 msgstr ""
 
-#: includes/src/View.php:604
+#: includes/src/View.php:609
 msgid "Remove the WooCommerce meta box in the WordPress Dashboard."
 msgstr ""
 
-#: includes/src/View.php:605
+#: includes/src/View.php:610
 msgid "Remove the WooCommerce Cart Fragments."
 msgstr ""
 
-#: includes/src/View.php:606
+#: includes/src/View.php:611
 msgid "Remove WooCommerce Extensions page that includes My Subscriptions page."
 msgstr ""
 
-#: includes/src/View.php:607
+#: includes/src/View.php:612
 msgid "This option will add rules to robots.txt to prevent robots from crawling add-to-cart links."
 msgstr ""
 
-#: includes/src/View.php:608
+#: includes/src/View.php:613
 msgid "Deactivate the WordPress XML-RPC and Pingbacks related features."
 msgstr ""
 
-#: includes/src/View.php:609
+#: includes/src/View.php:614
 msgid "Remove WordPress features related to HTML header such as meta generators and feed links to reduce the page size."
 msgstr ""
 
-#: includes/src/View.php:610
+#: includes/src/View.php:615
 msgid "Deactivate the WordPress Emoji feature."
 msgstr ""
 
-#: includes/src/View.php:611
+#: includes/src/View.php:616
 msgid "Deactivate the WordPress Feed feature."
 msgstr ""
 
-#: includes/src/View.php:612
+#: includes/src/View.php:617
 msgid "Deactivate the WordPress Embed feature."
 msgstr ""
 
-#: includes/src/View.php:613
+#: includes/src/View.php:618
 msgid "Deactivate the WordPress Lazy Load feature."
 msgstr ""
 
-#: includes/src/View.php:614
+#: includes/src/View.php:619
 msgid "Deactivate the WordPress Auto-generate Sitemap feature."
 msgstr ""
 
-#: includes/src/View.php:615
+#: includes/src/View.php:620
 msgid "Deactivate the WordPress Application Passwords feature."
 msgstr ""
 
-#: includes/src/View.php:616
+#: includes/src/View.php:621
 msgid "Deactivate the WordPress Events & News feed in Dashboard."
 msgstr ""
 
-#: includes/src/View.php:617
+#: includes/src/View.php:622
 msgid "Enable this option to turn off Browse Happy HTTP API requests, which checks whether the user needs a browser update."
 msgstr ""
 
-#: includes/src/View.php:618
+#: includes/src/View.php:623
 msgid "Enable this option to turn off the Serve Happy HTTP API request, which checks whether the user needs to update PHP."
 msgstr ""
 
-#: includes/src/View.php:619
+#: includes/src/View.php:624
 msgid "Enable this option to disable the post-via-email functionality."
 msgstr ""
 
-#: includes/src/View.php:620
+#: includes/src/View.php:625
 msgid "Preload Object Cache by fetching administrator-related pages."
 msgstr ""
 
-#: includes/src/View.php:621
+#: includes/src/View.php:626
 msgid "Display page loader when loading administrator pages."
 msgstr ""
 
-#: includes/src/View.php:622
+#: includes/src/View.php:627
 msgid "Display Object Cache stats at Overview page."
 msgstr ""
 
-#: includes/src/View.php:623
+#: includes/src/View.php:628
 msgid "Enable the Garbage Collector action button on the Overview page."
 msgstr ""
 
-#: includes/src/View.php:624
+#: includes/src/View.php:629
 msgid "Enable the additional Flush Cache action button on the Configuration page."
 msgstr ""
 
-#: includes/src/View.php:625
+#: includes/src/View.php:630
 msgid "Enable the Export/Import settings action button on the Configuration page."
 msgstr ""
 
-#: includes/src/View.php:626
+#: includes/src/View.php:631
 msgid "Enable automatic plugin updates for Docket Cache."
 msgstr ""
 
-#: includes/src/View.php:627
+#: includes/src/View.php:632
 msgid "Flush Object Cache when deactivate / uninstall."
 msgstr ""
 
-#: includes/src/View.php:628
+#: includes/src/View.php:633
 msgid "Flush OPcache when deactivate / uninstall."
 msgstr ""
 
-#: includes/src/View.php:629
+#: includes/src/View.php:634
 msgid "Notify the web-server OPcache to invalidate cache files after WP-CLI cache operations. Disable this if WP-CLI runs frequently and the HTTP callbacks are undesirable."
 msgstr ""
 
-#: includes/src/View.php:630
+#: includes/src/View.php:635
 msgid "Maximum size of the cache storage on disk. The garbage collector will remove the cache file to free up storage space."
 msgstr ""
 
-#: includes/src/View.php:631
+#: includes/src/View.php:636
 msgid "The maximum cache file can be stored on a disk. The cache file will free up by the garbage collector when triggered by WP Cron."
 msgstr ""
 
-#: includes/src/View.php:632
+#: includes/src/View.php:637
 msgid "Enable this option to allow Docket Cache to monitor the cache file limit in real-time."
 msgstr ""
 
-#: includes/src/View.php:633
+#: includes/src/View.php:638
 msgid "Enable this option to chunk cache files into smaller directories to avoid an excessive number of cache files in one directory. Only enable it if you have difficulty clearing the cache manually or experience slowdowns when the cache becomes too large."
 msgstr ""
 
-#: includes/src/View.php:634
+#: includes/src/View.php:639
 msgid "Enable this option to allow GC immediately remove the stale cache abandoned by WordPress, WooCommerce and others after doing cache invalidation."
 msgstr ""
 
-#: includes/src/View.php:635
+#: includes/src/View.php:640
 msgid "Enable this option to exclude stale cache created by WordPress, WooCommerce, and others from being stored on disk. Only enable it if you have an issue with inode limits."
 msgstr ""
 
-#: includes/src/View.php:636
+#: includes/src/View.php:641
 msgid "Enable this option to exclude empty caches from being stored on disk. Only enable it if you have an issue with inode limits."
 msgstr ""
 
-#: includes/src/View.php:637
+#: includes/src/View.php:642
 msgid "Limit HTTP requests in WP Admin."
 msgstr ""
 
-#: includes/src/View.php:638
+#: includes/src/View.php:643
 msgid "WordPress by default converts Transients as persistent object caching when available. Enable this option to persist Transients in the Database."
 msgstr ""
 
-#: includes/src/View.php:639
+#: includes/src/View.php:644
 msgid "WordPress by default automatically saves a draft every 1 minute when editing or create a new post. Changing this behaviour can reduce the usage of server resource."
 msgstr ""
 
-#: includes/src/View.php:640
+#: includes/src/View.php:645
 msgid "Post revision is a copy of each edit made to a post or page, allowing the possibility of reverting to a previous version. However, have a revision too much can create a bad impact on database performance. Changing this behaviour can reduce the usage of server resource."
 msgstr ""
 
-#: includes/src/View.php:641
+#: includes/src/View.php:646
 msgid "This option allows you to change the number of days before WordPress permanently deletes posts, pages, attachments, and comments, from the trash bin. The default is 30 days. There is no confirmation alert when someone clicks on \"Delete Permanently\" if this option is set to \"Disable Trash Bin\"."
 msgstr ""
 
-#: includes/src/View.php:642
+#: includes/src/View.php:647
 msgid "This option will completely disable the use of plugin and theme editor. If this option enabled, no plugins or theme file can be edited."
 msgstr ""
 
-#: includes/src/View.php:643
+#: includes/src/View.php:648
 msgid "This option will block users being able to use the plugin and theme installation/update functionality from the WordPress admin area."
 msgstr ""
 
-#: includes/src/View.php:644
+#: includes/src/View.php:649
 msgid "By default, WordPress creates a new set of images every time you edit image and restore the original. It leaves all the edits on the server. Enable this option to change this behaviour."
 msgstr ""
 
-#: includes/src/View.php:645
+#: includes/src/View.php:650
 msgid "Enable this option to turn on WordPress debugging."
 msgstr ""
 
-#: includes/src/View.php:646
+#: includes/src/View.php:651
 msgid "Enable this option to print debug info."
 msgstr ""
 
-#: includes/src/View.php:647
+#: includes/src/View.php:652
 msgid "Enable this option to log debug info."
 msgstr ""
 
-#: includes/src/View.php:648
+#: includes/src/View.php:653
 msgid "This option will disable all core updates."
 msgstr ""
 
-#: includes/src/View.php:649
+#: includes/src/View.php:654
 msgid "Enable this option to disable compression and concatenation of WP-Admin Scripts and CSS."
 msgstr ""
 
-#: includes/src/View.php:650
+#: includes/src/View.php:655
 msgid "Enable this option to disable the WP pseudo-cron. Only enable it if your site is already set up with real Cron."
 msgstr ""
 
-#: includes/src/View.php:654
+#: includes/src/View.php:659
 msgid "Cache WP Queries for a post which results in faster data retrieval and reduced database workload. By default only for built-in Post Types."
 msgstr ""
 
-#: includes/src/View.php:655
+#: includes/src/View.php:660
 msgid "Allow Advanced Post Caching to cache any Post Type."
 msgstr ""
 
-#: includes/src/View.php:659
+#: includes/src/View.php:664
 msgid "By default, cURL sends the \"Expect\" header all the time which severely impacts performance. Enable this option, only send it if the body is larger than 1 MB."
 msgstr ""
 
-#: includes/src/View.php:664
+#: includes/src/View.php:669
 msgid "No info available"
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/WpConfig.php:388
+#: includes/src/WpConfig.php:391
 msgid "%s resets to WordPress default."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/WpConfig.php:396
-#: includes/src/WpConfig.php:408
-#: includes/src/WpConfig.php:420
-#: includes/src/WpConfig.php:434
+#: includes/src/WpConfig.php:399
+#: includes/src/WpConfig.php:411
+#: includes/src/WpConfig.php:423
+#: includes/src/WpConfig.php:437
 msgid "%s set to disable."
 msgstr ""
 
 #. translators: %1$s = option name, %2$s = option_value
-#: includes/src/WpConfig.php:399
+#: includes/src/WpConfig.php:402
 msgid "%1$s set to every %2$s minutes."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/WpConfig.php:402
+#: includes/src/WpConfig.php:405
 msgid "%s set to every minute."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/WpConfig.php:411
+#: includes/src/WpConfig.php:414
 msgid "%s set to no limit."
 msgstr ""
 
 #. translators: %1$s = option name, %2$s = option_value
-#: includes/src/WpConfig.php:414
+#: includes/src/WpConfig.php:417
 msgid "%1$s set limit to %2$s revisions."
 msgstr ""
 
 #. translators: %1$s = option name, %2$s = option_value
-#: includes/src/WpConfig.php:423
+#: includes/src/WpConfig.php:426
 msgid "%1$s set to empty in %2$s days."
 msgstr ""
 
 #. translators: %s = option name
-#: includes/src/WpConfig.php:437
+#: includes/src/WpConfig.php:440
 msgid "%s set to enable."
 msgstr ""

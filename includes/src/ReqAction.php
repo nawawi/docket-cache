@@ -116,12 +116,19 @@ final class ReqAction
             case 'docket-enable-occache':
                 $result = $this->pt->cx()->install(true);
                 $response = $result ? 'docket-occache-enabled' : 'docket-occache-enabled-failed';
+                if ($result) {
+                    // State change behind the nonce check, not GET-driven screen_notice().
+                    $this->pt->co()->save('objectcacheoff', 'default');
+                }
                 do_action('docketcache/action/enable/objectcache', $result);
                 break;
 
             case 'docket-disable-occache':
                 $result = $this->pt->cx()->uninstall();
                 $response = $result ? 'docket-occache-disabled' : 'docket-occache-disabled-failed';
+                if ($result) {
+                    $this->pt->co()->save('objectcacheoff', 'enable');
+                }
                 do_action('docketcache/action/disable/objectcache', $result);
                 break;
 
@@ -612,7 +619,7 @@ final class ReqAction
             if (!empty($_GET['nv'])) {
                 $nv = sanitize_text_field($_GET['nv']);
                 if (!empty($nv)) {
-                    $option_value = $nv;
+                    $option_value = esc_html($nv);
                 }
             }
 
@@ -626,14 +633,12 @@ final class ReqAction
             switch ($token) {
                 case 'docket-occache-enabled':
                     $this->pt->notice = esc_html__('Object cache enabled.', 'docket-cache');
-                    $this->pt->co()->save('objectcacheoff', 'default');
                     break;
                 case 'docket-occache-enabled-failed':
                     $this->pt->notice = esc_html__('Object cache could not be enabled.', 'docket-cache');
                     break;
                 case 'docket-occache-disabled':
                     $this->pt->notice = esc_html__('Object cache disabled.', 'docket-cache');
-                    $this->pt->co()->save('objectcacheoff', 'enable');
                     break;
                 case 'docket-occache-disabled-failed':
                     $this->pt->notice = esc_html__('Object cache could not be disabled.', 'docket-cache');

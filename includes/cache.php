@@ -1492,6 +1492,18 @@ class WP_Object_Cache
             return false;
         }
 
+        // Pre-fix entry (no sv): evict and miss so it re-caches in the new format.
+        if ((int) ($data['sv'] ?? 0) < 2) {
+            $this->fs()->unlink($file, true);
+
+            return false;
+        }
+
+        // Guard md5-prefix collisions: stored key/group must match, else miss.
+        if (isset($data['key'], $data['group']) && ($data['key'] !== $key || $data['group'] !== $group)) {
+            return false;
+        }
+
         $is_timeout = false;
         if (!empty($data['timeout']) && $this->fs()->valid_timestamp($data['timeout']) && time() >= $data['timeout']) {
             $this->dc_log('exp', $logkey, $group.':'.$key);
@@ -1518,11 +1530,9 @@ class WP_Object_Cache
             $data['data'] = false;
         }
 
-        // nwdcx_unserialize failed to convert serialize object.
-        // we unserialize it here to get the object.
         if (!empty($data['data'])) {
-            // *_serialize set at dc_save, to load it faster
-            if (false !== strpos($data['type'], '_serialize')) {
+            // array_serialize is ours to unpack. A string_serialize value is the caller's own string, returned verbatim.
+            if ('array_serialize' === $data['type']) {
                 $data['data'] = unserialize($data['data']);
             } elseif ('string' === $data['type'] && \function_exists('maybe_unserialize')) {
                 // old cache data
@@ -1665,17 +1675,7 @@ class WP_Object_Cache
                 }
             }
 
-            // Unserialize content first.
-            if ('string' === $type) {
-                $data = nwdcx_unserialize($data);
-            } elseif ('array' === $type) {
-                $data_r = nwdcx_arraymap('nwdcx_unserialize', $data);
-
-                if (!empty($data_r)) {
-                    $data = $data_r;
-                }
-                unset($data_r);
-            }
+            // Store strings and array leaves verbatim. The array_serialize branch below still handles class instances.
         }
 
         $meta = [];
@@ -1720,6 +1720,7 @@ class WP_Object_Cache
         $meta['group'] = $group;
         $meta['key'] = $cache_key;
         $meta['type'] = $final_type;
+        $meta['sv'] = 2; // on-disk format version
 
         // If 0 let gc handle it by comparing file mtime
         // and maxttl constants.

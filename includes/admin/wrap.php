@@ -16,7 +16,7 @@ settings_errors(is_multisite() && is_network_admin() ? 'general' : '');
 if (1 === $this->info->status_code && isset($this->pt->token)) {
     switch ($this->pt->token) {
         case 'docket-occache-flushed':
-            $this->pt->flush_cache();
+            // Flush already ran in run_action (nonce-gated). Here just trigger the worker.
             $this->do_preload = true;
             $this->do_flush = true;
             break;
@@ -25,7 +25,6 @@ if (1 === $this->info->status_code && isset($this->pt->token)) {
             $this->do_flush = true;
             break;
         case 'docket-log-flushed':
-            $this->pt->flush_log();
             $this->do_fetch = true;
             break;
     }

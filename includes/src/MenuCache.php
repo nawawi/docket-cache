@@ -102,8 +102,18 @@ final class MenuCache
         }
     }
 
+    // Menus can vary by role/account, so caching is only safe for logged-out visitors.
+    private function is_logged_in_visitor()
+    {
+        return \function_exists('is_user_logged_in') && is_user_logged_in();
+    }
+
     public function pre_wp_nav_menu($output, $args)
     {
+        if ($this->is_logged_in_visitor()) {
+            return $output;
+        }
+
         $this->normalize_menu_object($args);
         if (isset($args->menu->term_id)) {
             $menu_key = $this->set_key($args);
@@ -122,6 +132,10 @@ final class MenuCache
     public function wp_nav_menu($nav_menu, $args)
     {
         if (false !== strpos($nav_menu, 'no-cache')) {
+            return $nav_menu;
+        }
+
+        if ($this->is_logged_in_visitor()) {
             return $nav_menu;
         }
 

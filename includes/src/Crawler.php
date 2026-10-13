@@ -14,7 +14,7 @@ namespace Nawawi\DocketCache;
 
 final class Crawler
 {
-    private static $version = '26.04.09';
+    private static $version = '26.04.10';
     public static $send_cookie = false;
 
     private static function is_local_url($url)
@@ -52,7 +52,7 @@ final class Crawler
             ],
         ];
 
-        if (self::$send_cookie && !empty($_COOKIE) && class_exists('\\WP_Http_Cookie')) {
+        if (self::$send_cookie && self::is_local_url($url) && !empty($_COOKIE) && class_exists('\\WP_Http_Cookie')) {
             $cookies = [];
             foreach ($_COOKIE as $name => $value) {
                 $cookies[] = new \WP_Http_Cookie(

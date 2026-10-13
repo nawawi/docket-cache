@@ -349,14 +349,10 @@ class EventList extends \WP_List_Table
     public function column_eventlist_args($event)
     {
         if (!empty($event->args)) {
-            if (\count($event->args) > 1) {
-                return sprintf(
-                    '<pre>%s</pre>',
-                    esc_html($this->pretty_args($event->args))
-                );
-            }
-
-            return $event->args[0];
+            return sprintf(
+                '<pre>%s</pre>',
+                esc_html($this->pretty_args($event->args))
+            );
         }
 
         return sprintf(
@@ -373,7 +369,7 @@ class EventList extends \WP_List_Table
             $callbacks = [];
 
             foreach ($hook_callbacks as $callback) {
-                $callbacks[] = '<code>'.$callback['callback']['name'].'</code>';
+                $callbacks[] = '<code>'.esc_html($callback['callback']['name']).'</code>';
             }
 
             return implode('<br>', $callbacks);

@@ -4,7 +4,7 @@ Tags: object cache, OPcache, cache, database, performance
 Requires at least: 5.4
 Tested up to: 7.0
 Requires PHP: 7.2.5
-Stable tag: 26.04.09
+Stable tag: 26.04.10
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 Donate link: https://docketcache.com/#sponsor
@@ -180,6 +180,21 @@ You can, but if your VPS supports Redis, we recommend using Redis for better per
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 26.04.10 =
+- Fixed: WP_Object_Cache::dc_get()/dc_save() -> Return cached strings exactly as stored to prevent PHP object injection from serialized-looking values.
+- Fixed: WP_Object_Cache::dc_get() -> Verify the stored key and group before serving a cached value.
+- Fixed: CliOpcache -> Store the WP-CLI OPcache shared secret in a PHP file instead of a web-readable lock file.
+- Fixed: Plugin::flush_fcache() -> Validate the cache file index to prevent path traversal.
+- Fixed: ReqAction -> Move the Suspend Object Cache state change behind the nonce-verified action.
+- Fixed: View::code_focus() -> Build the admin notice via a text node and restrict the option key to prevent DOM-based XSS.
+- Fixed: WpConfig::write_runtime() -> Only write expected on/off/integer values into runtime.php.
+- Fixed: Crawler -> Only attach cookies to loopback requests, never to the remote Cronbot endpoint.
+- Fixed: CronAgent::close_ping() -> Exclude captured cron hook output from the ping response.
+- Fixed: EventList -> Escape cron event arguments and callback names in the Cronbot table.
+- Fixed: Tweaks -> Cache HTTP responses only for GET requests without Authorization or Cookie, and never cache a response that sets cookies.
+- Fixed: MenuCache -> Skip the shared menu cache for logged-in users.
+- Improved: WP_Object_Cache -> On-disk cache format version migrates pre-update cache files on read, without a manual flush.
+
 = 26.04.09 =
 - Added: Cronbot -> Sponsor notice when the service is connected.
 - Fixed: nwdcx_cleanuptransient() -> Use prepared statements when removing transients from the database.
