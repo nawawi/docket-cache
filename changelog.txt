@@ -1,3 +1,11 @@
+= v26.04.11 (2026-10-15) =
+- Fixed: Becache::export_transient() -> Transients were returned as serialized strings instead of their original value.
+- Fixed: Becache::export_transient() -> Transient value could be replaced by its timeout, and expired transients were cached.
+- Fixed: Becache::store_cache() -> Exported transients now keep their own expiry instead of always using the maximum TTL.
+- Fixed: WP_Object_Cache::dc_update() -> Reset the stored type when incr/decr writes a new value.
+- Improved: Becache -> Store array and stdClass transients as native PHP, other classes are unserialized on read.
+- Improved: WP_Object_Cache -> Bump on-disk cache format version to evict transient cache files written by 26.04.10.
+
 = v26.04.10 (2026-10-14) =
 - Fixed: WP_Object_Cache::dc_get()/dc_save() -> Return cached strings exactly as stored to prevent PHP object injection from serialized-looking values.
 - Fixed: WP_Object_Cache::dc_get() -> Verify the stored key and group before serving a cached value.

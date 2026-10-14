@@ -145,7 +145,7 @@ final class Becache
         return $stat;
     }
 
-    private function store_cache($key, $data, $group, $expire = 0)
+    private function store_cache($key, $data, $group, $expire = 0, $is_raw = false)
     {
         if (!$this->fs()->mkdir_p($this->cache_path)) {
             return false;
@@ -167,7 +167,8 @@ final class Becache
             $timeout = time() + 3600;
         }
 
-        $timeout = $timeout > $this->cache_maxttl ? time() + $this->cache_maxttl : $timeout;
+        // Cap remaining time to maxttl.
+        $timeout = ($timeout - time()) > $this->cache_maxttl ? time() + $this->cache_maxttl : $timeout;
         $type = \gettype($data);
         if ('NULL' === $type && null === $data) {
             $data = '';
@@ -224,11 +225,16 @@ final class Becache
             nwdcx_suppresserrors($nwdcx_suppresserrors);
         }
 
+        // Raw DB value, dc_get() unserializes it.
+        if ($is_raw && 'string_serialize' === $final_type) {
+            $final_type = 'db_serialize';
+        }
+
         $meta['site_id'] = get_current_blog_id();
         $meta['group'] = $group;
         $meta['key'] = $cache_key;
         $meta['type'] = $final_type;
-        $meta['sv'] = 2;
+        $meta['sv'] = 3;
         $meta['timeout'] = $timeout;
         $meta['data'] = $data;
 
@@ -237,6 +243,27 @@ final class Becache
         }
 
         return false;
+    }
+
+    // Unserialize array/stdClass to native. Other classes stay raw ($is_raw).
+    private function native_value($value, &$is_raw = false)
+    {
+        $is_raw = false;
+        if (!nwdcx_serialized($value)) {
+            return $value;
+        }
+
+        $data = trim($value);
+        if (!@preg_match('@[OCE]:\d+:"(?!stdClass")@', $data)) {
+            $data = @unserialize($data, ['allowed_classes' => ['stdClass']]);
+            if (false !== $data) {
+                return $data;
+            }
+        }
+
+        $is_raw = true;
+
+        return $value;
     }
 
     public function export_transient()
@@ -271,17 +298,15 @@ final class Becache
                     $collect[$key] = ['value' => '', 'group' => 'transient', 'timeout' => 0];
                 }
 
-                $collect[$key]['value'] = $row['option_value'];
                 if ('_site_' === substr($row['option_name'], 0, 6)) {
                     $collect[$key]['group'] = 'site-transient';
                 }
 
+                // Keep value and timeout apart, row order varies.
                 if (false !== strpos($row['option_name'], '_transient_timeout_')) {
                     $collect[$key]['timeout'] = (int) $row['option_value'];
-
-                    if (time() > $collect[$key]['timeout']) {
-                        unset($collect[$key]);
-                    }
+                } else {
+                    $collect[$key]['value'] = $row['option_value'];
                 }
             }
 
@@ -291,8 +316,14 @@ final class Becache
                         break;
                     }
 
+                    // No value row, or expired.
+                    if ('' === $arr['value'] || ($arr['timeout'] > 0 && time() > $arr['timeout'])) {
+                        continue;
+                    }
+
                     $timeout = isset($arr['timeout']) ? $arr['timeout'] : 0;
-                    $this->store_cache($key, $arr['value'], $arr['group'], $timeout);
+                    $value = $this->native_value($arr['value'], $is_raw);
+                    $this->store_cache($key, $value, $arr['group'], $timeout, $is_raw);
                 }
             }
         }
@@ -319,21 +350,22 @@ final class Becache
                         $collect[$key] = ['value' => '', 'group' => 'site-transient', 'timeout' => 0];
                     }
 
-                    $collect[$key]['value'] = $row['meta_value'];
-
                     if (false !== strpos($row['meta_key'], '_site_transient_timeout_')) {
                         $collect[$key]['timeout'] = (int) $row['meta_value'];
-
-                        if (time() > $collect[$key]['timeout']) {
-                            unset($collect[$key]);
-                        }
+                    } else {
+                        $collect[$key]['value'] = $row['meta_value'];
                     }
                 }
 
                 if (!empty($collect)) {
                     foreach ($collect as $key => $arr) {
+                        if ('' === $arr['value'] || ($arr['timeout'] > 0 && time() > $arr['timeout'])) {
+                            continue;
+                        }
+
                         $timeout = isset($arr['timeout']) ? $arr['timeout'] : 0;
-                        $this->store_cache($key, $arr['value'], $arr['group'], $timeout);
+                        $value = $this->native_value($arr['value'], $is_raw);
+                        $this->store_cache($key, $value, $arr['group'], $timeout, $is_raw);
                     }
                 }
             }

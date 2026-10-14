@@ -4,7 +4,7 @@ Tags: object cache, OPcache, cache, database, performance
 Requires at least: 5.4
 Tested up to: 7.0
 Requires PHP: 7.2.5
-Stable tag: 26.04.10
+Stable tag: 26.04.11
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 Donate link: https://docketcache.com/#sponsor
@@ -180,6 +180,14 @@ You can, but if your VPS supports Redis, we recommend using Redis for better per
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 26.04.11 =
+- Fixed: Becache::export_transient() -> Transients were returned as serialized strings instead of their original value.
+- Fixed: Becache::export_transient() -> Transient value could be replaced by its timeout, and expired transients were cached.
+- Fixed: Becache::store_cache() -> Exported transients now keep their own expiry instead of always using the maximum TTL.
+- Fixed: WP_Object_Cache::dc_update() -> Reset the stored type when incr/decr writes a new value.
+- Improved: Becache -> Store array and stdClass transients as native PHP, other classes are unserialized on read.
+- Improved: WP_Object_Cache -> Bump on-disk cache format version to evict transient cache files written by 26.04.10.
+
 = 26.04.10 =
 - Fixed: WP_Object_Cache::dc_get()/dc_save() -> Return cached strings exactly as stored to prevent PHP object injection from serialized-looking values.
 - Fixed: WP_Object_Cache::dc_get() -> Verify the stored key and group before serving a cached value.

@@ -375,7 +375,7 @@ class Filesystem
         // We use native var_export to improve cache writing, since VarExporter::export will use preg_replace_callback on string types and
         // ReflectionClass to resolve class instances. Cached data may look not pretty.
         try {
-            if (version_compare(\PHP_VERSION, '7.3.0', '>=') && !empty($data['type']) && \in_array($data['type'], ['object', 'array', 'string', 'string_serialize', 'array_serialize', 'integer', 'boolean'])) {
+            if (version_compare(\PHP_VERSION, '7.3.0', '>=') && !empty($data['type']) && \in_array($data['type'], ['object', 'array', 'string', 'string_serialize', 'array_serialize', 'db_serialize', 'integer', 'boolean'])) {
                 $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
                 $arr_data = @var_export($data, true);
                 nwdcx_suppresserrors($nwdcx_suppresserrors);

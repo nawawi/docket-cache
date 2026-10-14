@@ -1492,8 +1492,8 @@ class WP_Object_Cache
             return false;
         }
 
-        // Pre-fix entry (no sv): evict and miss so it re-caches in the new format.
-        if ((int) ($data['sv'] ?? 0) < 2) {
+        // Older format: evict and miss so it re-caches.
+        if ((int) ($data['sv'] ?? 0) < 3) {
             $this->fs()->unlink($file, true);
 
             return false;
@@ -1531,9 +1531,9 @@ class WP_Object_Cache
         }
 
         if (!empty($data['data'])) {
-            // array_serialize is ours to unpack. A string_serialize value is the caller's own string, returned verbatim.
-            if ('array_serialize' === $data['type']) {
-                $data['data'] = unserialize($data['data']);
+            // Unpack our own serialized types. string_serialize is returned as is.
+            if (('array_serialize' === $data['type'] || 'db_serialize' === $data['type']) && \is_string($data['data'])) {
+                $data['data'] = @unserialize($data['data']);
             } elseif ('string' === $data['type'] && \function_exists('maybe_unserialize')) {
                 // old cache data
                 $data['data'] = maybe_unserialize($data['data']);
@@ -1720,7 +1720,7 @@ class WP_Object_Cache
         $meta['group'] = $group;
         $meta['key'] = $cache_key;
         $meta['type'] = $final_type;
-        $meta['sv'] = 2; // on-disk format version
+        $meta['sv'] = 3; // on-disk format version
 
         // If 0 let gc handle it by comparing file mtime
         // and maxttl constants.
@@ -1761,6 +1761,7 @@ class WP_Object_Cache
 
         $file = $this->get_file_path($cache_key, $group);
         $meta['data'] = $data;
+        $meta['type'] = \gettype($data); // old type may not fit new data
 
         if (true === $this->dc_code($file, $meta)) {
             return true;
