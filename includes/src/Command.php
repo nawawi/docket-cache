@@ -188,7 +188,7 @@ class Command extends WP_CLI_Command
      *
      * ## EXAMPLES
      *
-     *  wp cache update
+     *  wp cache dropin:update
      *
      * @subcommand dropin:update
      */
