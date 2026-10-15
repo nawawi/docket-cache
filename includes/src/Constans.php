@@ -236,6 +236,9 @@ final class Constans
         // ignore empty cache
         $this->maybe_define($this->px('EMPTYCACHE_IGNORE'), false);
 
+        // skip writing unchanged values, OPcache only
+        $this->maybe_define($this->px('SKIP_UNCHANGED'), true);
+
         // optimize db
         $this->maybe_define($this->px('CRONOPTMZDB'), 'never');
 

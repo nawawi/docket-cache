@@ -155,6 +155,13 @@ class WP_Object_Cache
     public $precache_loaded = [];
 
     /**
+     * Content hash of cache files read in this request.
+     *
+     * @var array
+     */
+    private $dc_hash = [];
+
+    /**
      * Precache status.
      *
      * @var bool
@@ -237,6 +244,13 @@ class WP_Object_Cache
      * @var bool
      */
     private $ignore_emptycache = false;
+
+    /**
+     * Skip writing unchanged values.
+     *
+     * @var bool
+     */
+    private $skip_unchanged = false;
 
     /**
      * Store Transients in DB.
@@ -1541,6 +1555,10 @@ class WP_Object_Cache
         }
         clearstatcache();
 
+        if (isset($data['hash'])) {
+            $this->dc_hash[$group][$key] = $data['hash'];
+        }
+
         // skip precache.
         if (isset($GLOBALS['DOCKET_CACHE_CODESTUB_FALSE']) && isset($GLOBALS['DOCKET_CACHE_CODESTUB_FALSE'][$file])) {
             $codestub_false = true;
@@ -1582,6 +1600,50 @@ class WP_Object_Cache
         $this->fs()->validate_fatal_error_file($file);
 
         return $stat;
+    }
+
+    /**
+     * dc_unchanged.
+     */
+    private function dc_unchanged($file, $meta, $expire)
+    {
+        // Hash differs from the file read in this request: changed, no need to read it again.
+        if (isset($meta['hash'], $this->dc_hash[$meta['group']][$meta['key']]) && $this->dc_hash[$meta['group']][$meta['key']] !== $meta['hash']) {
+            return false;
+        }
+
+        clearstatcache(true, $file);
+        if (!@is_file($file)) {
+            return false;
+        }
+
+        $old = $this->fs()->cache_get($file);
+        if (empty($old) || !\is_array($old) || !\array_key_exists('data', $old)) {
+            return false;
+        }
+
+        foreach (['sv', 'site_id', 'group', 'key', 'type'] as $name) {
+            if (!isset($old[$name]) || $old[$name] !== $meta[$name]) {
+                return false;
+            }
+        }
+
+        // Rewrite when under 90% of the lifetime is left.
+        $old_timeout = (int) ($old['timeout'] ?? 0);
+        if (0 === $meta['timeout']) {
+            if (0 !== $old_timeout) {
+                return false;
+            }
+        } elseif ($old_timeout < $meta['timeout'] - (int) ($expire / 10)) {
+            return false;
+        }
+
+        // Serialized values: compare hashes. Scalars: compare as is.
+        if (isset($meta['hash'])) {
+            return isset($old['hash']) && $old['hash'] === $meta['hash'];
+        }
+
+        return !isset($old['hash']) && $old['data'] === $meta['data'];
     }
 
     /**
@@ -1658,10 +1720,11 @@ class WP_Object_Cache
                 $len = 0;
                 $nwdcx_suppresserrors = nwdcx_suppresserrors(true);
                 if (\function_exists('maybe_serialize')) {
-                    $len = \strlen(@maybe_serialize($data));
+                    $serialized = @maybe_serialize($data);
                 } else {
-                    $len = \strlen(@serialize($data));
+                    $serialized = @serialize($data);
                 }
+                $len = \strlen($serialized);
                 nwdcx_suppresserrors($nwdcx_suppresserrors);
 
                 if ($len >= $this->cache_maxsize) {
@@ -1726,8 +1789,28 @@ class WP_Object_Cache
         // and maxttl constants.
         $meta['timeout'] = $timeout;
 
+        // Content hash, to skip unchanged writes. xxh128 is faster, PHP 8.1+.
+        if ($this->skip_unchanged && isset($serialized)) {
+            static $algo = null;
+            if (null === $algo) {
+                $algo = \in_array('xxh128', hash_algos(), true) ? 'xxh128' : 'md5';
+            }
+            $meta['hash'] = hash($algo, $serialized);
+        }
+
         // Before code_stub.
         $meta['data'] = $data;
+
+        // Unchanged, skip write to avoid OPcache waste.
+        if ($this->skip_unchanged && $this->dc_unchanged($file, $meta, $expire)) {
+            nwdcx_debuglog(__FUNCTION__.': '.$this->get_item_hash($file).': Unchanged, skip writing.');
+
+            return true;
+        }
+
+        if (isset($meta['hash'])) {
+            $this->dc_hash[$group][$cache_key] = $meta['hash'];
+        }
 
         // Only count new file.
         clearstatcache(true, $file);
@@ -1762,6 +1845,7 @@ class WP_Object_Cache
         $file = $this->get_file_path($cache_key, $group);
         $meta['data'] = $data;
         $meta['type'] = \gettype($data); // old type may not fit new data
+        unset($meta['hash'], $this->dc_hash[$group][$cache_key]); // hash is for the old data
 
         if (true === $this->dc_code($file, $meta)) {
             return true;
@@ -2201,6 +2285,9 @@ class WP_Object_Cache
 
         // bypass emptyache
         $this->ignore_emptycache = $this->cf()->is_dctrue('EMPTYCACHE_IGNORE', true);
+
+        // skip unchanged writes, OPcache only
+        $this->skip_unchanged = $this->cf()->is_dctrue('SKIP_UNCHANGED') && $this->fs()->is_opcache_enable();
 
         // maxfile check
         // true = count file at dc_save, false = will handle by GC.

@@ -639,6 +639,7 @@ final class View
             'flush_stalecache' => esc_html__('Enable this option to allow GC immediately remove the stale cache abandoned by WordPress, WooCommerce and others after doing cache invalidation.', 'docket-cache'),
             'stalecache_ignore' => esc_html__('Enable this option to exclude stale cache created by WordPress, WooCommerce, and others from being stored on disk. Only enable it if you have an issue with inode limits.', 'docket-cache'),
             'emptycache_ignore' => esc_html__('Enable this option to exclude empty caches from being stored on disk. Only enable it if you have an issue with inode limits.', 'docket-cache'),
+            'skip_unchanged' => esc_html__('Skip rewriting a cache file when the object data has not changed, so OPcache does not keep the old copy as wasted memory. Only used when OPcache is enabled.', 'docket-cache'),
             'limithttprequest' => esc_html__('Limit HTTP requests in WP Admin.', 'docket-cache'),
             'transientdb' => esc_html__('WordPress by default converts Transients as persistent object caching when available. Enable this option to persist Transients in the Database.', 'docket-cache'),
             'rtpostautosave' => esc_html__('WordPress by default automatically saves a draft every 1 minute when editing or create a new post. Changing this behaviour can reduce the usage of server resource.', 'docket-cache'),

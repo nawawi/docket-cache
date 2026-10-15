@@ -4,7 +4,7 @@ Tags: object cache, OPcache, cache, database, performance
 Requires at least: 5.4
 Tested up to: 7.1
 Requires PHP: 7.2.5
-Stable tag: 26.04.11
+Stable tag: 26.04.12
 License: MIT
 License URI: https://github.com/nawawi/docket-cache/blob/master/LICENSE.txt
 Donate link: https://docketcache.com/#sponsor
@@ -180,6 +180,11 @@ You can, but if your VPS supports Redis, we recommend using Redis for better per
 Please do manually remove wp-content/object-cache.php and wp-content/cache/docket-cache if an error occurs during updates. Thanks.
 
 == Changelog ==
+= 26.04.12 =
+- Improved: WP_Object_Cache::dc_save() -> Skip writing unchanged values to reduce OPcache wasted memory.
+- Added: DOCKET_CACHE_SKIP_UNCHANGED constant and "Skip Unchanged Cache Writes" option to turn it off.
+- Fixed: Command::dropino_update() -> Wrong command in the WP-CLI help example.
+
 = 26.04.11 =
 - Fixed: Becache::export_transient() -> Transients were returned as serialized strings instead of their original value.
 - Fixed: Becache::export_transient() -> Transient value could be replaced by its timeout, and expired transients were cached.

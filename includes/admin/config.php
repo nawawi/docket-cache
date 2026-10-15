@@ -604,9 +604,15 @@ $this->config_select_set_e(
                 </tr>*/
                 ?>
                 <tr id="emptycache_ignore">
-                    <th class="border-b"><?php $this->opt_title('emptycache_ignore'); ?></th>
+                    <th><?php $this->opt_title('emptycache_ignore'); ?></th>
                     <td>
                         <?php $this->config_select_bool_e('emptycache_ignore'); ?>
+                    </td>
+                </tr>
+                <tr id="skip_unchanged">
+                    <th class="border-b"><?php $this->opt_title('skip_unchanged'); ?></th>
+                    <td>
+                        <?php $this->config_select_bool_e('skip_unchanged'); ?>
                     </td>
                 </tr>
                 <tr>
