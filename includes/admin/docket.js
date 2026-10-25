@@ -200,61 +200,24 @@
                         }
                     );
 
-                var highlight_row = function( selector, lineNum ) {
-                    var val = selector.value;
-                    var arr = val.split( "\n" );
-
-                    var startPos = 0,
-                        endPos = val.length;
-                    for ( var x = 0; x < arr.length; x++ ) {
-                        if ( x == lineNum ) {
-                            break;
-                        }
-                        startPos += ( arr[ x ].length + 1 );
-
-                    }
-
-                    var endPos = arr[ lineNum ].length + startPos;
-
-                    if ( typeof( selector.selectionStart ) != "undefined" ) {
-                        selector.focus();
-                        selector.selectionStart = startPos;
-                        selector.selectionEnd = endPos;
-                        return true;
-                    }
-
-                    if ( document.selection && document.selection.createRange ) {
-                        selector.focus();
-                        selector.select();
-                        var range = document.selection.createRange();
-                        range.collapse( true );
-                        range.moveEnd( "character", endPos );
-                        range.moveStart( "character", startPos );
-                        range.select();
-                        return true;
-                    }
-
-                    return false;
-                };
+                // Row under the click, from the caret.
+                var $vcache_bt = $selector.find( 'a.button-vcache' );
+                var $vcache_info = $selector.find( 'span.vcache' );
+                var $vcache_close = $selector.find( 'a.button-vcache-c' );
 
                 var view_row = function( row ) {
                     var mm = row.match( /\:\s+\"([^"]+)\"\s+/ );
                     if ( mm && mm[ 1 ] ) {
                         var idx = mm[ 1 ];
-                        var $bt = $selector.find( 'a.button-vcache' );
-                        var url = $bt.attr( 'href' );
-
-                        $bt.removeClass( 'hide' );
+                        var url = $vcache_bt.attr( 'href' );
 
                         url = url.replace( /\&vcache=.*/, '' );
                         url = url + '&vcache=' + idx;
-                        $bt.attr( 'href', url );
-                        $selector.find( 'span.vcache' )
-                            .removeClass( 'hide' )
-                            .html( '<strong>Cache Index:</strong> ' + idx );
-
-                        $selector.find( 'a.button-vcache-c' )
+                        $vcache_bt.attr( 'href', url )
                             .removeClass( 'hide' );
+                        $vcache_info.removeClass( 'hide' )
+                            .html( '<strong>Cache Index:</strong> ' + idx );
+                        $vcache_close.removeClass( 'hide' );
                     }
                 };
 
@@ -263,21 +226,17 @@
                         .find( 'textarea#log' )
                         .on(
                             "click.dc-log",
-                            function( e ) {
-                                var $self = $( this );
-                                var sp = $self
-                                    .scrollTop()
-                                var lh = $self
-                                    .css( "line-height" );
-                                lh = parseInt( lh.substring( 0, lh.length - 2 ) );
+                            function() {
+                                var val = this.value;
+                                var pos = this.selectionStart;
+                                var start = pos > 0 ? val.lastIndexOf( "\n", pos - 1 ) + 1 : 0;
+                                var end = val.indexOf( "\n", pos );
+                                if ( end === -1 ) {
+                                    end = val.length;
+                                }
 
-                                var line = Math.floor( ( e.offsetY + sp ) / lh );
-                                var arr = $self
-                                    .val()
-                                    .split( "\n" );
-                                var row = arr[ line ];
-                                view_row( row );
-                                highlight_row( this, line );
+                                view_row( val.substring( start, end ) );
+                                this.setSelectionRange( start, end );
                             }
                         );
                 };

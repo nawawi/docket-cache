@@ -183,6 +183,8 @@ Please do manually remove wp-content/object-cache.php and wp-content/cache/docke
 = 26.04.12 =
 - Added: DOCKET_CACHE_SKIP_UNCHANGED constant and "Skip Unchanged Cache Writes" option to turn it off.
 - Fixed: Command::dropino_update() -> Wrong command in the WP-CLI help example.
+- Fixed: View::parse_log_query() -> Cache View showed "Data Not available" for every cache file.
+- Fixed: Cache Log -> Clicking a row selected a row further down in long logs, and nothing near the end.
 - Improved: WP_Object_Cache::dc_save() -> Skip writing unchanged values to reduce OPcache wasted memory.
 
 = 26.04.11 =

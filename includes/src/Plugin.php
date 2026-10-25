@@ -716,24 +716,36 @@ final class Plugin extends Bepart
     }
 
     /**
+     * cache_file_from_index.
+     */
+    public function cache_file_from_index($index)
+    {
+        // Only a bare cache-file index is valid. Reject path traversal.
+        if (!\is_string($index) || !preg_match('@^[a-z0-9]{12}\-[a-z0-9]{12}$@', $index)) {
+            return false;
+        }
+
+        if ($this->cf()->is_dctrue('CHUNKCACHEDIR')) {
+            $part = explode('-', $index);
+
+            return $this->cache_path.$this->get_chunk_path($part[0], $part[1]).$index.'.php';
+        }
+
+        return $this->cache_path.$index.'.php';
+    }
+
+    /**
      * flush_fcache.
      */
     public function flush_fcache(&$file = '')
     {
         if (!empty($_GET['idxv'])) {
-            $fx = sanitize_text_field($_GET['idxv']);
-
-            // Only a bare cache-file index is valid. Reject path traversal.
-            if (!preg_match('@^[a-z0-9]{12}\-[a-z0-9]{12}$@', $fx)) {
+            $fx = $this->cache_file_from_index(sanitize_text_field($_GET['idxv']));
+            if (false === $fx) {
                 return true;
             }
 
-            $file = $this->cache_path.$fx.'.php';
-            if ($this->cf()->is_dctrue('CHUNKCACHEDIR')) {
-                $part = explode('-', $fx);
-                $file = $this->cache_path.$this->get_chunk_path($part[0], $part[1]).$fx.'.php';
-            }
-
+            $file = $fx;
             if (@is_file($file) && $this->is_docketcachefile($file)) {
                 $this->co()->clear_part('cachestats');
 

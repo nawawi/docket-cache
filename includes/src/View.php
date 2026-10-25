@@ -98,17 +98,9 @@ final class View
         $ret->row_size = 15;
 
         if ($this->has_vcache()) {
-            $cache_path = $this->pt->cache_path;
-            $vache = $this->idx_vcache();
-            if ($this->pt->cf()->is_dctrue('CHUNKCACHEDIR')) {
-                $part = explode('-', $vache);
-                if (isset($part[1])) {
-                    $vache = $this->pt->get_chunk_path($part[0], $part[1]).$vache;
-                }
-            }
-            $file = $cache_path.$vache.'.php';
-            $file = sanitize_file_name($file);
-            if ($this->pt->filesize($file) > 0) {
+            // Not sanitize_file_name(), it strips the slashes.
+            $file = $this->pt->cache_file_from_index($this->idx_vcache());
+            if (false !== $file && $this->pt->is_docketcachefile($file) && $this->pt->filesize($file) > 0) {
                 $data = $this->pt->cache_get($file);
                 if (false !== $data) {
                     $ret->output = $this->pt->export_var($data);
