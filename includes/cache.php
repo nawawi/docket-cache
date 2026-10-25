@@ -1584,6 +1584,12 @@ class WP_Object_Cache
         }
 
         $code = $this->fs()->code_stub($data);
+
+        // Hash, expiry and write time on the first line, for dc_unchanged(). code_stub() starts with "<?php ".
+        if (isset($arr['hash'])) {
+            $code = '<?php /*dc:'.$arr['hash'].' '.(int) $arr['timeout'].' '.(int) $arr['timestamp'].'*/ '.substr($code, 6);
+        }
+
         $stat = $this->fs()->dump($file, $code, false); // 3rd param = validate
 
         if (false === $stat) {
@@ -1603,12 +1609,31 @@ class WP_Object_Cache
     }
 
     /**
+     * dc_content_hash.
+     */
+    private function dc_content_hash($meta, $serialized)
+    {
+        static $algo = null;
+        if (null === $algo) {
+            // xxh128 is faster, PHP 8.1+.
+            $algo = \in_array('xxh128', hash_algos(), true) ? 'xxh128' : 'md5';
+        }
+
+        // Covers the fields as well as the data, so equal hashes mean the same file content.
+        $ctx = hash_init($algo);
+        hash_update($ctx, $meta['sv']."\0".($meta['network_id'] ?? '')."\0".$meta['site_id']."\0".$meta['group']."\0".$meta['key']."\0".$meta['type']."\0");
+        hash_update($ctx, $serialized);
+
+        return hash_final($ctx);
+    }
+
+    /**
      * dc_unchanged.
      */
     private function dc_unchanged($file, $meta, $expire)
     {
         // Hash differs from the file read in this request: changed, no need to read it again.
-        if (isset($meta['hash'], $this->dc_hash[$meta['group']][$meta['key']]) && $this->dc_hash[$meta['group']][$meta['key']] !== $meta['hash']) {
+        if (isset($this->dc_hash[$meta['group']][$meta['key']]) && $this->dc_hash[$meta['group']][$meta['key']] !== $meta['hash']) {
             return false;
         }
 
@@ -1617,33 +1642,31 @@ class WP_Object_Cache
             return false;
         }
 
-        $old = $this->fs()->cache_get($file);
-        if (empty($old) || !\is_array($old) || !\array_key_exists('data', $old)) {
+        // Read the first line from disk, not the file through include. OPcache may still hold an older copy
+        // when WP-CLI or another server wrote the file. A file without the line is rewritten once.
+        $handle = @fopen($file, 'rb');
+        if (false === $handle) {
+            return false;
+        }
+        $head = (string) @fread($handle, 128);
+        @fclose($handle);
+
+        if (!preg_match('@^<\?php /\*dc:([0-9a-f]+) (\d+) (\d+)\*/@', $head, $match) || $match[1] !== $meta['hash']) {
             return false;
         }
 
-        foreach (['sv', 'site_id', 'group', 'key', 'type'] as $name) {
-            if (!isset($old[$name]) || $old[$name] !== $meta[$name]) {
-                return false;
-            }
-        }
-
-        // Rewrite when under 90% of the lifetime is left.
-        $old_timeout = (int) ($old['timeout'] ?? 0);
+        // Rewrite when under 90% of the lifetime is left, or the old expiry outlives the new one.
+        $old_timeout = (int) $match[2];
         if (0 === $meta['timeout']) {
             if (0 !== $old_timeout) {
                 return false;
             }
-        } elseif ($old_timeout < $meta['timeout'] - (int) ($expire / 10)) {
+        } elseif ($old_timeout > $meta['timeout'] || $old_timeout < $meta['timeout'] - (int) ($expire / 10)) {
             return false;
         }
 
-        // Serialized values: compare hashes. Scalars: compare as is.
-        if (isset($meta['hash'])) {
-            return isset($old['hash']) && $old['hash'] === $meta['hash'];
-        }
-
-        return !isset($old['hash']) && $old['data'] === $meta['data'];
+        // Rewrite after 10% of maxttl, so GC does not remove it by mtime.
+        return (int) $match[3] >= time() - (int) ($this->cache_maxttl / 10);
     }
 
     /**
@@ -1789,13 +1812,9 @@ class WP_Object_Cache
         // and maxttl constants.
         $meta['timeout'] = $timeout;
 
-        // Content hash, to skip unchanged writes. xxh128 is faster, PHP 8.1+.
-        if ($this->skip_unchanged && isset($serialized)) {
-            static $algo = null;
-            if (null === $algo) {
-                $algo = \in_array('xxh128', hash_algos(), true) ? 'xxh128' : 'md5';
-            }
-            $meta['hash'] = hash($algo, $serialized);
+        // Content hash, to skip unchanged writes. Scalars and empty values were not serialized above.
+        if ($this->skip_unchanged) {
+            $meta['hash'] = $this->dc_content_hash($meta, isset($serialized) ? $serialized : serialize($data));
         }
 
         // Before code_stub.

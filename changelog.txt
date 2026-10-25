@@ -1,7 +1,7 @@
 = v26.04.12 =
-- Improved: WP_Object_Cache::dc_save() -> Skip writing unchanged values to reduce OPcache wasted memory.
 - Added: DOCKET_CACHE_SKIP_UNCHANGED constant and "Skip Unchanged Cache Writes" option to turn it off.
 - Fixed: Command::dropino_update() -> Wrong command in the WP-CLI help example.
+- Improved: WP_Object_Cache::dc_save() -> Skip writing unchanged values to reduce OPcache wasted memory.
 
 = v26.04.11 (2026-10-15) =
 - Fixed: Becache::export_transient() -> Transients were returned as serialized strings instead of their original value.
