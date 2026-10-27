@@ -185,6 +185,8 @@ Please do manually remove wp-content/object-cache.php and wp-content/cache/docke
 - Fixed: Command::dropino_update() -> Wrong command in the WP-CLI help example.
 - Fixed: View::parse_log_query() -> Cache View showed "Data Not available" for every cache file.
 - Fixed: Cache Log -> Clicking a row selected a row further down in long logs, and nothing near the end.
+- Fixed: Plugin::register_tweaks() -> WordPress Translation Caching looped until a fatal error with WPML String Translation.
+- Fixed: Plugin::register_tweaks() -> WordPress Translation Caching gave text domains that were not loaded the translations of another domain.
 - Improved: WP_Object_Cache::dc_save() -> Skip writing unchanged values to reduce OPcache wasted memory.
 
 = 26.04.11 =

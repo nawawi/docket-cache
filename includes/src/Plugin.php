@@ -2321,12 +2321,18 @@ final class Plugin extends Bepart
                             return false;
                         }
 
-                        $l10n = $GLOBALS['l10n'];
-                        $upstream = empty($l10n[$domain]) ? null : $l10n[$domain];
-                        $mo = new MoCache($mofile, $domain, $upstream);
-                        $l10n[$domain] = $mo;
+                        $upstream = empty($GLOBALS['l10n'][$domain]) ? null : $GLOBALS['l10n'][$domain];
 
-                        $GLOBALS['l10n'] = $l10n;
+                        // Skip empty placeholders such as WPML JustInTime\MO. They loop back into MoCache.
+                        if ($upstream instanceof \NOOP_Translations || ($upstream instanceof \Translations && empty($upstream->entries))) {
+                            $upstream = null;
+                        }
+
+                        $mo = new MoCache($mofile, $domain, $upstream);
+
+                        // Unset like core. It may be the shared NOOP_Translations reference.
+                        unset($GLOBALS['l10n'][$domain]);
+                        $GLOBALS['l10n'][$domain] = $mo;
 
                         return true;
                     },
