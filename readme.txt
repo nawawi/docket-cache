@@ -187,7 +187,7 @@ Please do manually remove wp-content/object-cache.php and wp-content/cache/docke
 - Fixed: Cache Log -> Clicking a row selected a row further down in long logs, and nothing near the end.
 - Fixed: Plugin::register_tweaks() -> WordPress Translation Caching looped until a fatal error with WPML String Translation.
 - Fixed: Plugin::register_tweaks() -> WordPress Translation Caching gave text domains that were not loaded the translations of another domain.
-- Fixed: Filesystem::opcache_compile() -> Cache files rewritten within the same second stayed stale when the host blocks opcache_invalidate().
+- Fixed: Filesystem::opcache_compile() -> Cache files rewritten within the same second stayed stale when the host blocks opcache_invalidate() or the write came from WP-CLI.
 - Improved: WP_Object_Cache::dc_save() -> Skip writing unchanged values to reduce OPcache wasted memory.
 
 = 26.04.11 =

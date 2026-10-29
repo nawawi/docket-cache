@@ -869,8 +869,10 @@ class Filesystem
             return $can;
         }
 
+        // CLI has its own OPcache. Invalidate there does not reach the web server.
+        $can = 'cli' !== \PHP_SAPI && $this->opcache_function_exists('opcache_invalidate');
+
         // Same check as wp_opcache_invalidate().
-        $can = $this->opcache_function_exists('opcache_invalidate');
         $api = $can ? (string) \ini_get('opcache.restrict_api') : '';
         if ('' !== $api) {
             $script = !empty($_SERVER['SCRIPT_FILENAME']) ? realpath($_SERVER['SCRIPT_FILENAME']) : false;
