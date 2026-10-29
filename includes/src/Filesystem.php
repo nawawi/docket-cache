@@ -860,6 +860,27 @@ class Filesystem
     }
 
     /**
+     * opcache_can_invalidate.
+     */
+    public function opcache_can_invalidate()
+    {
+        static $can = null;
+        if (null !== $can) {
+            return $can;
+        }
+
+        // Same check as wp_opcache_invalidate().
+        $can = $this->opcache_function_exists('opcache_invalidate');
+        $api = $can ? (string) \ini_get('opcache.restrict_api') : '';
+        if ('' !== $api) {
+            $script = !empty($_SERVER['SCRIPT_FILENAME']) ? realpath($_SERVER['SCRIPT_FILENAME']) : false;
+            $can = false !== $script && 0 === stripos($script, $api);
+        }
+
+        return $can;
+    }
+
+    /**
      * opcache_is_cached.
      */
     public function opcache_is_cached($file)
@@ -915,6 +936,11 @@ class Filesystem
     public function opcache_compile($file)
     {
         if (!$this->is_opcache_enable()) {
+            return false;
+        }
+
+        // Without invalidate, the touch leaves same-second rewrites stale.
+        if (!$this->opcache_can_invalidate()) {
             return false;
         }
 
