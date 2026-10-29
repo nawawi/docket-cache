@@ -680,7 +680,7 @@ class Filesystem
         }
 
         foreach ($list as $func) {
-            if (!$this->is_function_disabled($name) && \function_exists($func)) {
+            if (!$this->is_function_disabled($func) && \function_exists($func)) {
                 return true;
             }
         }
