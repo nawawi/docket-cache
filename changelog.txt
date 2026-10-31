@@ -1,4 +1,4 @@
-= v26.04.12 =
+= v26.04.12 (2026-11-01) =
 - Added: DOCKET_CACHE_SKIP_UNCHANGED constant and "Skip Unchanged Cache Writes" option to turn it off.
 - Fixed: Command::dropino_update() -> Wrong command in the WP-CLI help example.
 - Fixed: View::parse_log_query() -> Cache View showed "Data Not available" for every cache file.
